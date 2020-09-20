@@ -1,0 +1,9 @@
+*.pyc
+venv
+static_root
+logs
+media
+.idea
+env.yaml
+env.prod.yaml
+*.sqlite3
