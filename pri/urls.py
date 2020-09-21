@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf.urls import static
+from django.conf import settings
 from rentals import views as rentals_views
 
 urlpatterns = [
@@ -25,3 +27,7 @@ urlpatterns = [
     # at a specified mount point.
     path('', rentals_views.HomeView.as_view(), name='home'),
 ]
+
+# This maps the MEDIA_ROOT url for local development
+if settings.DEBUG:
+    urlpatterns += static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
