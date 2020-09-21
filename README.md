@@ -55,11 +55,11 @@ Models (code representations of database tables) reside in `models.py`.
 Views (code which responds to a request with data which may be derived from models and either rendered to an HTML template or 
 returned in structured JSON) live in `views.py`.
 
-There are a few different ways to build views; the old-style, function-based views, map more or less logically to the code we have
+- There are a few different ways to build views; the old-style, function-based views, map more or less logically to the code we have
 in the old app, whereas class-based views (for example `TemplateView`) are a more flexible and semantic approach. Look up both
 in the Django docs.
 
-In either case, the views are where database queries are done (using the Django ORM language) and the results passed to the 
+- In either case, the views are where database queries are done (using the Django ORM language) and the results passed to the 
 template using the context dict. The template contains only minimal flow-control logic and presentation-layer formatting tags.
 
 `urls.py` in each app directory defines the URL patterns which map to specific views. Each app's `urls.py` is conventionally 
