@@ -37,8 +37,9 @@ If you are using PyCharm, you will need to configure it to look in your venv for
 - In *Python Interpreter*, if the "Python Interpreter" selector does not point to the python executable in your project's venv,
 you will need to click the gear icon and "Add", then select "Existing environment". Use the "..." button to navigate to the 
 project's venv and the `venv/bin/python` binary.
-- Open a new Terminal window. If the prompt shows `(venv)`, it is using the venv correctly. You can run `./manage.py` to verify
-that it correctly executes within the environment (it will list available commands if working correctly).
+- Open a new Terminal window (using PyCharm's built-in Terminal pane). If the prompt shows `(venv)`, it is using the venv 
+correctly. You can run `./manage.py` to verify that it correctly executes within the environment (it will list available 
+commands if working correctly).
 - If using PyCharm Professional (which has built-in Django support), you may additionally want to set up a default runner
 environment using the "Add Configuration" button in the top toolbar. Select "Django Server", then "Create configuration", 
 and enter "PRI" for the configuration name. You will now be able to start up a regular or debug local app server environment
