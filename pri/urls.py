@@ -26,7 +26,7 @@ urlpatterns = [
     # it might be better for each app dir to have its own urls.py and for this file to include that app's urls.py
     # at a specified mount point.
     path('', rentals_views.HomeView.as_view(), name='home'), # Class-based view version
-#    path('', rentals_views.home, name='home'), # Function-based view version
+    # path('', rentals_views.home, name='home'), # Function-based view version
 ]
 
 # This maps the MEDIA_ROOT url for local development
