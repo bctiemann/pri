@@ -125,6 +125,13 @@ for yourself, `./manage.py createsuperuser`
 Each model you create will need to be registered via the `admin.py` module in the appropriate app, in order for it to appear
 in the admin.
 
+### Django Shell and direct DB access
+
+Use `./manage.py shell` to invoke a Python REPL/shell which allows you to do direct code experimentaiton within the Django
+environment. The `ipython` repl variant is installed which provides a richer shell with history processing and other useful features.
+
+Use `./manage.py dbshell` to get a native CLI shell into the local database instance, whichever DB engine is being used.
+
 ## Django documentation
 
 https://docs.djangoproject.com/en/3.1/
