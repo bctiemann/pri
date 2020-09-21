@@ -8,7 +8,7 @@ from rentals.models import Vehicle
 def home(request):
     context = {
         'foo': 'bar',
-        'vehicles': Vehicle.objects.all()
+        'cars': Vehicle.objects.filter(vehicle_type=Vehicle.VehicleType.CAR.value)
     }
     return render(request, 'home.html', context=context)
 
@@ -21,5 +21,5 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['foo'] = 'bar'
-        context['vehicles'] = Vehicle.objects.all()
+        context['cars'] = Vehicle.objects.filter(vehicle_type=Vehicle.VehicleType.CAR.value)
         return context
