@@ -65,8 +65,8 @@ core entry point modules.
 ### env.yaml (local environment overrides)
 
 As standard, Django takes its central settings from the `settings.py` file in the main project directory (i.e. `pri`). However,
-I have added an `env.template.yaml` which you should copy to `env.yaml` in your local environment and in any additional env
-where the app will be deployed.
+I have added an `env.template.yaml` which you should use as a basis to create an `env.yaml` file in your local environment 
+and in any additional env where the app will be deployed.
 
 The localized `env.yaml` files allow us to set different values for settings such as `STATIC_ROOT` and other deployment-sensitive
 variations depending on the environment, without maintaining separate versions of `settings.py` in code and having to switch
@@ -74,16 +74,21 @@ between them.
 
 Any secrets/passwords/sensitive strings should be put in this yaml file; its contents will 
 be merged into `settings.py` and made available to the app. The secrets can be stored separately from the main source repo
-and shared directly between developers. In production deployments, env.yaml should be made readable only by the web user. 
+and shared directly between developers. In production deployments, `env.yaml` should be made readable only by the web user. 
 This is how we keep secrets out of source control.  
 
-For local development, your `env.yaml` only needs to have:
+For local development, your `env.yaml` minimally only needs to have:
 
 ```
 SECRET_KEY: <secret_key>
 ```
 
 If you want to use MySQL for local dev, add a `DATABASES` block following the example in `env.template.yaml`.
+
+`env.yaml` and `env.template.yaml` should be kept as small as possible, containing only those override values necessary
+for the localize environment. `settings.py` itself should have development-like settings for all its contents (so a developer
+who does not create an `env.yaml` file can ideally get up and running with minimal changes). `env.template.yaml` should indicate
+all settings that will need to be filled in for production.
 
 ### ORM and Database management: Migrations
 
