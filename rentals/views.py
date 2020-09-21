@@ -8,7 +8,7 @@ from rentals.models import Vehicle
 def home(request):
     context = {
         'foo': 'bar',
-        'cars': Vehicle.objects.filter(vehicle_type=Vehicle.VehicleType.CAR.value)
+        'cars': Vehicle.objects.filter(vehicle_type=Vehicle.VehicleType.CAR.value),
     }
     return render(request, 'home.html', context=context)
 
