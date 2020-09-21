@@ -13,12 +13,13 @@ class Vehicle(models.Model):
     # Model field names should be verbose, specific, and expressive; i.e. "vehicle_type" rather than "vtype"
     make = models.CharField(max_length=255, blank=True)
     model = models.CharField(max_length=255, blank=True)
+    year = models.IntegerField(blank=True)
     vehicle_type = models.CharField(choices=VehicleType.choices, max_length=20, blank=True)
 
     # Example of a model property which produces a derived value (requires no params other than self)
     @property
     def vehicle_name(self):
-        return f'{self.make} {self.model}'
+        return f'{self.year} {self.make} {self.model}'
 
     # Example of a model method taking one or more params - invoke like vehicle.is_available(date_start, date_end)
     def is_available(self, date_start, date_end):
