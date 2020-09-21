@@ -11,6 +11,8 @@ class Vehicle(models.Model):
 
     # Fields defined on the model correspond to database columns and fully define their behavior both in DB and in code.
     # Model field names should be verbose, specific, and expressive; i.e. "vehicle_type" rather than "vtype"
+    # Note that an auto-incrementing integer "id" field is implicit in all models, unless overridden using the
+    # "primary_key" property on a custom defined field
     make = models.CharField(max_length=255, blank=True)
     model = models.CharField(max_length=255, blank=True)
     year = models.IntegerField(blank=True)
@@ -28,4 +30,4 @@ class Vehicle(models.Model):
 
     # This is the string representation of the vehicle object; will be used in the admin, templates, etc. as a default
     def __str__(self):
-        return self.vehicle_name
+        return f'[{self.id}] {self.vehicle_name}'
