@@ -58,7 +58,7 @@ There are a few different ways to build views; the old-style, function-based vie
 in the old app, whereas class-based views (for example `TemplateView`) are a more flexible and semantic approach. Look up both
 in the Django docs.
 
-`urls.py` in each app directory define the URL patterns which map to specific views. Each app's `urls.py` is conventionally 
+`urls.py` in each app directory defines the URL patterns which map to specific views. Each app's `urls.py` is conventionally 
 mapped to a central `urls.py` which exists in the main `pri` directory, which also houses the project's `settings.py` and 
 core entry point modules.
 
@@ -66,17 +66,23 @@ core entry point modules.
 
 As standard, Django takes its central settings from the `settings.py` file in the main project directory (i.e. `pri`). However,
 I have added an `env.template.yaml` which you should copy to `env.yaml` in your local environment and in any additional env
-where the app will be deployed. Any secrets/passwords/sensitive strings should be put in this yaml file; its contents will 
+where the app will be deployed.
+
+The localized `env.yaml` files allow us to set different values for settings such as `STATIC_ROOT` and other deployment-sensitive
+variations depending on the environment, without maintaining separate versions of `settings.py` in code and having to switch
+between them.
+
+Any secrets/passwords/sensitive strings should be put in this yaml file; its contents will 
 be merged into `settings.py` and made available to the app. The secrets can be stored separately from the main source repo
-and shared directly. In production deployments, env.yaml should be made readable only by the web user. This is how we keep 
-secrets out of source control.  
+and shared directly between developers. In production deployments, env.yaml should be made readable only by the web user. 
+This is how we keep secrets out of source control.  
 
 ### ORM and Database management: Migrations
 
 It is important to drive and track all database changes in code rather than by directly manipulating the DB. This is the
 purpose of migrations.
 
-Each time you make a change to a model in the ORM  (i.e. in a `models.py` file), you should run `./manage.py makemigration` 
+Each time you make a change to a model in the ORM  (i.e. in a `models.py` file), you should run `./manage.py makemigrations` 
 to auto-generate migration files capturing the changes to the model, which translate to appropriate DB alterations for the 
 DB backend in use for a given environment. Then you can run `./manage.py migrate` to apply the migrations. Be sure to add 
 your newly created migration files to your git checkins.
@@ -119,3 +125,6 @@ for yourself, `./manage.py createsuperuser`
 Each model you create will need to be registered via the `admins.py` module in the appropriate app, in order for it to appear
 in the admin.
 
+## Django documentation
+
+https://docs.djangoproject.com/en/3.1/
