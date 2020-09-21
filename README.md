@@ -90,7 +90,7 @@ SECRET_KEY: <secret_key>
 If you want to use MySQL for local dev, add a `DATABASES` block following the example in `env.template.yaml`.
 
 `env.yaml` and `env.template.yaml` should be kept as small as possible, containing only those override values necessary
-for the localize environment. `settings.py` itself should have development-like settings for all its contents (so a developer
+for the localized environment. `settings.py` itself should have development-like settings for all its contents (so a developer
 who does not create an `env.yaml` file can ideally get up and running with minimal changes). `env.template.yaml` should indicate
 all settings that will need to be filled in for production.
 
