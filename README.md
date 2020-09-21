@@ -59,6 +59,9 @@ There are a few different ways to build views; the old-style, function-based vie
 in the old app, whereas class-based views (for example `TemplateView`) are a more flexible and semantic approach. Look up both
 in the Django docs.
 
+In either case, the views are where database queries are done (using the Django ORM language) and the results passed to the 
+template using the context dict. The template contains only minimal flow-control logic and presentation-layer formatting tags.
+
 `urls.py` in each app directory defines the URL patterns which map to specific views. Each app's `urls.py` is conventionally 
 mapped to a central `urls.py` which exists in the main `pri` directory, which also houses the project's `settings.py` and 
 core entry point modules.
