@@ -62,6 +62,11 @@ in the Django docs.
 - In either case, the views are where database queries are done (using the Django ORM language) and the results passed to the 
 template using the context dict. The template contains only minimal flow-control logic and presentation-layer formatting tags.
 
+- Ideally, view logic should be sparse as well; any methods or logic which processes or transforms data from the database
+should reside in the models, i.e. as properties or model methods, which can then be invoked on the model instances returned
+by the ORM. See `rentals.models.Vehicle` for an example model class demonstrating these approaches. (This follows the
+model-view-controller principle of separation of concerns)
+
 `urls.py` in each app directory defines the URL patterns which map to specific views. Each app's `urls.py` is conventionally 
 mapped to a central `urls.py` which exists in the main `pri` directory, which also houses the project's `settings.py` and 
 core entry point modules.
