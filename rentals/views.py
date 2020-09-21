@@ -1,10 +1,15 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
 
+from rentals.models import Vehicle
+
 
 # Function-based view
 def home(request):
-    context = {'foo': 'bar'}
+    context = {
+        'foo': 'bar',
+        'vehicles': Vehicle.objects.all()
+    }
     return render(request, 'home.html', context=context)
 
 
@@ -16,4 +21,5 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['foo'] = 'bar'
+        context['vehicles'] = Vehicle.objects.all()
         return context

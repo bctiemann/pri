@@ -32,3 +32,7 @@ class Vehicle(models.Model):
     # This is the string representation of the vehicle object; will be used in the admin, templates, etc. as a default
     def __str__(self):
         return f'[{self.id}] {self.vehicle_name}'
+
+    # Meta subclass is used for defining attributes like default ordering
+    class Meta:
+        ordering = 'year',
