@@ -50,7 +50,7 @@ Functionality within Django is organized into "apps" within the project. A basic
 core business logic. More apps can be created if desired to keep functionality segregated. Note that each app you add (via 
 `./manage.py startapp <app>`) needs to be added to `INSTALLED_APPS` in the settings in order for it to be recognized by Django.
 
-Models (code representations of database tables) reside in `models.py`.
+Models (code representations of database tables, and all object-oriented code surrounding them) reside in `models.py`.
 
 Views (code which responds to a request with data which may be derived from models and either rendered to an HTML template or 
 returned in structured JSON) live in `views.py`.
