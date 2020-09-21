@@ -119,10 +119,10 @@ in a view, put it in the main top-level `templates` directory.
 ### Django Admin
 
 The standard Django Admin interface is available at http://127.0.0.1/spork/. This provides the ability to do basic database
-maintenance, CRUD operations, and other standard maintenance tasks. Give yourself access to the admin by creating a superuser account 
+manipulation, CRUD operations, and other standard maintenance tasks. Give yourself access to the admin by creating a superuser account 
 for yourself, `./manage.py createsuperuser`
 
-Each model you create will need to be registered via the `admins.py` module in the appropriate app, in order for it to appear
+Each model you create will need to be registered via the `admin.py` module in the appropriate app, in order for it to appear
 in the admin.
 
 ## Django documentation
