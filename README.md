@@ -1,0 +1,121 @@
+# PRI Django
+
+This is the Python/Django implementation of the Performance Rentals shopping/rental/ecommerce website.
+
+## Installation
+
+Development should be done in a local environment using a sqlite (default) or MySQL/PostgreSQL database instance.
+
+Django provides a testing app runner via the `manage.py` command, i.e. `./manage.py runserver` (see below)
+
+To set up your local environment, you will need to create a python virtualenv.
+
+### Virtualenv Setup
+
+- Ensure you have a recent version of Python installed locally. This project is built for Python 3.8.
+- You will also need `pip` (normally installed as part of Python) and Virtualenv which can be installed from https://sourabhbajaj.com/mac-setup/Python/virtualenv.html
+Virtualenv is a means of localizing a python environment and its installed packages to a specific project, so changes to
+the OS-level Python do not affect your development environment.
+- Once you have virtualenv, cd into the root directory of this project and enter: 
+`virtualenv venv --python=<path/to/python>`
+- Then activate the virtualenv (which sets the enviroment vars to use the localized python for this shell only):
+`. venv/bin/activate` (other activate commands exist for non-bash shells)
+- You can deactivate the shell's environment at any time with `deactivate`. Or just close the shell, it is not persistent.
+- You can now install the project's Python requirement libraries:
+`pip install -r requirements.txt`
+- Check the installed libraries using `pip freeze`
+- Finally, set up your local database using `./manage.py migrate`. This will create the SQLite database using all existing migrations
+and sync the tables with the models in code.
+- You can now run the app using `./manage.py runserver [8000]` and connect to it locally at http://127.0.0.1:8000
+
+### PyCharm Setup
+
+If you are using PyCharm, you will need to configure it to point its built-in Python interpreter to your venv.
+
+- Go to *Preferences > Project: pri_dj*
+- In *Python Interpreter*, if the "Python Interpreter" selector does not point to the python executable in your project's venv,
+you will need to click the gear icon and "Add", then select "Existing environment". Use the "..." button to navigate to the 
+project's venv and the `venv/bin/python` binary.
+- Open a new Terminal window. If the prompt shows `(venv)`, it is using the venv correctly. You can run `./manage.py` to verify
+that it correctly executes within the environment (it will list available commands if working correctly).
+- If using PyCharm Professional (which has built-in Django support), you may additionally want to set up a default runner
+environment using the "Add Configuration" button in the top toolbar. Select "Django Server", then "Create configuration", 
+and enter "PRI" for the configuration name. You will now be able to start up a regular or debug local app server environment
+using the buttons to the right of the configuration.
+
+### Django Structure
+
+Functionality within Django is organized into "apps" within the project. A basic `rentals` app/directory has been created which contains
+core business logic. More apps can be created if desired to keep functionality segregated. Note that each app you add (via 
+`./manage.py startapp <app>`) needs to be added to `INSTALLED_APPS` in the settings in order for it to be recognized by Django.
+
+Models (code representations of database tables) reside in `models.py`.
+
+Views (code which responds to a request with data which may be derived from models and either rendered to an HTML template or 
+returned in structured JSON) live in `views.py`.
+
+There are a few different ways to build views; the old-style, function-based views, map more or less logically to the code we have
+in the old app, whereas class-based views (for example `TemplateView`) are a more flexible and semantic approach. Look up both
+in the Django docs.
+
+`urls.py` in each app directory define the URL patterns which map to specific views. Each app's `urls.py` is conventionally 
+mapped to a central `urls.py` which exists in the main `pri` directory, which also houses the project's `settings.py` and 
+core entry point modules.
+
+### env.yaml (local environment overrides)
+
+As standard, Django takes its central settings from the `settings.py` file in the main project directory (i.e. `pri`). However,
+I have added an `env.template.yaml` which you should copy to `env.yaml` in your local environment and in any additional env
+where the app will be deployed. Any secrets/passwords/sensitive strings should be put in this yaml file; its contents will 
+be merged into `settings.py` and made available to the app. The secrets can be stored separately from the main source repo
+and shared directly. In production deployments, env.yaml should be made readable only by the web user. This is how we keep 
+secrets out of source control.  
+
+### ORM and Database management: Migrations
+
+It is important to drive and track all database changes in code rather than by directly manipulating the DB. This is the
+purpose of migrations.
+
+Each time you make a change to a model in the ORM  (i.e. in a `models.py` file), you should run `./manage.py makemigration` 
+to auto-generate migration files capturing the changes to the model, which translate to appropriate DB alterations for the 
+DB backend in use for a given environment. Then you can run `./manage.py migrate` to apply the migrations. Be sure to add 
+your newly created migration files to your git checkins.
+
+The first task as part of building this application should be to capture the entire database schema in Django models, and 
+make it reproducible using migrations (including data migrations if necessary to fill in fixtures and architectural data —
+see https://docs.djangoproject.com/en/3.1/topics/migrations/#data-migrations)
+
+### API
+
+It is good practice, for a "hybrid" style website like this one (i.e. contains both server-rendered template views, and raw
+JSON APIs for consumption by SPAs and mobile apps), to have a separate "api" app which segregates out the views that are used
+in the latter pattern. It will prove useful to use the Django REST Framework (https://www.django-rest-framework.org) for 
+producing this view logic, and for handling RESTful, CRUD type operations with a minimum of custom work. There will be some 
+need for custom logic, mapping to the functions in the `porknbeans.cfc` library in the old codebase; for this you can use
+DRF serializers by overriding the `create` method (or other methods corresponding to pertinent CRUD operations) as necessary.
+
+### Static Files & Media
+
+Static files (images, js, css, etc) necessary for the infrastructure of the site are kept in `static` directories scoped to each
+app directory. When deploying, run `./manage.py collectstatic` to gather all these static assets into the `/static_root` directory
+which should be mapped to an Apache alias which serves them straight through without reverse proxy processing.
+
+Media files (changeable site content) will live in the `media` directory.
+
+Both these paths are controlled via the `settings.py` which is overridden locally in `env.yaml`.
+
+### Templates
+
+HTML templates are stored in `templates` directories scoped to each app, as well as in a global `templates` directory (to reduce
+the redundancy in the path made necessary by having per-app templates -- long story). TL;DR: to refer to a file called `template.html`
+in a view, put it in the main top-level `templates` directory.
+
+### Django Admin
+
+The standard Django Admin interface is available at http://127.0.0.1/spork/. This provides the ability to do basic database
+maintenance, CRUD operations, and other standard maintenance tasks. Give yourself access to the admin by creating a superuser account 
+for yourself, `./manage.py createsuperuser`
+
+Each model you create will need to be registered via the `admins.py` module in the appropriate app, in order for it to appear
+in the admin.
+

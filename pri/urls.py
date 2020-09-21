@@ -15,7 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from rentals import views as rentals_views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('spork/', admin.site.urls),
+
+    # This is an example of directly registering an app's views in the central site's urls.py. As the site grows,
+    # it might be better for each app dir to have its own urls.py and for this file to include that app's urls.py
+    # at a specified mount point.
+    path('', rentals_views.HomeView.as_view(), name='home'),
 ]
