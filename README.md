@@ -31,7 +31,7 @@ and sync the tables with the models in code.
 
 ### PyCharm Setup
 
-If you are using PyCharm, you will need to configure it to point its built-in Python interpreter to your venv.
+If you are using PyCharm, you will need to configure it to look in your venv for the Python interpreter to use.
 
 - Go to *Preferences > Project: pri_dj*
 - In *Python Interpreter*, if the "Python Interpreter" selector does not point to the python executable in your project's venv,
