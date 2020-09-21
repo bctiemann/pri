@@ -3,10 +3,14 @@ from django.db import models
 
 class Vehicle(models.Model):
 
+    # TextChoices and IntegerChoices are enum classes with internal and verbose values; if a CharField is set to use
+    # this object for its choices, it will be represented in the admin with a select dropdown of acceptable values.
     class VehicleType(models.TextChoices):
         CAR = ('car', 'Car')
         BIKE = ('bike', 'Bike')
 
+    # Fields defined on the model correspond to database columns and fully define their behavior both in DB and in code.
+    # Model field names should be verbose, specific, and expressive; i.e. "vehicle_type" rather than "vtype"
     make = models.CharField(max_length=255, blank=True)
     model = models.CharField(max_length=255, blank=True)
     vehicle_type = models.CharField(choices=VehicleType.choices, max_length=20, blank=True)
