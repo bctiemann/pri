@@ -77,6 +77,14 @@ be merged into `settings.py` and made available to the app. The secrets can be s
 and shared directly between developers. In production deployments, env.yaml should be made readable only by the web user. 
 This is how we keep secrets out of source control.  
 
+For local development, your `env.yaml` only needs to have:
+
+```
+SECRET_KEY: <secret_key>
+```
+
+If you want to use MySQL for local dev, add a `DATABASES` block following the example in `env.template.yaml`.
+
 ### ORM and Database management: Migrations
 
 It is important to drive and track all database changes in code rather than by directly manipulating the DB. This is the
