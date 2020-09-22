@@ -128,8 +128,10 @@ DRF serializers by overriding the `create` method (or other methods correspondin
 Static files (images, js, css, etc) necessary for the infrastructure of the site are kept in `static` directories scoped to each
 app directory. When deploying, run `./manage.py collectstatic` to gather all these static assets into the `/static_root` directory
 which should be mapped to an Apache alias which serves them straight through without reverse proxy processing.
+https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 Media files (changeable site content) will live in the `media` directory.
+https://docs.djangoproject.com/en/3.1/ref/settings/#media-root
 
 Both these paths are controlled via the `settings.py` which is overridden locally in `env.yaml`.
 
