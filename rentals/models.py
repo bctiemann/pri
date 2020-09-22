@@ -35,4 +35,4 @@ class Vehicle(models.Model):
 
     # Meta subclass is used for defining attributes like default ordering
     class Meta:
-        ordering = 'year',
+        ordering = ('year',)
