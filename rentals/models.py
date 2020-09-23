@@ -15,7 +15,7 @@ class Vehicle(models.Model):
     # "primary_key" parameter on a custom defined field
     make = models.CharField(max_length=255, blank=True)
     model = models.CharField(max_length=255, blank=True)
-    year = models.IntegerField(blank=True)
+    year = models.IntegerField()
     vehicle_type = models.CharField(choices=VehicleType.choices, max_length=20, blank=True)
 
     # Example of a model property which produces a derived value (requires no params other than self), and thus is
