@@ -15,7 +15,7 @@ To set up your local environment, you will need to create a python virtualenv.
 - Ensure you have a recent version of Python installed locally. This project is built for Python 3.8.
 - You will also need `pip` (normally installed as part of Python) and Virtualenv which can be installed from https://sourabhbajaj.com/mac-setup/Python/virtualenv.html
 Virtualenv is a means of localizing a python environment and its installed packages to a specific project, so changes to
-the OS-level Python do not affect your development environment.
+the OS-level Python do not affect your development environments, which are also segregated from one another.
 - Once you have virtualenv, cd into the root directory of this project and enter: 
 `virtualenv venv --python=<path/to/python>`
 - Then activate the virtualenv (which sets the enviroment vars to use the localized python for this shell only):
