@@ -8,6 +8,13 @@ class Vehicle(models.Model):
     class VehicleType(models.TextChoices):
         CAR = ('car', 'Car')
         BIKE = ('bike', 'Bike')
+        TRACK = ('track', 'Track Car')
+
+    class Status(models.IntegerChoices):
+        BUILDING = (0, 'Building')
+        READY = (1, 'Ready')
+        DOWN = (2, 'Damaged / Repairing')
+        OUT_OF_SERVICE = (3, 'Out Of Service')
 
     # Fields defined on the model correspond to database columns and fully define their behavior both in DB and in code.
     # Model field names should be verbose, specific, and expressive; i.e. "vehicle_type" rather than "vtype"
@@ -19,6 +26,7 @@ class Vehicle(models.Model):
     vehicle_type = models.CharField(choices=VehicleType.choices, max_length=20, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     acquired_on = models.DateField(null=True, blank=True)
+    status = models.IntegerField(choices=Status.choices, null=True, blank=True, default=0)
 
     # Example of a model property which produces a derived value (requires no params other than self), and thus is
     # referenced as a property rather than being invoked as a method (with parentheses) - vehicle.vehicle_name
