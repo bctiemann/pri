@@ -26,7 +26,7 @@ class Vehicle(models.Model):
     vehicle_type = models.CharField(choices=VehicleType.choices, max_length=20, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     acquired_on = models.DateField(null=True, blank=True)
-    status = models.IntegerField(choices=Status.choices, null=True, blank=True, default=0)
+    status = models.IntegerField(choices=Status.choices, default=Status.BUILDING.value)
 
     # Example of a model property which produces a derived value (requires no params other than self), and thus is
     # referenced as a property rather than being invoked as a method (with parentheses) - vehicle.vehicle_name
