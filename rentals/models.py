@@ -20,6 +20,7 @@ class Vehicle(models.Model):
     # Model field names should be verbose, specific, and expressive; i.e. "vehicle_type" rather than "vtype"
     # Note that an auto-incrementing integer "id" field is implicit in all models, unless overridden using the
     # "primary_key" parameter on a custom defined field
+    # https://docs.djangoproject.com/en/3.1/ref/models/fields/
     make = models.CharField(max_length=255, blank=True)
     model = models.CharField(max_length=255, blank=True)
     year = models.IntegerField()
