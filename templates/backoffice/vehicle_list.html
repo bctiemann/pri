@@ -33,7 +33,7 @@
     </tr>
     {% for vehicle in vehicle_list %}
         <tr class="clickable click-to-edit" idfield="vehicleid" itemid="{{ vehicle.id }}">
-            <td><a href="#CGI.SCRIPT_NAME#?edit=1&vehicleid={{ vehicle.id }}">{{ vehicle.id }}</a></td>
+            <td><a href="{% url "backoffice:vehicle-detail" pk=vehicle.id %}">{{ vehicle.id }}</a></td>
             <td>{{ vehicle.make }}</td>
             <td>{{ vehicle.model }}</td>
             <td>{{ vehicle.year }}</td>

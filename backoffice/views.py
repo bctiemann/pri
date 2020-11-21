@@ -5,6 +5,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 from rentals.models import Vehicle
+from backoffice.forms import VehicleForm
 
 
 class HomeView(TemplateView):
@@ -14,3 +15,9 @@ class HomeView(TemplateView):
 class VehicleListView(ListView):
     model = Vehicle
     template_name = 'backoffice/vehicle_list.html'
+
+
+class VehicleDetailView(UpdateView):
+    model = Vehicle
+    template_name = 'backoffice/vehicle_detail.html'
+    form_class = VehicleForm

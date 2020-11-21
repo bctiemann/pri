@@ -1,0 +1,291 @@
+{% extends "backoffice/base.html" %}
+
+{% block nav %}
+    <h1 class="pageheader">Vehicles
+    <ul class="nav_subpage">
+        <cfoutput>
+        <a href="#CGI.SCRIPT_NAME#?type=1"><li>Cars</li></a>
+        <a href="#CGI.SCRIPT_NAME#?type=2"><li>Motorcycles</li></a>
+        <a href="#CGI.SCRIPT_NAME#?type=3"><li>Track</li></a>
+        <a href="#CGI.SCRIPT_NAME#?edit=1"><li>Add</li></a>
+        </cfoutput>
+    </ul>
+</h1>
+{% endblock %}
+
+{% block content %}
+
+    {% comment %}
+    <cfif not IsDefined("vehicleid") OR vehicleid IS 0>
+        <h2>Add Vehicle</h2>
+        <cfset vehicleid = 0>
+    <cfelse>
+        <h2>Edit Vehicle</h2>
+    </cfif>
+    <!--- Pull vehicle (empty object with all fields blank if id=0) --->
+    <cfquery name="Vehicle" datasource="#DSN#">
+        SELECT vehicleid,make,model,year,type,plate,vin,mileage,damage,policyno,policyco,policytel,status,weighting FROM Vehicles
+        WHERE vehicleid = <CFQUERYPARAM value="#vehicleid#" CFSQLType="CF_SQL_NUMERIC">
+    </cfquery>
+    <cfquery name="VehicleFront" datasource="#FDSN#">
+        SELECT type,hp,tq,topspeed,trans,gears,status,location,tightfit,blurb,specs,origin,price,disc2day,disc3day,disc7day,deposit,milesinc FROM VehiclesFront
+        WHERE vehicleid = <CFQUERYPARAM value="#vehicleid#" CFSQLType="CF_SQL_NUMERIC">
+    </cfquery>
+
+    <!--- Decrypt encrypted fields --->
+    <cftry>
+        <cfset policyno_dec = Decrypt(Vehicle.policyno, globalkey, 'AES', 'hex')>
+        <cfcatch type="Any">
+            <cfset policyno_dec = "">
+        </cfcatch>
+    </cftry>
+
+    <cfif IsDefined("Form.fnc")>
+        <cfset Vehicle = Form>
+        <cfset VehicleFront = Form>
+        <cfset policyno_dec = Form.policyno>
+    </cfif>
+
+    <cfif IsDefined("URL.created")>
+        <p>Vehicle created successfully.</p>
+    <cfelseif IsDefined("URL.edited")>
+        <p>Vehicle updated successfully.</p>
+    </cfif>
+
+    <cfif vehicleid>
+    <div id="media_container">
+        <div class="media-section" id="vpics"></div>
+        <div class="media-section" id="vvids"></div>
+        <div class="media-section" id="showcase"></div>
+        <div class="media-section" id="thumbnail"></div>
+    </div>
+    </cfif>
+    {% endcomment %}
+
+    <cfoutput>
+    <form method="POST" action="{% url "backoffice:vehicle-detail" pk=vehicle.id %}">
+    <table class="inputform vehicles">
+        <tr>
+            <td>Type</td>
+            <td>
+                {{ form.vehicle_type }}
+            </td>
+        </tr>
+        <tr>
+            <td>Make</td>
+            <td>{{ form.make }}</td>
+        </tr>
+        <tr>
+            <td>Model</td>
+            <td><cfinput name="model" value="#Vehicle.model#" required="yes" maxlength="255" /></td>
+        </tr>
+        <tr>
+            <td>Year</td>
+            <td><cfinput name="year" value="#Vehicle.year#" required="yes" maxlength="4" /></td>
+        </tr>
+        <tr>
+            <td>Plate</td>
+            <td><cfinput name="plate" value="#Vehicle.plate#" maxlength="10" /></td>
+        </tr>
+        <tr>
+            <td>VIN</td>
+            <td><cfinput name="vin" value="#Vehicle.vin#" maxlength="50" /></td>
+        </tr>
+        <tr>
+            <td>Mileage</td>
+            <td><cfinput name="mileage" value="#Vehicle.mileage#" maxlength="8" validate="integer" required="no" /></td>
+        </tr>
+        <tr>
+            <td class="align-top">Damage</td>
+            <td><cftextarea name="damage">#Vehicle.damage#</cftextarea></td>
+        </tr>
+        <tr>
+            <td>Insurance Policy No.</td>
+            <td><cfinput name="policyno" value="#policyno_dec#" maxlength="255" /></td>
+        </tr>
+        <tr>
+            <td>Insurance Policy Company</td>
+            <td><cfinput name="policyco" value="#Vehicle.policyco#" maxlength="255" /></td>
+        </tr>
+        <tr>
+            <td>Insurance Policy Telephone</td>
+            <td><cfinput name="policytel" value="#Vehicle.policytel#" maxlength="30" /></td>
+        </tr>
+        <tr>
+            <td>Status</td>
+            <td>
+                <cfselect name="status">
+                    <option value="0" <cfif Vehicle.status IS 0>selected</cfif>>Building</option>
+                    <option value="1" <cfif Vehicle.status IS 1>selected</cfif>>Ready</option>
+                    <option value="2" <cfif Vehicle.status IS 2>selected</cfif>>Damaged/Repairing</option>
+                    <option value="3" <cfif Vehicle.status IS 3>selected</cfif>>Out Of Service</option>
+                </cfselect>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Weighting
+                <p class="subtext">Set Fleet Display Priority</p>
+            </td>
+            <td>
+                <cfselect name="weighting">
+                    <option value="0" <cfif Vehicle.weighting IS 0>selected</cfif>>0 - Normal</option>
+                    <option value="1" <cfif Vehicle.weighting IS 1>selected</cfif>>+1</option>
+                    <option value="2" <cfif Vehicle.weighting IS 2>selected</cfif>>+2</option>
+                    <option value="3" <cfif Vehicle.weighting IS 3>selected</cfif>>+3</option>
+                </cfselect>
+            </td>
+        </tr>
+
+        <tr class="divider">
+            <td colspan="2">
+                <h3>Front Site Data</h3>
+                <p class="subtext">All fields mandatory if published.</p>
+            </td>
+        </tr>
+
+        <tr>
+            <td>Horsepower (hp)</td>
+            <td><cfinput name="hp" size="10" value="#VehicleFront.hp#" maxlength="5" /></td>
+        </tr>
+        <tr>
+            <td>Torque (ft-lbs)</td>
+            <td><cfinput name="tq" size="10" value="#VehicleFront.tq#" maxlength="5" /></td>
+        </tr>
+        <tr>
+            <td>Top Speed (mph)</td>
+            <td><cfinput name="topspeed" size="10" value="#VehicleFront.topspeed#" maxlength="4" /></td>
+        </tr>
+        <tr>
+            <td>Transmission Type</td>
+            <td>
+                <cfselect name="trans">
+                    <option value="1" <cfif VehicleFront.trans IS 1>selected</cfif>>Manual</option>
+                    <option value="2" <cfif VehicleFront.trans IS 2>selected</cfif>>Flappy</option>
+                    <option value="3" <cfif VehicleFront.trans IS 3>selected</cfif>>Slushbox</option>
+                </cfselect>
+            </td>
+        </tr>
+        <tr>
+            <td>Number of Gears</td>
+            <td><cfinput name="gears" size="4" value="#VehicleFront.gears#" maxlength="1" /></td>
+        </tr>
+        <tr>
+            <td>Status (available to rent)</td>
+            <td>
+                <cfselect name="statusfront">
+                    <option value="0" <cfif VehicleFront.status IS 0>selected</cfif>>No</option>
+                    <option value="1" <cfif VehicleFront.status IS 1>selected</cfif>>Yes</option>
+                </cfselect>
+            </td>
+        </tr>
+        <tr>
+            <td>Location</td>
+            <td>
+                <cfselect name="location">
+                    <option value="1" <cfif VehicleFront.location IS 1>selected</cfif>>New York</option>
+                    <option value="2" <cfif VehicleFront.location IS 2>selected</cfif>>Florida</option>
+                </cfselect>
+            </td>
+        </tr>
+        <tr>
+            <td>Tight Fit (think Elise)</td>
+            <td>
+                <cfselect name="tightfit">
+                    <option value="0" <cfif VehicleFront.tightfit IS 0>selected</cfif>>No</option>
+                    <option value="1" <cfif VehicleFront.tightfit IS 1>selected</cfif>>Yes</option>
+                </cfselect>
+            </td>
+        </tr>
+        <tr>
+            <td class="align-top">Blurb</td>
+            <td><cftextarea name="blurb">#VehicleFront.blurb#</cftextarea></td>
+        </tr>
+        <tr>
+            <td class="align-top">Specs (JSON)<br /><small class="specs-model" title="model">Model</small></td>
+            <td>
+                <cfset specs = VehicleFront.specs>
+                <cfif specs IS "">
+                    <cfset specs = "{}">
+                </cfif>
+                <cftextarea name="specs" id="specs" style="height: 240px;">#specs#</cftextarea>
+                <pre id="specs-output"></pre>
+            </td>
+        </tr>
+        <tr>
+            <td>Country of Origin (two letter code)</td>
+            <td><cfinput name="origin" size="4" value="#VehicleFront.origin#" maxlength="2" /></td>
+        </tr>
+        <tr>
+            <td>Price Per Day</td>
+            <td><cfinput name="price" value="#VehicleFront.price#" maxlength="9" required="yes" /></td>
+        </tr>
+        <tr>
+            <td>2-Day Discount (%)</td>
+            <td><cfinput name="disc2day" value="#VehicleFront.disc2day#" maxlength="3" required="yes" /></td>
+        </tr>
+        <tr>
+            <td>3-Day Discount (%)</td>
+            <td><cfinput name="disc3day" value="#VehicleFront.disc3day#" maxlength="3" required="yes" /></td>
+        </tr>
+        <tr>
+            <td>7-Day Discount (%)</td>
+            <td><cfinput name="disc7day" value="#VehicleFront.disc7day#" maxlength="3" required="yes" /></td>
+        </tr>
+        <tr>
+            <td>Deposit Amount</td>
+            <td><cfinput name="deposit" value="#VehicleFront.deposit#" maxlength="9" required="yes" /></td>
+        </tr>
+        <tr>
+            <td>Miles Included</td>
+            <td><cfinput name="milesinc" value="#VehicleFront.milesinc#" maxlength="5" required="yes" /></td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>
+                <button class="btn" type="submit" name="submit"><cfif vehicleid>Edit<cfelse>Add</cfif></button>
+                <cfif vehicleid>
+                    <button class="btn delete" type="submit" name="delete" onclick="return confirmDelete(this.form, 'vehicle')">Delete Vehicle</button>
+                </cfif>
+            </td>
+        </tr>
+    </table>
+    <cfinput type="hidden" name="vehicleid" value="#vehicleid#" />
+    <cfinput type="hidden" name="fnc" value="edit" />
+    </form>
+    </cfoutput>
+
+    <div id="specs_model">
+{
+    "speclist": [
+        {
+            "spec": "Engine",
+            "value": "3.4L",
+            "unit": "boxer-6"
+        },
+        {
+            "spec": "Seats",
+            "value": 2,
+            "unit": "seats",
+            "hide_unit": true // Don't display unit on front page
+        },
+        {
+            "spec": "Power",
+            "value": 342,
+            "unit": "hp"
+        },
+        {
+            "spec": "Power-to-weight",
+            "value": 8.6,
+            "unit": "lbs/hp",
+            "hide_front": true // Hides this spec from front page
+        },
+        ...
+    ],
+    "headline": "This is a Porsche.", // Used on front page (optional)
+    "adjective": "amazing" // Used on front page bubble (optional)
+}
+    </div>
+
+{% endblock %}

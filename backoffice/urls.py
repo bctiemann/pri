@@ -8,5 +8,6 @@ from backoffice import views
 
 urlpatterns = [
     path('', views.HomeView.as_view(), name='home'),
-    path('vehicles/', views.VehicleListView.as_view(), name='vehicles-list'),
+    path('vehicles/', views.VehicleListView.as_view(), name='vehicle-list'),
+    path('vehicles/<int:pk>/', views.VehicleDetailView.as_view(), name='vehicle-detail'),
 ]
