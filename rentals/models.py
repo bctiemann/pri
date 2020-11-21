@@ -6,7 +6,7 @@ class Vehicle(models.Model):
     # TextChoices and IntegerChoices are enum classes with internal and verbose values; if a CharField is set to use
     # this object for its choices, it will be represented in the admin with a select dropdown of acceptable values.
     class VehicleType(models.TextChoices):
-        CAR = ('car', 'Car')
+        CAR = ('car', 'Road Car')
         BIKE = ('bike', 'Bike')
         TRACK = ('track', 'Track Car')
 

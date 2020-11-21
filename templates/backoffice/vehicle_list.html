@@ -1,0 +1,54 @@
+{% extends "backoffice/base.html" %}
+
+{% block nav %}
+    <h1 class="pageheader">Vehicles
+    <ul class="nav_subpage">
+        <cfoutput>
+        <a href="#CGI.SCRIPT_NAME#?type=1"><li>Cars</li></a>
+        <a href="#CGI.SCRIPT_NAME#?type=2"><li>Motorcycles</li></a>
+        <a href="#CGI.SCRIPT_NAME#?type=3"><li>Track</li></a>
+        <a href="#CGI.SCRIPT_NAME#?edit=1"><li>Add</li></a>
+        </cfoutput>
+    </ul>
+</h1>
+{% endblock %}
+
+{% block content %}
+
+    <table class="data alternating" page="#CGI.SCRIPT_NAME#" sortedby="#URL.sortby#" sorteddir="#URL.sortdir#"
+    <cfif IsDefined("URL.type") AND IsValid("integer",URL.type)>
+        filter="type=#URL.type#"
+    </cfif>>
+    <tr>
+        <cfoutput>
+        <th defaultdir="DESC" col="vehicleid">ID</th>
+        <th defaultdir="ASC" col="make">Make</th>
+        <th defaultdir="ASC" col="model">Model</th>
+        <th defaultdir="ASC" col="year">Year</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Rentable</th>
+        <th>Service</th>
+        </cfoutput>
+    </tr>
+    {% for vehicle in vehicle_list %}
+        <tr class="clickable click-to-edit" idfield="vehicleid" itemid="{{ vehicle.id }}">
+            <td><a href="#CGI.SCRIPT_NAME#?edit=1&vehicleid={{ vehicle.id }}">{{ vehicle.id }}</a></td>
+            <td>{{ vehicle.make }}</td>
+            <td>{{ vehicle.model }}</td>
+            <td>{{ vehicle.year }}</td>
+            <td>
+                {{ vehicle.get_vehicle_type_display }}
+            </td>
+            <td>
+                {{ vehicle.get_status_display }}
+            </td>
+            <td>
+                <cfif statusfront IS 1>{% if vehicle.is_rentable %}&##10003;{% endif %}</cfif>
+            </td>
+            <td></td>
+        </tr>
+    {% endfor %}
+    </table>
+
+{% endblock %}

@@ -14,12 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.conf.urls import static
 from django.conf import settings
 from rentals import views as rentals_views
 
 urlpatterns = [
+    # Django admin site (generic database backend operations, CRUD, user management, etc)
     path('spork/', admin.site.urls),
 
     # This is an example of directly registering an app's views in the central site's urls.py. As the site grows,
@@ -27,6 +28,10 @@ urlpatterns = [
     # at a specified mount point.
     path('', rentals_views.HomeView.as_view(), name='home'), # Class-based view version
     # path('', rentals_views.home, name='home'), # Function-based view version
+
+    # This is an example of an app's own namespaced urls.py being included in the main one at a mount point.
+    # This app contains the legacy site's administrative/business UI.
+    path('backoffice/', include(('backoffice.urls', 'backoffice'), namespace='backoffice')),
 ]
 
 # This maps the MEDIA_ROOT url for local development
