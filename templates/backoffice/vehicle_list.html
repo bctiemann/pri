@@ -1,17 +1,4 @@
-{% extends "backoffice/base.html" %}
-
-{% block nav %}
-    <h1 class="pageheader">Vehicles
-    <ul class="nav_subpage">
-        <cfoutput>
-        <a href="#CGI.SCRIPT_NAME#?type=1"><li>Cars</li></a>
-        <a href="#CGI.SCRIPT_NAME#?type=2"><li>Motorcycles</li></a>
-        <a href="#CGI.SCRIPT_NAME#?type=3"><li>Track</li></a>
-        <a href="#CGI.SCRIPT_NAME#?edit=1"><li>Add</li></a>
-        </cfoutput>
-    </ul>
-</h1>
-{% endblock %}
+{% extends "backoffice/vehicle.html" %}
 
 {% block content %}
 

@@ -1,17 +1,4 @@
-{% extends "backoffice/base.html" %}
-
-{% block nav %}
-    <h1 class="pageheader">Vehicles
-    <ul class="nav_subpage">
-        <cfoutput>
-        <a href="#CGI.SCRIPT_NAME#?type=1"><li>Cars</li></a>
-        <a href="#CGI.SCRIPT_NAME#?type=2"><li>Motorcycles</li></a>
-        <a href="#CGI.SCRIPT_NAME#?type=3"><li>Track</li></a>
-        <a href="#CGI.SCRIPT_NAME#?edit=1"><li>Add</li></a>
-        </cfoutput>
-    </ul>
-</h1>
-{% endblock %}
+{% extends "backoffice/vehicle.html" %}
 
 {% block content %}
 
@@ -62,8 +49,13 @@
     </cfif>
     {% endcomment %}
 
+    {{ form.errors }}
     <cfoutput>
-    <form method="POST" action="{% url "backoffice:vehicle-detail" pk=vehicle.id %}">
+    {% if vehicle %}
+        <form method="POST" action="{% url "backoffice:vehicle-detail" pk=vehicle.id %}">
+    {% else %}
+        <form method="POST" action="{% url "backoffice:vehicle-create" %}">
+    {% endif %}
     <table class="inputform vehicles">
         <tr>
             <td>Type</td>
@@ -253,6 +245,7 @@
     </table>
     <cfinput type="hidden" name="vehicleid" value="#vehicleid#" />
     <cfinput type="hidden" name="fnc" value="edit" />
+    {% csrf_token %}
     </form>
     </cfoutput>
 
