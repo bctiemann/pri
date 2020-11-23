@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rentals',
+    'customer_portal',
     'backoffice',
 ]
 

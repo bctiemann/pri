@@ -47,9 +47,12 @@ using the buttons to the right of the configuration.
 
 ### Django Structure
 
-Functionality in a Django project is organized into "apps" within the project. A basic `rentals` app/directory has been created which contains
-core business logic. More apps can be created if desired to keep functionality segregated. Note that each app you add (via 
-`./manage.py startapp <app>`) needs to be added to `INSTALLED_APPS` in the settings in order for it to be recognized by Django.
+Functionality in a Django project is organized into "apps" within the project. A basic `rentals` app/directory has been 
+created which contains core business logic, combining the non-authenticated and secure workflows of the existing site. 
+There is also `customer_portal` which will house the authenticated customer portal views, and `backoffice` which is the 
+administrative backend for processing rentals and other admin ops. More apps can be created if desired to keep 
+functionality segregated. Note that each app you add (via `./manage.py startapp <app>`) needs to be added to 
+`INSTALLED_APPS` in the settings in order for it to be recognized by Django.
 
 Models (code representations of database tables, and all object-oriented code surrounding them) reside in `models.py`.
 
