@@ -160,6 +160,17 @@ environment. The `ipython` repl variant is installed which provides a richer she
 
 Use `./manage.py dbshell` to get a native CLI shell into the local database instance, whichever DB engine is being used.
 
+### A note about multiple datasources
+
+If you want to continue with the pattern of segregated "front" and "back" databases for low- and high-value data, it's 
+possible to do that (https://docs.djangoproject.com/en/3.1/topics/db/multi-db/). However, I feel that this adds 
+unnecessary complexity for dubious benefit. Especially if, as I would prefer and recommend, we aren't storing any real 
+PII such as decryptable credit cards or passwords (these should just be handled via Stripe to avoid all PCI compliance
+issues), and with the datasourcees kept in the same infrastructure so a breach would expose both, there doesn't really 
+seem to be any value to keeping the data segregated in this way. The whole site should be SSL-only anyway, and individual
+views and apps can be protected as needed via authentication classes or middleware, so the conceptual division between
+"www" and "secure" seems moot, unless there's something I'm overlooking.
+
 ## Django documentation
 
 https://docs.djangoproject.com/en/3.1/
