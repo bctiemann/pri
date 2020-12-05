@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, reverse
 from django.views.generic import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
@@ -31,6 +31,9 @@ class VehicleDetailView(VehicleViewMixin, UpdateView):
     model = Vehicle
     template_name = 'backoffice/vehicle_detail.html'
     form_class = VehicleForm
+
+    def get_success_url(self):
+        return reverse('backoffice:vehicle-detail', kwargs={'pk': self.object.id})
 
 
 class VehicleCreateView(VehicleViewMixin, CreateView):

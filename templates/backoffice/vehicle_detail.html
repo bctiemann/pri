@@ -69,11 +69,11 @@
         </tr>
         <tr>
             <td>Model</td>
-            <td><cfinput name="model" value="#Vehicle.model#" required="yes" maxlength="255" /></td>
+            <td>{{ form.model }}</td>
         </tr>
         <tr>
             <td>Year</td>
-            <td><cfinput name="year" value="#Vehicle.year#" required="yes" maxlength="4" /></td>
+            <td>{{ form.year }}</td>
         </tr>
         <tr>
             <td>Plate</td>
@@ -105,14 +105,7 @@
         </tr>
         <tr>
             <td>Status</td>
-            <td>
-                <cfselect name="status">
-                    <option value="0" <cfif Vehicle.status IS 0>selected</cfif>>Building</option>
-                    <option value="1" <cfif Vehicle.status IS 1>selected</cfif>>Ready</option>
-                    <option value="2" <cfif Vehicle.status IS 2>selected</cfif>>Damaged/Repairing</option>
-                    <option value="3" <cfif Vehicle.status IS 3>selected</cfif>>Out Of Service</option>
-                </cfselect>
-            </td>
+            <td>{{ form.status }}</td>
         </tr>
         <tr>
             <td>
@@ -236,7 +229,13 @@
         <tr>
             <td></td>
             <td>
-                <button class="btn" type="submit" name="submit"><cfif vehicleid>Edit<cfelse>Add</cfif></button>
+                <button class="btn" type="submit" name="submit">
+                    {% if vehicle %}
+                        Edit
+                    {% else %}
+                        Add
+                    {% endif %}
+                </button>
                 <cfif vehicleid>
                     <button class="btn delete" type="submit" name="delete" onclick="return confirmDelete(this.form, 'vehicle')">Delete Vehicle</button>
                 </cfif>
