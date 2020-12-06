@@ -1,100 +1,21 @@
-<CFINCLUDE TEMPLATE="inc_header.cfm">
-<div id="content" class="loginwrap">
-<div class="logincontent">
+{% extends "accounts/base.html" %}
 
-<h1>Performance Rentals - Administration Login</h1>
+{% block content %}{% endblock %}
 
-<CFIF IsDefined("AccessDenied")>
-    <div class="loginerror">
-        <h3>ACCESS DENIED</h3>
-        <p>You have entered an incorrect password for the specified account.</p>
+{% block login_content %}
+
+    <div class="login-form-container">
+
+{#        {% include "two_factor/core/login.html" %}#}
+
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="loginform">
+                {% include "two_factor/login_form.html" %}
+                {% block next %}<input type="hidden" name="next" value="{% url "backoffice:home" %}" />{% endblock %}
+            </div>
+        </form>
+
     </div>
-</CFIF>
 
-<CFIF IsDefined("NoMail")>
-    <div class="loginerror">
-        <h3>ACCESS DENIED</h3>
-        <p>The administrator account you have entered does not exist.</p>
-    </div>
-</CFIF>
-
-<CFIF IsDefined("BadKey")>
-    <div class="loginerror">
-        <h3>ACCESS DENIED</h3>
-        <p>Your 2-factor authenticator is invalid or has expired.</p>
-    </div>
-</CFIF>
-
-<CFIF IsDefined("Disabled")>
-    <div class="loginerror">
-        <h3>ACCESS DENIED</h3>
-        <p>Your account has been disabled.</p>
-    </div>
-</CFIF>
-
-<CFIF IsDefined("NoKey")>
-    <div class="loginerror">
-        <h3>ACCESS DENIED</h3>
-        <p>You do not have a 2-factor key.</p>
-    </div>
-</CFIF>
-
-<CFIF IsDefined("KeyExpired")>
-    <div class="loginerror">
-        <h3>ACCESS DENIED</h3>
-        <p>Your 2-factor key has expired.</p>
-    </div>
-</CFIF>
-
-{{ form }}
-
-<cfform method="post" action="index.cfm">
-<table class="inputform">
-    <tr>
-        <td>Administrator</td>
-        <td><cfinput type="text" size="20" name="admin" id="admin" onblur="checkType()" required="yes" message="You must enter an administrator username." /></td>
-    </tr>
-    <tr>
-        <td>Password</td>
-        <td><cfinput type="password" size="20" name="pass" required="yes" message="You must enter a password." /></td>
-    </tr>
-    <tr>
-        <td>2-factor Key</td>
-        <td>
-            <cfinput type="text" name="key2f" style="width: 80px;" />
-            <button type="button" id="btn_send_key" class="btn" style="display: none;" onclick="doSend()">Send Key</button>
-        </td>
-    </tr>
-    <tr>
-        <td></td>
-        <td><button type="submit" class="btn">Log In</button></td>
-    </tr>
-</table>
-<input type="hidden" name="aid" id="aid" value="0" />
-</cfform>
-
-<CFOUTPUT>
-<table class="loginhostinfo">
-    <tr>
-        <td>IP</td>
-        <td>#realip#</td>
-    </tr>
-    <tr>
-        <td>HOST</td>
-        <td>#CGI.REMOTE_HOST#</td>
-    </tr>
-</table>
-</CFOUTPUT>
-
-<div class="loginwarning">
-    <p>ONLY <b>PERFORMANCE RENTALS</b> PERSONNEL ARE ALLOWED BEYOND THIS POINT.</p>
-    <p>ALL ACCESS IS LOGGED.</p>
-    <p>UNAUTHORIZED ACCESS ATTEMPTS WILL BE REPORTED TO THE <b>UNITED STATES FEDERAL AUTHORITIES</b>.</p>
-    <img width="180" height="120" src="images/fbi.gif" />
-</div>
-
-</div>
-</div>
-
-<CFINCLUDE TEMPLATE="inc_footer.cfm">
-<CFABORT>
+{% endblock %}

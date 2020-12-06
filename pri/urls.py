@@ -20,10 +20,43 @@ from django.urls import path, include
 from django.conf.urls import static
 from django.conf import settings
 from rentals import views as rentals_views
+from users import views as users_views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     # Django admin site (generic database backend operations, CRUD, user management, etc)
     path('spork/', admin.site.urls),
+
+    path('sign_out/', users_views.LogoutView.as_view(next_page='home'), name='sign-out'),
+
+    path('recovery/password_reset/',
+         users_views.PasswordResetView.as_view(
+             template_name='accounts/password_reset_form.html',
+             from_email=settings.SUPPORT_EMAIL,
+             extra_email_context={
+                 'site_name': settings.COMPANY_NAME
+             },
+         ),
+         name='password_reset',
+         ),
+    path('recovery/password_reset/done/',
+         auth_views.PasswordResetDoneView.as_view(
+             template_name='accounts/password_reset_done.html'
+         ),
+         name='password_reset_done'
+         ),
+    path('recovery/reset/<uidb64>/<token>/',
+         users_views.PasswordResetConfirmView.as_view(
+             template_name='accounts/password_reset_confirm.html'
+         ),
+         name='password_reset_confirm'
+         ),
+    path('recovery/reset/done/',
+         auth_views.PasswordResetCompleteView.as_view(
+             template_name='accounts/password_reset_complete.html'
+         ),
+         name='password_reset_complete'
+         ),
 
     # This is an example of directly registering an app's views in the central site's urls.py. As the site grows,
     # it might be better for each app dir to have its own urls.py and for this file to include that app's urls.py
