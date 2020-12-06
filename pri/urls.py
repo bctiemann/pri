@@ -13,6 +13,8 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from two_factor.urls import urlpatterns as tf_urls
+
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls import static
@@ -32,6 +34,8 @@ urlpatterns = [
     # This is an example of an app's own namespaced urls.py being included in the main one at a mount point.
     # This app contains the legacy site's administrative/business UI.
     path('backoffice/', include(('backoffice.urls', 'backoffice'), namespace='backoffice')),
+
+    path('', include(tf_urls, 'two_factor')),
 ]
 
 # This maps the MEDIA_ROOT url for local development

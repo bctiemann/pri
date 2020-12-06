@@ -57,8 +57,8 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django_otp.middleware.OTPMiddleware',
     'pri.middleware.LoginRequiredMiddleware',
-    # 'pri.middleware.SelectedClientMiddleware',
     'pri.middleware.PermissionsMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -119,6 +119,10 @@ AUTH_USER_MODEL = 'users.User'
 AUTH_EXEMPT_ROUTES = (
     'login',
 )
+
+LOGIN_URL = 'two_factor:login'
+# LOGIN_URL = '/account/login/'
+LOGIN_REDIRECT_URL = '/account/two_factor/'
 
 LOG_AUTH = True
 
