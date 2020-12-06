@@ -1,4 +1,5 @@
 from django.shortcuts import render, reverse
+from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
@@ -6,10 +7,16 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 from rentals.models import Vehicle
 from backoffice.forms import VehicleForm
+from users.views import LoginView
 
 
 class HomeView(TemplateView):
     template_name = 'backoffice/home.html'
+
+
+class LoginView(LoginView):
+    template_name = 'backoffice/login.html'
+    home_url = reverse_lazy('backoffice:home')
 
 
 class VehicleViewMixin:
