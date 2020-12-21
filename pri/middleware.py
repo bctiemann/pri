@@ -13,6 +13,9 @@ class LoginRequiredMiddleware(MiddlewareMixin):
     Middleware that requires a user to be authenticated to view any page other
     than LOGIN_URL. Exemptions to this requirement can optionally be specified
     in settings by setting a tuple of routes to ignore
+
+    Unauthenticated views (i.e. the front site) do not have a resolved.app_name
+    because they are not mapped to a namespace in the central pri/urls.py.
     """
     def process_request(self, request):
         assert hasattr(request, 'user'), """
@@ -25,6 +28,7 @@ class LoginRequiredMiddleware(MiddlewareMixin):
             current_route_name = resolved.url_name
             logger.info(f'{current_route_name} {resolved.app_name}')
 
+            # Exempt unauthenticated front-site views, and defer to the built-in auth for admin site
             if not resolved.app_name or resolved.app_name == 'admin':
                 return None
 
@@ -40,6 +44,12 @@ class LoginRequiredMiddleware(MiddlewareMixin):
 
 
 class PermissionsMiddleware(object):
+    """
+    This middleware ensures all views within a particular resolved app (i.e. "backoffice") are protected by
+    appropriate permissions. An example for backoffice is shown, where a 403 is raised if the user is not an admin.
+    For apps such as customer_portal, additional logic (such as checking whether the user is an active customer)
+    may need to be added.
+    """
 
     def __init__(self, get_response):
         self.get_response = get_response
