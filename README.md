@@ -171,6 +171,23 @@ seem to be any value to keeping the data segregated in this way. The whole site 
 views and apps can be protected as needed via authentication classes or middleware, so the conceptual division between
 "www" and "secure" seems moot, unless there's something I'm overlooking.
 
+### Authentication and Permissions
+
+There are a variety of ways to protect views in Django with appropriate authentication/authorization controls, depending
+on need. Per the documentation, a view can be restricted to an authenticated user via a decorator or mixin, and permissions
+enforced via the built-in permissions system: https://docs.djangoproject.com/en/3.1/topics/auth/default/
+
+However, because adding boilerplate controls to a lot of views becomes cumbersome and repetitive, I have set up auth
+and permissions via a middleware; see `pri.middleware`. These are classes through which all requests are passed and which
+can be leveraged to affect the request depending on aspects of the user or resources being accessed; so the way I have
+set it up, all views within the `backoffice` app require the user to be a) authenticated and b) an admin, or else it
+raises a `PermissionDenied` error. This structure may or may not need to be extended as the project grows; what is
+present now should serve as a baseline on which to build.
+
+Note that all login pages go through the django-two-factor auth flow; if 2-factor is enabled for a user, it will 
+challenge with one of several different auth methods (such as an TOTP code via an authenticator app). Two-factor is
+opt-in and will not be required unless enabled (which it should be on all admin accounts).   
+
 ## Django documentation
 
 https://docs.djangoproject.com/en/3.1/
