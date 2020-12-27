@@ -7,3 +7,4 @@ media
 env.yaml
 env.prod.yaml
 *.sqlite3
+.DS_Store
