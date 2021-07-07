@@ -183,6 +183,8 @@ MEDIA_URL = '/media/'
 COMPANY_NAME = 'Performance Rentals'
 SUPPORT_EMAIL = 'support@performance.rentals'
 
+COUNTRIES_ONLY = ['US', 'JP', 'IT', 'GB', 'DE']
+
 
 # Local overrides from env.yaml
 with open(os.path.join(BASE_DIR, 'env.yaml')) as f:

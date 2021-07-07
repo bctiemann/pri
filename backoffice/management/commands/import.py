@@ -1,5 +1,6 @@
 import MySQLdb
 import logging
+import json
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -63,6 +64,7 @@ class Command(BaseCommand):
                     model=old['model'],
                     year=old['year'],
                     vehicle_type=old['type'],
+                    status=0,
                     plate=old['plate'],
                     vin=old['vin'],
                     mileage=old['mileage'],
@@ -83,6 +85,22 @@ class Command(BaseCommand):
                     year=old['year'],
                     vehicle_type=old['type'],
                     status=old_front['status'],
+                    horsepower=old_front['hp'],
+                    torque=old_front['tq'],
+                    top_speed=old_front['topspeed'],
+                    transmission_type=old_front['trans'],
+                    gears=old_front['gears'],
+                    location=old_front['location'],
+                    tight_fit=old_front['tightfit'],
+                    blurb=old_front['blurb'],
+                    specs=json.loads(old_front['specs']),
+                    origin_country=old_front['origin'],
+                    price_per_day=old_front['price'],
+                    discount_2_day=old_front['disc2day'],
+                    discount_3_day=old_front['disc3day'],
+                    discount_7_day=old_front['disc7day'],
+                    deposit=old_front['deposit'],
+                    miles_included=old_front['milesinc'],
                 )
                 new.status = old_front['status']
                 new.save()

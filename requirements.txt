@@ -8,3 +8,4 @@ phonenumbers==8.12.14
 jedi==0.17.2
 pycryptodome==3.10.1
 django-searchable-encrypted-fields==0.1.9
+django-countries==7.2.1
