@@ -94,13 +94,13 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     },
-    'backoffice': {
+    'front': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db_backoffice.sqlite3',
+        'NAME': BASE_DIR / 'db_front.sqlite3',
     },
     'default_legacy': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'PRIF',
+        'NAME': 'PRIB',
         'HOST': '127.0.0.1',
         'PORT': 3306,
         'USER': None,
@@ -110,9 +110,9 @@ DATABASES = {
             'charset': 'utf8mb4',
         },
     },
-    'backoffice_legacy': {
+    'front_legacy': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'PRIB',
+        'NAME': 'PRIF',
         'HOST': '127.0.0.1',
         'PORT': 3306,
         'USER': None,

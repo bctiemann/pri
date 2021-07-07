@@ -30,7 +30,7 @@ class Command(BaseCommand):
         aes = AESCipher(key)
 
         legacy_db = settings.DATABASES['default_legacy']
-        legacy_backoffice_db = settings.DATABASES['backoffice_legacy']
+        legacy_front_db = settings.DATABASES['front_legacy']
         db = MySQLdb.connect(
             passwd=legacy_db['PASSWORD'],
             db=legacy_db['NAME'],
@@ -38,15 +38,15 @@ class Command(BaseCommand):
             user=legacy_db['USER'],
             charset=legacy_db['OPTIONS']['charset'],
         )
-        front_cursor = db.cursor(MySQLdb.cursors.DictCursor)
-        backoffice_db = MySQLdb.connect(
-            passwd=legacy_backoffice_db['PASSWORD'],
-            db=legacy_backoffice_db['NAME'],
-            host=legacy_backoffice_db['HOST'],
-            user=legacy_backoffice_db['USER'],
-            charset=legacy_backoffice_db['OPTIONS']['charset'],
+        back_cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        front_db = MySQLdb.connect(
+            passwd=legacy_front_db['PASSWORD'],
+            db=legacy_front_db['NAME'],
+            host=legacy_front_db['HOST'],
+            user=legacy_front_db['USER'],
+            charset=legacy_front_db['OPTIONS']['charset'],
         )
-        back_cursor = backoffice_db.cursor(MySQLdb.cursors.DictCursor)
+        front_cursor = front_db.cursor(MySQLdb.cursors.DictCursor)
 
         clear_existing = options.get('clear_existing')
 
@@ -74,8 +74,15 @@ class Command(BaseCommand):
                     weighting=old['weighting'],
                 )
                 front_cursor.execute("""SELECT * FROM VehiclesFront where vehicleid=%s""", old['vehicleid'])
-                old = front_cursor.fetchone()
-                print(old)
+                old_front = front_cursor.fetchone()
+                print(old_front)
                 new_front = VehicleMarketing.objects.create(
                     vehicle_id=new.id,
+                    make=old['make'],
+                    model=old['model'],
+                    year=old['year'],
+                    vehicle_type=old['type'],
+                    status=old_front['status'],
                 )
+                new.status = old_front['status']
+                new.save()

@@ -2,24 +2,11 @@ from encrypted_fields import fields
 
 from django.db import models
 
-from fleet.models import VehicleMarketing
+from fleet.models import VehicleMarketing, VehicleType, VehicleStatus
 
 
 # vehicles
 class Vehicle(models.Model):
-
-    # TextChoices and IntegerChoices are enum classes with internal and verbose values; if a CharField is set to use
-    # this object for its choices, it will be represented in the admin with a select dropdown of acceptable values.
-    class VehicleType(models.TextChoices):
-        CAR = ('car', 'Road Car')
-        BIKE = ('bike', 'Bike')
-        TRACK = ('track', 'Track Car')
-
-    class Status(models.IntegerChoices):
-        BUILDING = (0, 'Building')
-        READY = (1, 'Ready')
-        DOWN = (2, 'Damaged / Repairing')
-        OUT_OF_SERVICE = (3, 'Out Of Service')
 
     # Fields defined on the model correspond to database columns and fully define their behavior both in DB and in code.
     # Model field names should be verbose, specific, and expressive; i.e. "vehicle_type" rather than "vtype"
@@ -28,10 +15,12 @@ class Vehicle(models.Model):
     # https://docs.djangoproject.com/en/3.1/ref/models/fields/
     make = models.CharField(max_length=255, blank=True)
     model = models.CharField(max_length=255, blank=True)
-    year = models.IntegerField()
+    year = models.IntegerField(null=True, blank=True)
     vehicle_type = models.CharField(choices=VehicleType.choices, max_length=20, blank=True)
+    status = models.IntegerField(choices=VehicleStatus.choices, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     acquired_on = models.DateField(null=True, blank=True)
+    relinquished_on = models.DateField(null=True, blank=True)
     plate = models.CharField(max_length=10, blank=True)
     vin = models.CharField(max_length=50, blank=True)
     mileage = models.IntegerField(null=True, blank=True)

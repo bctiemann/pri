@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
 
-from fleet.models import VehicleMarketing
+from fleet.models import VehicleMarketing, VehicleType, VehicleStatus
 from backoffice.models import Vehicle
 
 
@@ -9,7 +9,7 @@ from backoffice.models import Vehicle
 def home(request):
     context = {
         'foo': 'bar',
-        'cars': Vehicle.objects.filter(vehicle_type=Vehicle.VehicleType.CAR.value),
+        'cars': Vehicle.objects.filter(vehicle_type=VehicleType.CAR.value),
     }
     return render(request, 'home.html', context=context)
 
@@ -22,5 +22,5 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['foo'] = 'bar'
-        context['cars'] = Vehicle.objects.filter(vehicle_type=Vehicle.VehicleType.CAR.value)
+        context['cars'] = Vehicle.objects.filter(vehicle_type=VehicleType.CAR.value)
         return context
