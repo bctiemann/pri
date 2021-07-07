@@ -1,3 +1,10 @@
 from django.contrib import admin
 
-# Register your models here.
+from backoffice.models import Vehicle
+
+
+class VehicleAdmin(admin.ModelAdmin):
+    list_display = ('make', 'model', 'year',)
+
+
+admin.site.register(Vehicle, VehicleAdmin)

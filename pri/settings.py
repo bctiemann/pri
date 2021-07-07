@@ -44,9 +44,10 @@ INSTALLED_APPS = [
     'django_otp.plugins.otp_static',
     'django_otp.plugins.otp_totp',
     'two_factor',
+    'encrypted_fields',
 
     'users',
-    'rentals',
+    'fleet',
     'customer_portal',
     'backoffice',
 ]
@@ -92,8 +93,38 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    },
+    'backoffice': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db_backoffice.sqlite3',
+    },
+    'default_legacy': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'PRIF',
+        'HOST': '127.0.0.1',
+        'PORT': 3306,
+        'USER': None,
+        'PASSWORD': None,
+        'OPTIONS': {
+            'init_command': 'SET character_set_connection=utf8mb4, collation_connection=utf8mb4_general_ci',
+            'charset': 'utf8mb4',
+        },
+    },
+    'backoffice_legacy': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'PRIB',
+        'HOST': '127.0.0.1',
+        'PORT': 3306,
+        'USER': None,
+        'PASSWORD': None,
+        'OPTIONS': {
+            'init_command': 'SET character_set_connection=utf8mb4, collation_connection=utf8mb4_general_ci',
+            'charset': 'utf8mb4',
+        },
+    },
 }
+
+DATABASE_ROUTERS = ('pri.db_routers.BackOfficeDBRouter',)
 
 
 # Password validation
