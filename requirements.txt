@@ -9,3 +9,4 @@ jedi==0.17.2
 pycryptodome==3.10.1
 django-searchable-encrypted-fields==0.1.9
 django-countries==7.2.1
+django-prettyjson==0.4.1

@@ -1,4 +1,7 @@
+from prettyjson import PrettyJSONWidget
+
 from django.contrib import admin
+from django.db.models import JSONField
 
 from fleet.models import Vehicle, VehicleMarketing
 
@@ -9,7 +12,9 @@ class VehicleAdmin(admin.ModelAdmin):
 
 class VehicleMarketingAdmin(admin.ModelAdmin):
     list_display = ('id', 'make', 'model', 'year', 'status',)
-
+    formfield_overrides = {
+        JSONField: {'widget': PrettyJSONWidget}
+    }
 
 admin.site.register(Vehicle, VehicleAdmin)
 admin.site.register(VehicleMarketing, VehicleMarketingAdmin)
