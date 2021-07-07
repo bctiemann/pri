@@ -1,3 +1,5 @@
+import uuid
+
 from encrypted_fields import fields
 from django_countries.fields import CountryField
 
@@ -6,6 +8,7 @@ from django.db import models
 
 # TextChoices and IntegerChoices are enum classes with internal and verbose values; if a CharField is set to use
 # this object for its choices, it will be represented in the admin with a select dropdown of acceptable values.
+
 class VehicleType(models.TextChoices):
     CAR = ('car', 'Road Car')
     BIKE = ('bike', 'Bike')
@@ -29,6 +32,22 @@ class LocationChoices(models.TextChoices):
     NEW_YORK = ('new_york', 'New York')
     TAMPA = ('tampa', 'Tampa')
 
+
+# Helper methods for providing custom upload locations for media
+
+def get_vehicle_picture_path(instance, filename):
+    extension = filename.split('.')[-1].lower()
+    filename = '{0}.{1}'.format(uuid.uuid4(), extension)
+    return 'pics/{0}'.format(filename)
+
+
+def get_vehicle_video_path(instance, filename):
+    extension = filename.split('.')[-1].lower()
+    filename = '{0}.{1}'.format(uuid.uuid4(), extension)
+    return 'vids/{0}'.format(filename)
+
+
+# Model classes
 
 class Vehicle(models.Model):
 
@@ -119,7 +138,11 @@ class VehicleMarketing(models.Model):
 
 
 class VehiclePicture(models.Model):
-    pass
+    vehicle = models.ForeignKey('fleet.Vehicle', null=True, on_delete=models.CASCADE)
+    image = models.ImageField(blank=True, width_field='width', height_field='height', upload_to=get_vehicle_picture_path)
+    width = models.IntegerField(null=True, blank=True)
+    height = models.IntegerField(null=True, blank=True)
+    is_first = models.BooleanField(default=False)
 
 
 class VehicleVideo(models.Model):
