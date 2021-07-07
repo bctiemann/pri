@@ -49,6 +49,10 @@ INSTALLED_APPS = [
 
     'users',
     'fleet',
+    'sales',
+    'service',
+    'consignment',
+    'marketing',
     'customer_portal',
     'backoffice',
 ]

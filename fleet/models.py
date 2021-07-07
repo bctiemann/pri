@@ -116,3 +116,15 @@ class VehicleMarketing(models.Model):
 
     def __str__(self):
         return f'[{self.id}] {self.vehicle_name}'
+
+
+class VehiclePicture(models.Model):
+    pass
+
+
+class VehicleVideo(models.Model):
+    pass
+
+
+class TollTag(models.Model):
+    pass

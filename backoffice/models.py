@@ -1,8 +1,12 @@
-from encrypted_fields import fields
-
 from django.db import models
 
-from fleet.models import VehicleMarketing, VehicleType, VehicleStatus
+
+class Employee(models.Model):
+    pass
+
+
+class BBSPost(models.Model):
+    pass
 
 
 # vehicles
