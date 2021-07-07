@@ -1,6 +1,6 @@
 from django import forms
 
-from backoffice.models import Vehicle
+from fleet.models import Vehicle
 
 
 class VehicleForm(forms.ModelForm):

@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
 
-from fleet.models import VehicleMarketing, VehicleType, VehicleStatus
-from backoffice.models import Vehicle
+from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
+# from backoffice.models import Vehicle
 
 
 # Function-based view

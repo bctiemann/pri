@@ -5,8 +5,7 @@ import json
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from backoffice.models import Vehicle
-from fleet.models import VehicleMarketing
+from fleet.models import Vehicle, VehicleMarketing
 from pri.cipher import AESCipher
 
 logger = logging.getLogger(__name__)
