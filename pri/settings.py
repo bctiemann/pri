@@ -124,7 +124,7 @@ DATABASES = {
     },
 }
 
-DATABASE_ROUTERS = ('pri.db_routers.BackOfficeDBRouter',)
+DATABASE_ROUTERS = ('pri.db_routers.FrontDBRouter',)
 
 
 # Password validation

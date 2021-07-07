@@ -1,17 +1,19 @@
 from fleet.models import VehicleMarketing
 
+FRONT_MODELS = [VehicleMarketing]
 
-class BackOfficeDBRouter(object):
+
+class FrontDBRouter(object):
 
     def db_for_read(self, model, **hints):
-        """ reading VehicleMarketing from front """
-        if model == VehicleMarketing:
+        """ reading model from front """
+        if model in FRONT_MODELS:
             return 'front'
         return None
 
     def db_for_write(self, model, **hints):
-        """ writing VehicleMarketing to front """
-        if model == VehicleMarketing:
+        """ writing model to front """
+        if model in FRONT_MODELS:
             return 'front'
         return None
 
