@@ -47,14 +47,19 @@ using the buttons to the right of the configuration.
 
 ### Django Structure
 
-Functionality in a Django project is organized into "apps" within the project. A basic `rentals` app/directory has been 
-created which contains core business logic, combining the non-authenticated and secure workflows of the existing site. 
-There is also `customer_portal` which will house the authenticated customer portal views, and `backoffice` which is the 
-administrative backend for processing rentals and other admin ops. More apps can be created if desired to keep 
-functionality segregated. Note that each app you add (via `./manage.py startapp <app>`) needs to be added to 
-`INSTALLED_APPS` in the settings in order for it to be recognized by Django.
+Functionality in a Django project is organized into "apps" (modules) within the project. There are apps for `fleet`, 
+`sales`, `backoffice`, and other directories which serve both as logical groupings of data models (tables), and to
+represent sub-sites within the main site (such as the non-authenticated site root, the secure customer portal,
+and the backoffice admin area). 
 
-Models (code representations of database tables, and all object-oriented code surrounding them) reside in `models.py`.
+More apps can be created if desired to keep  functionality segregated. Note that each app you add (via 
+`./manage.py startapp <app>`) needs to be added to `INSTALLED_APPS` in the settings in order for it to be recognized 
+by Django.
+
+Within an app, models (code representations of database tables, and all object-oriented code surrounding them) reside 
+in `models.py`. All tables from the database should be described in a `models.py` file and registered in an `admin.py`
+to be accessed via the standard Django admin for basic CRUD management (the backoffice site replaces most of this, but
+it's often important to be able to manage the DB objects directly and without business logic).
 
 Views (code which responds to a request with data which may be derived from models and either rendered to an HTML template or 
 returned in structured JSON) live in `views.py`.
