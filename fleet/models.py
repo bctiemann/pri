@@ -158,6 +158,7 @@ class VehiclePicture(models.Model):
     thumb_height = models.IntegerField(null=True, blank=True)
     is_first = models.BooleanField(default=False)
 
+    # Override save method to post-process the uploaded image/thumbnail
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
@@ -181,7 +182,7 @@ class VehiclePicture(models.Model):
             if not self.thumbnail:
                 thumb_size = (settings.THUMB_MAX_WIDTH, settings.THUMB_MAX_HEIGHT)
                 format_mime_type = image.get_format_mimetype()
-                thumb_format = self.IMAGE_FORMAT_MAP.get(format_mime_type)
+                thumb_format = self.IMAGE_FORMAT_MAP.get(format_mime_type, 'JPEG')
 
                 image.thumbnail(thumb_size)
                 temp_thumb = BytesIO()

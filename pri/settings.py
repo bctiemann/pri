@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'two_factor',
     'encrypted_fields',
     'prettyjson',
+    'localflavor',
+    'phonenumber_field',
 
     'users',
     'fleet',
@@ -189,6 +191,8 @@ COMPANY_NAME = 'Performance Rentals'
 SUPPORT_EMAIL = 'support@performance.rentals'
 
 COUNTRIES_ONLY = ['US', 'JP', 'IT', 'GB', 'DE']
+
+PHONENUMBER_DEFAULT_REGION = 'US'
 
 PIC_MAX_WIDTH = 1000
 PIC_MAX_HEIGHT = 1000

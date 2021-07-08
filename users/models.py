@@ -1,3 +1,7 @@
+from localflavor.us.models import USStateField, USZipCodeField
+from phonenumber_field.modelfields import PhoneNumberField
+from encrypted_fields import fields
+
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.utils.translation import ugettext_lazy as _
@@ -58,7 +62,7 @@ class User(AbstractBaseUser):
     )
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
-    mailing_address = models.TextField(_('mailing address'), blank=True)
+    # mailing_address = models.TextField(_('mailing address'), blank=True)
     is_active = models.BooleanField(
         _('active'),
         default=True,
@@ -116,3 +120,78 @@ class User(AbstractBaseUser):
     @property
     def is_superuser(self):
         return self.is_admin
+
+
+class Customer(models.Model):
+    user = models.OneToOneField('users.User', null=True, blank=True, on_delete=models.SET_NULL)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    # Mailing address lines are encrypted
+    address_line_1 = fields.EncryptedCharField(max_length=255, blank=True)
+    address_line_2 = fields.EncryptedCharField(max_length=255, blank=True)
+    city = models.CharField(max_length=255, blank=True)
+    state = USStateField(blank=True)
+    zip = USZipCodeField(blank=True)
+
+    # PhoneNumberFields need to be input either as (555) 123-1234 or +15551231234
+    # Use home_phone.as_national to display in (555) 123-1234 style
+    home_phone = PhoneNumberField(blank=True)
+    work_phone = PhoneNumberField(blank=True)
+    mobile_phone = PhoneNumberField(blank=True)
+    fax = PhoneNumberField(blank=True)
+
+    date_of_birth = models.DateField(null=True, blank=True)
+
+    license_number = fields.EncryptedCharField(max_length=30, blank=True)
+    license_state = USStateField(blank=True)
+    license_history = fields.EncryptedTextField(blank=True)
+
+    insurance_company = models.CharField(max_length=255, blank=True)
+    insurance_policy_number = fields.EncryptedCharField(max_length=255, blank=True)
+    insurance_company_phone = PhoneNumberField(blank=True)
+    coverage_verified = models.BooleanField(default=False)
+    rentals_count = models.IntegerField(null=True, blank=True)
+
+    cc_number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC1 number')
+    cc_exp_yr = models.CharField(max_length=4, blank=True, verbose_name='CC1 exp year')
+    cc_exp_mo = models.CharField(max_length=2, blank=True, verbose_name='CC1 exp month')
+    cc_cvv = models.CharField(max_length=6, blank=True, verbose_name='CC1 CVV')
+    cc_phone = PhoneNumberField(blank=True, verbose_name='CC1 contact phone')
+
+    cc2_number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC2 number')
+    cc2_exp_yr = models.CharField(max_length=4, blank=True, verbose_name='CC2 exp year')
+    cc2_exp_mo = models.CharField(max_length=2, blank=True, verbose_name='CC2 exp month')
+    cc2_cvv = models.CharField(max_length=6, blank=True, verbose_name='CC2 CVV')
+    cc2_phone = PhoneNumberField(blank=True, verbose_name='CC2 contact phone')
+
+    remarks = fields.EncryptedTextField(blank=True)
+    driver_skill = models.IntegerField(null=True, blank=True)
+    discount = models.IntegerField(null=True, blank=True)
+    music_genre = models.ForeignKey('users.MusicGenre', null=True, blank=True, on_delete=models.SET_NULL)
+
+    first_time = models.BooleanField(default=True)
+    drivers_club = models.BooleanField(default=False)
+    no_email = models.BooleanField(default=False)
+    survey_done = models.BooleanField(default=False)
+
+    registration_ip = models.GenericIPAddressField(null=True, blank=True)
+    registration_long = models.FloatField(null=True, blank=True)
+    registration_lat = models.FloatField(null=True, blank=True)
+
+    @property
+    def first_name(self):
+        return self.user.first_name
+
+    @property
+    def last_name(self):
+        return self.user.last_name
+
+
+class MusicGenre(models.Model):
+    name = models.CharField(max_length=50, blank=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ('name',)

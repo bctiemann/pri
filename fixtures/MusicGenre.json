@@ -1,0 +1,191 @@
+[
+{
+    "model": "users.musicgenre",
+    "pk": 1,
+    "fields": {
+        "name": "50's"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 2,
+    "fields": {
+        "name": "60's"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 3,
+    "fields": {
+        "name": "70's"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 4,
+    "fields": {
+        "name": "80's"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 5,
+    "fields": {
+        "name": "90's"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 6,
+    "fields": {
+        "name": "Alternative"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 7,
+    "fields": {
+        "name": "Big Band / Swing"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 8,
+    "fields": {
+        "name": "Classical"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 9,
+    "fields": {
+        "name": "Country"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 10,
+    "fields": {
+        "name": "Dance"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 11,
+    "fields": {
+        "name": "Electronic"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 12,
+    "fields": {
+        "name": "Everything"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 13,
+    "fields": {
+        "name": "Heavy Metal"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 14,
+    "fields": {
+        "name": "Instrumental"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 15,
+    "fields": {
+        "name": "Jazz"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 16,
+    "fields": {
+        "name": "Mellow"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 17,
+    "fields": {
+        "name": "Musicals/Broadway"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 18,
+    "fields": {
+        "name": "Pop"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 19,
+    "fields": {
+        "name": "Punk"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 20,
+    "fields": {
+        "name": "Rap"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 21,
+    "fields": {
+        "name": "R&B"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 22,
+    "fields": {
+        "name": "Reggae"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 23,
+    "fields": {
+        "name": "Rock"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 24,
+    "fields": {
+        "name": "Soul"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 25,
+    "fields": {
+        "name": "Soundtracks"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 26,
+    "fields": {
+        "name": "Top 40"
+    }
+},
+{
+    "model": "users.musicgenre",
+    "pk": 27,
+    "fields": {
+        "name": "World"
+    }
+}
+]

@@ -1,10 +1,6 @@
 from django.db import models
 
 
-class Customer(models.Model):
-    pass
-
-
 class Reservation(models.Model):
     pass
 
