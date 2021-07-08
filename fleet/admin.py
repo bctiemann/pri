@@ -8,12 +8,11 @@ from fleet.models import Vehicle, VehicleMarketing, VehiclePicture
 
 class VehiclePictureInline(admin.TabularInline):
     model = VehiclePicture
-    fk_name = 'vehicle'
+    fk_name = 'vehicle_marketing'
 
 
 class VehicleAdmin(admin.ModelAdmin):
     list_display = ('make', 'model', 'year',)
-    inlines = (VehiclePictureInline,)
 
 
 class VehicleMarketingAdmin(admin.ModelAdmin):
@@ -21,6 +20,8 @@ class VehicleMarketingAdmin(admin.ModelAdmin):
     formfield_overrides = {
         JSONField: {'widget': PrettyJSONWidget}
     }
+    inlines = (VehiclePictureInline,)
+
 
 admin.site.register(Vehicle, VehicleAdmin)
 admin.site.register(VehicleMarketing, VehicleMarketingAdmin)

@@ -109,7 +109,7 @@ class Command(BaseCommand):
                     tight_fit=old_front['tightfit'],
                     blurb=old_front['blurb'],
                     specs=json.loads(old_front['specs']),
-                    origin_country=old_front['origin'],
+                    origin_country='GB' if old_front['origin'] == 'UK' else old_front['origin'],
                     price_per_day=old_front['price'],
                     discount_2_day=old_front['disc2day'],
                     discount_3_day=old_front['disc3day'],

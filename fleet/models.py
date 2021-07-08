@@ -138,7 +138,7 @@ class VehicleMarketing(models.Model):
 
 
 class VehiclePicture(models.Model):
-    vehicle = models.ForeignKey('fleet.Vehicle', null=True, on_delete=models.CASCADE)
+    vehicle_marketing = models.ForeignKey('fleet.VehicleMarketing', null=True, on_delete=models.CASCADE)
     image = models.ImageField(blank=True, width_field='width', height_field='height', upload_to=get_vehicle_picture_path)
     width = models.IntegerField(null=True, blank=True)
     height = models.IntegerField(null=True, blank=True)

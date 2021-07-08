@@ -1,6 +1,14 @@
-from fleet.models import VehicleMarketing
+from fleet.models import VehicleMarketing, VehiclePicture, VehicleVideo
+from marketing.models import NewsItem, NewsletterSubscription, Tweet
 
-FRONT_MODELS = [VehicleMarketing]
+FRONT_MODELS = [
+    VehicleMarketing,
+    VehiclePicture,
+    VehicleVideo,
+    NewsItem,
+    NewsletterSubscription,
+    Tweet,
+]
 
 
 class FrontDBRouter(object):
