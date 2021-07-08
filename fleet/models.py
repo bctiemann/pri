@@ -22,13 +22,13 @@ class VehicleStatus(models.IntegerChoices):
     OUT_OF_SERVICE = (3, 'Out Of Service')
 
 
-class TransmissionTypeChoices(models.TextChoices):
+class TransmissionType(models.TextChoices):
     MANUAL = ('manual', 'Manual')  # 1
     SEMI_AUTO = ('semi_auto', 'Semi-Auto')  # 2
     AUTO = ('auto', 'Automatic')  # 3
 
 
-class LocationChoices(models.TextChoices):
+class Location(models.TextChoices):
     NEW_YORK = ('new_york', 'New York')
     TAMPA = ('tampa', 'Tampa')
 
@@ -113,9 +113,9 @@ class VehicleMarketing(models.Model):
     horsepower = models.IntegerField(null=True, blank=True)
     torque = models.IntegerField(null=True, blank=True)
     top_speed = models.IntegerField(null=True, blank=True)
-    transmission_type = models.CharField(choices=TransmissionTypeChoices.choices, max_length=12, blank=True)
+    transmission_type = models.CharField(choices=TransmissionType.choices, max_length=12, blank=True)
     gears = models.IntegerField(null=True, blank=True)
-    location = models.CharField(choices=LocationChoices.choices, max_length=12, blank=True, default=LocationChoices.NEW_YORK)
+    location = models.CharField(choices=Location.choices, max_length=12, blank=True, default=Location.NEW_YORK)
     tight_fit = models.BooleanField(default=False)
     blurb = models.TextField(blank=True)
     specs = models.JSONField(null=True, blank=True, help_text='JSON format')

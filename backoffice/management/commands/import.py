@@ -5,10 +5,27 @@ import json
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from fleet.models import Vehicle, VehicleMarketing
+from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus, TransmissionType, Location
 from pri.cipher import AESCipher
 
 logger = logging.getLogger(__name__)
+
+VEHICLE_TYPE_MAP = {
+    1: VehicleType.CAR,
+    2: VehicleType.BIKE,
+    3: VehicleType.TRACK,
+}
+
+TRANSMISSION_TYPE_MAP = {
+    1: TransmissionType.MANUAL,
+    2: TransmissionType.SEMI_AUTO,
+    3: TransmissionType.AUTO,
+}
+
+LOCATION_MAP = {
+    1: Location.NEW_YORK,
+    2: Location.TAMPA,
+}
 
 
 class Command(BaseCommand):
@@ -62,7 +79,7 @@ class Command(BaseCommand):
                     make=old['make'],
                     model=old['model'],
                     year=old['year'],
-                    vehicle_type=old['type'],
+                    vehicle_type=VEHICLE_TYPE_MAP.get(old['type']),
                     status=0,
                     plate=old['plate'],
                     vin=old['vin'],
@@ -76,20 +93,19 @@ class Command(BaseCommand):
                 )
                 front_cursor.execute("""SELECT * FROM VehiclesFront where vehicleid=%s""", old['vehicleid'])
                 old_front = front_cursor.fetchone()
-                print(old_front)
                 new_front = VehicleMarketing.objects.create(
                     vehicle_id=new.id,
                     make=old['make'],
                     model=old['model'],
                     year=old['year'],
-                    vehicle_type=old['type'],
+                    vehicle_type=VEHICLE_TYPE_MAP.get(old['type']),
                     status=old_front['status'],
                     horsepower=old_front['hp'],
                     torque=old_front['tq'],
                     top_speed=old_front['topspeed'],
-                    transmission_type=old_front['trans'],
+                    transmission_type=TRANSMISSION_TYPE_MAP.get(old_front['trans']),
                     gears=old_front['gears'],
-                    location=old_front['location'],
+                    location=LOCATION_MAP.get(old_front['location']),
                     tight_fit=old_front['tightfit'],
                     blurb=old_front['blurb'],
                     specs=json.loads(old_front['specs']),
