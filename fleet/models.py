@@ -144,6 +144,11 @@ class VehicleMarketing(models.Model):
 
 
 class VehiclePicture(models.Model):
+    IMAGE_FORMAT_MAP = {
+        'image/jpeg': 'JPEG',
+        'image/png': 'PNG',
+    }
+
     vehicle_marketing = models.ForeignKey('fleet.VehicleMarketing', null=True, on_delete=models.CASCADE)
     image = models.ImageField(blank=True, width_field='width', height_field='height', upload_to=get_vehicle_picture_path)
     width = models.IntegerField(null=True, blank=True)
@@ -162,21 +167,25 @@ class VehiclePicture(models.Model):
             except:
                 return False
 
+            # Resize uploaded image if larger than the main limits
             if image.width > settings.PIC_MAX_WIDTH or image.height > settings.PIC_MAX_HEIGHT:
                 pic_size = (settings.PIC_MAX_WIDTH, settings.PIC_MAX_HEIGHT)
+
                 image.thumbnail(pic_size)
                 image.save(self.image.path)
                 self.width = image.width
                 self.height = image.height
                 super().save(*args, **kwargs)
 
+            # Then, if there is no thumbnail, make a copy and resize
             if not self.thumbnail:
                 thumb_size = (settings.THUMB_MAX_WIDTH, settings.THUMB_MAX_HEIGHT)
-                image.thumbnail(thumb_size)
+                format_mime_type = image.get_format_mimetype()
+                thumb_format = self.IMAGE_FORMAT_MAP.get(format_mime_type)
 
-                FTYPE = 'JPEG'
+                image.thumbnail(thumb_size)
                 temp_thumb = BytesIO()
-                image.save(temp_thumb, FTYPE, quality=90)
+                image.save(temp_thumb, thumb_format, quality=90)
                 temp_thumb.seek(0)
                 self.thumbnail.save(self.image.name, ContentFile(temp_thumb.read()), save=True)
                 temp_thumb.close()
