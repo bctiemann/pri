@@ -1,9 +1,15 @@
 import uuid
+import os
 
 from encrypted_fields import fields
 from django_countries.fields import CountryField
+from PIL import Image
+from io import BytesIO
 
+from django.conf import settings
 from django.db import models
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 
 
 # TextChoices and IntegerChoices are enum classes with internal and verbose values; if a CharField is set to use
@@ -142,7 +148,39 @@ class VehiclePicture(models.Model):
     image = models.ImageField(blank=True, width_field='width', height_field='height', upload_to=get_vehicle_picture_path)
     width = models.IntegerField(null=True, blank=True)
     height = models.IntegerField(null=True, blank=True)
+    thumbnail = models.ImageField(blank=True, width_field='thumb_width', height_field='thumb_height', upload_to=get_vehicle_picture_path)
+    thumb_width = models.IntegerField(null=True, blank=True)
+    thumb_height = models.IntegerField(null=True, blank=True)
     is_first = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.image:
+            try:
+                image = Image.open(self.image.path)
+            except:
+                return False
+
+            if image.width > settings.PIC_MAX_WIDTH or image.height > settings.PIC_MAX_HEIGHT:
+                pic_size = (settings.PIC_MAX_WIDTH, settings.PIC_MAX_HEIGHT)
+                image.thumbnail(pic_size)
+                image.save(self.image.path)
+                self.width = image.width
+                self.height = image.height
+                super().save(*args, **kwargs)
+
+            if not self.thumbnail:
+                thumb_size = (settings.THUMB_MAX_WIDTH, settings.THUMB_MAX_HEIGHT)
+                image.thumbnail(thumb_size)
+
+                FTYPE = 'JPEG'
+                temp_thumb = BytesIO()
+                image.save(temp_thumb, FTYPE, quality=90)
+                temp_thumb.seek(0)
+                self.thumbnail.save(self.image.name, ContentFile(temp_thumb.read()), save=True)
+                temp_thumb.close()
+                super().save(*args, **kwargs)
 
 
 class VehicleVideo(models.Model):

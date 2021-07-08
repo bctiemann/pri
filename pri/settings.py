@@ -190,6 +190,11 @@ SUPPORT_EMAIL = 'support@performance.rentals'
 
 COUNTRIES_ONLY = ['US', 'JP', 'IT', 'GB', 'DE']
 
+PIC_MAX_WIDTH = 1000
+PIC_MAX_HEIGHT = 1000
+THUMB_MAX_WIDTH = 150
+THUMB_MAX_HEIGHT = 150
+
 
 # Local overrides from env.yaml
 with open(os.path.join(BASE_DIR, 'env.yaml')) as f:
