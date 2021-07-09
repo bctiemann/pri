@@ -24,7 +24,8 @@ class AESCipher(object):
         return self._remove_control_chars(str(self._unpad(decrypted), 'utf-8'))
 
     def _remove_control_chars(self, s):
-        return self.control_char_re.sub('', s)
+        return s
+        # return self.control_char_re.sub('', s)
 
     def _pad(self, s):
         return s + (self.bs - len(s) % self.bs) * chr(self.bs - len(s) % self.bs)

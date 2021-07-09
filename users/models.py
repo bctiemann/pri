@@ -60,18 +60,16 @@ class User(AbstractBaseUser):
         max_length=191,
         unique=True,
     )
-    first_name = models.CharField(_('first name'), max_length=30, blank=True)
-    last_name = models.CharField(_('last name'), max_length=30, blank=True)
     # mailing_address = models.TextField(_('mailing address'), blank=True)
     is_active = models.BooleanField(
         _('active'),
         default=True,
         help_text=_(
-            'Designates whether this user should be treated as active. '
+            'Designates whether this user should be allowed to login. '
             'Unselect this instead of deleting accounts.'
         ),
     )
-    is_admin = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False, help_text='Designates whether this user has access to the admin and backoffice sites.')
     notes = models.TextField(blank=True)
     date_joined = models.DateTimeField(auto_now_add=True)
     date_deleted = models.DateTimeField(null=True, blank=True)
@@ -81,10 +79,6 @@ class User(AbstractBaseUser):
     USERNAME_FIELD = 'email'
 
     objects = UserManager()
-
-    @property
-    def full_name(self):
-        return '{0} {1}'.format(self.first_name, self.last_name)
 
     def get_full_name(self):
         # The user is identified by their email address
@@ -126,6 +120,9 @@ class Customer(models.Model):
     user = models.OneToOneField('users.User', null=True, blank=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    first_name = models.CharField(_('first name'), max_length=30, blank=True)
+    last_name = models.CharField(_('last name'), max_length=30, blank=True)
+
     # Mailing address lines are encrypted
     address_line_1 = fields.EncryptedCharField(max_length=255, blank=True)
     address_line_2 = fields.EncryptedCharField(max_length=255, blank=True)
@@ -133,7 +130,6 @@ class Customer(models.Model):
     state = USStateField(blank=True)
     zip = USZipCodeField(blank=True)
 
-    # PhoneNumberFields need to be input either as (555) 123-1234 or +15551231234
     # Use home_phone.as_national to display in (555) 123-1234 style
     home_phone = PhoneNumberField(blank=True)
     work_phone = PhoneNumberField(blank=True)
@@ -150,7 +146,6 @@ class Customer(models.Model):
     insurance_policy_number = fields.EncryptedCharField(max_length=255, blank=True)
     insurance_company_phone = PhoneNumberField(blank=True)
     coverage_verified = models.BooleanField(default=False)
-    rentals_count = models.IntegerField(null=True, blank=True)
 
     cc_number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC1 number')
     cc_exp_yr = models.CharField(max_length=4, blank=True, verbose_name='CC1 exp year')
@@ -164,6 +159,7 @@ class Customer(models.Model):
     cc2_cvv = models.CharField(max_length=6, blank=True, verbose_name='CC2 CVV')
     cc2_phone = PhoneNumberField(blank=True, verbose_name='CC2 contact phone')
 
+    rentals_count = models.IntegerField(null=True, blank=True)
     remarks = fields.EncryptedTextField(blank=True)
     driver_skill = models.IntegerField(null=True, blank=True)
     discount = models.IntegerField(null=True, blank=True)
@@ -172,19 +168,12 @@ class Customer(models.Model):
     first_time = models.BooleanField(default=True)
     drivers_club = models.BooleanField(default=False)
     no_email = models.BooleanField(default=False)
+    ban = models.BooleanField(default=False)
     survey_done = models.BooleanField(default=False)
 
-    registration_ip = models.GenericIPAddressField(null=True, blank=True)
-    registration_long = models.FloatField(null=True, blank=True)
-    registration_lat = models.FloatField(null=True, blank=True)
-
-    @property
-    def first_name(self):
-        return self.user.first_name
-
-    @property
-    def last_name(self):
-        return self.user.last_name
+    registration_ip = models.GenericIPAddressField(null=True, blank=True, verbose_name='Registration IP')
+    registration_long = models.FloatField(null=True, blank=True, verbose_name='Registration longitude')
+    registration_lat = models.FloatField(null=True, blank=True, verbose_name='Registration latitude')
 
 
 class MusicGenre(models.Model):
