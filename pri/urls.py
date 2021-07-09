@@ -20,6 +20,7 @@ from django.urls import path, include
 from django.conf.urls import static
 from django.conf import settings
 from fleet import views as rentals_views
+from marketing import views as marketing_views
 from users import views as users_views
 from django.contrib.auth import views as auth_views
 
@@ -61,8 +62,8 @@ urlpatterns = [
     # This is an example of directly registering an app's views in the central site's urls.py. As the site grows,
     # it might be better for each app dir to have its own urls.py and for this file to include that app's urls.py
     # at a specified mount point.
-    path('', rentals_views.HomeView.as_view(), name='home'), # Class-based view version
-    # path('', rentals_views.home, name='home'), # Function-based view version
+    path('', marketing_views.HomeView.as_view(), name='home'),  # Class-based view version
+    # path('', rentals_views.home, name='home'),  # Function-based view version
 
     # This is an example of an app's own namespaced urls.py being included in the main one at a mount point.
     # This app contains the legacy site's administrative/business UI.

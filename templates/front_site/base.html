@@ -1,0 +1,130 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+    <title>Performance Rentals - Exotic Car and Motorcycle Rentals for the enthusiast!</title>
+    {% include "front_site/includes/meta.html" %}
+    {% include "front_site/includes/styles.html" %}
+    {% include "front_site/includes/js.html" %}
+</head>
+<body>
+
+    <div class="wrapper">
+
+        <CFINCLUDE TEMPLATE="inc_nav.cfm">
+        {% include "front_site/includes/nav.html" %}
+
+        <section class="l-content">
+
+            {% block content %}{% endblock %}
+
+        </section>
+
+        <div class="push"></div>
+    </div>
+
+
+
+    <footer class='l-footer'>
+    <nav>
+    <div class="l-container" style="position: relative;">
+    <a href='/' class='' style="z-index: 10; position: relative;"><img src='images/PRI_logo.png' alt='Performance Rentals' width='255px'></a>
+    <ul>
+        <cfoutput>
+        <li><a href="#OnSite#fleet.cfm">Fleet &amp; Rates</a></li>
+        <li><a href="#OnSite#services.cfm">Services</a></li>
+        <li><a href="#OnSite#specials.cfm">Specials</a></li>
+        <li><a href="#OnSite#about.cfm">About Us</a></li>
+        <li><a href="#OnSite#policies.cfm">Policies</a></li>
+        <li><a href="#OnSite#news.cfm">News</a></li>
+        <li><a href="#OnSite#contact.cfm">Contact</a></li>
+        </cfoutput>
+    </ul>
+    </div>
+    </nav>
+
+
+    <CFQUERY NAME="news" DATASOURCE="#FDSN#">
+    SELECT newsid,subject,thenews FROM News
+    ORDER BY stamp DESC
+    LIMIT 3
+    </CFQUERY>
+
+    <section class="quick-links">
+    <div class='l-container' style="position: relative; z-index: 10;">
+    <div class="l-row">
+    <section class='footer-container l-col-4'>
+    <span>News</span>
+    <ul class='object-list'>
+    <CFIF news.recordcount GT 0>
+    <CFOUTPUT QUERY="news">
+        <li><a href="#OnSite#news.cfm?newsid=#newsid#">#subject#</a></li>
+        <small><CFIF len(thenews) GT 100>#left(thenews,100)#...<CFELSE>#thenews#</CFIF></small>
+    </CFOUTPUT>
+     <CFELSE>
+     <li>None.</li>
+     </CFIF>
+     </ul>
+    <div class="ant-footer">
+    <CFINCLUDE TEMPLATE="inc_footer_seo.cfm">
+    </div>
+    </section>
+
+
+    <CFQUERY NAME="tweets" DATASOURCE="#FDSN#">
+    SELECT text,stamp FROM tweets
+    ORDER BY stamp DESC
+    LIMIT 2
+    </CFQUERY>
+
+    <section class='footer-container l-col-4'>
+    <span>Twitter</span> <small><i><a target="_blank" href="http://twitter.com/PerfRentals">@PerfRentals</a></i></small>
+    <br /><br />
+    <CFIF tweets.recordcount GT 0>
+    <CFOUTPUT QUERY="tweets">
+    <p class="tweet">#text#<br /><small class="er">#DateFormat(stamp,"mm/dd/yy")# @ #TimeFormat(stamp,"HH:mm")#</small></p><br />
+    </CFOUTPUT>
+    <CFELSE>
+    No tweets.
+    </CFIF>
+    </section>
+    <section class='footer-container l-col-4 l-lastcol'>
+    <span>Follow Performance Rentals</span>
+    <br />
+    <ul class='sock-list'>
+        <cfoutput>
+        <li><a href="https://twitter.com/perfrentals" class="twatter-follow-button" data-show-count="false" data-show-screen-name="true">Follow @perfrentals</a></li>
+        <li><a href="https://www.youtube.com/channel/UCunX3VH-J1xSc9KZF-lAqyA">Watch us on YouTube</a></li>
+        <li><a href="https://profiles.google.com/105350119426435106180/about" rel="publisher">Find us on Google+</a></li>
+        <li><a href="#OnSecSite#newsletter.cfm" rel="publisher">Subscribe to our Newsletter</a></li>
+        </cfoutput>
+    </ul>
+    <a target="_blank" href="https://itunes.apple.com/us/app/pri-cars/id456142248?mt=8"><img class="app-store" src="images/appstore.png" /></a>
+    </section>
+    </div>
+    </div>
+
+
+    </section>
+
+    <section class='info'>
+    <div class='l-container'>
+    <ul>
+        <cfoutput>
+        <li><a href="#OnSite#terms.cfm">Terms & Conditions</a></li>
+        <li><a href="#OnSite#privacy.cfm">Privacy Policy</a></li>
+        <li><a href="#OnSite#media.cfm">Media Inquiries</a></li>
+        <li><a href="#OnSite#terms.cfm">Copyright &copy; 2007-<CFOUTPUT>#DateFormat(Now(),"yyyy")#</CFOUTPUT> Performance Rentals, Inc. All Rights Reserved.	</a></li>
+        </cfoutput>
+    </ul>
+    </div>
+    </section>
+
+    </footer>
+
+
+    <CFINCLUDE TEMPLATE="inc_trk.cfm">
+
+</body>
+</html>

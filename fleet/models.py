@@ -103,7 +103,7 @@ class Vehicle(models.Model):
 class VehicleMarketing(models.Model):
 
     # This links the record to the Vehicle object, which is where potentially sensitive business data
-    # is stored. Cannot be a ForeignKey because the databases are kept segregated.
+    # is stored. Cannot be a ForeignKey because the databases are kept segregated. See pri/db_routers.py
     vehicle_id = models.IntegerField(null=True, blank=True, help_text='ID of Vehicle object this corresponds to')
 
     # These fields are redundant with the Vehicle class, and will be updated concurrently with that table when

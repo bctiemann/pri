@@ -54,13 +54,13 @@ class UserManager(BaseUserManager):
         return user
 
 
+# User is based on the internal Django authentication model, used for all password logins
 class User(AbstractBaseUser):
     email = LowercaseEmailField(
         verbose_name='email address',
         max_length=191,
         unique=True,
     )
-    # mailing_address = models.TextField(_('mailing address'), blank=True)
     is_active = models.BooleanField(
         _('active'),
         default=True,
@@ -72,7 +72,6 @@ class User(AbstractBaseUser):
     is_admin = models.BooleanField(default=False, help_text='Designates whether this user has access to the admin and backoffice sites.')
     notes = models.TextField(blank=True)
     date_joined = models.DateTimeField(auto_now_add=True)
-    date_deleted = models.DateTimeField(null=True, blank=True)
     created_by = models.ForeignKey('User', null=True, blank=True, on_delete=models.SET_NULL)
     last_login = models.DateTimeField(null=True, blank=True)
 
@@ -116,6 +115,7 @@ class User(AbstractBaseUser):
         return self.is_admin
 
 
+# Customer contains all business data for a customer, and optionally is linked to a login user
 class Customer(models.Model):
     user = models.OneToOneField('users.User', null=True, blank=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
