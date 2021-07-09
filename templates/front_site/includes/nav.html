@@ -19,6 +19,7 @@
 <a class="header-logo" href="#OnSite#"><img src="{% static "images/PRI_logo.png" %}" alt="Performance Rentals" width="255px"></a>
 </cfoutput>
 
+{% comment %}
 <CFQUERY NAME="theCars" DATASOURCE="#DSN#">
 SELECT vehicleid,make,model FROM Vehicles
 WHERE type = 1
@@ -32,34 +33,29 @@ WHERE type = 2
 AND status = 1
 ORDER BY weighting DESC
 </CFQUERY>
+{% endcomment %}
 
 <ul class='header-sitenav header-nav-obj'>
-    <cfoutput>
     <li class='fleet dropdown'><a href='#OnSite#fleet.cfm?list=cars'>Cars</a>
-    </cfoutput>
         <ul class="dropdown-menu">
-        <CFOUTPUT QUERY="theCars">
-            <li><a href="#OnSite#vehicles.cfm?vid=#vehicleid#">#make# #model#</a></li>
-        </CFOUTPUT>
+        {% for car in cars %}
+            <li><a href="#OnSite#vehicles.cfm?vid=#vehicleid#">{{ car.make }} {{ car.model }}</a></li>
+        {% endfor %}
         </ul>
     </li>
-    <cfoutput>
     <li class='fleet dropdown'><a href='#OnSite#fleet.cfm?list=bikes'>Bikes</a>
-    </cfoutput>
         <ul class="dropdown-menu">
-        <CFOUTPUT QUERY="theBikes">
-            <li><a href="#OnSite#vehicles.cfm?vid=#vehicleid#">#make# #model#</a></li>
-        </CFOUTPUT>
+        {% for bike in bikes %}
+            <li><a href="#OnSite#vehicles.cfm?vid=#vehicleid#">{{ bike.make }} {{ bike.model }}</a></li>
+        {% endfor %}
         </ul>
     </li>
-    <cfoutput>
     <li class='services'><a href='#OnSite#services.cfm'>Our Services</a></li>
     <li class='services'><a href='#OnSite#specials.cfm'>Specials</a></li>
     <li class='services'><a href='#OnSite#about.cfm'>About Us</a></li>
     <li class='services'><a href='#OnSite#policies.cfm'>Policies</a></li>
     <li class='services'><a href='#OnSite#news.cfm'>News</a></li>
     <li class='services'><a href='#OnSite#contact.cfm'>Contact</a></li>
-    </cfoutput>
 </ul>
 
 

@@ -1,11 +1,11 @@
 {% extends "front_site/base.html" %}
 
 {% block content %}
-<CFINCLUDE TEMPLATE="inc_showcase.cfm">
+    {% include "front_site/includes/showcase.html" %}
 
-<div class="l-container">
+    <div class="l-container">
 
-    <CFINCLUDE TEMPLATE="inc_offers.cfm">
+        {% include "front_site/includes/offers.html" %}
 
-</div>
+    </div>
 {% endblock %}

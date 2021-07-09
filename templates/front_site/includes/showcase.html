@@ -1,0 +1,114 @@
+{% comment %}
+<cfquery name="Showcase" datasource="#DSN#">
+    SELECT vehicleid,make,model,type FROM Vehicles
+    WHERE status = 1
+    <cfif IsDefined("URL.t") AND IsNumeric(URL.t)>
+        AND type = <CFQUERYPARAM value="#URL.t#" CFSQLType="CF_SQL_INTEGER">
+    </cfif>
+    ORDER BY RAND()
+    LIMIT 1
+</cfquery>
+{% endcomment %}
+
+<cfoutput query="Showcase">
+
+    {% comment %}
+    <cfquery name="ShowcaseFront" datasource="#FDSN#">
+        SELECT price,blurb,hp,tq,gears,trans,topspeed,specs FROM VehiclesFront
+        WHERE vehicleid = <CFQUERYPARAM value="#vehicleid#" CFSQLType="CF_SQL_INTEGER">
+    </cfquery>
+    {% endcomment %}
+
+    <cftry>
+        <cfset specsStruct = DeserializeJSON(ShowcaseFront.specs)>
+        <cfcatch type="Any">
+        </cfcatch>
+    </cftry>
+
+    <div class="showcase" style="background-image: url('images/#vehicleid#-showcase.jpg');">
+        <div class="showcase-overlay">
+            <h1 class="cartitle">{{ showcase_vehicle.make }} {{ showcase_vehicle.model }}</h1>
+
+            <cftry>
+                <cfset headline = specsStruct.headline>
+                <h1 class="cartitle headline">#headline#</h1>
+                <cfcatch type="Any">
+                </cfcatch>
+            </cftry>
+
+            <div class="showcasecontent">
+                #parseNewlines(ShowcaseFront.blurb)#
+            </div>
+            <p class="readmore">
+                <a href="vehicle.cfm?vid=#vehicleid#">Read more</a>
+            </p>
+
+            <div class="carstats">
+                <h3 class="statsheader">Quick Stats</h3>
+                <table class="labeled">
+                    <tr>
+                        <td>Power:</td> <td>#ShowcaseFront.hp# bhp</td>
+                    </tr>
+                    <tr>
+                        <td>Torque:</td> <td>#ShowcaseFront.tq# ft-lbs</td>
+                    </tr>
+                    <tr>
+                        <cfif ShowcaseFront.trans IS 1>
+                            <cfset transtype = "manual">
+                        <cfelseif ShowcaseFront.trans IS 2>
+                            <cfset transtype = "paddle-shift">
+                        <cfelseif ShowcaseFront.trans IS 3>
+                            <cfset transtype = "auto">
+                        </cfif>
+                        <td>Transmission:</td> <td>#ShowcaseFront.gears#-speed #transtype#</td>
+                    </tr>
+                    <tr>
+                        <td>Top speed:</td> <td>#ShowcaseFront.topspeed# mph</td>
+                    </tr>
+                    <cftry>
+                        <cfloop array="#specsStruct.speclist#" index="spec">
+                            <cfif NOT IsDefined("spec.hide_front") OR NOT spec.hide_front>
+                            <tr>
+                                <td>#spec.spec#:</td> <td>#spec.value# <cfif NOT IsDefined("spec.hide_unit") OR NOT spec.hide_unit>#spec.unit#</cfif></td>
+                            </tr>
+                            </cfif>
+                        </cfloop>
+                        <cfcatch type="Any">
+                        </cfcatch>
+                    </cftry>
+                </table>
+            </div>
+
+
+            <div class="resnow">
+                <div class="row">
+                    <div class="col-sm-6">
+
+                        <!-- normal -->
+                        <div class="ih-item circle effect3 right_to_left price-bubble">
+                            <a href="#OnSecSite#reserve.cfm?vid=#vehicleid#">
+                            <div class="img">
+                                <img class="click-to-reserve" src="images/ClickToReserve.png" />
+                                <img src="images/price-bg.jpg" alt="img"><span class="price-centered"><p class="price">#NumberFormat(ShowcaseFront.price,"$,")#</p>/day</span>
+                            </div>
+                            <div class="info">
+                                <h3>Reserve Now</h3>
+                                <cftry>
+                                    <cfset adjective = specsStruct.adjective>
+                                    <cfcatch type="Any">
+                                        <cfset adjective = "amazing">
+                                    </cfcatch>
+                                </cftry>
+                                <p><cfif type IS 1>Drive<cfelseif type IS 2>Ride</cfif> our #adjective#<br />#make# #model#!</p>
+                            </div>
+                            </a>
+                        </div>
+                        <!-- end normal -->
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</cfoutput>
