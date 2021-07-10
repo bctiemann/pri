@@ -63,7 +63,13 @@ urlpatterns = [
     # it might be better for each app dir to have its own urls.py and for this file to include that app's urls.py
     # at a specified mount point.
     path('', marketing_views.HomeView.as_view(), name='home'),  # Class-based view version
-    # path('', rentals_views.home, name='home'),  # Function-based view version
+    # path('', marketing_views.home, name='home'),  # Function-based view version
+
+    # A single view can be resolved by multiple patterns; in this case, one has a kwarg parameter (which is referred to
+    # in a template by specifying {% url "fleet" vehicle_type='cars' %}), and the other has none (leave off the
+    # vehicle_type param).
+    path('fleet/', marketing_views.FleetView.as_view(), name='fleet'),
+    path('fleet/<str:vehicle_type>/', marketing_views.FleetView.as_view(), name='fleet'),
 
     # This is an example of an app's own namespaced urls.py being included in the main one at a mount point.
     # This app contains the legacy site's administrative/business UI.

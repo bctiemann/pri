@@ -1,0 +1,102 @@
+{% extends "front_site/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="l-container">
+<div class="well">
+    <div class='section-header'>Our Fleet</div>
+
+    {% comment %}
+    <CFQUERY NAME="Vehicles" DATASOURCE="#DSN#">
+    SELECT vehicleid,make,model,type FROM Vehicles
+    WHERE status = 1
+    <cfif fleet IS "cars">
+        AND type = 1
+    <cfelseif fleet IS "bikes">
+        AND type = 2
+    </cfif>
+    ORDER BY type,weighting DESC
+    </CFQUERY>
+    {% endcomment %}
+
+    {% if vehicle_type %}
+        <cfif fleet IS NOT "all">
+        <cfoutput>
+        <div
+            class="fleet-banner"
+            {% if vehicle_type == 'cars' %}
+                style="background-image: url('{% static "images/cars_banner.jpg" %}');"
+            {% elif vehicle_type == 'bikes' %}
+                style="background-image: url('{% static "images/bikes_banner.jpg" %}');"
+            {% endif %}
+        >
+            <div class="fleet-banner-title">
+            {% if vehicle_type == 'cars' %}
+            <cfif fleet IS "cars">
+                <p class="overlay-text">The PRI Sports Cars</p>
+            {% elif vehicle_type == 'bikes' %}
+            <cfelseif fleet IS "bikes">
+                <p class="overlay-text">The PRI Bike Fleet</p>
+            </cfif>
+            {% endif %}
+            </div>
+        </div>
+        </cfoutput>
+        </cfif>
+    {% endif %}
+
+    <div class="fleet-list">
+
+    {% for vehicle in vehicles %}
+    <cfoutput query="Vehicles">
+        <cfquery name="VehicleFront" datasource="#FDSN#">
+            SELECT blurb,price,specs FROM VehiclesFront
+            WHERE vehicleid = <CFQUERYPARAM value="#vehicleid#" CFSQLType="CF_SQL_INTEGER">
+        </cfquery>
+
+        <cftry>
+            <cfset specsStruct = DeserializeJSON(VehicleFront.specs)>
+            <cfset headline = specsStruct.headline>
+            <cfcatch type="Any">
+                <cfset headline = "">
+            </cfcatch>
+        </cftry>
+
+        <div class="fleet-vehicle">
+            <a href="vehicle.cfm?vid=#vehicleid#"><img src="images/#vehicleid#-thumb.jpg" /></a>
+            <div class="car-info-fleet">
+
+                    <div class="price-fleet">
+                    <div class="ih-item circle effect4 left_to_right price-bubble">
+                        <a href="#OnSecSite#reserve.cfm?vid=#vehicleid#">
+                        <div class="img">
+                            <img class="click-to-reserve" src="images/ClickToReserve.png" />
+                            <img src="images/price-bg.jpg" alt="img"><span class="price-centered"><p class="price">#NumberFormat(VehicleFront.price,"$,")#</p>/day</span>
+                        </div>
+                        <div class="info">
+                            <h3>Reserve Now</h3>
+                        </div>
+                        </a>
+                    </div>
+                    </div>
+
+                <a href="vehicle.cfm?vid=#vehicleid#">
+                <h3>
+                    {{ vehicle.make }} {{ vehicle.model }}
+                    <span class="trimlevel">#headline#</span>
+                </h3>
+                </a>
+                <div class="blurb-fleet">
+                    #VehicleFront.blurb#
+                </div>
+            </div>
+        </div>
+    </cfoutput>
+    {% endfor %}
+
+    </div>
+
+</div>
+</div>
+{% endblock %}
