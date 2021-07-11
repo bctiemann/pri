@@ -99,6 +99,7 @@ class Command(BaseCommand):
                 old_front = front_cursor.fetchone()
                 new_front = VehicleMarketing.objects.create(
                     vehicle_id=new.id,
+                    weighting=old['weighting'],
                     make=old['make'],
                     model=old['model'],
                     year=old['year'],

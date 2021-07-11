@@ -71,6 +71,8 @@ urlpatterns = [
     path('fleet/', marketing_views.FleetView.as_view(), name='fleet'),
     path('fleet/<str:vehicle_type>/', marketing_views.FleetView.as_view(), name='fleet'),
 
+    path('vehicle/<str:slug>/', marketing_views.VehicleView.as_view(), name='vehicle'),
+
     # This is an example of an app's own namespaced urls.py being included in the main one at a mount point.
     # This app contains the legacy site's administrative/business UI.
     path('backoffice/', include(('backoffice.urls', 'backoffice'), namespace='backoffice')),

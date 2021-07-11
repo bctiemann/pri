@@ -1,0 +1,281 @@
+{% extends "front_site/base.html" %}
+{% load static %}
+
+{% comment %}
+<cfset vid = IsDefined("URL.vid") ? URL.vid : IsDefined("URL.carid") ? URL.carid : "">
+
+<CFIF NOT IsNumeric(vid)>
+    <CFLOCATION URL="fleet.cfm">
+    <CFABORT>
+</CFIF>
+
+<CFQUERY NAME="tCar" DATASOURCE="#DSN#">
+    SELECT vehicleid,make,model,status,type,redirect FROM Vehicles
+    WHERE vehicleid = <CFQUERYPARAM value="#vid#" CFSQLType="CF_SQL_INTEGER">
+</CFQUERY>
+<CFIF tCar.redirect GT 0>
+    <CFLOCATION URL="vehicle.cfm?vid=#tCar.redirect#">
+    <CFABORT>
+</CFIF>
+
+<CFQUERY NAME="tfCar" DATASOURCE="#FDSN#">
+    SELECT blurb,hp,tq,topspeed,trans,specs,
+    gears,milesinc,price,disc2day,disc3day,disc7day,
+    tightfit,origin,type
+    FROM VehiclesFront
+    WHERE vehicleid = <CFQUERYPARAM value="#vid#" CFSQLType="CF_SQL_INTEGER">
+</CFQUERY>
+
+<CFIF tfCar.recordCount IS 0>
+    <CFLOCATION URL="fleet.cfm">
+    <CFABORT>
+</CFIF>
+
+
+<cftry>
+    <cfset specsStruct = DeserializeJSON(tfCar.specs)>
+    <cfset headline = specsStruct.headline>
+    <cfcatch type="Any">
+        <cfset headline = "">
+    </cfcatch>
+</cftry>
+
+
+<CFINCLUDE TEMPLATE="inc_lib.cfm">
+<CFINCLUDE TEMPLATE="inc_header.cfm">
+    <title>
+    <CFOUTPUT QUERY="tCar">
+    <CFIF type IS 1>
+	Rent a #make# #model#! Available for rent in the New York tri-state area (NY / NYC, NJ, CT and PA)</title>
+	<meta name="DC.title" content="Rent a #make# #model#! Available for rent in the New York tri-state area (NY / NYC, NJ, CT and PA)">
+	<meta name="keywords" content="Performance Rentals, Performance Car Rentals, Exotic Car Rental, #make# rental, rent a #make# #model#, #make# rental NY, #make# rental NJ, #make# rental CT, #make# rental PA, exotic rental NY, exotic rental NJ, #model# rental NY, #model# rental NJ">
+	<meta name="description" content="Information about Performance Rentals' #make# #model#, available for rental in the New York tri-state area, including Manhattan (NYC), Long Island, Connecticut (CT), New Jersey (NJ), and Pennsylvania / Philadelphia (PA).">
+    <CFELSEIF type IS 2>
+	Rent a #make# #model#! Available for rent in the New York tri-state area (NY / NYC, NJ, CT and PA)</title>
+	<meta name="DC.title" content="Rent a #make# #model#! Available for rent in the New York tri-state area (NY / NYC, NJ, CT and PA)">
+	<meta name="keywords" content="Performance Rentals, Motorcycle Rental, Motorcycle Rentals, Bike Rentals, #make# rental, rent a #make# #model#,#make# rental NY, #make# rental NJ, #make# rental CT, #make# rental PA,#model# rental NY, #model# rental NJ">
+	<meta name="description" content="Information about Performance Rentals' #make# #model#, available for rental in the New York tri-state area, including Mahnattan (NYC), Long Island, Connecticut (CT), New Jersey (NJ), and Pennsylvania / Philadelphia (PA).">
+    <CFELSEIF type IS 3>
+	Rent a #make# #model#! Available for street or track rental in the New York tri-state area (NY / NYC, NJ, CT and PA)</title>
+	<meta name="DC.title" content="Rent a #make# #model#! Available for street or track rental in the New York tri-state area (NY / NYC, NJ, CT and PA)">
+	<meta name="keywords" content="Performance Rentals, Performance Car Rentals, Exotic Car Rental, #make# rental, rent a #make# #model#,#make# rental NY, #make# rental NJ, #make# rental CT, #make# rental PA, exotic rental NY, exotic rental NJ,#model# rental NY, #model# rental NJ">
+	<meta name="description" content="Information about Performance Rentals' #make# #model#, available for rental in the New York tri-state area, including Manhattan (NYC), Long Island, Connecticut (CT), New Jersey (NJ), and Pennsylvania / Philadelphia (PA).">
+    </CFIF>
+    </CFOUTPUT>
+<CFINCLUDE TEMPLATE="inc_meta.cfm">
+<CFINCLUDE TEMPLATE="inc_styles.cfm">
+<CFINCLUDE TEMPLATE="inc_js.cfm">
+
+</head>
+<body>
+
+<div class="wrapper">
+
+<CFINCLUDE TEMPLATE="inc_nav.cfm">
+
+<section class="l-content">
+{% endcomment %}
+
+{% block content %}
+<div class="l-container well">
+
+
+    <CFQUERY NAME="tPics" DATASOURCE="#FDSN#">
+        SELECT vpicsid,vehicleid,fext,isfirst FROM VPics
+        WHERE vehicleid = <CFQUERYPARAM value="#tCar.vehicleid#" CFSQLType="CF_SQL_INTEGER">
+        ORDER BY isfirst DESC, vpicsid ASC
+    </CFQUERY>
+    <CFQUERY NAME="tVids" DATASOURCE="#FDSN#">
+        SELECT * from VVids
+        WHERE vehicleid = <CFQUERYPARAM value="#tCar.vehicleid#" CFSQLType="CF_SQL_INTEGER">
+        ORDER BY isfirst DESC, vvidsid ASC
+    </CFQUERY>
+
+
+    <div class="flexslider">
+        <CFOUTPUT QUERY="tCar">
+        <h1 class="car-make-model overlay-text">
+            {{ vehicle.make }} {{ vehicle.model }}
+        </h1>
+        <div class="overlay-text trimlevel">#headline#</div>
+        </CFOUTPUT>
+
+        <div class="carousel left" id="bxslider_left"></div>
+        <div class="carousel right" id="bxslider_right"></div>
+        <ul class="bxslider" slider_id="car">
+        <CFOUTPUT QUERY="tPics">
+            <li><img src="#OnSite#pics/PRI-#tPics.vpicsid#.#tPics.fext#" /></li>
+        </CFOUTPUT>
+        </ul>
+    </div>
+
+
+
+    <CFOUTPUT QUERY="tfCar">
+
+    <div class="float-right">
+
+        <div class="the-numbers"></div>
+
+        <p class="newsletterblurb">
+        Interested in more information about this <cfif type IS 1>car<cfelseif type IS 2>bike</cfif>? Sign up for our <a
+        class="pic" href="#OnSecSite#newsletter.cfm">newsletter</a> and receive updates about
+        this and other vehicles, as well as special discounts from PRI!
+        </p>
+
+    </div>
+
+
+    <table class="the-cost">
+
+        <tr>
+            <th>Weekday</th>
+            <th>Weekend</th>
+            <th>Long Weekend</th>
+            <th>Week</th>
+        </tr>
+        <tr>
+            <td>
+                <span class="price">#NumberFormat(price,"$,")#</span> / 24 hrs
+            </td>
+            <td>
+                <span class="price">#NumberFormat(price * 2 * (1 - disc2day/100),"$,")#</span> / 48 hrs
+            </td>
+            <td>
+                <span class="price">#NumberFormat(price * 3 * (1 - disc3day/100),"$,")#</span> / 72 hrs
+            </td>
+            <td>
+                <span class="price">#NumberFormat(price * 7 * (1 - disc7day/100),"$,")#</span> / 7 days
+            </td>
+        </tr>
+        <tr class="milesinc">
+            <td>#NumberFormat(milesinc * 1 )# mi</td>
+            <td>#NumberFormat(milesinc * 2 )# mi</td>
+            <td>#NumberFormat(milesinc * 3 )# mi</td>
+            <td>#NumberFormat(milesinc * 7 )# mi</td>
+        </tr>
+        <tr>
+            <td colspan="4" class="fineprint">Overage is $1.95/mile. Purchase miles in advance for discounted rates.</th>
+        </tr>
+
+    </table>
+
+    <div class="price-fleet">
+    <div class="ih-item circle effect4 left_to_right price-bubble">
+        <a href="#OnSecSite#reserve.cfm?vid=#vid#">
+        <div class="img">
+            <img class="click-to-reserve" src="images/ClickToReserve.png" />
+            <img src="images/price-bg.jpg" alt="img"><span class="price-centered"><p class="price">#NumberFormat(price,"$,")#</p>/day</span>
+        </div>
+        <div class="info">
+            <h3>Reserve Now</h3>
+        </div>
+        </a>
+    </div>
+    </div>
+
+    <div class="carblurb">
+    #parseNewlines(blurb)#
+    </div>
+
+    </CFOUTPUT>
+
+
+
+    <CFIF tVids.recordcount GT 0>
+
+        <cfsetting showDebugOutput="No">
+
+        <cfoutput>
+            <video id="vehicle_video" class="video-js" controls preload="auto" width="530" height="298"
+                poster="vids/PRI-#tVids.vvidsid#.jpg" data-setup="{}">
+                <source src="vids/PRI-#tVids.vvidsid#.mp4" type='video/mp4'>
+                <source src="vids/PRI-#tVids.vvidsid#.webm" type='video/webm'>
+            <p class="vjs-no-js">
+            To view this video please enable JavaScript, and consider upgrading to a web browser that
+            <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+            </p>
+            </video>
+        </cfoutput>
+
+        <script src="http://vjs.zencdn.net/5.8.7/video.js"></script>
+
+        <div class="vvid-blurb-caption"></div>
+
+        <div class="vvid-thumbs">
+        <cfoutput query="tVids">
+            <div class="vvid-thumbnail" vvidsid="#vvidsid#">
+                <img src="vids/PRI-#vvidsid#.#thumbext#" title="#title# - #length#" />
+                <p>#title#</p>
+                <p>Run time: #length#</p>
+                <p class="vvid-blurb hidden">#parseNewlines(blurb)#</p>
+            </div>
+        </cfoutput>
+        </div>
+
+    </CFIF>
+
+<script type="text/javascript">
+//var words = new Array();
+
+<CFOUTPUT QUERY="tfCar">
+words = [
+{
+    text: '#gears#-speed',
+    subtext: '<CFIF trans IS 1>manual<CFELSEIF trans IS 2>paddle-shift<CFELSEIF trans IS 3>auto</CFIF>',
+    weight: 6,
+},
+{
+    text: '#hp#',
+    subtext: 'bhp',
+    weight: 9,
+},
+{
+    text: '#tq#',
+    subtext: 'ft-lbs',
+    weight: 10,
+},
+{
+    text: '#topspeed#',
+    subtext: 'mph',
+    weight: 9,
+},
+];
+
+var specs = #specs#;
+
+for (var k in specs.speclist) {
+    var spec = specs.speclist[k];
+    words.push({
+        text: spec.value,
+        subtext: spec.unit,
+        weight: (Math.random() * 6) + 3,
+    });
+}
+
+</CFOUTPUT>
+
+$('.the-numbers').jQCloud(words, {
+    width: 450,
+    height: 500,
+    steps: 10,
+    fontSize: ['90px', '80px', '60px', '50px', '40px']
+});
+
+</script>
+
+
+    </div>
+{% endblock %}
+
+{% comment %}
+    </section>
+
+    <div class="push"></div>
+</div>
+
+<CFINCLUDE TEMPLATE="inc_footer.cfm">
+</div>
+</div>
+
+{% endcomment %}

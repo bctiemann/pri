@@ -16,11 +16,12 @@ class VehicleAdmin(admin.ModelAdmin):
 
 
 class VehicleMarketingAdmin(admin.ModelAdmin):
-    list_display = ('id', 'make', 'model', 'year', 'status',)
+    list_display = ('id', 'slug', 'make', 'model', 'year', 'status',)
     formfield_overrides = {
         JSONField: {'widget': PrettyJSONWidget}
     }
     inlines = (VehiclePictureInline,)
+    prepopulated_fields = {"slug": ("model",)}
 
 
 admin.site.register(Vehicle, VehicleAdmin)

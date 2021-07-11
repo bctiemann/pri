@@ -49,50 +49,52 @@
     <div class="fleet-list">
 
     {% for vehicle in vehicles %}
-    <cfoutput query="Vehicles">
-        <cfquery name="VehicleFront" datasource="#FDSN#">
-            SELECT blurb,price,specs FROM VehiclesFront
-            WHERE vehicleid = <CFQUERYPARAM value="#vehicleid#" CFSQLType="CF_SQL_INTEGER">
-        </cfquery>
+        {% if vehicle.slug %}
+            <cfoutput query="Vehicles">
+                <cfquery name="VehicleFront" datasource="#FDSN#">
+                    SELECT blurb,price,specs FROM VehiclesFront
+                    WHERE vehicleid = <CFQUERYPARAM value="#vehicleid#" CFSQLType="CF_SQL_INTEGER">
+                </cfquery>
 
-        <cftry>
-            <cfset specsStruct = DeserializeJSON(VehicleFront.specs)>
-            <cfset headline = specsStruct.headline>
-            <cfcatch type="Any">
-                <cfset headline = "">
-            </cfcatch>
-        </cftry>
+                <cftry>
+                    <cfset specsStruct = DeserializeJSON(VehicleFront.specs)>
+                    <cfset headline = specsStruct.headline>
+                    <cfcatch type="Any">
+                        <cfset headline = "">
+                    </cfcatch>
+                </cftry>
 
-        <div class="fleet-vehicle">
-            <a href="vehicle.cfm?vid=#vehicleid#"><img src="images/#vehicleid#-thumb.jpg" /></a>
-            <div class="car-info-fleet">
+                <div class="fleet-vehicle">
+                    <a href="{% url "vehicle" slug=vehicle.slug %}"><img src="images/#vehicleid#-thumb.jpg" /></a>
+                    <div class="car-info-fleet">
 
-                    <div class="price-fleet">
-                    <div class="ih-item circle effect4 left_to_right price-bubble">
-                        <a href="#OnSecSite#reserve.cfm?vid=#vehicleid#">
-                        <div class="img">
-                            <img class="click-to-reserve" src="images/ClickToReserve.png" />
-                            <img src="images/price-bg.jpg" alt="img"><span class="price-centered"><p class="price">#NumberFormat(VehicleFront.price,"$,")#</p>/day</span>
-                        </div>
-                        <div class="info">
-                            <h3>Reserve Now</h3>
-                        </div>
+                            <div class="price-fleet">
+                            <div class="ih-item circle effect4 left_to_right price-bubble">
+                                <a href="#OnSecSite#reserve.cfm?vid=#vehicleid#">
+                                <div class="img">
+                                    <img class="click-to-reserve" src="images/ClickToReserve.png" />
+                                    <img src="images/price-bg.jpg" alt="img"><span class="price-centered"><p class="price">#NumberFormat(VehicleFront.price,"$,")#</p>/day</span>
+                                </div>
+                                <div class="info">
+                                    <h3>Reserve Now</h3>
+                                </div>
+                                </a>
+                            </div>
+                            </div>
+
+                        <a href="{% url "vehicle" slug=vehicle.slug %}">
+                        <h3>
+                            {{ vehicle.make }} {{ vehicle.model }}
+                            <span class="trimlevel">#headline#</span>
+                        </h3>
                         </a>
+                        <div class="blurb-fleet">
+                            #VehicleFront.blurb#
+                        </div>
                     </div>
-                    </div>
-
-                <a href="vehicle.cfm?vid=#vehicleid#">
-                <h3>
-                    {{ vehicle.make }} {{ vehicle.model }}
-                    <span class="trimlevel">#headline#</span>
-                </h3>
-                </a>
-                <div class="blurb-fleet">
-                    #VehicleFront.blurb#
                 </div>
-            </div>
-        </div>
-    </cfoutput>
+            </cfoutput>
+        {% endif %}
     {% endfor %}
 
     </div>

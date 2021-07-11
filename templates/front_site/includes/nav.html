@@ -39,14 +39,18 @@ ORDER BY weighting DESC
     <li class='fleet dropdown'><a href='{% url "fleet" vehicle_type='cars' %}'>Cars</a>
         <ul class="dropdown-menu">
         {% for car in cars %}
-            <li><a href="#OnSite#vehicles.cfm?vid=#vehicleid#">{{ car.make }} {{ car.model }}</a></li>
+            {% if car.slug %}
+                <li><a href="{% url "vehicle" slug=car.slug %}">{{ car.make }} {{ car.model }}</a></li>
+            {% endif %}
         {% endfor %}
         </ul>
     </li>
     <li class='fleet dropdown'><a href='{% url "fleet" vehicle_type='bikes' %}'>Bikes</a>
         <ul class="dropdown-menu">
         {% for bike in bikes %}
-            <li><a href="#OnSite#vehicles.cfm?vid=#vehicleid#">{{ bike.make }} {{ bike.model }}</a></li>
+            {% if bike.slug %}
+                <li><a href="{% url "vehicle" slug=bike.slug %}">{{ bike.make }} {{ bike.model }}</a></li>
+            {% endif %}
         {% endfor %}
         </ul>
     </li>

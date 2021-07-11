@@ -1,14 +1,14 @@
 from django.views.generic import TemplateView
 from django.http import Http404
 
-from fleet.models import Vehicle, VehicleType, VehicleStatus
+from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
 
 
 # This mixin allows us to include the common query for cars and bikes into every view, for the nav menu
 class NavMenuMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['ready_vehicles'] = Vehicle.objects.filter(status=VehicleStatus.READY.value).order_by('-weighting')
+        context['ready_vehicles'] = VehicleMarketing.objects.filter(status=VehicleStatus.READY.value).order_by('-weighting')
         context['cars'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.CAR.value)
         context['bikes'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.BIKE.value)
         return context
@@ -42,4 +42,16 @@ class FleetView(NavMenuMixin, TemplateView):
         if vehicle_type:
             context['vehicles'] = context.get(vehicle_type)
         context['vehicle_type'] = vehicle_type
+        return context
+
+
+class VehicleView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/vehicle.html'
+
+    def get_context_data(self, slug=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            context['vehicle'] = VehicleMarketing.objects.get(slug=slug)
+        except VehicleMarketing.DoesNotExist:
+            raise Http404
         return context
