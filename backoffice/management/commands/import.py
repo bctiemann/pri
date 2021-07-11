@@ -97,8 +97,10 @@ class Command(BaseCommand):
                 )
                 front_cursor.execute("""SELECT * FROM VehiclesFront where vehicleid=%s""", old['vehicleid'])
                 old_front = front_cursor.fetchone()
+                slug = f'{old["make"]-old["model"]}'
                 new_front = VehicleMarketing.objects.create(
                     vehicle_id=new.id,
+                    slug=slug,
                     weighting=old['weighting'],
                     make=old['make'],
                     model=old['model'],
