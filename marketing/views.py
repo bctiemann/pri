@@ -55,3 +55,7 @@ class VehicleView(NavMenuMixin, TemplateView):
         except VehicleMarketing.DoesNotExist:
             raise Http404
         return context
+
+
+class ReserveView(VehicleView):
+    template_name = 'front_site/reserve.html'

@@ -160,7 +160,7 @@
 
     <div class="price-fleet">
     <div class="ih-item circle effect4 left_to_right price-bubble">
-        <a href="#OnSecSite#reserve.cfm?vid=#vid#">
+        <a href="{% url "reserve" slug=vehicle.slug %}">
         <div class="img">
             <img class="click-to-reserve" src="images/ClickToReserve.png" />
             <img src="images/price-bg.jpg" alt="img"><span class="price-centered"><p class="price">#NumberFormat(price,"$,")#</p>/day</span>
