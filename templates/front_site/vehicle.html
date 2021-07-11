@@ -93,19 +93,17 @@
 
 
     <div class="flexslider">
-        <CFOUTPUT QUERY="tCar">
         <h1 class="car-make-model overlay-text">
             {{ vehicle.make }} {{ vehicle.model }}
         </h1>
-        <div class="overlay-text trimlevel">#headline#</div>
-        </CFOUTPUT>
+        <div class="overlay-text trimlevel">{{ vehicle.headline|default_if_none:'' }}</div>
 
         <div class="carousel left" id="bxslider_left"></div>
         <div class="carousel right" id="bxslider_right"></div>
         <ul class="bxslider" slider_id="car">
-        <CFOUTPUT QUERY="tPics">
-            <li><img src="#OnSite#pics/PRI-#tPics.vpicsid#.#tPics.fext#" /></li>
-        </CFOUTPUT>
+        {% for pic in vehicle.pics.all %}
+            <li><img src="{{ pic.image.url }}" /></li>
+        {% endfor %}
         </ul>
     </div>
 

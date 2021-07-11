@@ -8,9 +8,9 @@ from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
 class NavMenuMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['ready_vehicles'] = VehicleMarketing.objects.filter(status=VehicleStatus.READY.value).order_by('-weighting')
-        context['cars'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.CAR.value)
-        context['bikes'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.BIKE.value)
+        context['ready_vehicles'] = VehicleMarketing.objects.filter(status=VehicleStatus.READY).order_by('-weighting')
+        context['cars'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.CAR)
+        context['bikes'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.BIKE)
         return context
 
 
@@ -51,7 +51,7 @@ class VehicleView(NavMenuMixin, TemplateView):
     def get_context_data(self, slug=None, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
-            context['vehicle'] = VehicleMarketing.objects.get(slug=slug)
+            context['vehicle'] = VehicleMarketing.objects.get(slug=slug, status=VehicleStatus.READY)
         except VehicleMarketing.DoesNotExist:
             raise Http404
         return context

@@ -8,6 +8,7 @@ from io import BytesIO
 
 from django.conf import settings
 from django.db import models
+from django.utils.text import slugify
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 
@@ -108,6 +109,10 @@ class VehicleMarketing(models.Model):
     slug = models.SlugField(max_length=50, blank=True)
     weighting = models.IntegerField(null=True, blank=True)
 
+    showcase_image = models.ImageField(blank=True, width_field='showcase_width', height_field='showcase_height', upload_to=get_vehicle_picture_path)
+    showcase_width = models.IntegerField(null=True, blank=True)
+    showcase_height = models.IntegerField(null=True, blank=True)
+
     # These fields are redundant with the Vehicle class, and will be updated concurrently with that table when
     # edited via the backoffice form. This is to avoid any joins or queries against the Vehicle table when pulling
     # data for the front-end site.
@@ -141,6 +146,13 @@ class VehicleMarketing(models.Model):
     def vehicle_name(self):
         return f'{self.year} {self.make} {self.model}'
 
+    @property
+    def headline(self):
+        return self.specs.get('headline')
+
+    def get_slug(self):
+        return slugify(f'{self.make} {self.model}')
+
     def __str__(self):
         return f'[{self.id}] {self.vehicle_name}'
 
@@ -151,7 +163,7 @@ class VehiclePicture(models.Model):
         'image/png': 'PNG',
     }
 
-    vehicle_marketing = models.ForeignKey('fleet.VehicleMarketing', null=True, on_delete=models.CASCADE)
+    vehicle_marketing = models.ForeignKey('fleet.VehicleMarketing', null=True, on_delete=models.CASCADE, related_name='pics')
     image = models.ImageField(blank=True, width_field='width', height_field='height', upload_to=get_vehicle_picture_path)
     width = models.IntegerField(null=True, blank=True)
     height = models.IntegerField(null=True, blank=True)
