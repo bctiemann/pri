@@ -5,6 +5,7 @@ from encrypted_fields import fields
 from django_countries.fields import CountryField
 from PIL import Image
 from io import BytesIO
+from phonenumber_field.modelfields import PhoneNumberField
 
 from django.conf import settings
 from django.db import models
@@ -79,7 +80,7 @@ class Vehicle(models.Model):
     notes = models.TextField(blank=True)
     policy_number = fields.EncryptedCharField(max_length=255, blank=True)
     policy_company = models.CharField(max_length=255, blank=True)
-    policy_phone = models.CharField(max_length=30, blank=True)
+    policy_phone = PhoneNumberField(blank=True)
     weighting = models.IntegerField(null=True, blank=True)
     redirect_to = models.ForeignKey('fleet.Vehicle', null=True, blank=True, on_delete=models.SET_NULL)
 

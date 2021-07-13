@@ -96,9 +96,13 @@ class Command(BaseCommand):
                     notes=old['notes'],
                     policy_number=self.decrypt(old['policyno']),
                     policy_company=old['policyco'],
-                    policy_phone=old['policytel'],
                     weighting=old['weighting'],
                 )
+                try:
+                    new.policy_phone = old['policytel']
+                    new.save()
+                except ValueError:
+                    new.policy_phone = ''
                 front_cursor.execute("""SELECT * FROM VehiclesFront where vehicleid=%s""", old['vehicleid'])
                 old_front = front_cursor.fetchone()
                 slug = slugify(f'{old["make"]}-{old["model"]}')
@@ -253,4 +257,20 @@ class Command(BaseCommand):
                     customer=customer,
                     vehicle=vehicle,
                     id_old=old['customerid'],
+                    out_at=old['dateout'],
+                    back_at=old['dateback'],
+                    rate=old['rate'],
+                    drivers=old['drivers'],
+                    miles_included=old['milesinc'],
+                    extra_miles=old['xtramiles'],
+                    notes=old['notes'],
+                    coupon_code=old['coupon'],
+                    status=old['status'],
+                    deposit_amount=old['depamount'],
+                    confirmation_code=old['confcode'],
+                    delivery_required=bool(old['delivery']),
+                    tax_percent=old['taxpct'],
+                    delivery_zip=old['deliveryzip'],
                 )
+                new.reserved_at = old['reservdate']
+                new.save()
