@@ -130,7 +130,7 @@
         </cfoutput>
     </div>
 
-    <cfform method="POST" name="reservation_form" action="reserve.cfm" onsubmit="return false;" autocomplete="on">
+    <form method="POST" name="reservation_form" id="reservation_form" action="{% url "reserve" slug=vehicle.slug %}" onsubmit="return false;" autocomplete="on">
     <cfoutput query="Vehicle">
 
     <div class="reservation-form-sidebar">
@@ -142,7 +142,7 @@
     </div>
     </cfif>
 
-    <div id="reservation_identity">
+    <div id="reservation_details">
 
         <p class="reservation-info">
         We're glad to have you renting from us! Please give us some information on your needs: the
@@ -150,16 +150,22 @@
         (such as whether you'll need the vehicle delivered or whether you'll be picking it up at PRI).
         </p>
 
-        <table class="inputform identity">
+        {{ form.errors }}
+{#        {{ form }}#}
+
+        <table class="inputform details">
             <tr>
                 <td>Vehicle</td>
-                <td><cfinput name="vehicleid" type="hidden" value="#vid#" />#make# #model#</td>
+                <td><input name="vehicle" type="hidden" value="{{ vehicle.if }}" />{{ vehicle.make}} {{ vehicle.model }}</td>
             </tr>
             <tr>
                 <td>Rental Date</td>
                 <td>
+                    {{ form.out_date }} {{ form.out_date.errors }}
+                    {{ form.out_time }}
+                    {% comment %}
                     <cfinput name="dateout" value="#Reservation.dateout#" style="width: 120px;" placeholder="MM/DD/YYYY" class="#StructKeyExists(fieldErrors,"dateout") ? 'field-error' : ''#" />
-                    <cfselect name="dateouttime" class="#StructKeyExists(fieldErrors,"dateouttime") ? 'field-error' : ''#">
+                    <select name="dateouttime" class="#StructKeyExists(fieldErrors,"dateouttime") ? 'field-error' : ''#">
                         <option value="07:00" <cfif Reservation.dateouttime IS "07:00">selected</cfif>>7:00 am</option>
                         <option value="07:30" <cfif Reservation.dateouttime IS "07:30">selected</cfif>>7:30 am</option>
                         <option value="08:00" <cfif Reservation.dateouttime IS "08:00">selected</cfif>>8:00 am</option>
@@ -188,12 +194,16 @@
                         <option value="19:30" <cfif Reservation.dateouttime IS "19:30">selected</cfif>>7:30 pm</option>
                         <option value="20:00" <cfif Reservation.dateouttime IS "20:00">selected</cfif>>8:00 pm</option>
                         <option value="23:00" <cfif Reservation.dateouttime IS "23:00">selected</cfif>>Other (special)</option>
-                    </cfselect>
+                    </select>
+                    {% endcomment %}
                 </td>
             </tr>
             <tr>
                 <td>Return Date</td>
                 <td>
+                    {{ form.back_date }} {{ form.back_date.errors }}
+                    {{ form.back_time }}
+                    {% comment %}
                     <cfinput name="dateback" value="#Reservation.dateback#" style="width: 120px;" placeholder="MM/DD/YYYY" class="#StructKeyExists(fieldErrors,"dateback") ? 'field-error' : ''#" />
                     <cfselect name="datebacktime" class="#StructKeyExists(fieldErrors,"datebacktime") ? 'field-error' : ''#">
                         <option value="07:00" <cfif Reservation.datebacktime IS "07:00">selected</cfif>>7:00 am</option>
@@ -225,21 +235,26 @@
                         <option value="20:00" <cfif Reservation.datebacktime IS "20:00">selected</cfif>>8:00 pm</option>
                         <option value="23:00" <cfif Reservation.datebacktime IS "23:00">selected</cfif>>Other (special)</option>
                     </cfselect>
+                    {% endcomment %}
                 </td>
             </tr>
             <tr>
                 <td>Number of Drivers</td>
                 <td>
+                    {{ form.drivers }}
+                    {% comment %}
                     <cfselect name="drivers" class="#StructKeyExists(fieldErrors,"drivers") ? 'field-error' : ''#">
                         <option value="1" <cfif Reservation.drivers IS 1>selected</cfif>>1</option>
                         <option value="2" <cfif Reservation.drivers IS 2>selected</cfif>>2</option>
                         <option value="3" <cfif Reservation.drivers IS 3>selected</cfif>>More than 2</option>
                     </cfselect>
+                    {% endcomment %}
                 </td>
             </tr>
             <tr>
                 <td>Delivery</td>
                 <td>
+                    {{ form.delivery_required }}
                     <cfselect name="delivery" class="#StructKeyExists(fieldErrors,"delivery") ? 'field-error' : ''#" onchange="toggleDeliveryZip();">
                         <option value="0" <cfif Reservation.delivery IS 0>selected</cfif>>I will be picking up the vehicle at PRI in Ringwood, NJ</option>
                         <option value="1" <cfif Reservation.delivery IS 1>selected</cfif>>I would like the vehicle to be delivered to me</option>
@@ -293,8 +308,9 @@
             <tr class="buttons">
                 <td></td>
                 <td>
-                    <button type="submit" name="identity_btn" class="btn reserve-rental-identity-btn">Continue</button>
+                    <button type="submit" name="identity_btn" class="btn reserve-rental-details-btn">Continue</button>
                     <div class="spinner next-form-spinner identity-spinner"></div>
+                    <button type="submit">Submit</button>
                 </td>
             </tr>
             </cfif>
@@ -549,7 +565,8 @@
     <cfinput name="customerid" type="hidden" value="" />
     <cfinput name="reservation_type" type="hidden" value="rental" />
     <cfinput name="taxpct" type="hidden" value="" />
-    </cfform>
+    {% csrf_token %}
+    </form>
 
 </div>
 </div>

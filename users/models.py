@@ -119,6 +119,7 @@ class User(AbstractBaseUser):
 class Customer(models.Model):
     user = models.OneToOneField('users.User', null=True, blank=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
+    id_old = models.IntegerField(null=True, blank=True)
 
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
@@ -174,6 +175,9 @@ class Customer(models.Model):
     registration_ip = models.GenericIPAddressField(null=True, blank=True, verbose_name='Registration IP')
     registration_long = models.FloatField(null=True, blank=True, verbose_name='Registration longitude')
     registration_lat = models.FloatField(null=True, blank=True, verbose_name='Registration latitude')
+
+    def __str__(self):
+        return f'[{self.id}] {self.first_name} {self.last_name}'
 
 
 class MusicGenre(models.Model):

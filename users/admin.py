@@ -15,7 +15,7 @@ class CustomerAdmin(admin.ModelAdmin):
     readonly_fields = ('registration_ip', 'registration_lat', 'registration_long',)
     fieldsets = (
         (None, {
-            'fields': ('user', 'first_name', 'last_name',)
+            'fields': ('user', 'first_name', 'last_name', 'id_old',)
         }),
         ('Mailing address', {
             'fields': ('address_line_1', 'address_line_2', 'city', 'state', 'zip',)

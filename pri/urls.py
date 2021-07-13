@@ -19,8 +19,10 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls import static
 from django.conf import settings
+from api import views as api_views
 from fleet import views as rentals_views
 from marketing import views as marketing_views
+from sales import views as sales_views
 from users import views as users_views
 from django.contrib.auth import views as auth_views
 
@@ -73,7 +75,9 @@ urlpatterns = [
 
     path('vehicle/<str:slug>/', marketing_views.VehicleView.as_view(), name='vehicle'),
 
-    path('vehicle/<str:slug>/reserve/', marketing_views.ReserveView.as_view(), name='reserve'),
+    path('vehicle/<str:slug>/reserve/', sales_views.ReserveView.as_view(), name='reserve'),
+
+    path('api/validate/rental/details/', api_views.ValidateRentalDetailsView.as_view(), name='validate-rental-details'),
 
     # This is an example of an app's own namespaced urls.py being included in the main one at a mount point.
     # This app contains the legacy site's administrative/business UI.

@@ -1,3 +1,10 @@
 from django.contrib import admin
 
-# Register your models here.
+from sales.models import Reservation
+
+
+class ReservationAdmin(admin.ModelAdmin):
+    list_display = ('id', 'vehicle', 'customer',)
+
+
+admin.site.register(Reservation, ReservationAdmin)

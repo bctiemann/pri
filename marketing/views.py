@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, FormView, CreateView
 from django.http import Http404
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
@@ -48,6 +48,10 @@ class FleetView(NavMenuMixin, TemplateView):
 class VehicleView(NavMenuMixin, TemplateView):
     template_name = 'front_site/vehicle.html'
 
+    def get(self, *args, **kwargs):
+        print(kwargs)
+        return super().get(*args, **kwargs)
+
     def get_context_data(self, slug=None, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
@@ -55,7 +59,3 @@ class VehicleView(NavMenuMixin, TemplateView):
         except VehicleMarketing.DoesNotExist:
             raise Http404
         return context
-
-
-class ReserveView(VehicleView):
-    template_name = 'front_site/reserve.html'

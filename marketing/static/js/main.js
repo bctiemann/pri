@@ -1,23 +1,55 @@
 var maxphonelength = 14;
 
-var reserveValidateForm = function(method, section) {
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+var reserveValidateForm = function(reservationType, section) {
     var params = {};
     var formArray = $('#reservation_form').serializeArray();
     for (var elem in formArray) {
         params[formArray[elem].name] = formArray[elem].value;
     }
+    method = reservationType;
     params.component = 'porknbeans';
     params.method = method;
     console.log(params);
 
 //    $('.' + section + ' .btn').prop('disabled', true);
     $('#reservation_' + section + '_error').hide();
-    $.post('ajax_post.cfm',params,function(data) {
+//    $.post('ajax_post.cfm',params,function(data) {
+    console.log(method);
+    $.post(`/api/validate/${reservationType}/${section}/`, params, function(data) {
         console.log(data);
         $('.' + section + ' .field-error').removeClass('field-error');
         if (data.success) {
-            if (section == 'identity') {
-                if (method == 'validateRentalIdentity') {
+            if (section === 'details') {
+                if (reservationType === 'rental') {
                     $('.price-numdays').html(data.numdays + ' day' + (data.numdays != 1 ? 's' : ''));
                     $('.price-rental-total').html(data.tcostRaw.toFixed(2));
                     $('.price-multi-day-discount').html(data.multi_day_discount.toFixed(2));
@@ -35,7 +67,7 @@ var reserveValidateForm = function(method, section) {
                     } else {
                         $('.price-delivery-smallprint').css('visibility', 'visible');
                     }
-                } else if (method == 'validateJoyPerfIdentity') {
+                } else if (reservationType === 'joyperf') {
                     $('.price-nodrv').html(data.nodrv + ' driver' + (data.nodrv != 1 ? 's' : ''));
                     $('.price-drvcost').html(data.drvcost.toFixed(2));
                     $('.price-nopax').html(data.nopax + ' passenger' + (data.nopax != 1 ? 's' : ''));
@@ -194,8 +226,8 @@ $('document').ready(function() {
     })();
 
     // Date pickers
-    $('#dateout').datepicker({});
-    $('#dateback').datepicker({});
+    $('#id_out_date').datepicker({});
+    $('#id_back_date').datepicker({});
     $('#reqdate').datepicker({});
     $('#bupdate').datepicker({});
 
@@ -230,8 +262,8 @@ $('document').ready(function() {
     $('input#cccvv').payment('formatCardCVC');
     $('input#ccnum').trigger($.Event( 'keyup', {which:$.ui.keyCode.SPACE, keyCode:$.ui.keyCode.SPACE}));
 
-    $('.reserve-rental-identity-btn').click(function() {
-        reserveValidateForm('validateRentalIdentity', 'identity');
+    $('.reserve-rental-details-btn').click(function() {
+        reserveValidateForm('rental', 'details');
     });
     $('.reserve-joyperf-identity-btn').click(function() {
         reserveValidateForm('validateJoyPerfIdentity', 'identity');

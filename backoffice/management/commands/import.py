@@ -4,9 +4,11 @@ import json
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.utils.text import slugify
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus, TransmissionType, Location
 from users.models import Customer, User, MusicGenre
+from sales.models import Reservation
 from pri.cipher import AESCipher
 
 logger = logging.getLogger(__name__)
@@ -33,7 +35,8 @@ class Command(BaseCommand):
 
     enabled = {
         # 'do_vehicles': True,
-        'do_customers': True,
+        # 'do_customers': True,
+        'do_reservations': True,
     }
 
     def add_arguments(self, parser):
@@ -83,6 +86,7 @@ class Command(BaseCommand):
                     make=old['make'],
                     model=old['model'],
                     year=old['year'],
+                    id_old=old['vehicleid'],
                     vehicle_type=VEHICLE_TYPE_MAP.get(old['type']),
                     status=0,
                     plate=old['plate'],
@@ -97,7 +101,7 @@ class Command(BaseCommand):
                 )
                 front_cursor.execute("""SELECT * FROM VehiclesFront where vehicleid=%s""", old['vehicleid'])
                 old_front = front_cursor.fetchone()
-                slug = f'{old["make"]-old["model"]}'
+                slug = slugify(f'{old["make"]}-{old["model"]}')
                 new_front = VehicleMarketing.objects.create(
                     vehicle_id=new.id,
                     slug=slug,
@@ -158,6 +162,7 @@ class Command(BaseCommand):
                         music_genre = None
                     new = Customer.objects.create(
                         user=user,
+                        id_old=old['customerid'],
                         first_name=old['fname'],
                         last_name=old['lname'],
                         address_line_1=self.decrypt(old['addr']),
@@ -229,3 +234,23 @@ class Command(BaseCommand):
                         new.save()
                     except ValueError:
                         pass
+
+        if 'do_reservations' in self.enabled:
+            if clear_existing:
+                Reservation.objects.all().delete()
+            back_cursor.execute("""SELECT * FROM Reservations""")
+            for old in back_cursor.fetchall():
+                print(old['reservationid'])
+                try:
+                    customer = Customer.objects.get(id_old=old['customerid'])
+                except Customer.DoesNotExist:
+                    customer = None
+                try:
+                    vehicle = Vehicle.objects.get(id_old=old['vehicleid'])
+                except Vehicle.DoesNotExist:
+                    vehicle = None
+                new = Reservation.objects.create(
+                    customer=customer,
+                    vehicle=vehicle,
+                    id_old=old['customerid'],
+                )
