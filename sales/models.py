@@ -62,4 +62,16 @@ class Charge(models.Model):
 
 
 class Discount(models.Model):
-    pass
+    code = models.CharField(max_length=50, unique=True, db_index=True)
+    amount = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    percent = models.IntegerField(null=True, blank=True)
+
+    @property
+    def value_str(self):
+        if self.amount:
+            return f'${self.amount}'
+        if self.percent:
+            return f'{self.percent}%'
+
+    def __str__(self):
+        return f'{self.code} ({self.value_str})'

@@ -199,6 +199,14 @@ PIC_MAX_HEIGHT = 1000
 THUMB_MAX_WIDTH = 150
 THUMB_MAX_HEIGHT = 150
 
+EXTRA_MILES_PRICES = {
+    0: {'value': 0, 'label': 'None', 'cost': 0},
+    100: {'value': 100, 'label': '100 miles ($175)', 'cost': 175},
+    150: {'value': 150, 'label': '150 miles ($255)', 'cost': 255},
+    200: {'value': 200, 'label': '200 miles ($330)', 'cost': 330},
+    250: {'value': 250, 'label': '250 miles ($400)', 'cost': 400},
+}
+
 
 # Local overrides from env.yaml
 with open(os.path.join(BASE_DIR, 'env.yaml')) as f:

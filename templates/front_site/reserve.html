@@ -156,7 +156,7 @@
         <table class="inputform details">
             <tr>
                 <td>Vehicle</td>
-                <td><input name="vehicle" type="hidden" value="{{ vehicle.if }}" />{{ vehicle.make}} {{ vehicle.model }}</td>
+                <td><input name="vehicle_marketing" type="hidden" value="{{ vehicle.id }}" />{{ vehicle.make}} {{ vehicle.model }}</td>
             </tr>
             <tr>
                 <td>Rental Date</td>
@@ -255,15 +255,22 @@
                 <td>Delivery</td>
                 <td>
                     {{ form.delivery_required }}
+                    {% comment %}
                     <cfselect name="delivery" class="#StructKeyExists(fieldErrors,"delivery") ? 'field-error' : ''#" onchange="toggleDeliveryZip();">
                         <option value="0" <cfif Reservation.delivery IS 0>selected</cfif>>I will be picking up the vehicle at PRI in Ringwood, NJ</option>
                         <option value="1" <cfif Reservation.delivery IS 1>selected</cfif>>I would like the vehicle to be delivered to me</option>
                     </cfselect>
+                    {% endcomment %}
                 </td>
             </tr>
             <tr class="delivery-zip">
                 <td>Delivery ZIP</td>
-                <td><cfinput name="deliveryzip" value="#Reservation.deliveryzip#" style="width: 100px;" maxlength="10" class="#StructKeyExists(fieldErrors,"deliveryzip") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ form.delivery_zip }}
+                    {% comment %}
+                    <cfinput name="deliveryzip" value="#Reservation.deliveryzip#" style="width: 100px;" maxlength="10" class="#StructKeyExists(fieldErrors,"deliveryzip") ? 'field-error' : ''#" />
+                    {% endcomment %}
+                </td>
             </tr>
             <tr class="smallprint">
                 <td></td>
@@ -273,23 +280,29 @@
             </tr>
             <tr>
                 <td>Included Miles</td>
-                <td>#VehicleFront.milesinc# per day</td>
+                <td>{{ vehicle.miles_included }} per day</td>
             </tr>
             <tr>
                 <td>Extra miles</td>
                 <td>
+                    {{ form.extra_miles }}
+                    {% comment %}
                     <cfselect name="extramiles" class="#StructKeyExists(fieldErrors,"extramiles") ? 'field-error' : ''#">
                         <cfloop from="1" to="#arrayLen(extraMilesPrices)#" index="i">
                             <cfset milesChoice = extraMilesPrices[i]>
                             <option value="#milesChoice.value#" <cfif Reservation.extramiles IS milesChoice.value>selected</cfif>>#milesChoice.label#</option>
                         </cfloop>
                     </cfselect>
+                    {% endcomment %}
                     <small class="tooltip" title="You get #VehicleFront.milesinc# miles per day included with your rental. If you go beyond that amount, additional miles are charged at $1.95/mile. If you're planning on covering a lot of distance, buy additional miles now for a discount!">Pre-purchase and save! <span class="ui-icon ui-icon-info"></span></small>
                 </td>
             </tr>
             <tr>
                 <td>Email</td>
-                <td><cfinput name="email" value="#Reservation.email#" maxlength="255" class="#StructKeyExists(fieldErrors,"email") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ form.email }}
+                    <cfinput name="email" value="#Reservation.email#" maxlength="255" class="#StructKeyExists(fieldErrors,"email") ? 'field-error' : ''#" />
+                </td>
             </tr>
             <tr class="inline-password">
                 <td>Password</td>
@@ -297,11 +310,21 @@
             </tr>
             <tr>
                 <td>Discount/Coupon Code</td>
-                <td><cfinput name="coupon" value="#Reservation.coupon#" maxlength="20" placeholder="(Optional)" class="#StructKeyExists(fieldErrors,"coupon") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ form.coupon_code }}
+                    {% comment %}
+                    <cfinput name="coupon" value="#Reservation.coupon#" maxlength="20" placeholder="(Optional)" class="#StructKeyExists(fieldErrors,"coupon") ? 'field-error' : ''#" />
+                    {% endcomment %}
+                </td>
             </tr>
             <tr>
                 <td class="align-top">Notes/Requests</td>
-                <td><cftextarea name="notes" class="#StructKeyExists(fieldErrors,"notes") ? 'field-error' : ''#">#Reservation.notes#</cftextarea></td>
+                <td>
+                    {{ form.notes }}
+                    {% comment %}
+                    <cftextarea name="notes" class="#StructKeyExists(fieldErrors,"notes") ? 'field-error' : ''#">#Reservation.notes#</cftextarea>
+                    {% endcomment %}
+                </td>
             </tr>
 
             <cfif NOT IsDefined("IdentityResult") OR NOT IdentityResult.success OR (IsDefined("LoginResult") AND NOT LoginResult.success)>
@@ -570,9 +593,6 @@
 
 </div>
 </div>
-{% endblock %}
-</section>
-
 
 <div class="dialog" id="dialog_reset_password" title="Reset Password">
 <p>We will send you an email with a link to click on to receive your new password.</p>
@@ -628,6 +648,9 @@ standing regulations. In such case we may pick you up and transport you to a sui
 familiarization process and any required paperwork.
     </p>
 </div>
+
+{% endblock %}
+</section>
 
     <div class="push"></div>
 </div>

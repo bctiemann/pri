@@ -14,5 +14,6 @@ class ValidateRentalDetailsView(APIView):
         response = {
             'success': form.is_valid(),
             'errors': form.errors,
+            'price_data': form.price_data,
         }
         return Response(response)

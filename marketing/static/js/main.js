@@ -50,18 +50,18 @@ var reserveValidateForm = function(reservationType, section) {
         if (data.success) {
             if (section === 'details') {
                 if (reservationType === 'rental') {
-                    $('.price-numdays').html(data.numdays + ' day' + (data.numdays != 1 ? 's' : ''));
-                    $('.price-rental-total').html(data.tcostRaw.toFixed(2));
-                    $('.price-multi-day-discount').html(data.multi_day_discount.toFixed(2));
-                    $('.price-multi-day-discount-pct').html(data.multi_day_discount_pct);
-                    $('.price-car-discount').html(data.car_discount.toFixed(2));
-                    $('.price-customer-discount').html(data.customer_discount.toFixed(2));
-                    $('.price-extra-miles').html(data.extra_miles);
-                    $('.price-extra-miles-cost').html(data.extra_miles_cost.toFixed(2));
-                    $('.price-subtotal').html(data.subtotal.toFixed(2));
-                    $('.price-tax').html(data.tax_amt.toFixed(2));
-                    $('.price-total').html(data.total_w_tax.toFixed(2));
-                    $('.price-reservation-deposit').html(data.reservation_deposit.toFixed(2));
+                    $('.price-numdays').html(data.price_data.num_days + ' day' + (data.price_data.num_days != 1 ? 's' : ''));
+                    $('.price-rental-total').html(data.price_data.total_cost_raw.toFixed(2));
+                    $('.price-multi-day-discount').html(data.price_data.multi_day_discount.toFixed(2));
+                    $('.price-multi-day-discount-pct').html(data.price_data.multi_day_discount_pct);
+                    $('.price-car-discount').html(data.price_data.car_discount.toFixed(2));
+                    $('.price-customer-discount').html(data.price_data.customer_discount.toFixed(2));
+                    $('.price-extra-miles').html(data.price_data.extra_miles);
+                    $('.price-extra-miles-cost').html(data.price_data.extra_miles_cost.toFixed(2));
+                    $('.price-subtotal').html(data.price_data.subtotal.toFixed(2));
+                    $('.price-tax').html(data.price_data.tax_amount.toFixed(2));
+                    $('.price-total').html(data.price_data.total_with_tax.toFixed(2));
+                    $('.price-reservation-deposit').html(data.price_data.reservation_deposit.toFixed(2));
                     if (data.delivery == 0) {
                         $('.price-delivery-smallprint').css('visibility', 'hidden');
                     } else {
@@ -176,6 +176,14 @@ var pickVehicle = function(vehicleid) {
     }
     num_picked = $('.vehicle-picker-pick.picked').length;
     $('#button_vehicle_picker_done').button({'disabled': num_picked == 0});
+};
+
+var toggleDeliveryZip = function() {
+    if ($('#id_delivery_required').val() == 1) {
+        $('.delivery-zip').show();
+    } else {
+        $('.delivery-zip').hide();
+    }
 };
 
 var formatPhone = function(str) {
@@ -330,6 +338,10 @@ $('document').ready(function() {
     $('.inline-password').hide();
     $('.vehicle-pick-buttons').show();
     $('.vehicle-choice').hide();
+    $('#id_delivery_required').change(function() {
+        toggleDeliveryZip();
+    });
+    $('.delivery-zip').hide();
     $('.reserve-identity-btn').show();
 
 });
