@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
 from fleet.models import VehicleMarketing, VehicleStatus
-from sales.models import Reservation
+from sales.models import Reservation, Discount
 
 
 class ReservationRentalDetailsForm(forms.ModelForm):
@@ -54,6 +54,7 @@ class ReservationRentalDetailsForm(forms.ModelForm):
         (1, _('I would like the vehicle to be delivered to me')),
     )
     DATETIME_FORMAT = '%m/%d/%Y %H:%M'
+    discount = None
 
     vehicle_marketing = forms.ModelChoiceField(widget=forms.HiddenInput(), queryset=VehicleMarketing.objects.filter(status=VehicleStatus.READY))
     out_date = forms.DateField(widget=forms.DateInput(attrs={'placeholder': 'MM/DD/YYYY'}))
@@ -139,9 +140,29 @@ class ReservationRentalDetailsForm(forms.ModelForm):
     def raw_cost(self):
         return self.cleaned_data['vehicle_marketing'].price_per_day * self.num_days
 
+    def coupon_discount(self, value):
+        if not self.discount:
+            coupon_code = self.cleaned_data['coupon_code']
+            if not coupon_code:
+                return 0
+            try:
+                self.discount = Discount.objects.get(code=coupon_code)
+            except Discount.DoesNotExist:
+                return 0
+        return self.discount.get_discount_value(value)
+
     @property
     def sales_tax(self):
         return 0
+
+    @property
+    def subtotal(self):
+        subtotal = self.raw_cost
+        print(subtotal)
+        discount = self.coupon_discount(subtotal)
+        subtotal -= discount
+        print(subtotal)
+        return subtotal
 
     @property
     def total_with_tax(self):
@@ -157,14 +178,14 @@ class ReservationRentalDetailsForm(forms.ModelForm):
             num_drivers=None,
             total_cost_raw=self.raw_cost,
             total_cost=None,
-            car_discount=0,
+            car_discount=self.coupon_discount(self.raw_cost),
             customer_discount=0,
             customer_discount_pct=None,
             multi_day_discount=0,
             multi_day_discount_pct=None,
             extra_miles=None,
             extra_miles_cost=0,
-            subtotal=0,
+            subtotal=self.subtotal,
             total_with_tax=self.total_with_tax,
             reservation_deposit=0,
             tax_amount=0,

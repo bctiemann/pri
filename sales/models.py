@@ -73,5 +73,15 @@ class Discount(models.Model):
         if self.percent:
             return f'{self.percent}%'
 
+    def get_discount_value(self, value):
+        if self.amount:
+            return self.amount
+        elif self.percent:
+            return value * self.percent
+        return 0
+
+    def get_discounted_value(self, value):
+        return value - self.get_discount_value(value)
+
     def __str__(self):
         return f'{self.code} ({self.value_str})'
