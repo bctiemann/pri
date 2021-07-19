@@ -52,6 +52,8 @@ class GiftCertificate(models.Model):
 
 
 class TaxRate(models.Model):
+    MAX_AGE_DAYS = 30
+
     postal_code = USZipCodeField(blank=True)
     country = models.CharField(max_length=20, default='us')
     total_rate = models.DecimalField(max_digits=10, decimal_places=5, null=True, blank=True)
@@ -73,17 +75,16 @@ class TaxRate(models.Model):
             response = client.tax_rates_by_postal_code(include={'country': self.country, 'postalCode': self.postal_code})
             response.raise_for_status()
             result = response.json()
-            self.total_rate = result['totalRate']
+            self.total_rate = decimal.Decimal(result['totalRate'])
             self.detail = result['rates']
             self.date_updated = now()
         except HTTPError:
             self.total_rate = decimal.Decimal(settings.DEFAULT_TAX_RATE)
         self.save()
 
-
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        if not self.total_rate:
+        if not self.total_rate or (now() - self.date_updated).total_seconds() / 86400 > self.MAX_AGE_DAYS:
             self.update()
 
 

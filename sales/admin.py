@@ -15,7 +15,7 @@ class CouponAdmin(admin.ModelAdmin):
 
 
 class TaxRateAdmin(admin.ModelAdmin):
-    list_display = ('postal_code', 'total_rate',)
+    list_display = ('postal_code', 'total_rate', 'date_updated',)
     formfield_overrides = {
         JSONField: {'widget': PrettyJSONWidget}
     }
