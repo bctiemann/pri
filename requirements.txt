@@ -12,3 +12,4 @@ django-countries==7.2.1
 django-prettyjson==0.4.1
 Pillow==8.3.1
 django-localflavor==3.1
+avalara==21.6.0

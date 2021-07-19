@@ -207,6 +207,15 @@ EXTRA_MILES_PRICES = {
     250: {'value': 250, 'label': '250 miles ($400)', 'cost': 400},
 }
 
+AVALARA_ACCOUNT_ID = None
+AVALARA_API_KEY = None
+AVALARA_APP_NAME = 'Performance Rentals, Inc.'
+AVALARA_APP_VERSION = 'v0.1'
+AVALARA_MACHINE_NAME = 'Backend server 001'
+AVALARA_ENVIRONMENT = None
+DEFAULT_TAX_ZIP = '07456'
+DEFAULT_TAX_RATE = 0.07
+
 
 # Local overrides from env.yaml
 with open(os.path.join(BASE_DIR, 'env.yaml')) as f:

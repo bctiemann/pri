@@ -9,7 +9,9 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
 from fleet.models import VehicleMarketing, VehicleStatus
-from sales.models import Reservation, Discount
+from sales.models import Reservation, Coupon
+from users.models import Customer
+from sales.utils import PriceCalculator
 
 
 class ReservationRentalDetailsForm(forms.ModelForm):
@@ -55,6 +57,7 @@ class ReservationRentalDetailsForm(forms.ModelForm):
     )
     DATETIME_FORMAT = '%m/%d/%Y %H:%M'
     discount = None
+    customer = None
 
     vehicle_marketing = forms.ModelChoiceField(widget=forms.HiddenInput(), queryset=VehicleMarketing.objects.filter(status=VehicleStatus.READY))
     out_date = forms.DateField(widget=forms.DateInput(attrs={'placeholder': 'MM/DD/YYYY'}))
@@ -83,10 +86,13 @@ class ReservationRentalDetailsForm(forms.ModelForm):
             date_str = f'{self.data["out_date"]} {self.data["out_time"]}'
             out_at = datetime.datetime.strptime(date_str, self.DATETIME_FORMAT)
         except ValueError:
-            raise forms.ValidationError(_('Invalid out date.'))
+            raise forms.ValidationError(_('Invalid rental date.'))
+
         out_at = pytz.timezone(settings.TIME_ZONE).localize(out_at)
+
         if out_at < timezone.now():
             raise forms.ValidationError(_("You've specified a rental date in the past."))
+
         return out_at
 
     def clean_back_at(self):
@@ -95,12 +101,13 @@ class ReservationRentalDetailsForm(forms.ModelForm):
             date_str = f'{self.data["back_date"]} {self.data["back_time"]}'
             back_at = datetime.datetime.strptime(date_str, self.DATETIME_FORMAT)
         except ValueError:
-            raise forms.ValidationError(_('Invalid back date.'))
+            raise forms.ValidationError(_('Invalid return date.'))
 
         back_at = pytz.timezone(settings.TIME_ZONE).localize(back_at)
 
         if back_at < out_at:
             raise forms.ValidationError(_("You've specified a return date earlier than the rental date."))
+
         rental_duration = back_at - out_at
 
         if rental_duration.total_seconds() < 20 * 3600:
@@ -125,6 +132,15 @@ class ReservationRentalDetailsForm(forms.ModelForm):
         self.clean_back_at()
         return self.cleaned_data['back_date']
 
+    def clean(self):
+        print('cleaned:')
+        print(self.cleaned_data)
+        try:
+            self.customer = Customer.objects.get(user__email=self.cleaned_data['email'])
+        except (Customer.DoesNotExist, KeyError):
+            pass
+        return super().clean()
+
     @property
     def rental_duration(self):
         try:
@@ -137,6 +153,10 @@ class ReservationRentalDetailsForm(forms.ModelForm):
         return math.ceil(self.rental_duration.total_seconds() / 86400)
 
     @property
+    def tax_zip(self):
+        return self.cleaned_data['delivery_zip'] or settings.DEFAULT_TAX_ZIP
+
+    @property
     def raw_cost(self):
         return self.cleaned_data['vehicle_marketing'].price_per_day * self.num_days
 
@@ -146,10 +166,16 @@ class ReservationRentalDetailsForm(forms.ModelForm):
             if not coupon_code:
                 return 0
             try:
-                self.discount = Discount.objects.get(code=coupon_code)
+                self.discount = Coupon.objects.get(code=coupon_code)
             except Discount.DoesNotExist:
                 return 0
         return self.discount.get_discount_value(value)
+
+    def customer_discount(self, value):
+        print(self.customer)
+        if self.customer:
+            return value * self.customer.discount_pct / 100
+        return 0
 
     @property
     def sales_tax(self):
@@ -159,9 +185,23 @@ class ReservationRentalDetailsForm(forms.ModelForm):
     def subtotal(self):
         subtotal = self.raw_cost
         print(subtotal)
-        discount = self.coupon_discount(subtotal)
-        subtotal -= discount
+
+        # Multi-day discount
+
+        # Coupon discount
+        coupon_discount = self.coupon_discount(subtotal)
+        subtotal -= coupon_discount
         print(subtotal)
+
+        # Customer discount
+        customer_discount = self.customer_discount(subtotal)
+        subtotal -= customer_discount
+        print(subtotal)
+
+        # Extra miles
+
+        # Sales tax
+
         return subtotal
 
     @property
@@ -170,28 +210,38 @@ class ReservationRentalDetailsForm(forms.ModelForm):
 
     @property
     def price_data(self):
-        return dict(
-            rental_duration=self.rental_duration,
-            num_days=self.num_days,
-            sales_tax=self.sales_tax,
-            customer_id=None,
-            num_drivers=None,
-            total_cost_raw=self.raw_cost,
-            total_cost=None,
-            car_discount=self.coupon_discount(self.raw_cost),
-            customer_discount=0,
-            customer_discount_pct=None,
-            multi_day_discount=0,
-            multi_day_discount_pct=None,
-            extra_miles=None,
-            extra_miles_cost=0,
-            subtotal=self.subtotal,
-            total_with_tax=self.total_with_tax,
-            reservation_deposit=0,
-            tax_amount=0,
-            delivery=None,
-            deposit=0,
+        price_calculator = PriceCalculator(
+            self.cleaned_data['vehicle_marketing'],
+            self.num_days,
+            self.cleaned_data['coupon_code'],
+            self.cleaned_data['email'],
+            self.cleaned_data['extra_miles'],
+            self.tax_zip,
         )
+        return price_calculator.get_price_data()
+        # subtotal = self.subtotal
+        # return dict(
+        #     rental_duration=self.rental_duration,
+        #     num_days=self.num_days,
+        #     sales_tax=self.sales_tax,
+        #     customer_id=None,
+        #     num_drivers=None,
+        #     total_cost_raw=self.raw_cost,
+        #     total_cost=None,
+        #     coupon_discount=self.coupon_discount(self.raw_cost),
+        #     customer_discount=self.customer_discount(self.raw_cost),
+        #     customer_discount_pct=None,
+        #     multi_day_discount=0,
+        #     multi_day_discount_pct=None,
+        #     extra_miles=None,
+        #     extra_miles_cost=0,
+        #     subtotal=self.subtotal,
+        #     total_with_tax=self.total_with_tax,
+        #     reservation_deposit=0,
+        #     tax_amount=0,
+        #     delivery=None,
+        #     deposit=0,
+        # )
         """
         <cfset numdays = (rental_duration - 1) / 24>
 

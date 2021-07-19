@@ -13,6 +13,7 @@ class CustomerAdmin(admin.ModelAdmin):
     list_display = ('id', 'first_name', 'last_name', 'user',)
     autocomplete_fields = ('user',)
     readonly_fields = ('registration_ip', 'registration_lat', 'registration_long',)
+    search_fields = ('user__email', 'first_name', 'last_name',)
     fieldsets = (
         (None, {
             'fields': ('user', 'first_name', 'last_name', 'id_old',)
@@ -33,7 +34,7 @@ class CustomerAdmin(admin.ModelAdmin):
             'fields': ('cc2_number', 'cc2_exp_yr', 'cc2_exp_mo', 'cc2_cvv', 'cc2_phone',)
         }),
         ('Details', {
-            'fields': ('rentals_count', 'remarks', 'driver_skill', 'discount', 'music_genre',)
+            'fields': ('rentals_count', 'remarks', 'driver_skill', 'discount_pct', 'music_genre',)
         }),
         ('Options', {
             'fields': ('first_time', 'drivers_club', 'no_email', 'ban', 'survey_done',)

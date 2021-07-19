@@ -54,12 +54,13 @@ var reserveValidateForm = function(reservationType, section) {
                     $('.price-rental-total').html(data.price_data.total_cost_raw.toFixed(2));
                     $('.price-multi-day-discount').html(data.price_data.multi_day_discount.toFixed(2));
                     $('.price-multi-day-discount-pct').html(data.price_data.multi_day_discount_pct);
-                    $('.price-car-discount').html(data.price_data.car_discount.toFixed(2));
+                    $('.price-coupon-discount').html(data.price_data.coupon_discount.toFixed(2));
                     $('.price-customer-discount').html(data.price_data.customer_discount.toFixed(2));
                     $('.price-extra-miles').html(data.price_data.extra_miles);
                     $('.price-extra-miles-cost').html(data.price_data.extra_miles_cost.toFixed(2));
                     $('.price-subtotal').html(data.price_data.subtotal.toFixed(2));
                     $('.price-tax').html(data.price_data.tax_amount.toFixed(2));
+                    $('.price-tax-rate').html(data.price_data.tax_rate);
                     $('.price-total').html(data.price_data.total_with_tax.toFixed(2));
                     $('.price-reservation-deposit').html(data.price_data.reservation_deposit.toFixed(2));
                     if (data.delivery == 0) {
@@ -78,12 +79,12 @@ var reserveValidateForm = function(reservationType, section) {
                     $('.price-tax').html(data.tax_amt.toFixed(2));
                     $('.price-total').html(data.total_w_tax.toFixed(2));
                 }
-                if (data.customer_discount) {
+                if (data.price_data.customer_discount) {
                     $('.customer-discount').show();
                 } else {
                     $('.customer-discount').hide();
                 }
-                if (data.customerid) {
+                if (data.customer_id) {
                     $('.price-breakdown').appendTo($('#price_breakdown_existing_user'));
                     $('#reservation_payment').hide();
                     $('#reservation_payment_error').hide();
@@ -122,10 +123,18 @@ var reserveValidateForm = function(reservationType, section) {
             }
         } else {
             $('.' + section + ' .btn').prop('disabled', false);
-            $('#reservation_' + section + '_error .alert-message').html(data.error);
+            console.log(data.errors);
+           // $('#reservation_' + section + '_error .alert-message').html(data.errors_html);
             $('#reservation_' + section + '_error').show();
-            for (var field in data.fieldErrors) {
-                $('#' + field.toLowerCase()).addClass('field-error').select();
+            let selectedFirst = false;
+            for (var field in data.errors) {
+                const input = $('#id_' + field.toLowerCase());
+                input.addClass('field-error');
+                if (!selectedFirst) {
+                    $('#reservation_' + section + '_error .alert-message').html(data.errors[field]);
+                    input.select();
+                    selectedFirst = true;
+                }
             }
         }
     }, 'json')

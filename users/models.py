@@ -163,7 +163,7 @@ class Customer(models.Model):
     rentals_count = models.IntegerField(null=True, blank=True)
     remarks = fields.EncryptedTextField(blank=True)
     driver_skill = models.IntegerField(null=True, blank=True)
-    discount = models.IntegerField(null=True, blank=True)
+    discount_pct = models.IntegerField(null=True, blank=True)
     music_genre = models.ForeignKey('users.MusicGenre', null=True, blank=True, on_delete=models.SET_NULL)
 
     first_time = models.BooleanField(default=True)

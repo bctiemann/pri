@@ -1,6 +1,11 @@
+import json
 from localflavor.us.models import USStateField, USZipCodeField
+from avalara import AvataxClient
+from requests import HTTPError
 
+from django.conf import settings
 from django.db import models
+from django.utils.timezone import now
 
 
 class Reservation(models.Model):
@@ -45,8 +50,40 @@ class GiftCertificate(models.Model):
     pass
 
 
-class SalesTax(models.Model):
-    pass
+class TaxRate(models.Model):
+    postal_code = USZipCodeField(blank=True)
+    country = models.CharField(max_length=20, default='us')
+    total_rate = models.DecimalField(max_digits=10, decimal_places=5, null=True, blank=True)
+    detail = models.JSONField(null=True, blank=True)
+    date_updated = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return '{0}: {1}'.format(self.postal_code, self.total_rate)
+
+    def update(self):
+        client = AvataxClient(
+            settings.AVALARA_APP_NAME,
+            settings.AVALARA_APP_VERSION,
+            settings.AVALARA_MACHINE_NAME,
+            settings.AVALARA_ENVIRONMENT,
+        )
+        client.add_credentials(settings.AVALARA_ACCOUNT_ID, settings.AVALARA_LICENSE_KEY)
+        try:
+            response = client.tax_rates_by_postal_code(include={'country': self.country, 'postalCode': self.postal_code})
+            response.raise_for_status()
+            result = response.json()
+            self.total_rate = result['totalRate']
+            self.detail = result['rates']
+            self.date_updated = now()
+        except HTTPError:
+            self.total_rate = settings.DEFAULT_TAX_RATE
+        self.save()
+
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if not self.total_rate:
+            self.update()
 
 
 class Ban(models.Model):
@@ -61,7 +98,7 @@ class Charge(models.Model):
     pass
 
 
-class Discount(models.Model):
+class Coupon(models.Model):
     code = models.CharField(max_length=50, unique=True, db_index=True)
     amount = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
     percent = models.IntegerField(null=True, blank=True)

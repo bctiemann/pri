@@ -192,7 +192,7 @@ class Command(BaseCommand):
                         rentals_count=old['rentednum'],
                         remarks=self.decrypt(old['remarks']),
                         driver_skill=old['driverskill'],
-                        discount=int(old['discount']) if old['discount'].isdigit() else None,
+                        discount_pct=int(old['discount']) if old['discount'].isdigit() else None,
                         music_genre=music_genre,
                         first_time=bool(old['firsttime']),
                         drivers_club=bool(old['DriversClub']),
