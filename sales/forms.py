@@ -132,6 +132,15 @@ class ReservationRentalDetailsForm(forms.ModelForm):
         self.clean_back_at()
         return self.cleaned_data['back_date']
 
+    def clean_delivery_required(self):
+        return bool(int(self.cleaned_data['delivery_required']))
+
+    def clean_delivery_zip(self):
+        delivery_required = self.clean_delivery_required()
+        if delivery_required and not self.cleaned_data['delivery_zip']:
+            raise forms.ValidationError('Please specify the ZIP code for delivery.')
+        return self.cleaned_data['delivery_zip']
+
     def clean(self):
         print('cleaned:')
         print(self.cleaned_data)
@@ -154,7 +163,7 @@ class ReservationRentalDetailsForm(forms.ModelForm):
 
     @property
     def tax_zip(self):
-        return self.cleaned_data['delivery_zip'] or settings.DEFAULT_TAX_ZIP
+        return self.cleaned_data.get('delivery_zip') or settings.DEFAULT_TAX_ZIP
 
     # @property
     # def raw_cost(self):
