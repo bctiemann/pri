@@ -50,8 +50,8 @@ var reserveValidateForm = function(reservationType, section) {
         if (data.success) {
             if (section === 'details') {
                 if (reservationType === 'rental') {
-                    $('.price-numdays').html(data.price_data.num_days + ' day' + (data.price_data.num_days != 1 ? 's' : ''));
-                    $('.price-rental-total').html(data.price_data.total_cost_raw.toFixed(2));
+                    $('.price-numdays').html(data.price_data.num_days + ' day' + (data.price_data.num_days !== 1 ? 's' : ''));
+                    $('.price-rental-total').html(data.price_data.base_price.toFixed(2));
                     $('.price-multi-day-discount').html(data.price_data.multi_day_discount.toFixed(2));
                     $('.price-multi-day-discount-pct').html(data.price_data.multi_day_discount_pct);
                     $('.price-coupon-discount').html(data.price_data.coupon_discount.toFixed(2));
@@ -63,7 +63,7 @@ var reserveValidateForm = function(reservationType, section) {
                     $('.price-tax-rate').html(data.price_data.tax_rate);
                     $('.price-total').html(data.price_data.total_with_tax.toFixed(2));
                     $('.price-reservation-deposit').html(data.price_data.reservation_deposit.toFixed(2));
-                    if (data.delivery == 0) {
+                    if (data.delivery_required) {
                         $('.price-delivery-smallprint').css('visibility', 'hidden');
                     } else {
                         $('.price-delivery-smallprint').css('visibility', 'visible');

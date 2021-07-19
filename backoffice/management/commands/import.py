@@ -129,7 +129,7 @@ class Command(BaseCommand):
                     discount_2_day=old_front['disc2day'],
                     discount_3_day=old_front['disc3day'],
                     discount_7_day=old_front['disc7day'],
-                    deposit=old_front['deposit'],
+                    security_deposit=old_front['deposit'],
                     miles_included=old_front['milesinc'],
                 )
                 new.status = old_front['status']

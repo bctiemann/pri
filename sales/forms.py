@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _, ngettext_lazy
 from fleet.models import VehicleMarketing, VehicleStatus
 from sales.models import Reservation, Coupon
 from users.models import Customer
-from sales.utils import PriceCalculator
+from sales.utils import RentalPriceCalculator
 
 
 class ReservationRentalDetailsForm(forms.ModelForm):
@@ -156,61 +156,61 @@ class ReservationRentalDetailsForm(forms.ModelForm):
     def tax_zip(self):
         return self.cleaned_data['delivery_zip'] or settings.DEFAULT_TAX_ZIP
 
-    @property
-    def raw_cost(self):
-        return self.cleaned_data['vehicle_marketing'].price_per_day * self.num_days
-
-    def coupon_discount(self, value):
-        if not self.discount:
-            coupon_code = self.cleaned_data['coupon_code']
-            if not coupon_code:
-                return 0
-            try:
-                self.discount = Coupon.objects.get(code=coupon_code)
-            except Discount.DoesNotExist:
-                return 0
-        return self.discount.get_discount_value(value)
-
-    def customer_discount(self, value):
-        print(self.customer)
-        if self.customer:
-            return value * self.customer.discount_pct / 100
-        return 0
-
-    @property
-    def sales_tax(self):
-        return 0
-
-    @property
-    def subtotal(self):
-        subtotal = self.raw_cost
-        print(subtotal)
-
-        # Multi-day discount
-
-        # Coupon discount
-        coupon_discount = self.coupon_discount(subtotal)
-        subtotal -= coupon_discount
-        print(subtotal)
-
-        # Customer discount
-        customer_discount = self.customer_discount(subtotal)
-        subtotal -= customer_discount
-        print(subtotal)
-
-        # Extra miles
-
-        # Sales tax
-
-        return subtotal
-
-    @property
-    def total_with_tax(self):
-        return 0
+    # @property
+    # def raw_cost(self):
+    #     return self.cleaned_data['vehicle_marketing'].price_per_day * self.num_days
+    #
+    # def coupon_discount(self, value):
+    #     if not self.discount:
+    #         coupon_code = self.cleaned_data['coupon_code']
+    #         if not coupon_code:
+    #             return 0
+    #         try:
+    #             self.discount = Coupon.objects.get(code=coupon_code)
+    #         except Discount.DoesNotExist:
+    #             return 0
+    #     return self.discount.get_discount_value(value)
+    #
+    # def customer_discount(self, value):
+    #     print(self.customer)
+    #     if self.customer:
+    #         return value * self.customer.discount_pct / 100
+    #     return 0
+    #
+    # @property
+    # def sales_tax(self):
+    #     return 0
+    #
+    # @property
+    # def subtotal(self):
+    #     subtotal = self.raw_cost
+    #     print(subtotal)
+    #
+    #     # Multi-day discount
+    #
+    #     # Coupon discount
+    #     coupon_discount = self.coupon_discount(subtotal)
+    #     subtotal -= coupon_discount
+    #     print(subtotal)
+    #
+    #     # Customer discount
+    #     customer_discount = self.customer_discount(subtotal)
+    #     subtotal -= customer_discount
+    #     print(subtotal)
+    #
+    #     # Extra miles
+    #
+    #     # Sales tax
+    #
+    #     return subtotal
+    #
+    # @property
+    # def total_with_tax(self):
+    #     return 0
 
     @property
     def price_data(self):
-        price_calculator = PriceCalculator(
+        price_calculator = RentalPriceCalculator(
             self.cleaned_data['vehicle_marketing'],
             self.num_days,
             self.cleaned_data['coupon_code'],

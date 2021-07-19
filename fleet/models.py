@@ -141,7 +141,7 @@ class VehicleMarketing(models.Model):
     discount_2_day = models.IntegerField(null=True, blank=True, verbose_name='2-day discount', help_text='Percent')
     discount_3_day = models.IntegerField(null=True, blank=True, verbose_name='3-day discount', help_text='Percent')
     discount_7_day = models.IntegerField(null=True, blank=True, verbose_name='7-day discount', help_text='Percent')
-    deposit = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
+    security_deposit = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
     miles_included = models.IntegerField(null=True, blank=True, help_text='Per day')
 
     @property
