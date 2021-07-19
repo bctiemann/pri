@@ -5,12 +5,8 @@ from users.models import Customer
 
 
 class PriceCalculator:
-    vehicle_marketing = None
-    coupon = None
-    customer = None
 
     # rental_duration = None
-    num_days = None
     # sales_tax = None
     # customer_id = None
     # num_drivers = None
@@ -21,7 +17,6 @@ class PriceCalculator:
     # customer_discount_pct = None
     # multi_day_discount = None
     # multi_day_discount_pct = None
-    extra_miles = None
     # extra_miles_cost = None
     # subtotal = None
     # total_with_tax = 0
@@ -29,7 +24,8 @@ class PriceCalculator:
     # tax_amount = None
     # delivery = None
     # deposit = None
-    tax_zip = None
+    
+    pass
 
 
 class RentalPriceCalculator(PriceCalculator):
@@ -42,12 +38,20 @@ class RentalPriceCalculator(PriceCalculator):
     - Add extra miles cost
     - Add sales tax
     """
+    vehicle_marketing = None
+    num_days = None
+    extra_miles = None
+    tax_zip = None
+    tax_rate = None
+    coupon = None
+    customer = None
 
     def __init__(self, vehicle_marketing, num_days, coupon_code=None, email=None, extra_miles=None, tax_zip=None):
         self.vehicle_marketing = vehicle_marketing
         self.num_days = num_days
         self.extra_miles = int(extra_miles)
         self.tax_zip = tax_zip
+        self.tax_rate, tax_rate_created = TaxRate.objects.get_or_create(postal_code=tax_zip)
 
         try:
             self.coupon = Coupon.objects.get(code=coupon_code)
@@ -58,8 +62,6 @@ class RentalPriceCalculator(PriceCalculator):
             self.customer = Customer.objects.get(user__email=email)
         except Customer.DoesNotExist:
             pass
-
-        self.tax_rate, tax_rate_created = TaxRate.objects.get_or_create(postal_code=tax_zip)
 
     @property
     def multi_day_discount_pct(self):
