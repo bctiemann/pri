@@ -1,6 +1,7 @@
 from django.views.generic import TemplateView, FormView, CreateView
 from django.http import Http404
 from django.urls import reverse_lazy
+from django.utils.timezone import now
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
 from sales.models import Reservation, Rental, GuidedDrive
@@ -10,11 +11,7 @@ from users.views import LoginView
 class SidebarMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # context['ready_vehicles'] = VehicleMarketing.objects.filter(status=VehicleStatus.READY).order_by('-weighting')
-        # context['cars'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.CAR)
-        # context['bikes'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.BIKE)
-        context['upcoming_reservations'] = self.request.user.customer.reservation_set.all()
-        # context['upcoming_rentals'] = self.request.user.customer.rental_set.all()
+        context['upcoming_reservations'] = self.request.user.customer.basereservation_set.filter(out_at__gt=now())
         return context
 
 

@@ -36,6 +36,21 @@ class BaseReservation(models.Model):
     tax_percent = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
     delivery_zip = USZipCodeField(blank=True)
 
+    @property
+    def is_reservation(self):
+        try:
+            return bool(self.reservation)
+        except Reservation.DoesNotExist:
+            return False
+
+    @property
+    def is_rental(self):
+        try:
+            return bool(self.rental)
+        except Rental.DoesNotExist:
+            return False
+
+
     class Meta:
         abstract = False
 

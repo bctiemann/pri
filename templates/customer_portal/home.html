@@ -11,6 +11,7 @@
 
     <cfif page IS "upcoming">
 
+        {% for reservation in upcoming_reservations %}
         <cfoutput query="RentalsUpcoming">
             <a href="reserve_confirm.cfm?confcode=#confcode#">
             <div class="reservation <cfif NOT InfoComplete>incomplete-info</cfif>">
@@ -71,6 +72,7 @@
             </div>
             </a>
         </cfoutput>
+        {% endfor %}
 
         <cfif RentalsUpcoming.recordCount IS 0>
             <div class="no-records">No upcoming rentals</div>
