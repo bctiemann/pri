@@ -97,7 +97,7 @@
     <li class="<cfif selectedPage IS "reservations">selected-page</cfif>">
         <a href="index.cfm">
             <cfif RentalsUpcoming.recordCount GT 0>
-                <div class="badge">#RentalsUpcoming.recordCount#</div>
+                <div class="badge">{{ upcoming_reservations.count }}</div>
             </cfif>
             Reservations
         </a>

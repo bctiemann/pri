@@ -263,7 +263,7 @@ class Command(BaseCommand):
                     drivers=old['drivers'],
                     miles_included=old['milesinc'],
                     extra_miles=old['xtramiles'],
-                    notes=old['notes'],
+                    customer_notes=old['notes'],
                     coupon_code=old['coupon'],
                     status=old['status'],
                     deposit_amount=old['depamount'],

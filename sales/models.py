@@ -13,11 +13,10 @@ def generate_code():
     return ''.join(random.choice('123456789ABCNPQDXEFGHJKMVZ') for _ in range(4))
 
 
-class Reservation(models.Model):
+# Concrete base model class which is used to supply common fields to both the Reservation and Rental model classes.
+# Don't want to use an abstract model class because we want to be able to query both tables simultaneously in a union
 
-    class StatusChoices(models.IntegerChoices):
-        UNCONFIRMED = (0, 'Unconfirmed')
-        CONFIRMED = (1, 'Confirmed')
+class BaseReservation(models.Model):
 
     vehicle = models.ForeignKey('fleet.Vehicle', null=True, blank=True, on_delete=models.SET_NULL)
     customer = models.ForeignKey('users.Customer', null=True, blank=True, on_delete=models.SET_NULL)
@@ -29,18 +28,48 @@ class Reservation(models.Model):
     drivers = models.IntegerField(null=True, blank=True)
     miles_included = models.IntegerField(null=True, blank=True)
     extra_miles = models.IntegerField(null=True, blank=True)
-    notes = models.TextField(blank=True)
+    customer_notes = models.TextField(blank=True)
     coupon_code = models.CharField(max_length=30, blank=True)
-    status = models.IntegerField(choices=StatusChoices.choices, default=StatusChoices.UNCONFIRMED, blank=True)
     deposit_amount = models.IntegerField(null=True, blank=True)
     confirmation_code = models.CharField(max_length=10, blank=True)
     delivery_required = models.BooleanField(default=False)
     tax_percent = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
     delivery_zip = USZipCodeField(blank=True)
 
+    class Meta:
+        abstract = False
 
-class Rental(models.Model):
-    pass
+
+class Reservation(BaseReservation):
+
+    class StatusChoices(models.IntegerChoices):
+        UNCONFIRMED = (0, 'Unconfirmed')
+        CONFIRMED = (1, 'Confirmed')
+
+    status = models.IntegerField(choices=StatusChoices.choices, default=StatusChoices.UNCONFIRMED, blank=True)
+
+
+class Rental(BaseReservation):
+
+    class StatusChoices(models.IntegerChoices):
+        INCOMPLETE = (0, 'Incomplete')
+        CONFIRMED = (1, 'Confirmed/Billed')
+        IN_PROGRESS = (2, 'In Progress')
+        COMPLETE = (3, 'Complete')
+        CANCELLED = (4, 'Cancelled')
+
+    status = models.IntegerField(choices=StatusChoices.choices, default=StatusChoices.INCOMPLETE, blank=True)
+    mileage_out = models.IntegerField(null=True, blank=True)
+    mileage_back = models.IntegerField(null=True, blank=True)
+    abuse = models.TextField(blank=True)
+    damage_out = models.TextField(blank=True)
+    damage_in = models.TextField(blank=True)
+    internal_notes = models.TextField(blank=True)
+    deposit_charged_at = models.DateTimeField(null=True, blank=True)
+    deposit_refunded_at = models.DateTimeField(null=True, blank=True)
+    deposit_refund_amount = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    rental_discount_pct = models.IntegerField(null=True, blank=True)
+    extended_days = models.IntegerField(null=True, blank=True)
 
 
 class GuidedDrive(models.Model):
