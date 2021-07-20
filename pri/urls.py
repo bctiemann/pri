@@ -84,6 +84,8 @@ urlpatterns = [
     # This app contains the legacy site's administrative/business UI.
     path('backoffice/', include(('backoffice.urls', 'backoffice'), namespace='backoffice')),
 
+    path('customer/', include(('customer_portal.urls', 'customer_portal'), namespace='customer_portal')),
+
     path('', include(tf_urls, 'two_factor')),
 ]
 

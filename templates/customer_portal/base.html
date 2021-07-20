@@ -1,0 +1,537 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+    <title>Performance Rentals Customer Portal</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="{% static "customer/css/style.css" %}">
+    <link rel="stylesheet" href="{% static "customer/css/jquery-ui.css" %}">
+    <link rel="stylesheet"href="{% static "customer/css/ihover.css" %}">
+    <link href='https://fonts.googleapis.com/css?family=Oswald:400,700,300' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Orbitron|Hammersmith+One|Rambla|Neucha|Timmana' rel='stylesheet' type='text/css'>
+    <script src="{% static "customer/js/jquery.js" %}"></script>
+    <script src="{% static "customer/js/jquery.payment.js" %}"></script>
+    <script src="{% static "customer/js/jquery-ui.min.js" %}"></script>
+    <script src="{% static "customer/js/main.js" %}"></script>
+    </head>
+<body>
+
+<cfset selectedPage="reservations">
+
+<table class="layout">
+<tr>
+<td class="sidebar">
+    {% include "customer_portal/includes/sidebar.html" %}
+</td>
+<td class="main">
+
+    <div class="wrapper">
+
+    <CFINCLUDE TEMPLATE="inc_contentheader.cfm">
+
+    <div class="well">
+        <div class='section-header'>Reservations</div>
+
+        <div class="form-page-container">
+
+            <ul class="form-page-nav">
+                <li page="upcoming" <cfif page IS "upcoming">class="selected"</cfif>><a href="index.cfm?page=upcoming">Upcoming Reservations</a></li>
+                <li page="past" <cfif page IS "past">class="selected"</cfif>><a href="index.cfm?page=past">Past Rentals</a></li>
+                <li page="reserve" <cfif page IS "reserve">class="selected"</cfif>><a href="index.cfm?page=reserve">Make Reservation</a></li>
+            </ul>
+
+            <cfif page IS "upcoming">
+
+                <cfoutput query="RentalsUpcoming">
+                    <a href="reserve_confirm.cfm?confcode=#confcode#">
+                    <div class="reservation <cfif NOT InfoComplete>incomplete-info</cfif>">
+                        <div class="confcode">#confcode#</div>
+                        <table class="small-item-data">
+                            <tr>
+                                <td>
+                                    <cfif delivery IS 1>
+                                        PRI Delivers Vehicle:
+                                    <cfelse>
+                                        Pick Up at PRI:
+                                    </cfif>
+                                </td>
+                                <td>#TimeFormat(dateout, "h:MM tt")# #DateFormat(dateout,"ddd MM/DD/YYYY")#</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <cfif delivery IS 1>
+                                        PRI Collects Vehicle:
+                                    <cfelse>
+                                        Due Back at PRI:
+                                    </cfif>
+                                </td>
+                                <td>#TimeFormat(dateback, "h:MM tt")# #DateFormat(dateback,"ddd MM/DD/YYYY")#</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>#numdays# day<cfif numdays IS NOT 1>s</cfif></td>
+                            </tr>
+                        </table>
+                        <p class="reservation-status">
+                            <cfif reservationid GT 0 AND status IS 0>
+                                Unconfirmed
+                            <cfelseif (reservationid GT 0 AND status IS 1) OR (rentalid GT 0 AND status IS 1)>
+                                Confirmed
+                            <cfelseif rentalid GT 0 AND status IS 2>
+                                In Progress
+                            <cfelseif rentalid GT 0 AND status IS 3>
+                                Complete
+                            </cfif>
+                        </p>
+                        <div class="vehiclepic-box">
+                            <img class="vehiclepic" src="#OnSite#images/#vehicleid#-thumb.jpg" />
+                            <span class="offer-title overlay-text bottom">#make# #model#</span>
+                        </div>
+                        <cfif InfoComplete>
+                            <cfif notes IS NOT "">
+                                <div class="customer-notes">
+                                    #parseNewlines(notes)#
+                                </div>
+                            </cfif>
+                        <cfelse>
+                            <div class="exception complete-info-prompt">
+                                <h3>Action Required</h3>
+                                <p>Please complete your information.</p>
+                            </div>
+                        </cfif>
+                    </div>
+                    </a>
+                </cfoutput>
+
+                <cfif RentalsUpcoming.recordCount IS 0>
+                    <div class="no-records">No upcoming rentals</div>
+                </cfif>
+
+            <cfelseif page IS "past">
+
+                <cfoutput query="RentalsPast">
+                    <div class="reservation complete">
+                        <div class="confcode">#confcode#</div>
+                        <table class="small-item-data">
+                            <tr>
+                                <td>
+                                    <cfif delivery IS 1>
+                                        PRI Delivers Vehicle:
+                                    <cfelse>
+                                        Pick Up at PRI:
+                                    </cfif>
+                                </td>
+                                <td>#TimeFormat(dateout, "h:MM tt")# #DateFormat(dateout,"ddd MM/DD/YYYY")#</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <cfif delivery IS 1>
+                                        PRI Collects Vehicle:
+                                    <cfelse>
+                                        Due Back at PRI:
+                                    </cfif>
+                                </td>
+                                <td>#TimeFormat(dateback, "h:MM tt")# #DateFormat(dateback,"ddd MM/DD/YYYY")#</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>#numdays# day<cfif numdays IS NOT 1>s</cfif></td>
+                            </tr>
+                        </table>
+                        <p class="reservation-status">Complete</p>
+                        <div class="vehiclepic-box">
+                            <img class="vehiclepic" src="#OnSite#images/#vehicleid#-thumb.jpg" />
+                            <span class="offer-title overlay-text bottom">#make# #model#</span>
+                        </div>
+                        <cfif InfoComplete>
+                            <cfif notes IS NOT "">
+                                <div class="customer-notes">
+                                    #parseNewlines(notes)#
+                                </div>
+                            </cfif>
+                        </cfif>
+                    </div>
+                </cfoutput>
+
+                <cfif RentalsPast.recordCount IS 0>
+                    <div class="no-records">No past rentals</div>
+                </cfif>
+
+
+            <cfelseif page IS "reserve">
+
+                <cfif vid GT 0>
+
+                    <cfquery name="Vehicle" datasource="#DSN#">
+                        SELECT make,model,year FROM Vehicles
+                        WHERE vehicleid = <CFQUERYPARAM value="#vid#" CFSQLType="CF_SQL_INTEGER">
+                    </cfquery>
+
+                    <cfform method="POST" name="reservation_form" action="index.cfm" onsubmit="return false;">
+                    <cfoutput query="Vehicle">
+
+                        <cfquery name="VehicleFront" datasource="#FDSN#">
+                            SELECT milesinc,deposit FROM VehiclesFront
+                            WHERE vehicleid = <CFQUERYPARAM value="#vid#" CFSQLType="CF_SQL_INTEGER">
+                        </cfquery>
+
+                        <cfif Len(formError) GT 0>
+                        <div class="exception" id="reservation_form_error">
+                            <h3>An error occurred</h3>
+                            <p class="alert-message">#formError#</p>
+                        </div>
+                        </cfif>
+
+                        <div id="reservation_price">
+
+                            <table class="inputform price">
+                                <tr>
+                                    <td>Vehicle</td>
+                                    <td><cfinput name="vehicleid" type="hidden" value="#vid#" />#make# #model#</td>
+                                </tr>
+                                <tr>
+                                    <td>Rental Date</td>
+                                    <td>
+                                        <cfinput name="dateout" value="#Reservation.dateout#" style="width: 120px;" placeholder="MM/DD/YYYY" class="#StructKeyExists(fieldErrors,"dateout") ? 'field-error' : ''#" />
+                                        <cfselect name="dateouttime" class="#StructKeyExists(fieldErrors,"dateouttime") ? 'field-error' : ''#">
+                                            <option value="07:00" <cfif Reservation.dateouttime IS "07:00">selected</cfif>>7:00 am</option>
+                                            <option value="07:30" <cfif Reservation.dateouttime IS "07:30">selected</cfif>>7:30 am</option>
+                                            <option value="08:00" <cfif Reservation.dateouttime IS "08:00">selected</cfif>>8:00 am</option>
+                                            <option value="08:30" <cfif Reservation.dateouttime IS "08:30">selected</cfif>>8:30 am</option>
+                                            <option value="09:00" <cfif Reservation.dateouttime IS "09:00">selected</cfif>>9:00 am</option>
+                                            <option value="09:30" <cfif Reservation.dateouttime IS "09:30">selected</cfif>>9:30 am</option>
+                                            <option value="10:00" <cfif Reservation.dateouttime IS "10:00">selected</cfif>>10:00 am</option>
+                                            <option value="10:30" <cfif Reservation.dateouttime IS "10:30">selected</cfif>>10:30 am</option>
+                                            <option value="11:00" <cfif Reservation.dateouttime IS "11:00">selected</cfif>>11:00 am</option>
+                                            <option value="11:30" <cfif Reservation.dateouttime IS "11:30">selected</cfif>>11:30 am</option>
+                                            <option value="12:00" <cfif Reservation.dateouttime IS "12:00">selected</cfif>>12:00 pm</option>
+                                            <option value="12:30" <cfif Reservation.dateouttime IS "12:30">selected</cfif>>12:30 pm</option>
+                                            <option value="13:00" <cfif Reservation.dateouttime IS "13:00">selected</cfif>>1:00 pm</option>
+                                            <option value="13:30" <cfif Reservation.dateouttime IS "13:30">selected</cfif>>1:30 pm</option>
+                                            <option value="14:00" <cfif Reservation.dateouttime IS "14:00">selected</cfif>>2:00 pm</option>
+                                            <option value="14:30" <cfif Reservation.dateouttime IS "14:30">selected</cfif>>2:30 pm</option>
+                                            <option value="15:00" <cfif Reservation.dateouttime IS "15:00">selected</cfif>>3:00 pm</option>
+                                            <option value="15:30" <cfif Reservation.dateouttime IS "15:30">selected</cfif>>3:30 pm</option>
+                                            <option value="16:00" <cfif Reservation.dateouttime IS "16:00">selected</cfif>>4:00 pm</option>
+                                            <option value="16:30" <cfif Reservation.dateouttime IS "16:30">selected</cfif>>4:30 pm</option>
+                                            <option value="17:00" <cfif Reservation.dateouttime IS "17:00">selected</cfif>>5:00 pm</option>
+                                            <option value="17:30" <cfif Reservation.dateouttime IS "17:30">selected</cfif>>5:30 pm</option>
+                                            <option value="18:00" <cfif Reservation.dateouttime IS "18:00">selected</cfif>>6:00 pm</option>
+                                            <option value="18:30" <cfif Reservation.dateouttime IS "18:30">selected</cfif>>6:30 pm</option>
+                                            <option value="19:00" <cfif Reservation.dateouttime IS "19:00">selected</cfif>>7:00 pm</option>
+                                            <option value="19:30" <cfif Reservation.dateouttime IS "19:30">selected</cfif>>7:30 pm</option>
+                                            <option value="20:00" <cfif Reservation.dateouttime IS "20:00">selected</cfif>>8:00 pm</option>
+                                            <option value="23:00" <cfif Reservation.dateouttime IS "23:00">selected</cfif>>Other (special)</option>
+                                        </cfselect>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Return Date</td>
+                                    <td>
+                                        <cfinput name="dateback" value="#Reservation.dateback#" style="width: 120px;" placeholder="MM/DD/YYYY" class="#StructKeyExists(fieldErrors,"dateback") ? 'field-error' : ''#" />
+                                        <cfselect name="datebacktime" class="#StructKeyExists(fieldErrors,"datebacktime") ? 'field-error' : ''#">
+                                            <option value="07:00" <cfif Reservation.datebacktime IS "07:00">selected</cfif>>7:00 am</option>
+                                            <option value="07:30" <cfif Reservation.datebacktime IS "07:30">selected</cfif>>7:30 am</option>
+                                            <option value="08:00" <cfif Reservation.datebacktime IS "08:00">selected</cfif>>8:00 am</option>
+                                            <option value="08:30" <cfif Reservation.datebacktime IS "08:30">selected</cfif>>8:30 am</option>
+                                            <option value="09:00" <cfif Reservation.datebacktime IS "09:00">selected</cfif>>9:00 am</option>
+                                            <option value="09:30" <cfif Reservation.datebacktime IS "09:30">selected</cfif>>9:30 am</option>
+                                            <option value="10:00" <cfif Reservation.datebacktime IS "10:00">selected</cfif>>10:00 am</option>
+                                            <option value="10:30" <cfif Reservation.datebacktime IS "10:30">selected</cfif>>10:30 am</option>
+                                            <option value="11:00" <cfif Reservation.datebacktime IS "11:00">selected</cfif>>11:00 am</option>
+                                            <option value="11:30" <cfif Reservation.datebacktime IS "11:30">selected</cfif>>11:30 am</option>
+                                            <option value="12:00" <cfif Reservation.datebacktime IS "12:00">selected</cfif>>12:00 pm</option>
+                                            <option value="12:30" <cfif Reservation.datebacktime IS "12:30">selected</cfif>>12:30 pm</option>
+                                            <option value="13:00" <cfif Reservation.datebacktime IS "13:00">selected</cfif>>1:00 pm</option>
+                                            <option value="13:30" <cfif Reservation.datebacktime IS "13:30">selected</cfif>>1:30 pm</option>
+                                            <option value="14:00" <cfif Reservation.datebacktime IS "14:00">selected</cfif>>2:00 pm</option>
+                                            <option value="14:30" <cfif Reservation.datebacktime IS "14:30">selected</cfif>>2:30 pm</option>
+                                            <option value="15:00" <cfif Reservation.datebacktime IS "15:00">selected</cfif>>3:00 pm</option>
+                                            <option value="15:30" <cfif Reservation.datebacktime IS "15:30">selected</cfif>>3:30 pm</option>
+                                            <option value="16:00" <cfif Reservation.datebacktime IS "16:00">selected</cfif>>4:00 pm</option>
+                                            <option value="16:30" <cfif Reservation.datebacktime IS "16:30">selected</cfif>>4:30 pm</option>
+                                            <option value="17:00" <cfif Reservation.datebacktime IS "17:00">selected</cfif>>5:00 pm</option>
+                                            <option value="17:30" <cfif Reservation.datebacktime IS "17:30">selected</cfif>>5:30 pm</option>
+                                            <option value="18:00" <cfif Reservation.datebacktime IS "18:00">selected</cfif>>6:00 pm</option>
+                                            <option value="18:30" <cfif Reservation.datebacktime IS "18:30">selected</cfif>>6:30 pm</option>
+                                            <option value="19:00" <cfif Reservation.datebacktime IS "19:00">selected</cfif>>7:00 pm</option>
+                                            <option value="19:30" <cfif Reservation.datebacktime IS "19:30">selected</cfif>>7:30 pm</option>
+                                            <option value="20:00" <cfif Reservation.datebacktime IS "20:00">selected</cfif>>8:00 pm</option>
+                                            <option value="23:00" <cfif Reservation.datebacktime IS "23:00">selected</cfif>>Other (special)</option>
+                                        </cfselect>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Number of Drivers</td>
+                                    <td>
+                                        <cfselect name="drivers" class="#StructKeyExists(fieldErrors,"drivers") ? 'field-error' : ''#">
+                                            <option value="1" <cfif Reservation.drivers IS 1>selected</cfif>>1</option>
+                                            <option value="2" <cfif Reservation.drivers IS 2>selected</cfif>>2</option>
+                                            <option value="3" <cfif Reservation.drivers IS 3>selected</cfif>>More than 2</option>
+                                        </cfselect>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Delivery</td>
+                                    <td>
+                                        <cfselect name="delivery" class="#StructKeyExists(fieldErrors,"delivery") ? 'field-error' : ''#" onchange="toggleDeliveryZip();">
+                                            <option value="0" <cfif Reservation.delivery IS 1>selected</cfif>>I will be picking up the vehicle at PRI in Ringwood, NJ</option>
+                                            <option value="1" <cfif Reservation.delivery IS 2>selected</cfif>>I would like the vehicle to be delivered to me</option>
+                                        </cfselect>
+                                    </td>
+                                </tr>
+                                <tr class="delivery-zip">
+                                    <td>Delivery ZIP</td>
+                                    <td><cfinput name="deliveryzip" value="#Reservation.deliveryzip#" style="width: 100px;" maxlength="10" class="#StructKeyExists(fieldErrors,"deliveryzip") ? 'field-error' : ''#" /></td>
+                                </tr>
+                                <tr class="smallprint">
+                                    <td></td>
+                                    <td>
+                                        <small class="subtext delivery-pricing tooltip" title="pricing">See delivery pricing <span class="ui-icon ui-icon-info"></span></small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Included Miles</td>
+                                    <td>#VehicleFront.milesinc# per day</td>
+                                </tr>
+                                <tr>
+                                    <td>Extra miles</td>
+                                    <td>
+                                        <cfselect name="extramiles" class="#StructKeyExists(fieldErrors,"extramiles") ? 'field-error' : ''#">
+                                            <cfloop from="1" to="#arrayLen(extraMilesPrices)#" index="i">
+                                                <cfset milesChoice = extraMilesPrices[i]>
+                                                <option value="#milesChoice.value#" <cfif Reservation.extramiles IS milesChoice.value>selected</cfif>>#milesChoice.label#</option>
+                                            </cfloop>
+                                        </cfselect>
+                                        <small class="tooltip" title="You get #VehicleFront.milesinc# miles per day included with your rental. If you go beyond that amount, additional miles are charged at $1.95/mile. If you're planning on covering a lot of distance, buy additional miles now for a discount!">Pre-purchase and save! <span class="ui-icon ui-icon-info"></span></small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Discount/Coupon Code</td>
+                                    <td><cfinput name="coupon" value="#Reservation.coupon#" maxlength="20" placeholder="(Optional)" class="#StructKeyExists(fieldErrors,"coupon") ? 'field-error' : ''#" /></td>
+                                </tr>
+                                <tr>
+                                    <td class="align-top">Notes/Requests</td>
+                                    <td><cftextarea name="notes" class="#StructKeyExists(fieldErrors,"notes") ? 'field-error' : ''#">#Reservation.notes#</cftextarea></td>
+                                </tr>
+
+                                <tr class="buttons">
+                                    <td></td>
+                                    <td>
+                                        <button type="submit" name="price_btn" class="btn reserve-rental-price-btn">Continue</button>
+                                        <div class="spinner next-form-spinner price-spinner"></div>
+                                    </td>
+                                </tr>
+
+                            </table>
+
+                        </div>
+
+                    <div class="exception hidden" id="reservation_price_error">
+                        <h3>An error occurred</h3>
+                        <p class="alert-message"></p>
+                    </div>
+
+                    <div id="reservation_confirm" class="hidden">
+
+                        <div id="price_breakdown">
+                        <table class="price-breakdown small-item-data">
+                            <tr>
+                                <td>Rental total (<span class="price-numdays"></span>)</td>
+                                <td>$<span class="price-rental-total"></span></td>
+                                <td></td>
+                            </tr>
+                            <tr class="multiday">
+                                <td>Multi-Day Discount (<span class="price-multi-day-discount-pct"></span>%)</td>
+                                <td>- $<span class="price-multi-day-discount"></span></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Coupon Discount</td>
+                                <td>- $<span class="price-car-discount"></span></td>
+                                <td></td>
+                            </tr>
+                            <tr class="customer-discount">
+                                <td>Promotional Discount</td>
+                                <td>- $<span class="price-customer-discount"></span></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Extra Miles (<span class="price-extra-miles"></span>)</td>
+                                <td>$<span class="price-extra-miles-cost"></span></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Subtotal</td>
+                                <td>$<span class="price-subtotal"></span></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Tax (<span class="price-tax-rate"></span>%)</td>
+                                <td>$<span class="price-tax"></span></td>
+                                <td></td>
+                            </tr>
+                            <tr class="total">
+                                <td>Total</td>
+                                <td>$<span class="price-total"></span></td>
+                                <td></td>
+                            </tr>
+                            <tr class="deposit">
+                                <td>Reservation Deposit</td>
+                                <td>$<span class="price-reservation-deposit"></span></td>
+                                <td class="tooltip" title="We will charge your card 50% of the rental total in order to secure your reservation. The remainder will be due at the time you receive the vehicle.">Amount to be charged now <span class="ui-icon ui-icon-info"></span></td>
+                            </tr>
+                            <tr class="smallprint">
+                                <td colspan="3" class="price-delivery-smallprint">
+                                Delivery may incur additional charges. <span class="delivery-pricing" title="pricing">See pricing <span class="ui-icon ui-icon-info"></span></span>
+                                </td>
+                            </tr>
+                            <tr class="security-deposit">
+                                <td>Security Deposit</td>
+                                <td>$<span class="price-security-deposit">#NumberFormat(VehicleFront.deposit,".__")#</span></td>
+                                <td class="tooltip" title="We require a security deposit of some form of collateral with rentals of our vehicles. This typically is done by placing an authorization (&quot;hold&quot;) on a credit card. This hold is performed 1-2 days prior to the rental date, and is released right after the rental is over. If you would like to use different cards for your rental and your security deposit, you will be able to submit a card for the security deposit after you complete the reservation.">Refundable collateral amount <span class="ui-icon ui-icon-info"></span></td>
+                            </tr>
+                        </table>
+                        </div>
+
+                        <table class="inputform confirm">
+
+                            <tr class="buttons">
+                                <td></td>
+                                <td>
+                                    <button type="submit" name="confirm_btn" class="btn reserve-rental-confirm-btn">Complete Reservation</button>
+                                    <div class="spinner next-form-spinner confirm-spinner"></div>
+                                </td>
+                            </tr>
+
+                        </table>
+
+                    </div>
+
+                    <div class="exception hidden" id="reservation_confirm_error">
+                        <h3>An error occurred</h3>
+                        <p class="alert-message"></p>
+                    </div>
+
+                    </cfoutput>
+                    <cfinput name="page" type="hidden" value="reserve" />
+                    <cfinput name="reservationid" type="hidden" value="#Reservation.reservationid#" />
+                    <cfinput name="reservation_type" type="hidden" value="rental" />
+                    </cfform>
+
+                <cfelse>
+
+                    <cfquery name="Cars" datasource="#DSN#">
+                        SELECT vehicleid,make,model FROM Vehicles
+                        WHERE status = 1
+                        AND type = 1
+                        ORDER BY weighting DESC
+                    </cfquery>
+
+                    <cfquery name="Bikes" datasource="#DSN#">
+                        SELECT vehicleid,make,model FROM Vehicles
+                        WHERE status = 1
+                        AND type = 2
+                        ORDER BY weighting DESC
+                    </cfquery>
+
+                    <div class="vehicle-picker-column right">
+                    <cfoutput query="Bikes">
+                        <cfquery name="BikesFront" datasource="#FDSN#">
+                            SELECT price FROM VehiclesFront
+                            WHERE vehicleid = <CFQUERYPARAM value="#vehicleid#" CFSQLType="CF_SQL_INTEGER">
+                        </cfquery>
+                        <a href="index.cfm?page=reserve&vid=#vehicleid#">
+                            <div class="vehicle-picker-pick reservation-picker" vehicleid="#vehicleid#">
+                                <div class="section-header">#NumberFormat(BikesFront.price,"$,")# / day</div>
+                                <img src="#OnSite#images/#vehicleid#-thumb.jpg" />
+                                <span class="caption">#make# #model#</span>
+                            </div>
+                        </a>
+                    </cfoutput>
+                    </div>
+
+                    <div class="vehicle-picker-column">
+                    <cfoutput query="Cars">
+                        <cfquery name="CarsFront" datasource="#FDSN#">
+                            SELECT price FROM VehiclesFront
+                            WHERE vehicleid = <CFQUERYPARAM value="#vehicleid#" CFSQLType="CF_SQL_INTEGER">
+                        </cfquery>
+                        <a href="index.cfm?page=reserve&vid=#vehicleid#">
+                            <div class="vehicle-picker-pick reservation-picker" vehicleid="#vehicleid#">
+                                <div class="section-header">#NumberFormat(CarsFront.price,"$,")# / day</div>
+                                <img src="#OnSite#images/#vehicleid#-thumb.jpg" />
+                                <span class="caption">#make# #model#</span>
+                            </div>
+                        </a>
+                    </cfoutput>
+                    </div>
+
+                </cfif>
+
+            </cfif>
+
+        </div>
+
+    </div>
+
+    <div class="push"></div>
+    </div>
+
+    <CFINCLUDE TEMPLATE="inc_footer.cfm">
+
+</td>
+</tr>
+</table>
+
+<div id="delivery_pricing" style="display: none;">
+    <p>We deliver our vehicles to most locations within the New York City tri-state area. Delivery rates are as follows:</p>
+    <table class="small-item-data delivery-pricing" style="margin-left: 0px;">
+        <tr>
+            <td>Rockland County</td>
+            <td>Free</td>
+       </tr>
+       <tr>
+            <td>Manhattan*</td>
+            <td>Free</td>
+       </tr>
+       <tr>
+            <td>Westchester Airport</td>
+            <td>Free</td>
+       </tr>
+       <tr>
+            <td>Orange County (south of Newburgh)</td>
+            <td>Free</td>
+       </tr>
+       <tr>
+            <td>Northern NJ / Bergen / Passaic County</td>
+            <td>Free</td>
+       </tr>
+       <tr>
+            <td>Metro NYC / JFK / LGA*</td>
+            <td>$99 each way</td>
+       </tr>
+       <tr>
+            <td>Long Island / Connecticut</td>
+            <td>$139 each way</td>
+       </tr>
+       <tr>
+            <td>South NJ / Philadelphia</td>
+            <td>$159 each way</td>
+       </tr>
+       <tr>
+            <td>Other areas</td>
+            <td>$2.00 / mile</td>
+       </tr>
+    </table>
+    <p>
+* Due to the nature of Manhattan and the NYC metro area, some locations may be difficult for us to deliver a vehicle due to parking or
+standing regulations. In such case we may pick you up and transport you to a suitable location at which to conduct the vehicle
+familiarization process and any required paperwork.
+    </p>
+</div>
+
+</body>
+</html>
