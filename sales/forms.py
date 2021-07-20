@@ -2,6 +2,8 @@ import datetime
 import pytz
 import math
 from localflavor.us.forms import USZipCodeField
+from phonenumber_field.formfields import PhoneNumberField
+from creditcards.models import CardNumberField, CardExpiryField, SecurityCodeField
 
 from django.conf import settings
 from django import forms
@@ -58,6 +60,10 @@ class ReservationRentalDetailsForm(forms.ModelForm):
     DATETIME_FORMAT = '%m/%d/%Y %H:%M'
     discount = None
     customer = None
+
+    # It is not necessary to explicitly define form fields on this class if they are defined in the model class,
+    # except to override certain default behaviors such as choice values or widget attributes. We must define
+    # additional fields here if they do not exist in the model referenced in Meta (Reservation).
 
     vehicle_marketing = forms.ModelChoiceField(widget=forms.HiddenInput(), queryset=VehicleMarketing.objects.filter(status=VehicleStatus.READY))
     out_date = forms.DateField(widget=forms.DateInput(attrs={'placeholder': 'MM/DD/YYYY'}))
@@ -280,4 +286,44 @@ class ReservationRentalDetailsForm(forms.ModelForm):
 
     class Meta:
         model = Reservation
+        fields = '__all__'
+
+
+class ReservationRentalPaymentForm(forms.ModelForm):
+    error_css_class = 'field-error'
+    EXP_MONTH_CHOICES = (
+        ('01', 'January (01)'),
+        ('02', 'February (02)'),
+        ('03', 'March (03)'),
+        ('04', 'April (04)'),
+        ('05', 'May (05)'),
+        ('06', 'June (06)'),
+        ('07', 'July (07)'),
+        ('08', 'August (08)'),
+        ('09', 'September (09)'),
+        ('10', 'October (10)'),
+        ('11', 'November (11)'),
+        ('12', 'December (12)'),
+    )
+
+    # first_name = forms.CharField()
+    # last_name = forms.CharField()
+    # mobile_phone = PhoneNumberField()
+    # home_phone = PhoneNumberField()
+    # work_phone = PhoneNumberField()
+    # fax = PhoneNumberField()
+    # cc_number = forms.CharField()
+    cc_exp_yr = forms.ChoiceField()
+    cc_exp_mo = forms.ChoiceField(choices=EXP_MONTH_CHOICES)
+    # cc_cvv = forms.CharField()
+    # cc_phone = PhoneNumberField()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        current_year = timezone.now().year
+        self.fields['cc_exp_yr'].choices = ((year, year) for year in range(current_year, current_year + 11))
+        # self.fields['extra_miles'].choices = ((k, v['label']) for k, v in settings.EXTRA_MILES_PRICES.items())
+
+    class Meta:
+        model = Customer
         fields = '__all__'

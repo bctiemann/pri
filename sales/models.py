@@ -9,6 +9,10 @@ from django.db import models
 from django.utils.timezone import now
 
 
+def generate_code():
+    return ''.join(random.choice('123456789ABCNPQDXEFGHJKMVZ') for _ in range(4))
+
+
 class Reservation(models.Model):
 
     class StatusChoices(models.IntegerChoices):
