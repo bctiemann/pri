@@ -290,7 +290,7 @@ $('document').ready(function() {
         reserveValidateForm('validatePassword', 'password');
     });
     $('.reserve-login-btn').click(function() {
-        reserveValidateForm('validateLogin', 'password');
+        reserveValidateForm('rental', 'payment');
     });
     $('.reserve-rental-complete-btn').click(function() {
         reserveValidateForm('rental', 'payment');

@@ -25,6 +25,7 @@ class ValidateRentalDetailsView(APIView):
             'success': form.is_valid(),
             'errors': form.errors,
             'errors_html': form.errors.as_ul(),
+            'customer_id': form.customer.id if form.customer else None,
             'price_data': form.price_data,
             'delivery_required': form.cleaned_data['delivery_required'],
         }

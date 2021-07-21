@@ -289,7 +289,7 @@ class ReservationRentalDetailsForm(forms.ModelForm):
         fields = '__all__'
 
 
-class ReservationRentalPaymentForm(forms.ModelForm):
+class ReservationRentalPaymentForm(ReservationRentalDetailsForm):
     error_css_class = 'field-error'
     EXP_MONTH_CHOICES = (
         ('01', 'January (01)'),
@@ -317,6 +317,7 @@ class ReservationRentalPaymentForm(forms.ModelForm):
     cc_exp_mo = forms.ChoiceField(choices=EXP_MONTH_CHOICES)
     # cc_cvv = forms.CharField()
     # cc_phone = PhoneNumberField()
+    password = forms.CharField(widget=forms.PasswordInput())
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
