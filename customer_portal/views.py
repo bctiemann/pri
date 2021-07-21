@@ -26,3 +26,7 @@ class HomeView(SidebarMixin, TemplateView):
 class LoginView(LoginView):
     template_name = 'customer_portal/login.html'
     home_url = reverse_lazy('customer_portal:home')
+
+
+class ConfirmReservationView(SidebarMixin, TemplateView):
+    template_name = 'customer_portal/confirm_reservation.html'

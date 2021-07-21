@@ -1,6 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from django.urls import reverse_lazy, reverse
+
 from sales.forms import ReservationRentalDetailsForm, ReservationRentalPaymentForm
 
 
@@ -33,10 +35,13 @@ class ValidateRentalPaymentView(APIView):
         # Create Customer or login existing user
         # Create Reservation
 
+        confirmation_code = 'abc123'
+
         response = {
             'success': form.is_valid() and payment_form.is_valid(),
             'errors': form.errors,
             'errors_html': form.errors.as_ul(),
             'reservation_type': 'rental',
+            'customer_site_url': reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': confirmation_code}),
         }
         return Response(response)

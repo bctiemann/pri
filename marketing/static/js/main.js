@@ -116,7 +116,7 @@ var reserveValidateForm = function(reservationType, section) {
                 } else if (data.reservation_type == 'joyride') {
                     window.location.href = data.custsite + 'joyride_confirm.cfm?confcode=' + data.confcode;
                 } else if (data.reservation_type === 'rental') {
-                    window.location.href = data.custsite + 'reserve_confirm.cfm?confcode=' + data.confcode;
+                    window.location.href = data.customer_site_url;
                 } else if (data.reservation_type == 'gift') {
                     window.location.href = 'gift.cfm?tag=' + data.tag;
                 }
