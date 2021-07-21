@@ -1,11 +1,19 @@
+import random
 from localflavor.us.models import USStateField, USZipCodeField
 from phonenumber_field.modelfields import PhoneNumberField
 from encrypted_fields import fields
+from english_words import english_words_lower_set
 
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+
+
+def generate_password():
+    words = [w for w in english_words_lower_set if len(w) < 8 and len(w) > 3]
+    digit_string = random.randrange(100, 1000)
+    return f'{random.choice(words).capitalize()}{digit_string}{random.choice(words).capitalize()}'
 
 
 class LowercaseEmailField(models.EmailField):
