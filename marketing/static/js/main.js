@@ -138,7 +138,8 @@ var reserveValidateForm = function(reservationType, section) {
             }
         }
     }, 'json')
-    .fail(function() {
+    .fail(function(data) {
+        console.log(data.responseJSON);
         var error = 'There was an error communicating with our system. Please try again.';
         $('#reserve-' + section + '-btn').prop('disabled', false);
         $('#reservation_' + section + '_error .alert-message').html(error);

@@ -1,5 +1,6 @@
 import json
 import decimal
+import random
 from localflavor.us.models import USStateField, USZipCodeField
 from avalara import AvataxClient
 from requests import HTTPError
@@ -8,9 +9,13 @@ from django.conf import settings
 from django.db import models
 from django.utils.timezone import now
 
+from sales.enums import RESERVATION_TYPE_CODE_MAP
 
-def generate_code():
-    return ''.join(random.choice('123456789ABCNPQDXEFGHJKMVZ') for _ in range(4))
+
+def generate_code(reservation_type):
+    alpha_str = ''.join(random.choice('123456789ABCNPQDXEFGHJKMVZ') for _ in range(4))
+    numeric_str = random.randrange(10, 100)
+    return f'{RESERVATION_TYPE_CODE_MAP.get(reservation_type)}{alpha_str}{numeric_str}'
 
 
 # Concrete base model class which is used to supply common fields to both the Reservation and Rental model classes.
@@ -31,7 +36,7 @@ class BaseReservation(models.Model):
     customer_notes = models.TextField(blank=True)
     coupon_code = models.CharField(max_length=30, blank=True)
     deposit_amount = models.IntegerField(null=True, blank=True)
-    confirmation_code = models.CharField(max_length=10, blank=True)
+    confirmation_code = models.CharField(max_length=10, blank=True, unique=True)
     delivery_required = models.BooleanField(default=False)
     tax_percent = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
     delivery_zip = USZipCodeField(blank=True)
