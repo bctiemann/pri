@@ -129,15 +129,15 @@ class Customer(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     id_old = models.IntegerField(null=True, blank=True)
 
-    first_name = models.CharField(_('first name'), max_length=30, blank=True)
-    last_name = models.CharField(_('last name'), max_length=30, blank=True)
+    first_name = models.CharField(_('first name'), max_length=30)
+    last_name = models.CharField(_('last name'), max_length=30)
 
     # Mailing address lines are encrypted
-    address_line_1 = fields.EncryptedCharField(max_length=255, blank=True)
+    address_line_1 = fields.EncryptedCharField(max_length=255)
     address_line_2 = fields.EncryptedCharField(max_length=255, blank=True)
-    city = models.CharField(max_length=255, blank=True)
-    state = USStateField(blank=True)
-    zip = USZipCodeField(blank=True)
+    city = models.CharField(max_length=255)
+    state = USStateField()
+    zip = USZipCodeField()
 
     # Use home_phone.as_national to display in (555) 123-1234 style
     home_phone = PhoneNumberField(blank=True)
@@ -156,11 +156,11 @@ class Customer(models.Model):
     insurance_company_phone = PhoneNumberField(blank=True)
     coverage_verified = models.BooleanField(default=False)
 
-    cc_number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC1 number')
-    cc_exp_yr = models.CharField(max_length=4, blank=True, verbose_name='CC1 exp year')
-    cc_exp_mo = models.CharField(max_length=2, blank=True, verbose_name='CC1 exp month')
-    cc_cvv = models.CharField(max_length=6, blank=True, verbose_name='CC1 CVV')
-    cc_phone = PhoneNumberField(blank=True, verbose_name='CC1 contact phone')
+    cc_number = fields.EncryptedCharField(max_length=255, verbose_name='CC1 number')
+    cc_exp_yr = models.CharField(max_length=4, verbose_name='CC1 exp year')
+    cc_exp_mo = models.CharField(max_length=2, verbose_name='CC1 exp month')
+    cc_cvv = models.CharField(max_length=6, verbose_name='CC1 CVV')
+    cc_phone = PhoneNumberField(verbose_name='CC1 contact phone')
 
     cc2_number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC2 number')
     cc2_exp_yr = models.CharField(max_length=4, blank=True, verbose_name='CC2 exp year')
