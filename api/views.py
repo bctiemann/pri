@@ -8,7 +8,7 @@ from django.urls import reverse_lazy, reverse
 from django.db import IntegrityError
 from django.contrib.auth import authenticate, login
 
-from sales.forms import ReservationRentalDetailsForm, ReservationRentalPaymentForm
+from sales.forms import ReservationRentalDetailsForm, ReservationRentalPaymentForm, ReservationRentalLoginForm
 from sales.models import Reservation, generate_code
 from sales.enums import ReservationType
 from users.models import User, Customer, generate_password
@@ -42,10 +42,42 @@ class ValidateRentalPaymentView(APIView):
     # authentication_classes = ()
     # permission_classes = ()
 
+    # form_type is passed in via the url pattern in urls.py as a kwarg to .as_view()
+    form_type = None
+
+    def _get_form_class(self):
+        if self.form_type == 'payment':
+            return ReservationRentalPaymentForm
+        elif self.form_type == 'login':
+            return ReservationRentalLoginForm
+
+    @staticmethod
+    def _get_login_customer(request, form):
+        if form.customer:
+            if authenticate(request, username=form.customer.user.email, password=form.cleaned_data['password']):
+                login(request, form.customer.user)
+                return form.customer
+            # Only way to return None is if password is incorrect for an existing user's email
+            return None
+        else:
+            # Create Customer object and login
+            # TODO: Ensure that every User has a Customer attached, as providing an email of an unattached user will
+            # try to create a new user which will fail the uniqueness constraint. Alternatively, do a get_or_create
+            user = User.objects.create_user(form.cleaned_data['email'], password=generate_password())
+            customer_kwargs = {key: form.cleaned_data.get(key) for key in form.customer_fields}
+            customer = Customer.objects.create(
+                user=user,
+                **customer_kwargs,
+            )
+            login(request, user)
+        return customer
+
     def post(self, request):
+        form_class = self._get_form_class()
         # form = ReservationRentalDetailsForm(request.POST)
-        form = ReservationRentalPaymentForm(request.POST)
+        form = form_class(request.POST)
         print(form.data)
+        print(self.form_type)
         print(form.is_valid())
         print(form.errors.as_json())
         if not form.is_valid():
@@ -55,26 +87,14 @@ class ValidateRentalPaymentView(APIView):
             })
 
         # Create Customer or login existing user
-        if form.customer:
-            if authenticate(request, username=form.customer.user.email, password=form.cleaned_data['password']):
-                login(request, form.customer.user)
-            else:
-                return Response({
-                    'success': False,
-                    'errors': {
-                        'password': ['Incorrect password'],
-                    },
-                })
-            customer = form.customer
-        else:
-            # Create Customer object and login
-            user = User.objects.create_user(form.cleaned_data['email'], password=generate_password())
-            customer_kwargs = {key: form.cleaned_data.get(key) for key in form.customer_fields}
-            customer = Customer.objects.create(
-                user=user,
-                **customer_kwargs,
-            )
-            login(request, user)
+        customer = self._get_login_customer(request, form)
+        if not customer:
+            return Response({
+                'success': False,
+                'errors': {
+                    'password': ['Incorrect password'],
+                },
+            })
 
         # Create Reservation
 

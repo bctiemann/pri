@@ -294,8 +294,8 @@ class ReservationRentalDetailsForm(forms.ModelForm):
         fields = '__all__'
 
 
+# 2nd-phase form; extends ReservationRentalDetailsForm with Customer fields so it inherits all the first form's validations
 class ReservationRentalPaymentForm(ReservationRentalDetailsForm):
-    error_css_class = 'field-error'
     customer_fields = (
         'first_name', 'last_name', 'mobile_phone', 'home_phone', 'work_phone', 'fax', 'cc_number', 'cc_exp_yr',
         'cc_exp_mo', 'cc_cvv', 'cc_phone', 'address_line_1', 'address_line_2', 'city', 'state', 'zip'
@@ -326,7 +326,7 @@ class ReservationRentalPaymentForm(ReservationRentalDetailsForm):
     cc_exp_mo = forms.ChoiceField(choices=EXP_MONTH_CHOICES)
     # cc_cvv = forms.CharField()
     # cc_phone = PhoneNumberField()
-    password = forms.CharField(widget=forms.PasswordInput(), required=False)
+    # password = forms.CharField(widget=forms.PasswordInput(), required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -337,3 +337,9 @@ class ReservationRentalPaymentForm(ReservationRentalDetailsForm):
     class Meta:
         model = Customer
         fields = '__all__'
+
+
+# If the customer already exists, this form will be shown and processed instead of ReservationRentalPaymentForm
+class ReservationRentalLoginForm(ReservationRentalDetailsForm):
+
+    password = forms.CharField(widget=forms.PasswordInput())

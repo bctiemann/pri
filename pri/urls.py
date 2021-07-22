@@ -78,7 +78,8 @@ urlpatterns = [
     path('vehicle/<str:slug>/reserve/', sales_views.ReserveView.as_view(), name='reserve'),
 
     path('api/validate/rental/details/', api_views.ValidateRentalDetailsView.as_view(), name='validate-rental-details'),
-    path('api/validate/rental/payment/', api_views.ValidateRentalPaymentView.as_view(), name='validate-rental-payment'),
+    path('api/validate/rental/payment/', api_views.ValidateRentalPaymentView.as_view(form_type='payment'), name='validate-rental-payment'),
+    path('api/validate/rental/login/', api_views.ValidateRentalPaymentView.as_view(form_type='login'), name='validate-rental-login'),
 
     # This is an example of an app's own namespaced urls.py being included in the main one at a mount point.
     # This app contains the legacy site's administrative/business UI.
