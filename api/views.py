@@ -11,6 +11,7 @@ from django.contrib.auth import authenticate, login
 from sales.forms import ReservationRentalDetailsForm, ReservationRentalPaymentForm
 from sales.models import Reservation, generate_code
 from sales.enums import ReservationType
+from users.models import User, Customer, generate_password
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +48,11 @@ class ValidateRentalPaymentView(APIView):
         print(form.data)
         print(form.is_valid())
         print(form.errors.as_json())
+        if not form.is_valid():
+            return Response({
+                'success': False,
+                'errors': form.errors,
+            })
 
         # Create Customer or login existing user
         if form.customer:
@@ -59,9 +65,16 @@ class ValidateRentalPaymentView(APIView):
                         'password': ['Incorrect password'],
                     },
                 })
+            customer = form.customer
         else:
             # Create Customer object and login
-            pass
+            user = User.objects.create_user(form.cleaned_data['email'], password=generate_password())
+            customer_kwargs = {key: form.cleaned_data.get(key) for key in form.customer_fields}
+            customer = Customer.objects.create(
+                user=user,
+                **customer_kwargs,
+            )
+            login(request, user)
 
         # Create Reservation
 
@@ -75,6 +88,8 @@ class ValidateRentalPaymentView(APIView):
             try:
                 reservation = Reservation.objects.create(
                     confirmation_code=confirmation_code,
+                    customer=customer,
+                    vehicle=form.vehicle,
 
                 )
             except IntegrityError:

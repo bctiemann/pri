@@ -10,7 +10,7 @@ from django import forms
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
-from fleet.models import VehicleMarketing, VehicleStatus
+from fleet.models import Vehicle, VehicleMarketing, VehicleStatus
 from sales.models import Reservation, Coupon
 from users.models import Customer
 from sales.utils import RentalPriceCalculator
@@ -60,6 +60,7 @@ class ReservationRentalDetailsForm(forms.ModelForm):
     DATETIME_FORMAT = '%m/%d/%Y %H:%M'
     discount = None
     customer = None
+    vehicle = None
 
     # It is not necessary to explicitly define form fields on this class if they are defined in the model class,
     # except to override certain default behaviors such as choice values or widget attributes. We must define
@@ -154,6 +155,10 @@ class ReservationRentalDetailsForm(forms.ModelForm):
             self.customer = Customer.objects.get(user__email=self.cleaned_data['email'])
         except (Customer.DoesNotExist, KeyError):
             pass
+        try:
+            self.vehicle = Vehicle.objects.get(pk=self.cleaned_data['vehicle_marketing'].vehicle_id)
+        except Vehicle.DoesNotExist:
+            raise forms.ValidationError(f"Vehicle {self.cleaned_data['vehicle_marketing']} mapped incorrectly.")
         return super().clean()
 
     @property
@@ -291,6 +296,10 @@ class ReservationRentalDetailsForm(forms.ModelForm):
 
 class ReservationRentalPaymentForm(ReservationRentalDetailsForm):
     error_css_class = 'field-error'
+    customer_fields = (
+        'first_name', 'last_name', 'mobile_phone', 'home_phone', 'work_phone', 'fax', 'cc_number', 'cc_exp_yr',
+        'cc_exp_mo', 'cc_cvv', 'cc_phone', 'address_line_1', 'address_line_2', 'city', 'state', 'zip'
+    )
     EXP_MONTH_CHOICES = (
         ('01', 'January (01)'),
         ('02', 'February (02)'),
@@ -317,7 +326,7 @@ class ReservationRentalPaymentForm(ReservationRentalDetailsForm):
     cc_exp_mo = forms.ChoiceField(choices=EXP_MONTH_CHOICES)
     # cc_cvv = forms.CharField()
     # cc_phone = PhoneNumberField()
-    password = forms.CharField(widget=forms.PasswordInput())
+    password = forms.CharField(widget=forms.PasswordInput(), required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

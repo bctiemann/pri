@@ -82,7 +82,7 @@ class RentalPriceCalculator(PriceCalculator):
         return self.coupon.get_discount_value(value)
 
     def get_customer_discount(self, value):
-        if self.customer:
+        if self.customer and self.customer.discount_pct:
             return value * self.customer.discount_pct / 100
         return 0
 
