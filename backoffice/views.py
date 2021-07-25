@@ -4,6 +4,7 @@ from django.views.generic import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView, LogoutView, INTERNAL_RESET_SESSION_TOKEN
 
 from fleet.models import Vehicle
 from backoffice.forms import VehicleForm
@@ -17,6 +18,10 @@ class HomeView(TemplateView):
 class LoginView(LoginView):
     template_name = 'backoffice/login.html'
     home_url = reverse_lazy('backoffice:home')
+
+
+class LogoutView(LogoutView):
+    pass
 
 
 class VehicleViewMixin:

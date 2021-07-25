@@ -1,3 +1,5 @@
+{% extends "customer_portal/base.html" %}
+
 <CFINCLUDE TEMPLATE="inc_lib.cfm">
 <CFINCLUDE TEMPLATE="inc_header.cfm">
 <title>Performance Rentals Customer Portal</title>
@@ -21,7 +23,9 @@
     <div class="well">
         <div class='section-header'>Customer Login</div>
 
+        {% block page_title %}Customer Login{% endblock %}
 
+        {% block content %}
 <div id="content" class="loginwrap">
 <div class="logincontent">
 
@@ -89,6 +93,7 @@
 
 </div>
 </div>
+{% endblock %}
 
     </div>
 

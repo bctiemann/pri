@@ -1,3 +1,11 @@
+{% load static %}
+
+<!DOCTYPE HTML>
+<html>
+{% include "backoffice/includes/headers.html" %}
+<body>
+
+{% comment %}
 {% extends "accounts/base.html" %}
 
 {% block content %}{% endblock %}
@@ -19,3 +27,97 @@
     </div>
 
 {% endblock %}
+{% endcomment %}
+
+{% block content %}
+<CFINCLUDE TEMPLATE="inc_header.cfm">
+<div id="content" class="loginwrap">
+<div class="logincontent">
+
+<h1>Performance Rentals - Administration Login</h1>
+
+<CFIF IsDefined("AccessDenied")>
+    <div class="loginerror">
+        <h3>ACCESS DENIED</h3>
+        <p>You have entered an incorrect password for the specified account.</p>
+    </div>
+</CFIF>
+
+<CFIF IsDefined("NoMail")>
+    <div class="loginerror">
+        <h3>ACCESS DENIED</h3>
+        <p>The administrator account you have entered does not exist.</p>
+    </div>
+</CFIF>
+
+<CFIF IsDefined("BadKey")>
+    <div class="loginerror">
+        <h3>ACCESS DENIED</h3>
+        <p>Your 2-factor authenticator is invalid or has expired.</p>
+    </div>
+</CFIF>
+
+<CFIF IsDefined("Disabled")>
+    <div class="loginerror">
+        <h3>ACCESS DENIED</h3>
+        <p>Your account has been disabled.</p>
+    </div>
+</CFIF>
+
+<CFIF IsDefined("NoKey")>
+    <div class="loginerror">
+        <h3>ACCESS DENIED</h3>
+        <p>You do not have a 2-factor key.</p>
+    </div>
+</CFIF>
+
+<CFIF IsDefined("KeyExpired")>
+    <div class="loginerror">
+        <h3>ACCESS DENIED</h3>
+        <p>Your 2-factor key has expired.</p>
+    </div>
+</CFIF>
+
+    <div class="login-form-container">
+
+{#        {% include "two_factor/core/login.html" %}#}
+
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="loginform">
+                {% include "two_factor/login_form.html" %}
+                {% block next %}<input type="hidden" name="next" value="{% url "backoffice:home" %}" />{% endblock %}
+            </div>
+        </form>
+
+    </div>
+
+<CFOUTPUT>
+<table class="loginhostinfo">
+    <tr>
+        <td>IP</td>
+        <td>#realip#</td>
+    </tr>
+    <tr>
+        <td>HOST</td>
+        <td>#CGI.REMOTE_HOST#</td>
+    </tr>
+</table>
+</CFOUTPUT>
+
+<div class="loginwarning">
+    <p>ONLY <b>PERFORMANCE RENTALS</b> PERSONNEL ARE ALLOWED BEYOND THIS POINT.</p>
+    <p>ALL ACCESS IS LOGGED.</p>
+    <p>UNAUTHORIZED ACCESS ATTEMPTS WILL BE REPORTED TO THE <b>UNITED STATES FEDERAL AUTHORITIES</b>.</p>
+    <img width="180" height="120" src="{% static "backoffice/images/fbi.gif" %}" />
+</div>
+
+</div>
+</div>
+
+<CFINCLUDE TEMPLATE="inc_footer.cfm">
+<CFABORT>
+{% endblock %}
+
+</body>
+</html>

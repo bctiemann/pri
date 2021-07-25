@@ -2,24 +2,13 @@
 
 <!DOCTYPE HTML>
 <html>
-    <head>
-    <title>Performance Rentals Administration</title>
-    <link rel=stylesheet href="{% static "backoffice/css/style.css" %}" TYPE="text/css">
-    <link rel=stylesheet href="{% static "backoffice/css/jquery-ui.css" %}" TYPE="text/css">
-    <script type="text/javascript" src="{% static "backoffice/js/jquery.js" %}"></script>
-    <script type="text/javascript" src="{% static "backoffice/js/jquery.inputmask.bundle.min.js" %}"></script>
-    <script type="text/javascript" src="{% static "backoffice/js/jquery.payment.js" %}"></script>
-    <script type="text/javascript" src="{% static "backoffice/js/jquery-ui.min.js" %}"></script>
-    <script src="{% static "backoffice/js/main.js" %}" language="javascript"></script>
-    <cfif Login IS False>
-        <meta Http-equiv="refresh" Content="1500; Url=zzz.cfm">
-    </cfif>
-</head>
+{% include "backoffice/includes/headers.html" %}
 <body>
 
     <CFINCLUDE TEMPLATE="inc_lib.cfm">
     <CFIF IsDefined("Login") AND Login IS false>
 
+    {% if user.is_authenticated %}
     <div class="header">
         <div id="header_logo">
         <a href="status.cfm"><img src="{% static "backoffice/images/PRI_logo_header.png" %}" /></a>
@@ -317,10 +306,11 @@
         </div>
         </CFIF>
     </div>
+    {% endif %}
 
     {% block nav %}{% endblock %}
 
-    <div class="content">
+    <div class="{% if not user.is_authenticated %}content{% endif %}">
 
         {% block content %}{% endblock %}
 
