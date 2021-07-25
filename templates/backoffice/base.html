@@ -310,7 +310,7 @@
 
     {% block nav %}{% endblock %}
 
-    <div class="{% if not user.is_authenticated %}content{% endif %}">
+    <div class="{% block content_class %}content{% endblock %}">
 
         {% block content %}{% endblock %}
 

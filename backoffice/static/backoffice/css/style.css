@@ -13,9 +13,8 @@ div.header {
 	width: 100%;
 	height: 42px;
 	box-shadow: 0px 3px 3px rgba(0,0,0,0.2);
-	z-index: 1;
+	z-index: 1000;
 }
-
 
 table.layout {
 	border-collapse: collapse;
@@ -57,15 +56,18 @@ div#header_logo {
 
 #admlist {
 	position: absolute;
-	width: 300px;
+	width: 400px;
 	right: 50px;
+}
+#admlist table {
+	width: 100%;
 }
 
 #nav {
 	margin: 5px auto 0 auto;
 	color: #fff;
 	background-color: #000;
-} 
+}
 
 #logo {
 	position: absolute;
@@ -259,15 +261,15 @@ a#logoutlink:hover {
 }
 
 div#menu_vehicles {
-	left: 100px;	
+	left: 100px;
 	width: 220px;
 }
 div#menu_ops {
-	left: 180px;	
+	left: 180px;
 	width: 220px;
 }
 div#menu_admin {
-	left: 275px;	
+	left: 275px;
 	width: 220px;
 }
 
@@ -287,12 +289,25 @@ div#todolist {
 table.pricestable {
 	border-collapse: collapse;
 	width: 570px;
+        font-family: Verdana,Arial;
+        font-size: 7pt;
+}
+table.pricestable th {
+	background-color: #fd969b;
+	text-align: left;
+}
+table.pricestable th.align-center {
+	text-align: center;
 }
 table.pricestable td {
 	white-space: nowrap;
-        font-family: Verdana,Arial;
-        font-size: 7pt;	
 	padding: 2px;
+}
+table.pricestable > tbody > tr:nth-child(odd) {
+        background-color: #fccac9;
+}
+table.pricestable > tbody > tr:nth-child(even) {
+        background-color: #fff7c9;
 }
 table.pricestable td.price {
 	text-align: right;
@@ -301,6 +316,7 @@ table.pricestable td.price {
 table.data.logs td {
 	font-family: Monaco,monospace;
 	font-size: 10px;
+	white-space: nowrap;
 }
 
 ul.navmenu {
@@ -384,7 +400,7 @@ h1.pageheader ul {
 	list-style-type: none;
 	position: absolute;
 	top: 46px;
-	left: 240px;
+	left: 340px;
 }
 h1.pageheader li {
 	display: inline-block;
@@ -403,7 +419,8 @@ h1.pageheader li:hover {
 	border: 1px solid #d5cfc9;
 }
 h1.pageheader li.selected {
-	border-color: #3189e1;
+	border-color: #757175;
+	background-color: #efefef;
 }
 
 
@@ -438,10 +455,11 @@ table.data {
 	border-collapse: collapse;
 	width: 90%;
 	border-width: 1px 2px 2px 1px;
-	border-width: 1px;
+	border-width: 0px;
 	border-style: solid;
 	border-color: #666;
 	box-shadow: 0px 1px 3px rgba(0,0,0,0.8);
+	box-shadow: none;
 	margin-top: 5px;
 }
 table.data tr {
@@ -462,6 +480,7 @@ table.data th {
 	border-style: solid;
 	background-color: #d0d0c8;
 	background: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#bbb));
+	background: none;
 	color: #555;
 }
 table.data th[defaultdir] {
@@ -475,14 +494,12 @@ table.data th.sort_unselected {
 	padding: 5px;
 }
 table.data th.sort_selected {
-	box-shadow: inset 0px 1px 2px rgba(0,0,0,0.8);
-	background: -webkit-gradient(linear, left top, left bottom, from(#ccc), to(#aaa));
 }
 table.data th.asc {
-	background: url('../images/arrow_up.png') no-repeat right center, linear-gradient(#ccc, #aaa);
+	background: url('../images/arrow_up.png') no-repeat right center, linear-gradient(#f0f0f0, #e0e0e0);
 }
 table.data th.desc {
-	background: url('../images/arrow_down.png') no-repeat right center, linear-gradient(#ccc, #aaa);
+	background: url('../images/arrow_down.png') no-repeat right center, linear-gradient(#f0f0f0, #e0e0e0);
 }
 table.data th a {
 	display: block;
@@ -513,6 +530,15 @@ table.data td.data {
 table.data td.text {
 	text-align: left;
 }
+table.data td.truncate {
+	max-width: 200px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+.navigator-table table.data {
+	width: 100%;
+}
 
 table.inputform {
         border-collapse: collapse;
@@ -535,14 +561,25 @@ table.inputform td {
         vertical-align: middle;
         height: 38px;
 	line-height: 32px;
+	position: relative;
 }
 table.inputform td:first-child {
         text-align: right;
         width: 200px;
-        padding-right: 20px;
+        padding-right: 10px;
         font-weight: normal;
         vertical-align: middle;
 	line-height: 16px;
+}
+table.inputform td:nth-child(2) {
+	padding-left: 10px;
+}
+table.inputform td.currency {
+	padding-left: 0px;
+}
+table.inputform td.currency span.currency-prefix {
+	display: inline-block;
+	width: 10px;
 }
 table.inputform td.align-top {
 	vertical-align: top;
@@ -563,8 +600,24 @@ table.inputform textarea {
         border-color: rgba(17, 17, 18, 0.3);
 }
 table.inputform input[type=text],
+table.inputform input[type=email],
+table.inputform input[type=search],
 table.inputform input[type=password] {
         width: 240px;
+}
+table.inputform input.search {
+	border-radius: 18px;
+	background: url('../images/icon_search.png') no-repeat 224px top;
+	background-size: 30px;
+	padding-right: 36px;
+	padding-left: 16px;
+	width: 206px;
+}
+table.inputform input.search:focus {
+	outline: none;
+}
+table.inputform input.short {
+        width: 100px;
 }
 table.inputform textarea {
         width: 340px;
@@ -672,8 +725,11 @@ table.price-breakdown {
 	border-collapse: collapse;
 }
 table.price-breakdown td {
-	padding: 0px;
+	padding: 0px 10px;
 	text-align: right;
+}
+.bill-total {
+	background-color: #eee;
 }
 
 table.drivers {
@@ -722,7 +778,7 @@ b.red {
  color: #ff0000;
 }
 span.red {
- color: #B22222; 
+ color: #B22222;
 }
 
 p.info {
@@ -731,6 +787,9 @@ p.info {
 	font-size: 11px;
 }
 
+div.pager {
+	margin-right: 10%;
+}
 div.pageslink {
 	float: right;
 	margin-top: 15px;
@@ -758,7 +817,7 @@ div.reply {
 div.bbsinfo {
 }
 div.bbsinfo a.submenu {
-	float: right;	
+	float: right;
 }
 div.bbsnotetext {
 	margin: 10px;
@@ -806,6 +865,7 @@ div#map {
 	right: 0px;
 	margin-right: 5px;
 	text-align: center;
+	z-index: 6;
 }
 div#map p {
 	color: #666;
@@ -819,6 +879,10 @@ div#maplink {
 pre {
 	font-size: 11px;
 	line-height: 11px;
+}
+.pre {
+	font-family: monospace;
+	white-space: pre;
 }
 /*
 pre#specs-output {
@@ -842,25 +906,28 @@ input.cc-field {
 input.cc-field.identified {
         background-size: auto;
 }
-input.cc-field.visa {
+.visa {
         background-image: url('../images/cards/visa.png');
 }
-input.cc-field.mastercard {
+.mastercard {
         background-image: url('../images/cards/mastercard.png');
 }
-input.cc-field.amex {
+.amex {
         background-image: url('../images/cards/amex.png');
 }
-input.cc-field.jcb {
+.jcb {
         background-image: url('../images/cards/jcb.png');
 }
-input.cc-field.discover {
+.discover {
         background-image: url('../images/cards/discover.png');
 }
-input.cc-field.dinersclub {
+.dinersclub {
         background-image: url('../images/cards/diners.png');
 }
 
+input.dont-edit {
+	background-color: #cecece;
+}
 
 .btn {
   background: #74cc8e;
@@ -893,22 +960,22 @@ input.cc-field.dinersclub {
 }
 
 .btn.delete {
-  background: #ff9ba2;  
-  background-image: -webkit-linear-gradient(top, #ff9ba2, #6a3707);  
-  background-image: -moz-linear-gradient(top, #ff9ba2, #6a3707);  
-  background-image: -ms-linear-gradient(top, #ff9ba2, #6a3707);  
-  background-image: -o-linear-gradient(top, #ff9ba2, #6a3707);  
-  background-image: linear-gradient(to bottom, #ff9ba2, #6a3707);  
+  background: #ff9ba2;
+  background-image: -webkit-linear-gradient(top, #ff9ba2, #6a3707);
+  background-image: -moz-linear-gradient(top, #ff9ba2, #6a3707);
+  background-image: -ms-linear-gradient(top, #ff9ba2, #6a3707);
+  background-image: -o-linear-gradient(top, #ff9ba2, #6a3707);
+  background-image: linear-gradient(to bottom, #ff9ba2, #6a3707);
   margin-left: 100px;
 }
- 
+
 .btn.delete:hover {
-  background: #fac0c5; 
-  background-image: -webkit-linear-gradient(top, #fac0c5, #cc6843); 
-  background-image: -moz-linear-gradient(top, #fac0c5, #cc6843); 
-  background-image: -ms-linear-gradient(top, #fac0c5, #cc6843); 
-  background-image: -o-linear-gradient(top, #fac0c5, #cc6843); 
-  background-image: linear-gradient(to bottom, #fac0c5, #cc6843); 
+  background: #fac0c5;
+  background-image: -webkit-linear-gradient(top, #fac0c5, #cc6843);
+  background-image: -moz-linear-gradient(top, #fac0c5, #cc6843);
+  background-image: -ms-linear-gradient(top, #fac0c5, #cc6843);
+  background-image: -o-linear-gradient(top, #fac0c5, #cc6843);
+  background-image: linear-gradient(to bottom, #fac0c5, #cc6843);
 }
 
 span.ui-icon {
@@ -1127,6 +1194,9 @@ td.bbsdeleted {
 	position: relative;
 	background-color: #32c7fa;
 	display: inline-block;
+	background-repeat: no-repeat;
+	background-position: bottom right;
+	background-size: 50px;
 }
 .card-mockup.inactive {
 	background-color: #e5e5e5;
@@ -1173,8 +1243,116 @@ td.bbsdeleted {
 	white-space: pre;
 }
 
-div.ui-tooltip { 
+div.ui-tooltip {
 	max-width: 500px;
 	width: 500px;
+}
+
+ul.item-select {
+	list-style-type: none;
+	padding: 0px;
+	width: 220px;
+}
+ul.item-select li {
+	display: block;
+	padding: 10px;
+	background-color: #dedede;
+	border-style: solid;
+	border-color: #aaa;
+	border-width: 0px 1px 1px 1px;
+}
+ul.item-select a:first-child li {
+	border-width: 1px;
+}
+ul.item-select li.selected {
+	background-color: #f0f0f0;
+}
+ul.item-select a {
+	text-decoration: none;
+}
+
+div.navigator-table {
+	width: 80%;
+	float: right;
+}
+
+div.vehicle-services {
+	display: inline-block;
+	vertical-align: top;
+	padding: 10px;
+	margin: 10px;
+	height: 210px;
+}
+div.vehicle-services.type-1 {
+	background-color: #dedede;
+}
+div.vehicle-services.type-2 {
+	background-color: #ffffaa;
+}
+div.vehicle-services.type-3 {
+	background-color: #aaaaff;
+}
+div.vehicle-services h3 {
+	margin: 0px 0px 10px 0px;
+}
+div.service-item {
+	display: inline-block;
+	vertical-align: top;
+	border: 1px solid #a44;
+	padding: 10px;
+	background-color: #fff;
+	border-radius: 10px;
+}
+div.service-item .notes {
+	height: 60px;
+	width: 80px;
+	margin: 10px;
+	margin-top: 20px;
+	font-size: 12px;
+	overflow: hidden;
+}
+div.vehicle-services a {
+	text-decoration: none;
+}
+
+.no-records {
+	color: #aaa;
+	font-style: italic;
+}
+
+.schedule-conflict-warning {
+	cursor: pointer;
+	width: 280px;
+	position: absolute;
+	top: 20px;
+	left: 280px;
+	z-index: 9;
+}
+
+.matched-customer {
+	cursor: pointer;
+}
+
+.consigner-vehicles {
+	list-style-type: none;
+	padding: 0px;
+	margin: 3px;
+}
+.consigner-vehicles li {
+	line-height: 24px;
+}
+
+.consigner-history {
+	float: right;
+	width: 500px;
+}
+
+tr.payment {
+	color: #f00;
+	background-color: #ddd;
+}
+tbody.totals {
+	font-weight: bold;
+	border-top: 1px solid #000;
 }
 
