@@ -58,7 +58,7 @@
     {% endif %}
     <table class="inputform vehicles">
         <tr>
-            <td>Type</td>
+            <td><label for="id_vehicle_type">Type</label></td>
             <td>
                 {{ form.vehicle_type }}
             </td>
@@ -131,7 +131,7 @@
 
         <tr>
             <td>Horsepower (hp)</td>
-            <td><cfinput name="hp" size="10" value="#VehicleFront.hp#" maxlength="5" /></td>
+            <td>{{ marketing_form.horsepower }}</td>
         </tr>
         <tr>
             <td>Torque (ft-lbs)</td>

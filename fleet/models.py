@@ -111,7 +111,7 @@ class VehicleMarketing(models.Model):
     slug = models.SlugField(max_length=50, blank=True)
     weighting = models.IntegerField(null=True, blank=True)
 
-    showcase_image = models.ImageField(blank=True, width_field='showcase_width', height_field='showcase_height', upload_to=get_vehicle_picture_path)
+    showcase_image = models.ImageField(null=True, blank=True, width_field='showcase_width', height_field='showcase_height', upload_to=get_vehicle_picture_path)
     showcase_width = models.IntegerField(null=True, blank=True)
     showcase_height = models.IntegerField(null=True, blank=True)
 
