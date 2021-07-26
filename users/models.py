@@ -4,6 +4,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from encrypted_fields import fields
 from english_words import english_words_lower_set
 
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.utils.translation import ugettext_lazy as _
@@ -82,6 +83,7 @@ class User(AbstractBaseUser):
     date_joined = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('User', null=True, blank=True, on_delete=models.SET_NULL)
     last_login = models.DateTimeField(null=True, blank=True)
+    admin_last_activity = models.DateTimeField(null=True, blank=True)
 
     USERNAME_FIELD = 'email'
 
@@ -121,6 +123,10 @@ class User(AbstractBaseUser):
     @property
     def is_superuser(self):
         return self.is_admin
+
+    @property
+    def is_sleeping(self):
+        return (timezone.now() - self.admin_last_activity).total_seconds() > settings.ADMIN_SLEEP_TIMEOUT_SECS
 
 
 # Customer contains all business data for a customer, and optionally is linked to a login user

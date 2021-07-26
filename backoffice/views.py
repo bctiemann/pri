@@ -1,5 +1,10 @@
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication
+
 from django.shortcuts import render, reverse
 from django.urls import reverse_lazy
+from django.utils.dateparse import parse_datetime
 from django.views.generic import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
@@ -24,6 +29,20 @@ class LoginView(LoginView):
 
 class LogoutView(LogoutView):
     pass
+
+
+# API view to track admin activity
+
+class TrackActivityView(APIView):
+
+    authentication_classes = (BasicAuthentication, SessionAuthentication)
+
+    def post(self, request):
+        request.user.admin_last_activity = parse_datetime(request.POST.get('last_activity'))
+        request.user.save()
+        return Response({
+            'is_sleeping': request.user.is_sleeping,
+        })
 
 
 # Template generics-based CRUD views

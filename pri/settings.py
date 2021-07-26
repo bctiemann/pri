@@ -224,6 +224,8 @@ AVALARA_ENVIRONMENT = None
 DEFAULT_TAX_ZIP = '07456'
 DEFAULT_TAX_RATE = '0.07'
 
+ADMIN_SLEEP_TIMEOUT_SECS = 1500
+
 
 # Local overrides from env.yaml
 with open(os.path.join(BASE_DIR, 'env.yaml')) as f:

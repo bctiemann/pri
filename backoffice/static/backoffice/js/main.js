@@ -403,12 +403,16 @@ var formatPhone = function(str) {
 };
 
 var trackActivity = function () {
-    let now = new Date();
-    let idleTime = now - lastActivity;
-    if (idleTime > idleTimeoutSecs * 1000 && !activityTrackerExempt) {
-        console.log('Sleeping; idling out');
-        window.location.href = '/backoffice/';
-    }
+    let url = '/backoffice/track_activity/';
+    const params = {
+        last_activity: lastActivity.toISOString(),
+    };
+    $.post(url, params, function(data) {
+        if (data.is_sleeping && !activityTrackerExempt) {
+            console.log('Sleeping; idling out');
+            window.location.href = '/backoffice/';
+        }
+    });
 };
 
 
