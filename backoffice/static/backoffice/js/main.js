@@ -2,6 +2,7 @@ var maxphonelength = 14;
 var cloudmade_key = "b55e3a3af1394462b2099bc1263f1e5e";
 let lastActivity = null;
 const idleTimeoutSecs = 1500;
+let activityTrackerExempt = false;
 
 var map;
 var geocoder;
@@ -406,7 +407,9 @@ var trackActivity = function () {
     let idleTime = now - lastActivity;
     if (idleTime > idleTimeoutSecs * 1000) {
         console.log('Sleeping; idling out');
-        // Check if we are already on home page; otherwise, push to there
+        if (!activityTrackerExempt) {
+            window.location.href = '/backoffice/';
+        }
     }
 };
 
