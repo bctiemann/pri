@@ -25,27 +25,12 @@ class LogoutView(LogoutView):
 
 
 class VehicleViewMixin:
-    marketing_form_class = None
-
-    def get_marketing_form_class(self):
-        return self.marketing_form_class
-
-    def get_marketing_form_kwargs(self):
-        kwargs = self.get_form_kwargs()
-        kwargs['instance'] = kwargs['instance'].vehicle_marketing
-        return kwargs
-
-    def get_marketing_form(self, form_class=None):
-        if form_class is None:
-            form_class = self.get_marketing_form_class()
-        return form_class(**self.get_marketing_form_kwargs())
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['vehicle_model'] = Vehicle
         if 'vehicle_type' in self.kwargs:
             context['vehicle_list'] = context['vehicle_list'].filter(vehicle_type=self.kwargs['vehicle_type'])
-        context['marketing_form'] = self.get_marketing_form()
         return context
 
 
@@ -68,6 +53,24 @@ class VehicleDetailView(VehicleViewMixin, UpdateView):
         result = super().post(request, *args, **kwargs)
         VehicleMarketing.objects.filter(vehicle_id=self.object.id).update(**marketing_form.cleaned_data)
         return result
+
+    def get_marketing_form_class(self):
+        return self.marketing_form_class
+
+    def get_marketing_form_kwargs(self):
+        kwargs = self.get_form_kwargs()
+        kwargs['instance'] = kwargs['instance'].vehicle_marketing
+        return kwargs
+
+    def get_marketing_form(self, form_class=None):
+        if form_class is None:
+            form_class = self.get_marketing_form_class()
+        return form_class(**self.get_marketing_form_kwargs())
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['marketing_form'] = self.get_marketing_form()
+        return context
 
     def get_success_url(self):
         return reverse('backoffice:vehicle-detail', kwargs={'pk': self.object.id})
