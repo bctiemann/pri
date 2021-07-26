@@ -405,11 +405,9 @@ var formatPhone = function(str) {
 var trackActivity = function () {
     let now = new Date();
     let idleTime = now - lastActivity;
-    if (idleTime > idleTimeoutSecs * 1000) {
+    if (idleTime > idleTimeoutSecs * 1000 && !activityTrackerExempt) {
         console.log('Sleeping; idling out');
-        if (!activityTrackerExempt) {
-            window.location.href = '/backoffice/';
-        }
+        window.location.href = '/backoffice/';
     }
 };
 
@@ -613,6 +611,7 @@ $(document).ready(function() {
     refreshMedia();
 
     setInterval('trackActivity()', 5000);
+    lastActivity = new Date();
     addEventListener('mousemove', function() {
         lastActivity = new Date();
     })
