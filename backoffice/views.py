@@ -11,6 +11,8 @@ from backoffice.forms import VehicleForm, VehicleMarketingForm
 from users.views import LoginView
 
 
+# Home and login/logout views
+
 class HomeView(TemplateView):
     template_name = 'backoffice/home.html'
 
@@ -23,6 +25,8 @@ class LoginView(LoginView):
 class LogoutView(LogoutView):
     pass
 
+
+# Template generics-based CRUD views
 
 class VehicleViewMixin:
 

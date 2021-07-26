@@ -11,7 +11,7 @@
     {% if user.is_authenticated %}
     <div class="header">
         <div id="header_logo">
-        <a href="status.cfm"><img src="{% static "backoffice/images/PRI_logo_header.png" %}" /></a>
+        <a href="{% url "backoffice:home" %}"><img src="{% static "backoffice/images/PRI_logo_header.png" %}" /></a>
         </div>
 
         <CFINCLUDE TEMPLATE="inc_menu.cfm">

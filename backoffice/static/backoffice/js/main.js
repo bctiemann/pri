@@ -1,11 +1,42 @@
 var maxphonelength = 14;
 var cloudmade_key = "b55e3a3af1394462b2099bc1263f1e5e";
+let lastActivity = null;
+const idleTimeoutSecs = 1500;
 
 var map;
 var geocoder;
 var lat_start = 40.755;             // New York NY
 var long_start = -73.954;
 
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
 
 function checkType() {
     var tmin = $('#admin').val();
@@ -370,6 +401,15 @@ var formatPhone = function(str) {
     return str;
 };
 
+var trackActivity = function () {
+    let now = new Date();
+    let idleTime = now - lastActivity;
+    if (idleTime > idleTimeoutSecs * 1000) {
+        console.log('Sleeping; idling out');
+        // Check if we are already on home page; otherwise, push to there
+    }
+};
+
 
 $(document).ready(function() {
 
@@ -569,5 +609,9 @@ $(document).ready(function() {
     refreshDrivers();
     refreshMedia();
 
+    setInterval('trackActivity()', 5000);
+    addEventListener('mousemove', function() {
+        lastActivity = new Date();
+    })
 });
 
