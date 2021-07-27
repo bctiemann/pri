@@ -12,17 +12,11 @@
     SELECT vehicleid,mileage FROM Vehicles
     WHERE status = 1
 </CFQUERY>
-<CFSET maintCount = 0>
-<CFLOOP QUERY="Vehicles">
-    <CFQUERY NAME="Maintenance" DATASOURCE="#DSN#" cachedWithin="#tHour#">
-        SELECT maintid,stamp,mileage FROM Maintenance
-        WHERE vehicleid = #vehicleid#
-        AND mileage < #mileage#
-    </CFQUERY>
-    <CFIF Maintenance.recordcount GT 0>
-        <CFSET maintCount = maintCount+Maintenance.recordcount>
-    </CFIF>
-</CFLOOP>
+<CFQUERY NAME="Maintenance" DATASOURCE="#DSN#" cachedWithin="#tHour#">
+    SELECT serviceid FROM Service
+    WHERE due = 1
+</CFQUERY>
+<cfset maintCount = Maintenance.recordCount>
 <CFQUERY NAME="pDamage" DATASOURCE="#DSN#" cachedWithin="#tHour#">
     SELECT count(*) as TotalOf FROM Damage
     WHERE repaired = 0
@@ -99,7 +93,7 @@
 	<a class="headermenu" id="todolistlink" href="javascript:nop()">To-Do List
 	<CFIF todocount GT 0><span class="badgebubble"><CFOUTPUT>#todocount#</CFOUTPUT></span></CFIF>
 	</a>
-    <a class="headermenu" id="logoutlink" href="{% url "sign-out" %}">Logout [{{ user.email }}]</a>
+	<a class="headermenu" id="logoutlink" href="index.cfm?Exit=yes">Logout [<CFOUTPUT>#YourID.user#</CFOUTPUT>]</a>
 </div>
 
 <a id="opsmenulink" class="headermenu">Operations</a>
@@ -135,6 +129,21 @@
 	<a class="tnav <CFIF scrpt IS "subpay.cfm">selected</CFIF>" href="subpay.cfm">Substitute Payments</a>
 	</li>
 </CFIF>
+<CFIF YourID.acclev IS 1>
+	<li>
+	<a class="tnav <CFIF scrpt IS "ownerpay.cfm">selected</CFIF>" href="ownerpay.cfm">Special Use Owner Payments</a>
+	</li>
+</CFIF>
+<CFIF YourID.acclev IS 1>
+	<li>
+	<a class="tnav <CFIF scrpt IS "stripepay.cfm">selected</CFIF>" href="stripepay.cfm">Charge Card via Stripe</a>
+	</li>
+</CFIF>
+<CFIF YourID.acclev IS 1>
+	<li>
+	<a class="tnav <CFIF scrpt IS "charges.cfm">selected</CFIF>" href="charges.cfm">Stripe Charges</a>
+	</li>
+</CFIF>
 <CFIF YourID.acclev IS 1 OR YourID.acclev IS 4>
 	<li>
 	<a class="tnav <CFIF scrpt IS "survey.cfm">selected</CFIF>" href="survey.cfm">Survey Results</a>
@@ -143,6 +152,11 @@
 <CFIF YourID.acclev IS 1>
 	<li>
 	<a class="tnav <CFIF scrpt IS "tards.cfm">selected</CFIF>" href="tards.cfm">Tards</a>
+	</li>
+</CFIF>
+<CFIF YourID.acclev IS 1>
+	<li>
+	<a class="tnav <CFIF scrpt IS "tolltags.cfm">selected</CFIF>" href="tolltags.cfm">Toll Tags (E-ZPass)</a>
 	</li>
 </CFIF>
 </ul>
@@ -169,12 +183,12 @@
 </CFIF>
 <CFIF YourID.acclev IS 1 OR YourID.acclev IS 2>
 	<li>
-	<a class="tnav <CFIF scrpt IS "joyperf.cfm">selected</CFIF>" href="joyperf.cfm">Performance Experiences</a>
+	<a class="tnav <CFIF scrpt IS "joyperf.cfm">selected</CFIF>" href="joyperf.cfm?type=2">Performance Experiences</a>
 	</li>
 </CFIF>
 <CFIF YourID.acclev IS 1 OR YourID.acclev IS 2>
 	<li>
-	<a class="tnav <CFIF scrpt IS "joyperf.cfm">selected</CFIF>" href="joyperf.cfm">Joy Rides</a>
+	<a class="tnav <CFIF scrpt IS "joyperf.cfm">selected</CFIF>" href="joyperf.cfm?type=1">Joy Rides</a>
 	</li>
 </CFIF>
 </ul>
@@ -187,6 +201,11 @@
     <li>
         <a class="tnav <CFIF scrpt IS "accounts.cfm">selected</CFIF>" href="accounts.cfm">Accounts</a>
     </li>
+    <CFIF YourID.acclev IS 1>
+    <li>
+        <a class="tnav <CFIF scrpt IS "owners.cfm">selected</CFIF>" href="owners.cfm">Special Use Owners</a>
+    </li>
+    </CFIF>
 <!---
     <li>
         <a class="tnav <CFIF scrpt IS "timesheet.cfm">selected</CFIF>" href="timesheet.cfm">Time Sheet</a>
@@ -230,6 +249,9 @@
     </li>
     </CFIF>
     <li>
+        <a class="tnav <CFIF scrpt IS "salestax.cfm">selected</CFIF>" href="salestax.cfm">Sales Tax</a>
+    </li>
+    <li>
         <a class="tnav <CFIF scrpt IS "bbs.cfm">selected</CFIF>" href="bbs.cfm">BBS</a>
     </li>
     <CFIF YourID.acclev IS 1>
@@ -254,12 +276,12 @@
     </CFIF>
     <CFIF YourID.acclev IS 1 OR YourID.acclev IS 2>
         <CFIF pPerfExp.TotalOf IS NOT 0>
-            <a class="l_perfexp" href="joyperf.cfm?Option=1"><CFOUTPUT>#pPerfExp.TotalOf#</CFOUTPUT> PerfExp<CFIF pPerfExp.TotalOf IS NOT 1>s</CFIF></a>
+            <a class="l_perfexp" href="joyperf.cfm?type=2"><CFOUTPUT>#pPerfExp.TotalOf#</CFOUTPUT> PerfExp<CFIF pPerfExp.TotalOf IS NOT 1>s</CFIF></a>
         </CFIF>
     </CFIF>
     <CFIF YourID.acclev IS 1 OR YourID.acclev IS 2>
         <CFIF pJoyRide.TotalOf IS NOT 0>
-            <a class="l_joyride" href="joyperf.cfm?Option=1"><CFOUTPUT>#pJoyRide.TotalOf#</CFOUTPUT> Joy Ride<CFIF pJoyRide.TotalOf IS NOT 1>s</CFIF></a>
+            <a class="l_joyride" href="joyperf.cfm?type=1"><CFOUTPUT>#pJoyRide.TotalOf#</CFOUTPUT> Joy Ride<CFIF pJoyRide.TotalOf IS NOT 1>s</CFIF></a>
         </CFIF>
     </CFIF>
     <CFIF YourID.acclev IS 1 OR YourID.acclev IS 3>

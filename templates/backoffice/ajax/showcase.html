@@ -1,0 +1,28 @@
+<CFIF NOT (Login IS False AND YourID.adminid GT 0)>
+    Invalid access.
+    <CFABORT>
+</CFIF>
+
+<cfif NOT (IsDefined("URL.vehicleid") AND IsNumeric(URL.vehicleid))>
+    Invalid vehicle ID.
+    <cfabort>
+</cfif>
+
+<h3>Showcase (front page, 1600x800)</h3>
+
+<cfif FileExists("#ThumbUploads##vehicleid#-showcase.jpg")>
+    <cfoutput>
+    <CFSET unix_time = DateDiff("s", CreateDate(1970,1,1), Now()) />
+    <img class="showcase" src="#OnSite#images/#URL.vehicleid#-showcase.jpg?#unix_time#" />
+    </cfoutput>
+</cfif>
+
+<div class="upload-form" id="showcase_upload">
+    <cfform method="POST" enctype="multipart/form-data" id="showcase_form">
+        <cfinput type="file" name="showcaseup" />
+        <cfinput type="hidden" name="vehicleid" value="#URL.vehicleid#" />
+        <button type="submit" name="upload_showcase" class="btn">Upload</button>
+        <div class="spinner floatright" id="spinner-showcase" method="uploadShowcase"></div>
+    </cfform>
+</div>
+

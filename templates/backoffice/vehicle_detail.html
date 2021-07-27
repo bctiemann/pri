@@ -2,6 +2,12 @@
 
 {% block content %}
 
+    {% if vehicle %}
+        <h2>Edit Vehicle</h2>
+    {% else %}
+        <h2>Add Vehicle</h2>
+    {% endif %}
+
     {% comment %}
     <cfif not IsDefined("vehicleid") OR vehicleid IS 0>
         <h2>Add Vehicle</h2>
@@ -38,7 +44,9 @@
     <cfelseif IsDefined("URL.edited")>
         <p>Vehicle updated successfully.</p>
     </cfif>
+    {% endcomment %}
 
+    {% if vehicle %}
     <cfif vehicleid>
     <div id="media_container">
         <div class="media-section" id="vpics"></div>
@@ -47,7 +55,7 @@
         <div class="media-section" id="thumbnail"></div>
     </div>
     </cfif>
-    {% endcomment %}
+    {% endif %}
 
     {{ form.errors }}
     <cfoutput>
@@ -61,6 +69,21 @@
             <td><label for="id_vehicle_type">Type</label></td>
             <td>
                 {{ form.vehicle_type }}
+            </td>
+        </tr>
+        <tr>
+            <td>Ownership</td>
+            <td>
+                <cfquery name="Consigners" datasource="#DSN#">
+                    SELECT consignerid,fname,lname FROM Consigners
+                    ORDER BY lname
+                </cfquery>
+                <cfselect name="consignerid">
+                    <option value="0">PRI</option>
+                    <cfloop query="#Consigners#">
+                        <option value="#consignerid#" <CFIF Consignment.consignerid IS consignerid>selected</CFIF>>Special Use: #fname# #lname#</option>
+                    </cfloop>
+                </cfselect>
             </td>
         </tr>
         <tr>
@@ -92,6 +115,10 @@
             <td><cftextarea name="damage">#Vehicle.damage#</cftextarea></td>
         </tr>
         <tr>
+            <td class="align-top">Notes</td>
+            <td><cftextarea name="notes">#Vehicle.notes#</cftextarea></td>
+        </tr>
+        <tr>
             <td>Insurance Policy No.</td>
             <td><cfinput name="policyno" value="#policyno_dec#" maxlength="255" /></td>
         </tr>
@@ -106,6 +133,37 @@
         <tr>
             <td>Status</td>
             <td>{{ form.status }}</td>
+        </tr>
+        <tr>
+            <td>Toll tag</td>
+            <td>
+                <cfquery name="TollTags" datasource="#DSN#">
+                    SELECT * FROM TollTags
+                    LEFT JOIN Vehicles ON Vehicles.vehicleid=TollTags.vehicleid
+                    ORDER BY tagnumber
+                </cfquery>
+                <cfselect name="tolltagid">
+                    <option value="">(None)</option>
+                    <cfloop query="#TollTags#">
+                        <option value="#tolltagid#" <cfif tolltagid IS TollTag.tolltagid>selected</cfif>>#tagnumber#<cfif TollTags.vehicleid GT 0> (#year# #make# #model#)<cfelseif altusage IS NOT ""> (#altusage#)</cfif></option>
+                    </cfloop>
+                </cfselect>
+            </td>
+        </tr>
+        <tr>
+            <td>Redirect to</td>
+            <td>
+                <cfquery name="RedirectVehicles" datasource="#DSN#">
+                    SELECT * FROM Vehicles
+                    ORDER BY vehicleid
+                </cfquery>
+                <cfselect name="redirect">
+                    <option value="">(None)</option>
+                    <cfloop query="#RedirectVehicles#">
+                        <option value="#vehicleid#" <cfif vehicleid IS Vehicle.redirect>selected</cfif>>#year# #make# #model#</option>
+                    </cfloop>
+                </cfselect>
+            </td>
         </tr>
         <tr>
             <td>
@@ -154,15 +212,6 @@
         <tr>
             <td>Number of Gears</td>
             <td><cfinput name="gears" size="4" value="#VehicleFront.gears#" maxlength="1" /></td>
-        </tr>
-        <tr>
-            <td>Status (available to rent)</td>
-            <td>
-                <cfselect name="statusfront">
-                    <option value="0" <cfif VehicleFront.status IS 0>selected</cfif>>No</option>
-                    <option value="1" <cfif VehicleFront.status IS 1>selected</cfif>>Yes</option>
-                </cfselect>
-            </td>
         </tr>
         <tr>
             <td>Location</td>

@@ -116,3 +116,8 @@ class VehicleCreateView(VehicleViewMixin, CreateView):
     model = Vehicle
     template_name = 'backoffice/vehicle_detail.html'
     form_class = VehicleForm
+
+
+class VehicleShowcaseView(TemplateView):
+    template_name = 'backoffice/ajax/showcase.html'
+

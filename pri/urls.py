@@ -86,6 +86,7 @@ urlpatterns = [
     path('backoffice/', include(('backoffice.urls', 'backoffice'), namespace='backoffice')),
 
     path('customer/', include(('customer_portal.urls', 'customer_portal'), namespace='customer_portal')),
+    path('special/', include(('consignment.urls', 'consignment'), namespace='consignment')),
 
     path('', include(tf_urls, 'two_factor')),
 ]
