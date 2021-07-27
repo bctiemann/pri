@@ -1,0 +1,66 @@
+{% extends "consignment/home.html" %}
+
+{% block nav_proceeds_selected %}selected{% endblock %}
+
+{% block subpage_pane %}
+    <p class="table-info">
+    These are estimated gross amounts of rental revenues collected from the selected vehicle(s). These amounts do not reflect taxes, fees,
+    or deductions by PRI prior to the calculation of net revenues.
+    </p>
+
+    {% comment %}
+    <cfquery name="PastRentals" datasource="#DSN#">
+        SELECT rentalid,Rentals.vehicleid,dateout,dateback,numdays,rate,milesout,milesback,year,make,model FROM Rentals
+        INNER JOIN ConsignmentVehicles ON ConsignmentVehicles.vehicleid = Rentals.vehicleid
+        INNER JOIN Vehicles ON Rentals.vehicleid = Vehicles.vehicleid
+        WHERE Rentals.status = 3
+        AND Vehicles.status = 1
+        <cfif vid GT 0>
+            AND Rentals.vehicleid = <CFQUERYPARAM value="#vid#" CFSQLType="CF_SQL_NUMERIC">
+        </cfif>
+        AND consignerid = <CFQUERYPARAM value="#YourID.consignerid#" CFSQLType="CF_SQL_NUMERIC">
+        ORDER BY dateout
+    </cfquery>
+    <cfset rateTotal = 0>
+    {% endcomment %}
+
+    <table class="data proceeds">
+        <tr>
+            <th>Vehicle</th>
+            <th>Date Out</th>
+            <th>Date Back</th>
+            <th>Mileage</th>
+            <th>Gross</th>
+        </tr>
+        <cfoutput query="PastRentals">
+
+        <cfif numdays GTE 7>
+            <cfset gross = VehiclePrices[vehicleid].price * numdays * (1 - VehiclePrices[vehicleid].disc7day/100)>
+        <cfelseif numdays GTE 3>
+            <cfset gross = VehiclePrices[vehicleid].price * numdays * (1 - VehiclePrices[vehicleid].disc3day/100)>
+        <cfelseif numdays GTE 2>
+            <cfset gross = VehiclePrices[vehicleid].price * numdays * (1 - VehiclePrices[vehicleid].disc2day/100)>
+        <cfelse>
+            <cfset gross = VehiclePrices[vehicleid].price * numdays>
+        </cfif>
+
+        <tr>
+            <td>#make# #model#</td>
+            <td>#DateFormat(dateout,"MM/DD/YYYY")#</td>
+            <td>#DateFormat(dateback,"MM/DD/YYYY")#</td>
+            <td class="numeric">#NumberFormat(milesback,",")#</td>
+            <td class="numeric">$#NumberFormat(gross,",.__")#</td>
+        </tr>
+        <cfset rateTotal = rateTotal + gross>
+        </cfoutput>
+        <cfoutput>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="numeric">$#NumberFormat(rateTotal,",.__")#</td>
+        </tr>
+        </cfoutput>
+    </table>
+{% endblock %}

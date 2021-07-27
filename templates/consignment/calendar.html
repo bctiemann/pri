@@ -1,0 +1,29 @@
+{% extends "consignment/home.html" %}
+
+{% block nav_calendar_selected %}selected{% endblock %}
+
+{% block subpage_pane %}
+    <div class="calendar-instructions">
+        <cfif vid GT 0>
+            Reserve the vehicle for your own use by clicking on a date.
+        <cfelse>
+            To reserve a vehicle for your own use, select the vehicle from the sidebar at left.
+        </cfif>
+    </div>
+
+    <cfset mo = IsDefined("URL.mo") AND IsNumeric(URL.mo) ? URL.mo : 0>
+
+    <cfoutput>
+    <script type="text/javascript">
+vid = <cfif vid GT 0>#vid#<cfelse>0</cfif>;
+    </script>
+    </cfoutput>
+
+    <cfoutput>
+    <a class="calendar-control back" onclick="loadCalendar(-1)">Back</a>
+    <a class="calendar-control forward" onclick="loadCalendar(1)">Forward</a>
+    </cfoutput>
+
+
+    <div class="calendar-container"></div>
+{% endblock %}

@@ -10,6 +10,9 @@ from consignment import views
 
 
 urlpatterns = [
-    path('', views.HomeView.as_view(), name='home'),
+    # path('', views.HomeView.as_view(), name='home'),
+    path('', RedirectView.as_view(url='/special/calendar/'), name='home'),
     path('login/', views.LoginView.as_view(), name='login'),
+    path('calendar/', views.CalendarView.as_view(), name='calendar'),
+    path('proceeds/', views.ProceedsView.as_view(), name='proceeds'),
 ]

@@ -1,1 +1,158 @@
 {% extends "consignment/base.html" %}
+
+{% block page_title %}Vehicle Activity{% endblock %}
+
+{% comment %}
+<cfif vid IS NOT "" AND NOT IsNumeric(vid)>
+    <cfthrow message="Invalid vehicle ID.">
+</cfif>
+
+<cfif vid GT 0>
+    <cfquery name="Vehicle" datasource="#DSN#">
+        SELECT Vehicles.vehicleid,year,make,model FROM Vehicles
+        INNER JOIN ConsignmentVehicles ON ConsignmentVehicles.vehicleid = Vehicles.vehicleid
+        WHERE consignerid = <CFQUERYPARAM value="#YourID.consignerid#" CFSQLType="CF_SQL_NUMERIC">
+        AND Vehicles.vehicleid = <CFQUERYPARAM value="#vid#" CFSQLType="CF_SQL_NUMERIC">
+        AND status = 1
+    </cfquery>
+
+   <cfif Vehicle.recordCount IS 0>
+       <cfthrow message="Invalid vehicle ID.">
+   </cfif>
+
+    <cfoutput query="Vehicle">
+        <img class="vehicle-header" src="#OnSite#images/#vehicleid#-thumb.jpg" />
+        <h1>#make# #model#</h1>
+    </cfoutput>
+<cfelse>
+    <h1>All Vehicles</h1>
+</cfif>
+
+<cfquery name="ConsignmentVehicles" datasource="#DSN#">
+    SELECT vehicleid FROM ConsignmentVehicles
+    WHERE consignerid = <CFQUERYPARAM value="#YourID.consignerid#" CFSQLType="CF_SQL_NUMERIC">
+</cfquery>
+<cfset VehiclePrices = StructNew()>
+<cfloop query="ConsignmentVehicles">
+    <cfquery name="VehiclePrice" datasource="#FDSN#">
+        SELECT vehicleid,price,disc2day,disc3day,disc7day FROM VehiclesFront
+        WHERE vehicleid = <CFQUERYPARAM value="#vehicleid#" CFSQLType="CF_SQL_NUMERIC">
+    </cfquery>
+    <cfset VehiclePrices[vehicleid] = VehiclePrice>
+</cfloop>
+{% endcomment %}
+
+{% block content %}
+
+    {% if vehicle %}
+        <img class="vehicle-header" src="#OnSite#images/#vehicleid#-thumb.jpg" />
+        <h1>#make# #model#</h1>
+    {% else %}
+        <h1>All Vehicles</h1>
+    {% endif %}
+
+    <cfoutput>
+    <ul class="form-page-nav two-col">
+        <li page="calendar" class="{% block nav_calendar_selected %}{% endblock %}">
+            <a href="{% url "consignment:calendar" %}">Calendar</a>
+        </li>
+        <li page="proceeds" class="{% block nav_proceeds_selected %}{% endblock %}">
+            <a href="{% url "consignment:proceeds" %}">Rental Proceeds</a>
+        </li>
+    </ul>
+    </cfoutput>
+
+    {% block subpage_pane %}{% endblock %}
+
+    {% comment %}
+    <cfif page IS "calendar">
+
+        <div class="calendar-instructions">
+            <cfif vid GT 0>
+                Reserve the vehicle for your own use by clicking on a date.
+            <cfelse>
+                To reserve a vehicle for your own use, select the vehicle from the sidebar at left.
+            </cfif>
+        </div>
+
+        <cfset mo = IsDefined("URL.mo") AND IsNumeric(URL.mo) ? URL.mo : 0>
+
+        <cfoutput>
+        <script type="text/javascript">
+    vid = <cfif vid GT 0>#vid#<cfelse>0</cfif>;
+        </script>
+        </cfoutput>
+
+        <cfoutput>
+        <a class="calendar-control back" onclick="loadCalendar(-1)">Back</a>
+        <a class="calendar-control forward" onclick="loadCalendar(1)">Forward</a>
+        </cfoutput>
+
+
+        <div class="calendar-container"></div>
+
+
+    <cfelseif page IS "proceeds">
+
+        <p class="table-info">
+        These are estimated gross amounts of rental revenues collected from the selected vehicle(s). These amounts do not reflect taxes, fees,
+        or deductions by PRI prior to the calculation of net revenues.
+        </p>
+
+        <cfquery name="PastRentals" datasource="#DSN#">
+            SELECT rentalid,Rentals.vehicleid,dateout,dateback,numdays,rate,milesout,milesback,year,make,model FROM Rentals
+            INNER JOIN ConsignmentVehicles ON ConsignmentVehicles.vehicleid = Rentals.vehicleid
+            INNER JOIN Vehicles ON Rentals.vehicleid = Vehicles.vehicleid
+            WHERE Rentals.status = 3
+            AND Vehicles.status = 1
+            <cfif vid GT 0>
+                AND Rentals.vehicleid = <CFQUERYPARAM value="#vid#" CFSQLType="CF_SQL_NUMERIC">
+            </cfif>
+            AND consignerid = <CFQUERYPARAM value="#YourID.consignerid#" CFSQLType="CF_SQL_NUMERIC">
+            ORDER BY dateout
+        </cfquery>
+        <cfset rateTotal = 0>
+
+        <table class="data proceeds">
+            <tr>
+                <th>Vehicle</th>
+                <th>Date Out</th>
+                <th>Date Back</th>
+                <th>Mileage</th>
+                <th>Gross</th>
+            </tr>
+            <cfoutput query="PastRentals">
+
+            <cfif numdays GTE 7>
+                <cfset gross = VehiclePrices[vehicleid].price * numdays * (1 - VehiclePrices[vehicleid].disc7day/100)>
+            <cfelseif numdays GTE 3>
+                <cfset gross = VehiclePrices[vehicleid].price * numdays * (1 - VehiclePrices[vehicleid].disc3day/100)>
+            <cfelseif numdays GTE 2>
+                <cfset gross = VehiclePrices[vehicleid].price * numdays * (1 - VehiclePrices[vehicleid].disc2day/100)>
+            <cfelse>
+                <cfset gross = VehiclePrices[vehicleid].price * numdays>
+            </cfif>
+
+            <tr>
+                <td>#make# #model#</td>
+                <td>#DateFormat(dateout,"MM/DD/YYYY")#</td>
+                <td>#DateFormat(dateback,"MM/DD/YYYY")#</td>
+                <td class="numeric">#NumberFormat(milesback,",")#</td>
+                <td class="numeric">$#NumberFormat(gross,",.__")#</td>
+            </tr>
+            <cfset rateTotal = rateTotal + gross>
+            </cfoutput>
+            <cfoutput>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="numeric">$#NumberFormat(rateTotal,",.__")#</td>
+            </tr>
+            </cfoutput>
+        </table>
+
+    </cfif>
+    {% endcomment %}
+{% endblock %}

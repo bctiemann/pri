@@ -22,3 +22,11 @@ class HomeView(SidebarMixin, TemplateView):
 class LoginView(LoginView):
     template_name = 'consignment/login.html'
     home_url = reverse_lazy('consignment:home')
+
+
+class CalendarView(SidebarMixin, TemplateView):
+    template_name = 'consignment/calendar.html'
+
+
+class ProceedsView(SidebarMixin, TemplateView):
+    template_name = 'consignment/proceeds.html'
