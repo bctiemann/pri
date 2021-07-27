@@ -9,6 +9,7 @@ from backoffice import views
 
 urlpatterns = [
     path('', views.HomeView.as_view(), name='home'),
+    path('landing/', views.LandingView.as_view(), name='landing'),
     path('login/', views.LoginView.as_view(), name='login'),
     path('logout/', views.LogoutView.as_view(), name='logout'),
 

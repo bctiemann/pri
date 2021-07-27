@@ -443,12 +443,34 @@ table.alternating > tbody > tr.portal:nth-child(even) {
 table.alternating > tbody > tr.portal:nth-child(odd) {
         background-color: #ffe4c2;
 }
+table.admins.alternating > tbody > tr:nth-child(even) {
+        background-color: #dedede;
+}
+table.admins.alternating > tbody > tr:nth-child(odd) {
+        background-color: #efefef;
+}
+table.data.alternating th {
+	background-color: #fff;
+}
 table > tbody > tr.selected,
 table.alternating > tbody > tr.selected {
         background-color: #fea;
         /*border: 1px solid #000;*/
         outline: thin solid #000;
         border-radius: 3px;
+}
+
+.small, table.data .small {
+	font-size: smaller;
+}
+.less-than-1-hour {
+	color: #ff0000;
+}
+.less-than-2-days {
+	color: #000000;
+}
+.more-than-2-days {
+	color: #808080;
 }
 
 table.data {

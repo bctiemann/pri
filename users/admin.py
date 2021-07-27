@@ -4,9 +4,10 @@ from users.models import User, Customer, MusicGenre
 
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('id', 'email',)
+    list_display = ('id', 'email', 'customer', 'is_admin', 'last_login', 'is_sleeping',)
     readonly_fields = ('created_by', 'last_login',)
     search_fields = ('email',)
+    list_filter = ('is_admin',)
 
 
 class CustomerAdmin(admin.ModelAdmin):

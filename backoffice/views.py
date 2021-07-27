@@ -14,11 +14,24 @@ from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmVie
 from fleet.models import Vehicle, VehicleMarketing
 from backoffice.forms import VehicleForm, VehicleMarketingForm
 from users.views import LoginView
+from users.models import User
 
 
 # Home and login/logout views
 
-class HomeView(TemplateView):
+class AdminViewMixin:
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['admin_users'] = User.objects.filter(is_admin=True)
+        return context
+
+
+class LandingView(AdminViewMixin, TemplateView):
+    template_name = 'backoffice/landing.html'
+
+
+class HomeView(AdminViewMixin, TemplateView):
     template_name = 'backoffice/home.html'
 
 

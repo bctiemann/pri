@@ -198,6 +198,7 @@ MEDIA_URL = '/media/'
 COMPANY_NAME = 'Performance Rentals'
 SUPPORT_EMAIL = 'support@performance.rentals'
 
+# Choices for country picker for vehicle origins
 COUNTRIES_ONLY = ['US', 'JP', 'IT', 'GB', 'DE']
 
 PHONENUMBER_DEFAULT_REGION = 'US'
@@ -215,6 +216,10 @@ EXTRA_MILES_PRICES = {
     250: {'value': 250, 'label': '250 miles ($400)', 'cost': 400},
 }
 
+# Backoffice site seconds of idle until push to "sleeping" page
+ADMIN_SLEEP_TIMEOUT_SECS = 1500
+
+# Sales tax calculation API
 AVALARA_ACCOUNT_ID = None
 AVALARA_API_KEY = None
 AVALARA_APP_NAME = 'Performance Rentals, Inc.'
@@ -223,8 +228,6 @@ AVALARA_MACHINE_NAME = 'Backend server 001'
 AVALARA_ENVIRONMENT = None
 DEFAULT_TAX_ZIP = '07456'
 DEFAULT_TAX_RATE = '0.07'
-
-ADMIN_SLEEP_TIMEOUT_SECS = 1500
 
 
 # Local overrides from env.yaml

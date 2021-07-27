@@ -1,0 +1,34 @@
+<table class="data alternating admins" style="width: 400px;">
+    <tr>
+        <th></th>
+        <th>Administrator</th>
+        <th class="right">Last On</th>
+        <th>Asleep?</th>
+    </tr>
+    {% for admin_user in admin_users %}
+        <tr>
+            <td align=right class="small">
+                <CFIF founder is 1>@</CFIF>
+                <CFIF Authority IS 1>!</CFIF>
+            </td>
+            <td>{{ admin_user.full_name }}</td>
+            <td class="numeric small {{ admin_user.last_activity_class }}">
+                {{ admin_user.admin_last_activity|date:"M d y h:iA" }}
+            </td>
+            <td>
+                {% if admin_user.is_sleeping %}Zzz...{% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+
+{% if not admin_users.exists %}
+    <p>Problem. No Administrative Accounts. (So, how'd you get in here?)</p>
+{% endif %}
+
+<div align=right class="small">
+    ! = Authority to Create Accounts<br>
+    @ = Autoregen<br>
+    <b><span class="less-than-1-hour">Red</span></b>, less than 1hr<br>
+    <b><span class="less-than-2-days">Black</span></b>, less than 2days<br>
+</div>

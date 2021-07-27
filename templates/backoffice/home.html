@@ -1,77 +1,169 @@
 {% extends "backoffice/base.html" %}
 {% load static %}
 
+{% block nav %}
+    <h1 class="pageheader">Status (Waiting Room)
+        <ul class="nav_subpage" style="left: 340px;">
+            <cfoutput>
+            <a href="status.cfm?AddNotes="><li>Post to BBS</li></a>
+            <a href="status.cfm?Option=0"><li>BBS (Recent)</li></a>
+            </cfoutput>
+        </ul>
+    </h1>
+{% endblock %}
+
 {% block content_class %}{% endblock %}
 
 {% block content %}
-    <CFINCLUDE TEMPLATE="inc_header.cfm">
+    <table border=0 cellspacing=0 cellpadding=5 width=100%>
+    <tr>
 
-<h1 class="pageheader" style="background-color: #fff">
-</h1>
+            <td valign=top class="clear" rowspan=3>
+            <CFINCLUDE TEMPLATE="inc_bbs.cfm">
+            </td>
 
-<div id="content">
-
-<div id="admlist">
-
-        <CFQUERY NAME="Administration" DATASOURCE="#DSN#">
-                SELECT fullname,stamp,sleeping,authority,founder FROM admin
-                ORDER BY Stamp DESC,AdminID
+            <td class="statistics">
+                {% comment %}
+        <CFQUERY NAME="customers" DATASOURCE="#DSN#"
+    cachedWithin="#CreateTimeSpan(0,0,30,0)#">
+        SELECT count(*) as TotalOf FROM Customers
         </CFQUERY>
-        <table class="data">
-        <tr>
-                <th></th>
-                <th>Administrator</th>
-                <th class="right">Last On</th>
-                <th>Asleep?</th>
-        </tr>
-        <CFOUTPUT QUERY="Administration"><tr style="background-color: ###iif(currentrow MOD 2,DE('#row1color#'),DE('#row2color#'))#">
-                <td align=right><small><CFIF founder is 1>@</CFIF>
-<CFIF Authority IS 1>!</CFIF></small></td>
-                <td>#FullName#</td>
-                <td class="numeric"><small><CFSET x = Now() - Stamp><CFIF x LT 0.05>
-<font color=##ff0000><CFELSEIF x LT 1><font><CFELSE><font
-color=##808080></CFIF>
-#DateFormat(Stamp,"mmm dd y")#
-#TimeFormat(Stamp,"hh:mmTT")#</font></small></td>
-                <td><CFIF Sleeping IS 1>Zzz...</CFIF></td>
-        </tr></CFOUTPUT>
-        </table>
-        <CFIF Administration.RecordCount IS 0>
-                <p>Problem. No Administrative Accounts. (So, how'd you get in here?)</p>
+            <CFQUERY NAME="rentals" DATASOURCE="#DSN#"
+    cachedWithin="#CreateTimeSpan(0,0,30,0)#">
+        SELECT count(*) as TotalOf FROM Rentals
+        WHERE dateout > Now()
+        </CFQUERY>
+        <CFQUERY NAME="newsletter" DATASOURCE="#FDSN#" cachedWithin="#CreateTimeSpan(0,0,30,0)#">
+        SELECT count(*) as TotalOf FROM Newsletter
+        where confirmed=1
+        </CFQUERY>
+    <!---
+        <CFQUERY NAME="marks" DATASOURCE="#FDSN#" cachedWithin="#CreateTimeSpan(0,0,30,0)#">
+        SELECT count(*) as TotalOf FROM Marketeers
+        where confirm=1
+        </CFQUERY>
+    --->
+        <CFQUERY NAME="marktot" DATASOURCE="PRIAds" cachedWithin="#CreateTimeSpan(0,0,30,0)#">
+        SELECT sum(clicks) as clicks, sum(rents) as rents FROM traffic
+        </CFQUERY>
+        <CFQUERY NAME="gifttot" DATASOURCE="#DSN#" cachedWithin="#CreateTimeSpan(0,0,30,0)#">
+        SELECT sum(amount) as TotalOf FROM GiftCerts
+        WHERE ispaid = 1
+        </CFQUERY>
+        <CFIF gifttot.totalof GT 0>
+        <CFSET gtot = gifttot.totalof>
+        <CFELSE>
+        <CFSET gtot = 0.00>
         </CFIF>
-        <div align=right>
-        <small>
+        <CFQUERY NAME="subtot" DATASOURCE="#DSN#" cachedWithin="#CreateTimeSpan(0,0,30,0)#">
+        SELECT sum(amount) as TotalOf FROM subp
+        WHERE ispaid = 1
+        </CFQUERY>
+        <CFIF subtot.totalof GT 0>
+        <CFSET stot = subtot.totalof>
+        <CFELSE>
+        <CFSET stot = 0.00>
+        </CFIF>
+        <CFQUERY NAME="joytot" DATASOURCE="#DSN#" cachedWithin="#CreateTimeSpan(0,0,30,0)#">
+        SELECT sum(rate) as TotalOf FROM JoyPerf
+        WHERE status = 1
+            AND type = 1
+        </CFQUERY>
+        <CFQUERY NAME="perftot" DATASOURCE="#DSN#" cachedWithin="#CreateTimeSpan(0,0,30,0)#">
+        SELECT sum(rate) as TotalOf FROM JoyPerf
+        WHERE status = 1
+            AND type = 2
+        </CFQUERY>
+        <CFIF perftot.totalof GT 0>
+        <CFSET ptot = perftot.totalof>
+        <CFELSE>
+        <CFSET ptot = 0.00>
+        </CFIF>
+        <CFIF joytot.totalof GT 0>
+        <CFSET jtot = joytot.totalof>
+        <CFELSE>
+        <CFSET jtot = 0.00>
+        </CFIF>
+        <CFSET joyperftot = jtot + ptot>
+        <CFQUERY NAME="renttot" DATASOURCE="#DSN#" cachedWithin="#CreateTimeSpan(0,0,30,0)#">
+        SELECT sum(rate) as totalof FROM Rentals
+        WHERE status = 3
+        </CFQUERY>
+        <CFIF renttot.totalof GT 0>
+        <CFSET rtot = renttot.totalof>
+        <CFELSE>
+        <CFSET rtot = 0.00>
+        </CFIF>
+        <CFSET allbucks = gtot + joyperftot + stot + rtot>
+            <!-- -->
+            <CFQUERY NAME="Administration" DATASOURCE="#DSN#">
+                    SELECT fullname,stamp,sleeping,authority,founder FROM admin
+                    ORDER BY Stamp DESC,AdminID
+            </CFQUERY>
+            {% endcomment %}
+
+            {% include "backoffice/includes/admin_table.html" %}
+            {% comment %}
+            <table class="data alternating admins" style="width: 400px;">
+                <tr>
+                    <th></th>
+                    <th>Administrator</th>
+                    <th class="right">Last On</th>
+                    <th>Asleep?</th>
+                </tr>
+                {% for admin_user in admin_users %}
+                <tr>
+                    <td align=right class="small">
+                        <CFIF founder is 1>@</CFIF>
+                        <CFIF Authority IS 1>!</CFIF>
+                    </td>
+                    <td>{{ admin_user.full_name }}</td>
+                    <td class="numeric small {{ admin_user.last_activity_class }}">
+                        {{ admin_user.admin_last_activity|date:"M d y h:iA" }}
+                    </td>
+                    <td>
+                        {% if admin_user.is_sleeping %}Zzz...{% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% if not admin_users.exists %}
+                <p>Problem. No Administrative Accounts. (So, how'd you get in here?)</p>
+            {% endif %}
+
+            <div align=right class="small">
                 ! = Authority to Create Accounts<br>
                 @ = Autoregen<br>
-        <font color=#202020>
-        <b><font color=#ff0000>Red</font></b>, less than 1hr<Br>
-        <b><font color=#000000>Black</font></b>, less than 2days<br>
-        </font>
-        </small>
-        </div>
-   </div>
+                <b><span class="less-than-1-hour">Red</span></b>, less than 1hr<br>
+                <b><span class="less-than-2-days">Black</span></b>, less than 2days<br>
+            </div>
+            {% endcomment %}
 
+                <small><b>fact:</b> we have
+    (<CFOUTPUT>#customers.TotalOf#</CFOUTPUT>) <a
+    href="customers.cfm">customers</a></small><br>
+                <small><b>fact:</b> we have
+    (<CFOUTPUT>#rentals.TotalOf#</CFOUTPUT>) upcoming <a
+    href="rentals.cfm">rentals</a></small><br>
+    <small><b>fact:</b> we have
+    (<CFOUTPUT>#newsletter.TotalOf#</CFOUTPUT>) <a
+    href="massemail.cfm">newsletter subs</a></small><br>
+    <CFIF YourID.acclev IS 1>
+    <small><b>fact:</b> we've made
+    (<CFOUTPUT>#NumberFormat(gtot,"$___,___.__")#</CFOUTPUT>) from gift certificates</small><br>
+    <small><b>fact:</b> we've hoovered up
+    (<CFOUTPUT>#NumberFormat(stot,"$___,___.__")#</CFOUTPUT>) in substitute payments</small><br>
+    <small><b>fact:</b> we've acquired
+    (<CFOUTPUT>#NumberFormat(joyperftot,"$___,___.__")#</CFOUTPUT>) from joyrides and perf exps</small><br>
+    <small><b>fact:</b> we've absconded with
+    (<CFOUTPUT>#NumberFormat(rtot,"$___,___.__")#</CFOUTPUT>) from rentals</small><br>
+    <small><b>fact:</b> all told we've made
+    (<CFOUTPUT>#NumberFormat(allbucks,"$___,___.__")#</CFOUTPUT>) since ever</small><br>
+    </CFIF>
+    </td>
+    </tr>
+    </table>
 
-        <a href="status.cfm"><img src="{% static "backoffice/images/PRI_logo_adm.jpg" %}" width="500"
-height="131" border=0 hspace=0 vspace=0 alt="PRI Administration"></a>
-
-<br />
-
-<p>
-Performance Rentals Administration Tool. All access to this area is <b>restricted and logged</b>.
-</p>
-<p>
-You are responsible for data security. Do not leave logged in sessions unattended for any reason.
-</p>
-<p>
-<b>Do not access this area from foreign/insecure networks.</b>
-</p>
-
-
-</div>
-<CFINCLUDE TEMPLATE="inc_footer.cfm">
-
-    <script type="text/javascript">
-    activityTrackerExempt = true;
-    </script>
+    <div id="livecalendar">
+    </div>
 {% endblock %}

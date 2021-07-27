@@ -86,7 +86,7 @@
             {% csrf_token %}
             <div class="loginform">
                 {% include "two_factor/login_form.html" %}
-                {% block next %}<input type="hidden" name="next" value="{% url "backoffice:home" %}" />{% endblock %}
+                {% block next %}<input type="hidden" name="next" value="{% url "backoffice:landing" %}" />{% endblock %}
             </div>
         </form>
 

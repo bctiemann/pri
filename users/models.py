@@ -10,6 +10,8 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
+from users.enums import AdminIdleTimeCSSClass
+
 
 def generate_password():
     words = [w for w in english_words_lower_set if len(w) < 8 and len(w) > 3]
@@ -126,7 +128,26 @@ class User(AbstractBaseUser):
 
     @property
     def is_sleeping(self):
+        if not self.admin_last_activity:
+            return None
         return (timezone.now() - self.admin_last_activity).total_seconds() > settings.ADMIN_SLEEP_TIMEOUT_SECS
+
+    @property
+    def last_activity_class(self):
+        if not self.admin_last_activity:
+            return None
+        last_activity_age_secs = (timezone.now() - self.admin_last_activity).total_seconds()
+        if last_activity_age_secs < 3600:
+            return AdminIdleTimeCSSClass.LESS_THAN_1_HOUR.value
+        if last_activity_age_secs < 86400 * 2:
+            return AdminIdleTimeCSSClass.LESS_THAN_2_DAYS.value
+        return AdminIdleTimeCSSClass.MORE_THAN_2_DAYS.value
+
+    @property
+    def full_name(self):
+        if self.customer:
+            return f'{self.customer.first_name} {self.customer.last_name}'
+        return self.email
 
 
 # Customer contains all business data for a customer, and optionally is linked to a login user
