@@ -70,6 +70,7 @@ class Vehicle(models.Model):
     id_old = models.IntegerField(null=True, blank=True)
     vehicle_type = models.CharField(choices=VehicleType.choices, max_length=20)
     status = models.IntegerField(choices=VehicleStatus.choices, default=VehicleStatus.BUILDING)
+    external_owner = models.ForeignKey('consignment.Consigner', null=True, blank=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
     acquired_on = models.DateField(null=True, blank=True)
     relinquished_on = models.DateField(null=True, blank=True)

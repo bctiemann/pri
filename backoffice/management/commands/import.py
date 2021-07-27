@@ -9,6 +9,7 @@ from django.utils.text import slugify
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus, TransmissionType, Location
 from users.models import Customer, User, MusicGenre
 from sales.models import Reservation
+from consignment.models import Consigner
 from pri.cipher import AESCipher
 
 logger = logging.getLogger(__name__)
@@ -36,7 +37,8 @@ class Command(BaseCommand):
     enabled = {
         # 'do_vehicles': True,
         # 'do_customers': True,
-        'do_reservations': True,
+        # 'do_reservations': True,
+        'do_consigners': True,
     }
 
     def add_arguments(self, parser):
@@ -274,3 +276,35 @@ class Command(BaseCommand):
                 )
                 new.reserved_at = old['reservdate']
                 new.save()
+
+        if 'do_consigners' in self.enabled:
+            if clear_existing:
+                Consigner.objects.all().delete()
+            back_cursor.execute("""SELECT * FROM Consigners""")
+            for old in back_cursor.fetchall():
+                print(old)
+                password = self.decrypt(old['password'])
+                notes = self.decrypt(old['notes'])
+                account_number = self.decrypt(old['aa'])
+                routing_number = self.decrypt(old['ar'])
+                address = self.decrypt(old['addr'])
+                user = None
+                if old['email']:
+                    try:
+                        user = User.objects.get(email=old['email'])
+                    except User.DoesNotExist:
+                        user = User.objects.create_user(
+                            email=old['email'],
+                            password=password,
+                        )
+                    user.save()
+                new = Consigner.objects.create(
+                    user=user,
+                    first_name=old['fname'],
+                    last_name=old['lname'],
+                    id_old=old['consignerid'],
+                    notes=notes,
+                    account_number=account_number,
+                    routing_number=routing_number,
+                    address=address,
+                )
