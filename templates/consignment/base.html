@@ -1,0 +1,223 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+    <title>Performance Rentals Special Use Portal</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <link rel="stylesheet" href="{% static "consignment/css/style.css" %}">
+    <link rel="stylesheet" href="{% static "consignment/css/jquery-ui.css" %}">
+    <link rel="stylesheet"href="{% static "consignment/css/ihover.css" %}">
+    <link href='https://fonts.googleapis.com/css?family=Oswald:400,700,300' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Orbitron|Hammersmith+One|Rambla|Neucha|Timmana' rel='stylesheet' type='text/css'>
+
+    <script src="{% static "consignment/js/jquery.js" %}"></script>
+    <script src="{% static "consignment/js/jquery.payment.js" %}"></script>
+    <script src="{% static "consignment/js/jquery-ui.min.js" %}"></script>
+    <script src="{% static "consignment/js/main.js" %}"></script>
+</head>
+<body>
+
+<cfset selectedPage="vehicles">
+
+<table class="layout">
+<tr>
+<td class="sidebar">
+    {% include "consignment/includes/sidebar.html" %}
+</td>
+<td class="main">
+
+    <div class="wrapper">
+
+    {% include "consignment/includes/content_header.html" %}
+
+    <div class="well">
+        <div class='section-header'>Vehicle Activity</div>
+
+        <cftry>
+
+            <cfif vid IS NOT "" AND NOT IsNumeric(vid)>
+                <cfthrow message="Invalid vehicle ID.">
+            </cfif>
+
+            <cfif vid GT 0>
+                <cfquery name="Vehicle" datasource="#DSN#">
+                    SELECT Vehicles.vehicleid,year,make,model FROM Vehicles
+                    INNER JOIN ConsignmentVehicles ON ConsignmentVehicles.vehicleid = Vehicles.vehicleid
+                    WHERE consignerid = <CFQUERYPARAM value="#YourID.consignerid#" CFSQLType="CF_SQL_NUMERIC">
+                    AND Vehicles.vehicleid = <CFQUERYPARAM value="#vid#" CFSQLType="CF_SQL_NUMERIC">
+                    AND status = 1
+                </cfquery>
+
+               <cfif Vehicle.recordCount IS 0>
+                   <cfthrow message="Invalid vehicle ID.">
+               </cfif>
+
+                <cfoutput query="Vehicle">
+                    <img class="vehicle-header" src="#OnSite#images/#vehicleid#-thumb.jpg" />
+                    <h1>#make# #model#</h1>
+                </cfoutput>
+            <cfelse>
+                <h1>All Vehicles</h1>
+            </cfif>
+
+            <cfquery name="ConsignmentVehicles" datasource="#DSN#">
+                SELECT vehicleid FROM ConsignmentVehicles
+                WHERE consignerid = <CFQUERYPARAM value="#YourID.consignerid#" CFSQLType="CF_SQL_NUMERIC">
+            </cfquery>
+            <cfset VehiclePrices = StructNew()>
+            <cfloop query="ConsignmentVehicles">
+                <cfquery name="VehiclePrice" datasource="#FDSN#">
+                    SELECT vehicleid,price,disc2day,disc3day,disc7day FROM VehiclesFront
+                    WHERE vehicleid = <CFQUERYPARAM value="#vehicleid#" CFSQLType="CF_SQL_NUMERIC">
+                </cfquery>
+                <cfset VehiclePrices[vehicleid] = VehiclePrice>
+            </cfloop>
+
+            <div class="form-page-container">
+
+                <cfoutput>
+                <ul class="form-page-nav two-col">
+                    <li page="calendar" <cfif page IS "calendar">class="selected"</cfif>><a href="index.cfm?page=calendar&vid=#vid#">Calendar</a></li>
+                    <li page="proceeds" <cfif page IS "proceeds">class="selected"</cfif>><a href="index.cfm?page=proceeds&vid=#vid#">Rental Proceeds</a></li>
+                </ul>
+                </cfoutput>
+
+                <cfif page IS "calendar">
+
+                    <div class="calendar-instructions">
+                        <cfif vid GT 0>
+                            Reserve the vehicle for your own use by clicking on a date.
+                        <cfelse>
+                            To reserve a vehicle for your own use, select the vehicle from the sidebar at left.
+                        </cfif>
+                    </div>
+
+                    <cfset mo = IsDefined("URL.mo") AND IsNumeric(URL.mo) ? URL.mo : 0>
+
+                    <cfoutput>
+                    <script type="text/javascript">
+vid = <cfif vid GT 0>#vid#<cfelse>0</cfif>;
+                    </script>
+                    </cfoutput>
+
+                    <cfoutput>
+                    <a class="calendar-control back" onclick="loadCalendar(-1)">Back</a>
+                    <a class="calendar-control forward" onclick="loadCalendar(1)">Forward</a>
+                    </cfoutput>
+
+
+                    <div class="calendar-container"></div>
+
+
+                <cfelseif page IS "proceeds">
+
+                    <p class="table-info">
+                    These are estimated gross amounts of rental revenues collected from the selected vehicle(s). These amounts do not reflect taxes, fees,
+                    or deductions by PRI prior to the calculation of net revenues.
+                    </p>
+
+                    <cfquery name="PastRentals" datasource="#DSN#">
+                        SELECT rentalid,Rentals.vehicleid,dateout,dateback,numdays,rate,milesout,milesback,year,make,model FROM Rentals
+                        INNER JOIN ConsignmentVehicles ON ConsignmentVehicles.vehicleid = Rentals.vehicleid
+                        INNER JOIN Vehicles ON Rentals.vehicleid = Vehicles.vehicleid
+                        WHERE Rentals.status = 3
+                        AND Vehicles.status = 1
+                        <cfif vid GT 0>
+                            AND Rentals.vehicleid = <CFQUERYPARAM value="#vid#" CFSQLType="CF_SQL_NUMERIC">
+                        </cfif>
+                        AND consignerid = <CFQUERYPARAM value="#YourID.consignerid#" CFSQLType="CF_SQL_NUMERIC">
+                        ORDER BY dateout
+                    </cfquery>
+                    <cfset rateTotal = 0>
+
+                    <table class="data proceeds">
+                        <tr>
+                            <th>Vehicle</th>
+                            <th>Date Out</th>
+                            <th>Date Back</th>
+                            <th>Mileage</th>
+                            <th>Gross</th>
+                        </tr>
+                        <cfoutput query="PastRentals">
+
+                        <cfif numdays GTE 7>
+                            <cfset gross = VehiclePrices[vehicleid].price * numdays * (1 - VehiclePrices[vehicleid].disc7day/100)>
+                        <cfelseif numdays GTE 3>
+                            <cfset gross = VehiclePrices[vehicleid].price * numdays * (1 - VehiclePrices[vehicleid].disc3day/100)>
+                        <cfelseif numdays GTE 2>
+                            <cfset gross = VehiclePrices[vehicleid].price * numdays * (1 - VehiclePrices[vehicleid].disc2day/100)>
+                        <cfelse>
+                            <cfset gross = VehiclePrices[vehicleid].price * numdays>
+                        </cfif>
+
+                        <tr>
+                            <td>#make# #model#</td>
+                            <td>#DateFormat(dateout,"MM/DD/YYYY")#</td>
+                            <td>#DateFormat(dateback,"MM/DD/YYYY")#</td>
+                            <td class="numeric">#NumberFormat(milesback,",")#</td>
+                            <td class="numeric">$#NumberFormat(gross,",.__")#</td>
+                        </tr>
+                        <cfset rateTotal = rateTotal + gross>
+                        </cfoutput>
+                        <cfoutput>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="numeric">$#NumberFormat(rateTotal,",.__")#</td>
+                        </tr>
+                        </cfoutput>
+                    </table>
+
+                </cfif>
+
+            </div>
+
+            <cfif vid GT 0>
+                <div class="dialog" id="dialog_reserve_vehicle" title="Reserve Vehicle">
+                <cfoutput>
+                <p>You're reserving your #Vehicle.make# #Vehicle.model# for <span class="reserve-date"></span>.
+                </cfoutput>
+                Please enter the number of days you'd like to reserve it for.</p>
+                <input id="reserve_number_days" placeholder="1" />
+                </div>
+            </cfif>
+
+            <div class="dialog" id="dialog_reserve_vehicle_done" title="Reserve Vehicle">
+            <p>Your vehicle has been reserved for the dates selected.</p>
+            </div>
+
+            <div class="dialog" id="dialog_clear_reservation" title="Clear Reservation">
+            <p>You're releasing your reservation on your vehicle for <span class="reserve-date"></span>
+            and making it available for rental. Proceed?
+            </div>
+
+
+            <cfcatch type="Any">
+                <cfoutput>
+                <div class="exception">
+                    <p>#cfcatch.message#</p>
+                    <p>#cfcatch.detail#</p>
+                </div>
+                </cfoutput>
+            </cfcatch>
+        </cftry>
+
+    </div>
+
+    <div class="push"></div>
+    </div>
+
+    {% include "consignment/includes/footer.html" %}
+
+</td>
+</tr>
+</table>
+
+</body>
+</html>

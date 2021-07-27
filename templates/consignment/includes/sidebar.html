@@ -1,0 +1,63 @@
+{% load static %}
+
+<cfoutput>
+<a class="header-logo" href="#OnCnsSite#"><img src='{% static "consignment/images/PRI_logo.png" %}' alt='Performance Rentals' width="255px"></a>
+</cfoutput>
+
+<cfif IsValidUser>
+
+    {% comment %}
+<cfquery name="Vehicles" datasource="#DSN#">
+    SELECT Vehicles.vehicleid,year,make,model FROM Vehicles
+    INNER JOIN ConsignmentVehicles ON ConsignmentVehicles.vehicleid = Vehicles.vehicleid
+    WHERE consignerid = <CFQUERYPARAM value="#YourID.consignerid#" CFSQLType="CF_SQL_NUMERIC">
+    AND status = 1
+</cfquery>
+{% endcomment %}
+
+
+<ul class="sidebar-nav">
+    <li class="account-info <cfif selectedPage IS "vehicles" AND vid IS "">selected-page</cfif>">
+        <a href="index.cfm">All Vehicles</a>
+    </li>
+    <cfoutput query="Vehicles">
+    <li class="<cfif selectedPage IS "vehicles" AND vid IS vehicleid>selected-page</cfif>">
+
+        {% comment %}
+        <cfquery name="RentalsUpcoming" datasource="#DSN#">
+            SELECT Upcoming.vehicleid,reservationid,rentalid,confcode,dateout,dateback,make,model,Upcoming.status,Upcoming.notes,delivery,numdays FROM (
+                SELECT 0 AS reservationid,rentalid,vehicleid,confcode,dateout,dateback,status,notes,delivery,numdays
+                FROM Rentals
+                WHERE dateback > NOW()
+                AND status != 4
+                AND vehicleid = <CFQUERYPARAM value="#vehicleid#" CFSQLType="CF_SQL_NUMERIC">
+            ) Upcoming
+            INNER JOIN Vehicles ON Vehicles.vehicleid = Upcoming.vehicleid
+            ORDER BY dateout ASC
+        </cfquery>
+        {% endcomment %}
+
+        <a href="index.cfm?vid=#vehicleid#">
+            <cfif RentalsUpcoming.recordCount GT 0>
+                <div class="badge">#RentalsUpcoming.recordCount#</div>
+            </cfif>
+            #make# #model#
+        </a>
+    </li>
+    </cfoutput>
+</ul>
+<ul class="sidebar-nav">
+    <li class="account-info <cfif selectedPage IS "payments">selected-page</cfif>">
+        <a href="payments.cfm">Payments</a>
+    </li>
+    <li class="account-info <cfif selectedPage IS "password">selected-page</cfif>">
+        <a href="password.cfm">Change Password</a>
+    </li>
+</ul>
+<ul class="sidebar-nav">
+    <li class="account-info">
+        <a href="index.cfm?exit=1">Log Out</a>
+    </li>
+</ul>
+
+</cfif>
