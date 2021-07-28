@@ -10,6 +10,7 @@ from django.http import Http404
 
 from users.views import LoginView
 from fleet.models import Vehicle
+from consignment.utils import EventCalendar
 
 
 class VehicleContextMixin:
@@ -56,16 +57,19 @@ class CalendarWidgetView(VehicleContextMixin, TemplateView):
         except (TypeError, ValueError):
             month_offset = 0
 
-        cal = calendar.HTMLCalendar(firstweekday=6)
-
         focus_date = now + relativedelta(months=month_offset)
         prev_date = focus_date - relativedelta(months=1)
         next_date = focus_date + relativedelta(months=1)
 
-        # TODO: Override HTMLCalendar to format with css classes and ConsignmentReservations
+        consigner = self.request.user.consigner
+        vehicle = context.get('vehicle')
 
-        context['prev_month'] = mark_safe(cal.formatmonth(prev_date.year, prev_date.month))
-        context['current_month'] = mark_safe(cal.formatmonth(focus_date.year, focus_date.month))
-        context['next_month'] = mark_safe(cal.formatmonth(next_date.year, next_date.month))
+        focus_cal = EventCalendar(year=focus_date.year, month=focus_date.month, consigner=consigner, vehicle=vehicle, firstweekday=6)
+        prev_cal = EventCalendar(year=prev_date.year, month=prev_date.month, consigner=consigner, vehicle=vehicle, firstweekday=6)
+        next_cal = EventCalendar(year=next_date.year, month=next_date.month, consigner=consigner, vehicle=vehicle, firstweekday=6)
+
+        context['prev_month'] = mark_safe(prev_cal.formatmonth())
+        context['current_month'] = mark_safe(focus_cal.formatmonth())
+        context['next_month'] = mark_safe(next_cal.formatmonth())
 
         return context

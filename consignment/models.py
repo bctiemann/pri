@@ -25,12 +25,11 @@ class Consigner(models.Model):
         return f'[{self.id}] {self.full_name}'
 
 
-class ConsignmentVehicle(models.Model):
-    pass
-
-
 class ConsignmentReservation(models.Model):
-    pass
+    vehicle = models.ForeignKey('fleet.Vehicle', null=True, blank=True, on_delete=models.SET_NULL)
+    reserved_at = models.DateTimeField(auto_now_add=True)
+    out_at = models.DateTimeField(null=True, blank=True)
+    back_at = models.DateTimeField(null=True, blank=True)
 
 
 class ConsignmentPayment(models.Model):
