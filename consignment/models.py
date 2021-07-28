@@ -1,5 +1,7 @@
+import pytz
 from encrypted_fields import fields
 
+from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -30,6 +32,14 @@ class ConsignmentReservation(models.Model):
     reserved_at = models.DateTimeField(auto_now_add=True)
     out_at = models.DateTimeField(null=True, blank=True)
     back_at = models.DateTimeField(null=True, blank=True)
+
+    @property
+    def out_date(self):
+        return self.out_at.astimezone(pytz.timezone(settings.TIME_ZONE)).date()
+
+    @property
+    def back_date(self):
+        return self.back_at.astimezone(pytz.timezone(settings.TIME_ZONE)).date()
 
 
 class ConsignmentPayment(models.Model):

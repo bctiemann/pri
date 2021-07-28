@@ -28,8 +28,9 @@ class EventCalendar(calendar.HTMLCalendar):
         focus_date = datetime.datetime(self.year, self.month, day)
         focus_date = pytz.timezone(settings.TIME_ZONE).localize(focus_date)
 
-        rentals = set(filter(lambda r: r.out_at.astimezone(pytz.timezone(settings.TIME_ZONE)).date() <= focus_date.date() <= r.back_at.astimezone(pytz.timezone(settings.TIME_ZONE)).date(), self.rentals))
-        consigner_reservations = set(filter(lambda r: r.out_at.astimezone(pytz.timezone(settings.TIME_ZONE)).date() <= focus_date.date() <= r.back_at.astimezone(pytz.timezone(settings.TIME_ZONE)).date(), self.consigner_reservations))
+        # Filter rentals/reservations down to the current (localized) date, wihtout hitting the DB again
+        rentals = set(filter(lambda r: r.out_date <= focus_date.date() <= r.back_date, self.rentals))
+        consigner_reservations = set(filter(lambda r: r.out_date <= focus_date.date() <= r.back_date, self.consigner_reservations))
 
         classes = self.cssclasses[weekday]
         if rentals:

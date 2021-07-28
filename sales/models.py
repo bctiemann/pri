@@ -1,4 +1,5 @@
 import json
+import pytz
 import decimal
 import random
 from localflavor.us.models import USStateField, USZipCodeField
@@ -55,6 +56,13 @@ class BaseReservation(models.Model):
         except Rental.DoesNotExist:
             return False
 
+    @property
+    def out_date(self):
+        return self.out_at.astimezone(pytz.timezone(settings.TIME_ZONE)).date()
+
+    @property
+    def back_date(self):
+        return self.back_at.astimezone(pytz.timezone(settings.TIME_ZONE)).date()
 
     class Meta:
         abstract = False
