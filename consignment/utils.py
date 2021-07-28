@@ -45,10 +45,11 @@ class EventCalendar(calendar.HTMLCalendar):
         next_month_start = month_start + relativedelta(months=1)
 
         self.rentals = Rental.objects.filter(out_at__lte=next_month_start, back_at__gte=month_start)
-        self.consigner_reservations = ConsignmentReservation.objects.filter(out_at__lte=next_month_start, back_at__gte=month_start)
         self.rentals = self.rentals.filter(vehicle__external_owner=self.consigner)
+        self.consigner_reservations = ConsignmentReservation.objects.filter(out_at__lte=next_month_start, back_at__gte=month_start)
+        self.consigner_reservations = self.consigner_reservations.filter(consigner=self.consigner)
         if self.vehicle:
-            self.rentals = rentals.filter(vehicle=self.vehicle)
-            self.consigner_reservations = consigner_reservations.filter(vehicle=self.vehicle)
+            self.rentals = self.rentals.filter(vehicle=self.vehicle)
+            self.consigner_reservations = self.consigner_reservations.filter(vehicle=self.vehicle)
 
         return super().formatmonth(self.year, self.month, withyear=withyear)

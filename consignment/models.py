@@ -28,6 +28,7 @@ class Consigner(models.Model):
 
 
 class ConsignmentReservation(models.Model):
+    consigner = models.ForeignKey('consignment.Consigner', null=True, blank=True, on_delete=models.SET_NULL)
     vehicle = models.ForeignKey('fleet.Vehicle', null=True, blank=True, on_delete=models.SET_NULL)
     reserved_at = models.DateTimeField(auto_now_add=True)
     out_at = models.DateTimeField(null=True, blank=True)
