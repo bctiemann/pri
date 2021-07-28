@@ -67,6 +67,7 @@ class Vehicle(models.Model):
     make = models.CharField(max_length=255, blank=True)
     model = models.CharField(max_length=255, blank=True)
     year = models.IntegerField(null=True, blank=True)
+    slug = models.SlugField(max_length=50, blank=True)
     id_old = models.IntegerField(null=True, blank=True)
     vehicle_type = models.CharField(choices=VehicleType.choices, max_length=20)
     status = models.IntegerField(choices=VehicleStatus.choices, default=VehicleStatus.BUILDING)
@@ -109,7 +110,6 @@ class VehicleMarketing(models.Model):
     # This links the record to the Vehicle object, which is where potentially sensitive business data
     # is stored. Cannot be a ForeignKey because the databases are kept segregated. See pri/db_routers.py
     vehicle_id = models.IntegerField(null=True, blank=True, help_text='ID of Vehicle object this corresponds to')
-    slug = models.SlugField(max_length=50, blank=True)
     weighting = models.IntegerField(null=True, blank=True)
 
     showcase_image = models.ImageField(null=True, blank=True, width_field='showcase_width', height_field='showcase_height', upload_to=get_vehicle_picture_path)
@@ -122,6 +122,7 @@ class VehicleMarketing(models.Model):
     make = models.CharField(max_length=255, blank=True)
     model = models.CharField(max_length=255, blank=True)
     year = models.IntegerField(null=True, blank=True)
+    slug = models.SlugField(max_length=50, blank=True)
     vehicle_type = models.CharField(choices=VehicleType.choices, max_length=20)
     status = models.IntegerField(choices=VehicleStatus.choices, default=VehicleStatus.BUILDING)
 

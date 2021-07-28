@@ -14,5 +14,9 @@ urlpatterns = [
     path('', RedirectView.as_view(url='/special/calendar/'), name='home'),
     path('login/', views.LoginView.as_view(), name='login'),
     path('calendar/', views.CalendarView.as_view(), name='calendar'),
+    path('calendar/<str:slug>/', views.CalendarView.as_view(), name='calendar'),
     path('proceeds/', views.ProceedsView.as_view(), name='proceeds'),
+    path('proceeds/<str:slug>/', views.ProceedsView.as_view(), name='proceeds'),
+    path('calendar_widget/', views.CalendarWidgetView.as_view(), name='calendar-widget'),
+    path('calendar_widget/<str:slug>/', views.CalendarWidgetView.as_view(), name='calendar-widget'),
 ]

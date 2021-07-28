@@ -1,5 +1,5 @@
 var maxphonelength = 14;
-var vid = 0;
+var vehicleSlug = '';
 var monthOffset = 0;
 var dateout = null;
 var reservationid = null;
@@ -30,7 +30,13 @@ var sendResetPassword = function() {
 
 var loadCalendar = function(mo) {
     monthOffset += mo;
-    $('.calendar-container').load('ajax_calendar.cfm?mo=' + monthOffset + '&vid=' + vid, function() {
+    let url = '/special/calendar_widget/';
+    if (vehicleSlug) {
+        url += `${vehicleSlug}/`;
+    }
+    url += `?month_offset=${monthOffset}`;
+    $('.calendar-container').load(url, function() {
+    // $('.calendar-container').load('ajax_calendar.cfm?mo=' + monthOffset + '&vid=' + vid, function() {
         $('.calendar-date').click(function() {
             if ($(this).hasClass('reservation')) {
                 $('.reserve-date').html($(this).attr('date'));
@@ -44,7 +50,7 @@ var loadCalendar = function(mo) {
                         },
                     }
                 });
-            } else if (!$(this).hasClass('rental') && vid) {
+            } else if (!$(this).hasClass('rental') && vehicleSlug) {
                 $('.reserve-date').html($(this).attr('date'));
                 $('#reserve_number_days').val('');
                 dateout = $(this).attr('date');

@@ -9,7 +9,7 @@ from django.utils.text import slugify
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus, TransmissionType, Location
 from users.models import Customer, User, MusicGenre
 from sales.models import Reservation
-from consignment.models import Consigner
+from consignment.models import Consigner, ConsignmentVehicle
 from pri.cipher import AESCipher
 
 logger = logging.getLogger(__name__)
@@ -35,10 +35,11 @@ LOCATION_MAP = {
 class Command(BaseCommand):
 
     enabled = {
-        # 'do_vehicles': True,
-        # 'do_customers': True,
-        # 'do_reservations': True,
+        'do_vehicles': True,
+        'do_customers': True,
+        'do_reservations': True,
         'do_consigners': True,
+        'do_consignmentvehicles': True,
     }
 
     def add_arguments(self, parser):
@@ -84,10 +85,12 @@ class Command(BaseCommand):
             back_cursor.execute("""SELECT * FROM Vehicles""")
             for old in back_cursor.fetchall():
                 print(old['make'], old['model'])
+                slug = slugify(f'{old["make"]}-{old["model"]}')
                 new = Vehicle.objects.create(
                     make=old['make'],
                     model=old['model'],
                     year=old['year'],
+                    slug=slug,
                     id_old=old['vehicleid'],
                     vehicle_type=VEHICLE_TYPE_MAP.get(old['type']),
                     status=0,
@@ -107,7 +110,6 @@ class Command(BaseCommand):
                     new.policy_phone = ''
                 front_cursor.execute("""SELECT * FROM VehiclesFront where vehicleid=%s""", old['vehicleid'])
                 old_front = front_cursor.fetchone()
-                slug = slugify(f'{old["make"]}-{old["model"]}')
                 new_front = VehicleMarketing.objects.create(
                     vehicle_id=new.id,
                     slug=slug,
@@ -282,7 +284,7 @@ class Command(BaseCommand):
                 Consigner.objects.all().delete()
             back_cursor.execute("""SELECT * FROM Consigners""")
             for old in back_cursor.fetchall():
-                print(old)
+                print(f"{old['fname']} {old['lname']}")
                 password = self.decrypt(old['password'])
                 notes = self.decrypt(old['notes'])
                 account_number = self.decrypt(old['aa'])
@@ -308,3 +310,21 @@ class Command(BaseCommand):
                     routing_number=routing_number,
                     address=address,
                 )
+
+        if 'do_consignmentvehicles' in self.enabled:
+            if clear_existing:
+                ConsignmentVehicle.objects.all().delete()
+            back_cursor.execute("""SELECT * FROM ConsignmentVehicles""")
+            for old in back_cursor.fetchall():
+                print(old)
+                try:
+                    consigner = Consigner.objects.get(id_old=old['consignerid'])
+                except Consigner.DoesNotExist:
+                    pass
+                try:
+                    vehicle = Vehicle.objects.get(id_old=old['vehicleid'])
+                except Vehicle.DoesNotExist:
+                    pass
+                vehicle.external_owner = consigner
+                vehicle.save()
+

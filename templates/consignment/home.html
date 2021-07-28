@@ -46,7 +46,7 @@
 
     {% if vehicle %}
         <img class="vehicle-header" src="#OnSite#images/#vehicleid#-thumb.jpg" />
-        <h1>#make# #model#</h1>
+        <h1>{{ vehicle.make }} {{ vehicle.model }}</h1>
     {% else %}
         <h1>All Vehicles</h1>
     {% endif %}
@@ -54,10 +54,18 @@
     <cfoutput>
     <ul class="form-page-nav two-col">
         <li page="calendar" class="{% block nav_calendar_selected %}{% endblock %}">
-            <a href="{% url "consignment:calendar" %}">Calendar</a>
+            {% if vehicle %}
+                <a href="{% url "consignment:calendar" slug=vehicle.slug %}">Calendar</a>
+            {% else %}
+                <a href="{% url "consignment:calendar" %}">Calendar</a>
+            {% endif %}
         </li>
         <li page="proceeds" class="{% block nav_proceeds_selected %}{% endblock %}">
-            <a href="{% url "consignment:proceeds" %}">Rental Proceeds</a>
+            {% if vehicle %}
+                <a href="{% url "consignment:proceeds" slug=vehicle.slug %}">Rental Proceeds</a>
+            {% else %}
+                <a href="{% url "consignment:proceeds" %}">Rental Proceeds</a>
+            {% endif %}
         </li>
     </ul>
     </cfoutput>

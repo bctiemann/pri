@@ -1,0 +1,14 @@
+<cfset monthOffset = -1 + mo>
+<cfinclude template="inc_calendar.cfm">
+{{ prev_month }}
+{% include "consignment/includes/calendar_month.html" %}
+            
+<cfset monthOffset = 0 + mo>
+<cfinclude template="inc_calendar.cfm">
+{{ current_month }}
+{% include "consignment/includes/calendar_month.html" %}
+
+<cfset monthOffset = 1 + mo>
+<cfinclude template="inc_calendar.cfm">
+{{ next_month }}
+{% include "consignment/includes/calendar_month.html" %}

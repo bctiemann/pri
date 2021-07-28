@@ -17,11 +17,12 @@
 
 
 <ul class="sidebar-nav">
-    <li class="account-info <cfif selectedPage IS "vehicles" AND vid IS "">selected-page</cfif>">
-        <a href="index.cfm">All Vehicles</a>
+    <li class="account-info {% if selected_page == 'vehicles' and not vehicle %}selected-page{% endif %}">
+        <a href="{% url "consignment:calendar" %}">All Vehicles</a>
     </li>
+    {% for menu_vehicle in user.consigner.vehicle_set.all %}
     <cfoutput query="Vehicles">
-    <li class="<cfif selectedPage IS "vehicles" AND vid IS vehicleid>selected-page</cfif>">
+    <li class="{% if selected_page == 'vehicles' and menu_vehicle == vehicle %}selected-page{% endif %}">
 
         {% comment %}
         <cfquery name="RentalsUpcoming" datasource="#DSN#">
@@ -37,14 +38,15 @@
         </cfquery>
         {% endcomment %}
 
-        <a href="index.cfm?vid=#vehicleid#">
+        <a href="{% url "consignment:calendar" slug=menu_vehicle.slug %}">
             <cfif RentalsUpcoming.recordCount GT 0>
                 <div class="badge">#RentalsUpcoming.recordCount#</div>
             </cfif>
-            #make# #model#
+            {{ menu_vehicle.make }} {{ menu_vehicle.model }}
         </a>
     </li>
     </cfoutput>
+    {% endfor %}
 </ul>
 <ul class="sidebar-nav">
     <li class="account-info <cfif selectedPage IS "payments">selected-page</cfif>">
