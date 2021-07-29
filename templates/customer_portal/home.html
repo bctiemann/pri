@@ -4,16 +4,16 @@
 
 {% block content %}
     <ul class="form-page-nav">
-        <li page="upcoming" class="{% block nav_upcoming_reservations_selected %}{% endblock %}">
+        <li page="upcoming" class="{% block nav_upcoming_reservations_class %}{% endblock %}">
             <a href="{% url "customer_portal:upcoming-reservations" %}">Upcoming Reservations</a>
         </li>
-        <li page="past" class="{% block nav_past_rentals_selected %}{% endblock %}">
+        <li page="past" class="{% block nav_past_rentals_class %}{% endblock %}">
             <a href="{% url "customer_portal:past-rentals" %}">Past Rentals</a>
         </li>
-        <li page="reserve" class="{% block nav_make_reservation_selected %}{% endblock %}">
+        <li page="reserve" class="{% block nav_make_reservation_class %}{% endblock %}">
             <a href="{% url "customer_portal:make-reservation" %}">Make Reservation</a>
         </li>
     </ul>
 
-    {% block reservation_pane %}{% endblock %}
+    {% block subpage_pane %}{% endblock %}
 {% endblock %}

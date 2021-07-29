@@ -1,8 +1,8 @@
 {% extends "customer_portal/home.html" %}
 
-{% block nav_past_rentals_selected %}selected{% endblock %}
+{% block nav_past_rentals_class %}selected{% endblock %}
 
-{% block reservation_pane %}
+{% block subpage_pane %}
 
     <cfoutput query="RentalsPast">
         <div class="reservation complete">

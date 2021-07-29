@@ -93,7 +93,7 @@
 	<a class="headermenu" id="todolistlink" href="javascript:nop()">To-Do List
 	<CFIF todocount GT 0><span class="badgebubble"><CFOUTPUT>#todocount#</CFOUTPUT></span></CFIF>
 	</a>
-	<a class="headermenu" id="logoutlink" href="index.cfm?Exit=yes">Logout [<CFOUTPUT>#YourID.user#</CFOUTPUT>]</a>
+	<a class="headermenu" id="logoutlink" href="{% url "backoffice:logout" %}">Logout [{{ user.full_name }}]</a>
 </div>
 
 <a id="opsmenulink" class="headermenu">Operations</a>

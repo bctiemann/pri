@@ -53,14 +53,14 @@
 
     <cfoutput>
     <ul class="form-page-nav two-col">
-        <li page="calendar" class="{% block nav_calendar_selected %}{% endblock %}">
+        <li page="calendar" class="{% block nav_calendar_class %}{% endblock %}">
             {% if vehicle %}
                 <a href="{% url "consignment:calendar" slug=vehicle.slug %}">Calendar</a>
             {% else %}
                 <a href="{% url "consignment:calendar" %}">Calendar</a>
             {% endif %}
         </li>
-        <li page="proceeds" class="{% block nav_proceeds_selected %}{% endblock %}">
+        <li page="proceeds" class="{% block nav_proceeds_class %}{% endblock %}">
             {% if vehicle %}
                 <a href="{% url "consignment:proceeds" slug=vehicle.slug %}">Rental Proceeds</a>
             {% else %}

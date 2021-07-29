@@ -1,8 +1,8 @@
 {% extends "customer_portal/home.html" %}
 
-{% block nav_upcoming_reservations_selected %}selected{% endblock %}
+{% block nav_upcoming_reservations_class %}selected{% endblock %}
 
-{% block reservation_pane %}
+{% block subpage_pane %}
 
     {% for reservation in upcoming_reservations %}
     <cfoutput query="RentalsUpcoming">
