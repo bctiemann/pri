@@ -67,6 +67,26 @@ class CalendarWidgetView(VehicleContextMixin, TemplateView):
         focus_cal = EventCalendar(year=focus_date.year, month=focus_date.month, consigner=consigner, vehicle=vehicle, firstweekday=6)
         prev_cal = EventCalendar(year=prev_date.year, month=prev_date.month, consigner=consigner, vehicle=vehicle, firstweekday=6)
         next_cal = EventCalendar(year=next_date.year, month=next_date.month, consigner=consigner, vehicle=vehicle, firstweekday=6)
+        day_cssclasses = [
+            'mon calendar-date this-month',
+            'tue calendar-date this-month',
+            'wed calendar-date this-month',
+            'thu calendar-date this-month',
+            'fri calendar-date this-month',
+            'sat calendar-date this-month',
+            'sun calendar-date this-month',
+        ]
+        cssclass_noday = 'calendar-date other-month'
+        cssclass_month_head = 'month-head'
+        focus_cal.cssclass_month_head = cssclass_month_head
+        prev_cal.cssclass_month_head = cssclass_month_head
+        next_cal.cssclass_month_head = cssclass_month_head
+        focus_cal.cssclasses = day_cssclasses
+        prev_cal.cssclasses = day_cssclasses
+        next_cal.cssclasses = day_cssclasses
+        focus_cal.cssclass_noday = cssclass_noday
+        prev_cal.cssclass_noday = cssclass_noday
+        next_cal.cssclass_noday = cssclass_noday
 
         context['prev_month'] = mark_safe(prev_cal.formatmonth())
         context['current_month'] = mark_safe(focus_cal.formatmonth())

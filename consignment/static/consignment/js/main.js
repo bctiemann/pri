@@ -50,7 +50,7 @@ var loadCalendar = function(mo) {
                         },
                     }
                 });
-            } else if (!$(this).hasClass('rental') && vehicleSlug) {
+            } else if ($(this).attr('date') && !$(this).hasClass('rental') && vehicleSlug) {
                 $('.reserve-date').html($(this).attr('date'));
                 $('#reserve_number_days').val('');
                 dateout = $(this).attr('date');

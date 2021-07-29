@@ -5,10 +5,13 @@
 {% block subpage_pane %}
     <div class="calendar-instructions">
         <cfif vid GT 0>
+        {% if vehicle %}
             Reserve the vehicle for your own use by clicking on a date.
+        {% else %}
         <cfelse>
             To reserve a vehicle for your own use, select the vehicle from the sidebar at left.
         </cfif>
+        {% endif %}
     </div>
 
     <cfset mo = IsDefined("URL.mo") AND IsNumeric(URL.mo) ? URL.mo : 0>
@@ -26,4 +29,24 @@
 
 
     <div class="calendar-container"></div>
+
+        <cfif vid GT 0>
+        <div class="dialog" id="dialog_reserve_vehicle" title="Reserve Vehicle">
+        <cfoutput>
+        <p>You're reserving your #Vehicle.make# #Vehicle.model# for <span class="reserve-date"></span>.
+        </cfoutput>
+        Please enter the number of days you'd like to reserve it for.</p>
+        <input id="reserve_number_days" placeholder="1" />
+        </div>
+    </cfif>
+
+    <div class="dialog" id="dialog_reserve_vehicle_done" title="Reserve Vehicle">
+    <p>Your vehicle has been reserved for the dates selected.</p>
+    </div>
+
+    <div class="dialog" id="dialog_clear_reservation" title="Clear Reservation">
+    <p>You're releasing your reservation on your vehicle for <span class="reserve-date"></span>
+    and making it available for rental. Proceed?
+    </div>
+
 {% endblock %}

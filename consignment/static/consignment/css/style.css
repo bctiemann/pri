@@ -2229,30 +2229,30 @@ span.ui-icon {
 	margin: 0px auto;
 	height: 300px;
 }
-.calendar {
+.month {
 	display: inline-block;
 	margin: 18px;
 	border-collapse: collapse;
 	vertical-align: top;
 }
-.calendar th {
+.month th {
 	background-color: #f7941e;
 	border: 1px solid #f7941e;
 	color: #fff;
 	font-family: "Oswald", 'Myriad Pro', 'Myriad', helvetica, arial, sans-serif;
 	text-align: center;
 }
-.calendar-date {
+.month td {
 	border: 1px solid #f7941e;
 	width: 36px;
 	height: 36px;
 	position: relative;
 	cursor: pointer;
 }
-.calendar-date.rental {
+.month .rental {
 	background-color: #6060ff;
 }
-.calendar-date.reservation {
+.month .reservation {
 	background-color: #94e9ff;
 }
 .day-label {
