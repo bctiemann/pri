@@ -25,7 +25,12 @@
         </cfcatch>
     </cftry>
 
-    <div class="showcase" style="background-image: url('images/#vehicleid#-showcase.jpg');">
+    <div
+        class="showcase"
+        {% if showcase_vehicle.showcase_image %}
+            style="background-image: url('{{ showcase_vehicle.showcase_image.url }}');"
+        {% endif %}
+    >
         <div class="showcase-overlay">
             <h1 class="cartitle">{{ showcase_vehicle.make }} {{ showcase_vehicle.model }}</h1>
 
