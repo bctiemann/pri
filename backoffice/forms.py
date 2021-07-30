@@ -18,7 +18,7 @@ class VehicleMarketingForm(forms.ModelForm):
 
     class Meta:
         model = VehicleMarketing
-        exclude = ('vehicle_id', 'slug', 'showcase_image',)
+        exclude = ('vehicle_id', 'slug', 'showcase_image', 'thumbnail_image',)
 
 
 class VehicleShowcaseForm(forms.ModelForm):
@@ -26,3 +26,10 @@ class VehicleShowcaseForm(forms.ModelForm):
     class Meta:
         model = VehicleMarketing
         fields = ('showcase_image',)
+
+
+class VehicleThumbnailForm(forms.ModelForm):
+
+    class Meta:
+        model = VehicleMarketing
+        fields = ('thumbnail_image',)

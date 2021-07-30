@@ -215,7 +215,7 @@ var refreshMedia = function() {
     var vpicsUrl = 'ajax_vpics.cfm?vehicleid=' + vehicleid;
     var vvidsUrl = 'ajax_vvids.cfm?vehicleid=' + vehicleid;
     var showcaseUrl = 'showcase/';
-    var thumbnailUrl = 'ajax_thumbnail.cfm?vehicleid=' + vehicleid;
+    var thumbnailUrl = 'thumbnail/';
     $('#vpics').load(vpicsUrl, function() {
         $('.vpic-delete').click(function() {
             var vpicsid = $(this).attr('vpicsid');

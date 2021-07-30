@@ -112,9 +112,15 @@ class VehicleMarketing(models.Model):
     vehicle_id = models.IntegerField(null=True, blank=True, help_text='ID of Vehicle object this corresponds to')
     weighting = models.IntegerField(null=True, blank=True)
 
+    # Hero shot (front page)
     showcase_image = models.ImageField(null=True, blank=True, width_field='showcase_width', height_field='showcase_height', upload_to=get_vehicle_picture_path)
     showcase_width = models.IntegerField(null=True, blank=True)
     showcase_height = models.IntegerField(null=True, blank=True)
+
+    # Fleet page side view image
+    thumbnail_image = models.ImageField(null=True, blank=True, width_field='thumbnail_width', height_field='thumbnail_height', upload_to=get_vehicle_picture_path)
+    thumbnail_width = models.IntegerField(null=True, blank=True)
+    thumbnail_height = models.IntegerField(null=True, blank=True)
 
     # These fields are redundant with the Vehicle class, and will be updated concurrently with that table when
     # edited via the backoffice form. This is to avoid any joins or queries against the Vehicle table when pulling
