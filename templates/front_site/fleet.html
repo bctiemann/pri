@@ -67,7 +67,7 @@
                 <div class="fleet-vehicle">
                     <a href="{% url "vehicle" slug=vehicle.slug %}">
                         {% if vehicle.thumbnail_image %}
-                            <img src="{{ vehicle.thumbnail_image.url }}" />
+                            <img class="fleet-thumbnail" src="{{ vehicle.thumbnail_image.url }}" />
                         {% endif %}
                     </a>
                     <div class="car-info-fleet">

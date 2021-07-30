@@ -1673,9 +1673,10 @@ table.labeled td:first-child {
 	clear: both;
 	height: 150px;
 }
-.fleet-vehicle img {
+.fleet-vehicle img.fleet-thumbnail {
 	float: left;
 	margin-right: 20px;
+	width: 300px;
 }
 .car-info-fleet {
 }
