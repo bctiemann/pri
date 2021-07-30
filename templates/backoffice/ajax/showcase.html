@@ -10,19 +10,23 @@
 
 <h3>Showcase (front page, 1600x800)</h3>
 
+{% if vehiclemarketing.showcase_image %}
 <cfif FileExists("#ThumbUploads##vehicleid#-showcase.jpg")>
     <cfoutput>
     <CFSET unix_time = DateDiff("s", CreateDate(1970,1,1), Now()) />
-    <img class="showcase" src="#OnSite#images/#URL.vehicleid#-showcase.jpg?#unix_time#" />
+    <img class="showcase" src="{{ vehiclemarketing.showcase_image.url }}" />
     </cfoutput>
 </cfif>
+{% endif %}
 
 <div class="upload-form" id="showcase_upload">
-    <cfform method="POST" enctype="multipart/form-data" id="showcase_form">
+    <form method="POST" action="{% url "backoffice:vehicle-showcase" pk=vehiclemarketing.pk %}" enctype="multipart/form-data" id="showcase_form">
+        {{ form.showcase_image }}
         <cfinput type="file" name="showcaseup" />
         <cfinput type="hidden" name="vehicleid" value="#URL.vehicleid#" />
         <button type="submit" name="upload_showcase" class="btn">Upload</button>
         <div class="spinner floatright" id="spinner-showcase" method="uploadShowcase"></div>
-    </cfform>
+        {% csrf_token %}
+    </form>
 </div>
 
