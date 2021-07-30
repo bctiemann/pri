@@ -152,7 +152,9 @@ class VehicleMarketing(models.Model):
 
     @property
     def headline(self):
-        return self.specs.get('headline')
+        if self.specs:
+            return self.specs.get('headline')
+        return ''
 
     def get_slug(self):
         return slugify(f'{self.make} {self.model}')

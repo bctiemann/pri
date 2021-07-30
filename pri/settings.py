@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'prettyjson',
     'localflavor',
     'phonenumber_field',
+    'precise_bbcode',
 
     'users',
     'fleet',
