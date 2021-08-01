@@ -1,5 +1,6 @@
 var maxphonelength = 14;
 var cloudmade_key = "b55e3a3af1394462b2099bc1263f1e5e";
+var blurTimeout = null;
 let lastActivity = null;
 const idleTimeoutSecs = 1500;
 let activityTrackerExempt = false;
@@ -103,6 +104,18 @@ var refreshSpecs = function() {
     }
 };
 
+var refreshSalesTaxDetail = function() {
+    var detailJson = $('#detail').val();
+    if (detailJson) {
+        try {
+            $('#salestax-output').html(JSON.stringify(JSON.parse(detailJson), null, 4));
+        } catch(err) {
+            $('#salestax-output').html('Invalid JSON.');
+            console.log(err);
+        }
+    }
+};
+
 var refreshDrivers = function() {
     $('#drivers').load('ajax_drivers.cfm?rentalid=' + $('#rentalid').val(), function(html) {
         $('#do_driver_add').button({
@@ -192,6 +205,7 @@ var cloneCustomer = function() {
         fname: $('#clone_fname').val(),
         lname: $('#clone_lname').val(),
         email: $('#clone_email').val(),
+        clone_license: $('#clone_license').prop('checked'),
         customerid: $('#clone_customerid').val(),
         rentalid: rentalid,
     };
@@ -210,12 +224,26 @@ console.log(data);
     });
 }
 
+var showPastRentals = function() {
+    $('#dialog_past_rentals').dialog({
+        modal: true,
+        width: 600,
+        buttons: {
+            'OK': function() {
+                $(this).dialog('close');
+            },
+        }
+    });
+};
+
 var refreshMedia = function() {
     var vehicleid = $('#vehicleid').val();
     var vpicsUrl = 'ajax_vpics.cfm?vehicleid=' + vehicleid;
     var vvidsUrl = 'ajax_vvids.cfm?vehicleid=' + vehicleid;
     var showcaseUrl = 'showcase/';
     var thumbnailUrl = 'thumbnail/';
+    var inspectionUrl = 'inspection/';
+    var mobilethumbUrl = 'ajax_mobilethumb.cfm?vehicleid=' + vehicleid;
     $('#vpics').load(vpicsUrl, function() {
         $('.vpic-delete').click(function() {
             var vpicsid = $(this).attr('vpicsid');
@@ -305,6 +333,16 @@ var refreshMedia = function() {
             return uploadMedia('uploadThumbnail', vehicleid);
         });
     });
+    $('#inspection').load(inspectionUrl, function() {
+        $('#inspection_form').submit(function() {
+            return uploadMedia('uploadInspection', vehicleid);
+        });
+    });
+    $('#mobilethumb').load(mobilethumbUrl, function() {
+        $('#mobilethumb_form').submit(function() {
+            return uploadMedia('uploadMobileThumb', vehicleid);
+        });
+    });
 };
 
 var editMedia = function(method, mediaid) {
@@ -320,7 +358,10 @@ console.log(data);
         } else {
             alert(data.error);
         }
-    }, 'json');
+    }, 'json')
+    .fail(function() {
+        alert('An error occurred. Please retry.');
+    });
 };
 
 
@@ -334,6 +375,12 @@ var uploadMedia = function(method, vehicleid) {
     });
     $.each($('#thumbnailup')[0].files, function(i, file) {
         data.append('thumbnailup', file);
+    });
+    $.each($('#inspectionup')[0].files, function(i, file) {
+        data.append('inspectionup', file);
+    });
+    $.each($('#mobilethumbup')[0].files, function(i, file) {
+        data.append('mobilethumbup', file);
     });
     data.append('component', 'media');
     data.append('method', method);
@@ -365,10 +412,21 @@ console.log(data);
             } else {
                 alert(data.error);
             }
-        },        
+        },
+    })
+    .fail(function() {
+        alert('An error occurred. Please retry.');
     });
     return false;
 }
+
+var selectVehicle = function() {
+    var vehicleid = $('#vehicle_select').val();
+    var baseurl = window.location.href.split('?')[0];
+    var urlparams = getJsonFromUrl(true);
+    urlparams.vehicleid = vehicleid;
+    window.location.href = baseurl + '?' + serialize(urlparams);
+};
 
 
 var showSurveyDetails = function(surveyid) {
@@ -378,10 +436,82 @@ console.log(surveyid);
     });
 };
 
+var sendInsuranceAuthForm = function(customerid) {
+    if (confirm('An insurance authorization form will be emailed to the customer. Continue?')) {
+        $.post('ajax_post.cfm', {
+            component: 'reservations',
+            method: 'sendInsuranceAuthForm',
+            customerid: customerid,
+        },
+        function(data) {
+            if (data.success) {
+                alert('Insurance form was successfully sent.');
+            } else {
+                alert(data.error);
+            }
+        }, 'json');
+    }
+};
+
+var sendWelcomeEmail = function(reservationid, rentalid) {
+    if (confirm('The welcome email (with a link to the customer portal/password retrieval page) will be emailed to the customer. Proceed?')) {
+        $.post('ajax_post.cfm', {
+            component: 'reservations',
+            method: 'sendWelcomeEmail',
+            reservationid: reservationid,
+            rentalid: rentalid,
+        },
+        function(data) {
+            if (data.success) {
+                alert('Welcome email was successfully sent.');
+            } else {
+                alert(data.error);
+            }
+        }, 'json');
+    }
+};
+
+var sendGiftCertEmail = function(giftcertid) {
+    if (confirm('An email will be sent notifying the customer of the download link for the completed gift certificate. Proceed?')) {
+        $.post('ajax_post.cfm', {
+            component: 'giftcert',
+            method: 'sendGiftCertEmail',
+            giftcertid: giftcertid,
+        },
+        function(data) {
+            if (data.success) {
+                alert('Gift certificate download email was successfully sent.');
+            } else {
+                alert(data.error);
+            }
+        }, 'json');
+    }
+};
+
+var getTaxRate = function() {
+    var zip = $('#deliveryzip').val() || $('#zipcode').val() || '';
+    $.post('ajax_post.cfm', {
+        component: 'reservations',
+        method: 'getSalesTax',
+        zip: zip,
+    },
+    function(data) {
+console.log(data);
+        if (data.success) {
+            $('#taxpct').val(data.tax_rate.toFixed(3));
+            $('#totalrate').val(data.tax_rate.toFixed(3));
+            $('#detail').val(JSON.stringify(data.salesTax));
+            refreshSalesTaxDetail();
+        } else {
+            alert(data.error);
+        }
+    }, 'json');
+};
+
 var formatPhone = function(str) {
     if (str.match('^[+]')) {
         return '+' + str.replace(/[^0-9 ]/gi, '');
-    }  
+    }
     var strRaw = str;
     var p = str.replace(/[^\d]*/gi, '');
 
@@ -392,7 +522,7 @@ var formatPhone = function(str) {
         }
         pp = pp + p.substring(3, 6);
     }
-    if (p.length >= 6) {  
+    if (p.length >= 6) {
         if (p.length > 6 || (p.length == 6 && !strRaw.match('-$'))) {
             pp = pp + '-';
         }
@@ -407,10 +537,123 @@ var trackActivity = function () {
     const params = {
         last_activity: lastActivity.toISOString(),
     };
-    $.post(url, params, function(data) {
+    $.post(url, params, function (data) {
         if (data.is_sleeping && !activityTrackerExempt) {
             console.log('Sleeping; idling out');
             window.location.href = '/backoffice/';
+        }
+    });
+};
+
+var getJsonFromUrl = function(hashBased) {
+    var query;
+    if(hashBased) {
+        var pos = location.href.indexOf("?");
+        if(pos==-1) return [];
+        query = location.href.substr(pos+1);
+    } else {
+        query = location.search.substr(1);
+    }
+    var result = {};
+    query.split("&").forEach(function(part) {
+        if(!part) return;
+        part = part.split("+").join(" "); // replace every + with space, regexp-free version
+        var eq = part.indexOf("=");
+        var key = eq>-1 ? part.substr(0,eq) : part;
+        var val = eq>-1 ? decodeURIComponent(part.substr(eq+1)) : "";
+        var from = key.indexOf("[");
+        if(from==-1) result[decodeURIComponent(key)] = val;
+        else {
+            var to = key.indexOf("]");
+            var index = decodeURIComponent(key.substring(from+1,to));
+            key = decodeURIComponent(key.substring(0,from));
+            if(!result[key]) result[key] = [];
+            if(!index) result[key].push(val);
+            else result[key][index] = val;
+        }
+    });
+    return result;
+};
+
+var serialize = function(obj) {
+    var str = [];
+    for(var p in obj)
+        if (obj.hasOwnProperty(p)) {
+            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+        }
+    return str.join("&");
+}
+
+var stripeResponseHandler = function(status, response) {
+    var $form = $('#stripe_form');
+console.log(response);
+    if (response.error) {
+        $('#stripe_error').val(response.error.message);
+        $('#stripe_error_param').val(response.error.param);
+        $form.get(0).submit();
+    } else {
+        $('#stripe_token').val(response.id);
+        $form.get(0).submit();
+    }
+};
+
+var checkScheduleConflict = function() {
+    var params = {
+        component: 'reservations',
+        method: 'checkConflict',
+        dateout: $('#dateout').val(),
+        dateouttime: $('#dateouttime').val(),
+        dateback: $('#dateback').val(),
+        datebacktime: $('#datebacktime').val(),
+        vehicleid: $('#vehicleid').val(),
+        reservationid: $('#reservationid').val() || null,
+        rentalid: $('#rentalid').val() || null,
+    }
+    $.post('ajax_post.cfm',params,function(data) {
+console.log(data);
+        if (data.success) {
+            if (data.conflicts.length > 0) {
+                $('#conflict_vehicle').html(data.make + ' ' + data.model);
+                $('#conflict_data tbody').empty();
+                for (var c in data.conflicts) {
+                    conflict = data.conflicts[c];
+                    var tr = $('<tr>');
+                    tr.append($('<td>', {
+                        html: conflict.fname + ' ' + conflict.lname,
+                    })).append($('<td>').append(
+                        $('<a>', {
+                            href: conflict.reservationid ? 'reservations.cfm?edit=1&reservationid=' + conflict.reservationid : 'rentals.cfm?edit=1&rentalid=' + conflict.rentalid,
+                            html: conflict.type,
+                            target: '_blank',
+                        })
+                    )).append($('<td>', {
+                        html: conflict.dateout,
+                    })).append($('<td>', {
+                        html: conflict.dateback,
+                    })).append($('<td>', {
+                        html: conflict.numdays,
+                    }));
+                    $('#conflict_data tbody').append(tr);
+                }
+                $('.schedule-conflict-warning').show();
+            } else {
+                $('.schedule-conflict-warning').hide();
+            }
+        } else {
+            console.log(data.error);
+        }
+    }, 'json');
+};
+
+var showScheduleConflicts = function() {
+    $('#dialog_conflicts').dialog({
+        modal: true,
+        width: 1000,
+        maxHeight: 700,
+        buttons: {
+            'OK': function() {
+                $(this).dialog('close');
+            },
         }
     });
 };
@@ -481,7 +724,7 @@ $(document).ready(function() {
             } else {
                 $('#map').html("<p>No map available</p>");
             }
-        });    
+        });
     }
 
     // Table sorting by column headers
@@ -517,11 +760,18 @@ $(document).ready(function() {
         refreshSpecs();
     });
 
+    // Autoformat sales tax details JSON field
+    refreshSalesTaxDetail();
+    $('#detail').keyup(function() {
+        refreshSalesTaxDetail();
+    });
+
     // Enforce formatting for phone numbers
     $('.phone').on('keyup change', function() {
         $(this).val(formatPhone($(this).val()));
     });
 
+    // Enforce formatting for SSN (on subpay)
 //    $('.currency').inputmask({'alias': 'currency'});
     $('.ssn').inputmask("mask", {'mask': '999-99-9999'});
 
@@ -538,7 +788,13 @@ $(document).ready(function() {
     $('#deprefundon').datepicker({});
     $('#reqdate').datepicker({});
     $('#bupdate').datepicker({});
+    $('#donestamp').datepicker({});
+    $('#nextstamp').datepicker({});
+    $('#stamp').datepicker({});
+    $('#damageon').datepicker({});
+    $('#repairedon').datepicker({});
 
+    // Tooltip for vehicle specs model
     $('.specs-model').tooltip({
         content: function() {
             return $('#specs_model').html();
@@ -554,20 +810,29 @@ $(document).ready(function() {
     $('input#ccnum').trigger($.Event( 'keyup', {which:$.ui.keyCode.SPACE, keyCode:$.ui.keyCode.SPACE}));
     $('input#cc2num').trigger($.Event( 'keyup', {which:$.ui.keyCode.SPACE, keyCode:$.ui.keyCode.SPACE}));
 
+    // Add CC classes to credit card field upon load
+    $('div.card-number').each(function() {
+        $(this).parent().addClass($.payment.cardType($(this).html()));
+    });
+
     // Autocomplete for adding customers to reservations
     $('input#customername').keyup(function() {
-        $('.newuserfield').val('').prop('disabled', false);
+        $('.newuserfield').val('').removeClass('dont-edit');
+        $('.matched-customer').hide();
     }).autocomplete({
         source: 'cfc/customers.cfc?method=getCustomers',
         select: function(event, ui) {
             $('input#customerid').val(ui.item.customerid);
             $('input#customername').val(ui.item.label);
-            $('input#fname').val(ui.item.fname).prop('disabled', true);
-            $('input#lname').val(ui.item.lname).prop('disabled', true);
-            $('input#email').val(ui.item.email).prop('disabled', true);
-            $('input#hphone').val(ui.item.hphone).prop('disabled', true);
-            $('input#wphone').val(ui.item.wphone).prop('disabled', true);
-            $('input#mphone').val(ui.item.mphone).prop('disabled', true);
+
+            $('input#fname').val(ui.item.fname).addClass('dont-edit');
+            $('input#lname').val(ui.item.lname).addClass('dont-edit');
+            $('input#email').val(ui.item.email).addClass('dont-edit');
+            $('input#hphone').val(ui.item.hphone).addClass('dont-edit');
+            $('input#wphone').val(ui.item.wphone).addClass('dont-edit');
+            $('input#mphone').val(ui.item.mphone).addClass('dont-edit');
+            $('.matched-customer').attr('customerid', ui.item.customerid).show();
+
             $('#doemail').val(0);
             return false;
         },
@@ -584,12 +849,12 @@ $(document).ready(function() {
 
     // Disable out/in date pickers depending on status of rental
     if ($.inArray($('#status').val(), ['2','3']) > -1) {
-        $('#dateout').prop('disabled', true);
-        $('#dateouttime').prop('disabled', true);
+        $('#dateout').addClass('dont-edit');
+        $('#dateouttime').addClass('dont-edit');
     }
     if ($.inArray($('#status').val(), ['3']) > -1) {
-        $('#dateback').prop('disabled', true);
-        $('#datebacktime').prop('disabled', true);
+        $('#dateback').addClass('dont-edit');
+        $('#datebacktime').addClass('dont-edit');
     }
 
     // Set default driver and passenger numbers when switching JoyPerf type
@@ -604,6 +869,28 @@ $(document).ready(function() {
         }
     });
 
+    // Stripe payment form
+    $('#stripe_form').submit(function(event) {
+        var $form = $(this);
+        // Disable the submit button to prevent repeated clicks
+        $form.find('button').prop('disabled', true);
+        var addr = $('#addr').val().split('\n');
+        Stripe.card.createToken({
+            name: $('#ccname').val(),
+            number: $('#ccnum').val(),
+            cvc: $('#cccvv').val(),
+            exp_month: $('#ccexpmo').val(),
+            exp_year: $('#ccexpyr').val(),
+            address_line1: addr[0],
+            address_line2: addr[1],
+            address_city: $('#city').val(),
+            address_state: $('#state').val(),
+            address_zip: $('#zip').val(),
+        }, stripeResponseHandler);
+        return false;
+    });
+
+    // Survey details diaog
     $('tr.survey').click(function() {
         showSurveyDetails($(this).attr('itemid'));
     });
@@ -611,13 +898,30 @@ $(document).ready(function() {
         window.location = '?edit=1&' + $(this).attr('idfield') + '=' + $(this).attr('itemid');
     });
 
+    // Schedule conflict checking in reservation / rental pages
+    $('.check-conflict').blur(function() {
+        clearTimeout(blurTimeout);
+        blurTimeout = setTimeout('checkScheduleConflict()', 1000);
+    });
+    if ($('.check-conflict').length) {
+        checkScheduleConflict();
+    }
+
+    // Buttonize the "Number of Rentals" number
+    $('.past-rentals').button().click(function() {
+        showPastRentals();
+    });
+
+    // Icon link to customer page on reservation / rental pages
+    if ($('#customerid').val() == 0) {
+        $('.matched-customer').hide();
+    }
+    $('.matched-customer').click(function() {
+        window.open('customers.cfm?edit=1&customerid=' + $(this).attr('customerid'));
+    });
+
     refreshDrivers();
     refreshMedia();
 
-    setInterval('trackActivity()', 5000);
-    lastActivity = new Date();
-    addEventListener('mousemove', function() {
-        lastActivity = new Date();
-    })
 });
 

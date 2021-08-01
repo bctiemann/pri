@@ -20,5 +20,6 @@ urlpatterns = [
     path('vehicles/<int:pk>/', views.VehicleDetailView.as_view(), name='vehicle-detail'),
     path('vehicles/<int:pk>/showcase/', views.VehicleShowcaseView.as_view(), name='vehicle-showcase'),
     path('vehicles/<int:pk>/thumbnail/', views.VehicleThumbnailView.as_view(), name='vehicle-thumbnail'),
+    path('vehicles/<int:pk>/inspection/', views.VehicleInspectionlView.as_view(), name='vehicle-inspection'),
     path('vehicles/<str:vehicle_type>/', views.VehicleListView.as_view(), name='vehicle-list'),
 ]

@@ -12,7 +12,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView, LogoutView, INTERNAL_RESET_SESSION_TOKEN
 
 from fleet.models import Vehicle, VehicleMarketing
-from backoffice.forms import VehicleForm, VehicleShowcaseForm, VehicleThumbnailForm, VehicleMarketingForm
+from backoffice.forms import VehicleForm, VehicleShowcaseForm, VehicleThumbnailForm, VehicleInspectionForm, VehicleMarketingForm
 from users.views import LoginView
 from users.models import User
 
@@ -131,6 +131,15 @@ class VehicleThumbnailView(UpdateView):
     template_name = 'backoffice/ajax/thumbnail.html'
     model = VehicleMarketing
     form_class = VehicleThumbnailForm
+
+    def get_success_url(self):
+        return reverse('backoffice:vehicle-detail', kwargs={'pk': self.object.vehicle_id})
+
+
+class VehicleInspectionlView(UpdateView):
+    template_name = 'backoffice/ajax/inspection.html'
+    model = VehicleMarketing
+    form_class = VehicleInspectionForm
 
     def get_success_url(self):
         return reverse('backoffice:vehicle-detail', kwargs={'pk': self.object.vehicle_id})

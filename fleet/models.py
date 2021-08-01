@@ -122,6 +122,11 @@ class VehicleMarketing(models.Model):
     thumbnail_width = models.IntegerField(null=True, blank=True)
     thumbnail_height = models.IntegerField(null=True, blank=True)
 
+    # Vector from multiple angles, used for marking damage on rentals
+    inspection_image = models.ImageField(null=True, blank=True, width_field='inspection_width', height_field='inspection_height', upload_to=get_vehicle_picture_path)
+    inspection_width = models.IntegerField(null=True, blank=True)
+    inspection_height = models.IntegerField(null=True, blank=True)
+
     # These fields are redundant with the Vehicle class, and will be updated concurrently with that table when
     # edited via the backoffice form. This is to avoid any joins or queries against the Vehicle table when pulling
     # data for the front-end site.
