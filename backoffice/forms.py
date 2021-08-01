@@ -1,6 +1,6 @@
 from django import forms
 
-from fleet.models import Vehicle, VehicleMarketing
+from fleet.models import Vehicle, VehicleMarketing, VehiclePicture
 from consignment.models import Consigner
 
 
@@ -40,3 +40,10 @@ class VehicleInspectionForm(forms.ModelForm):
     class Meta:
         model = VehicleMarketing
         fields = ('inspection_image',)
+
+
+class VehiclePictureForm(forms.ModelForm):
+
+    class Meta:
+        model = VehiclePicture
+        fields = ('image',)

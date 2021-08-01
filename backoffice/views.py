@@ -10,9 +10,12 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView, LogoutView, INTERNAL_RESET_SESSION_TOKEN
+from django.http import Http404, HttpResponseRedirect
 
-from fleet.models import Vehicle, VehicleMarketing
-from backoffice.forms import VehicleForm, VehicleShowcaseForm, VehicleThumbnailForm, VehicleInspectionForm, VehicleMarketingForm
+from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo
+from backoffice.forms import (
+    VehicleForm, VehicleShowcaseForm, VehicleThumbnailForm, VehicleInspectionForm, VehiclePictureForm, VehicleMarketingForm
+)
 from users.views import LoginView
 from users.models import User
 
@@ -143,3 +146,30 @@ class VehicleInspectionlView(UpdateView):
 
     def get_success_url(self):
         return reverse('backoffice:vehicle-detail', kwargs={'pk': self.object.vehicle_id})
+
+
+class VehiclePicturesView(CreateView):
+    template_name = 'backoffice/ajax/vehicle_pictures.html'
+    model = VehiclePicture
+    form_class = VehiclePictureForm
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.vehicle_marketing = VehicleMarketing.objects.get(pk=kwargs['pk'])
+        except VehicleMarketing.DoesNotExist:
+            raise Http404
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        vehicle_picture = form.save(commit=False)
+        vehicle_picture.vehicle_marketing = self.vehicle_marketing
+        vehicle_picture.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['vehicle_marketing'] = self.vehicle_marketing
+        return context
+
+    def get_success_url(self):
+        return reverse('backoffice:vehicle-detail', kwargs={'pk': self.vehicle_marketing.vehicle_id})

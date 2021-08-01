@@ -1,0 +1,44 @@
+<CFIF NOT (Login IS False AND YourID.adminid GT 0)>
+    Invalid access.
+    <CFABORT>
+</CFIF>
+
+<cfif NOT (IsDefined("URL.vehicleid") AND IsNumeric(URL.vehicleid))>
+    Invalid vehicle ID.
+    <cfabort>
+</cfif>
+
+<CFSET unix_time = DateDiff("s", CreateDate(1970,1,1), Now()) />
+
+<cfquery name="VPics" datasource="#FDSN#">
+    SELECT vpicsid,fext,isfirst FROM VPics
+    WHERE vehicleid = <CFQUERYPARAM value="#URL.vehicleid#" CFSQLType="CF_SQL_NUMERIC">
+    ORDER BY isfirst DESC,vpicsid ASC
+</cfquery>
+
+<h3>Pics (1000x672)</h3>
+
+{% for picture in vehicle_marketing.pics.all %}
+<cfoutput query="VPics">
+    <div class="vpic-container">
+        <a href="#OnSite#pics/PRI-#vpicsid#.#fext#" target="_blank">
+            <img class="vpic" src="{{ picture.image.url }}" />
+        </a>
+        <span class="vpic-delete ui-icon ui-icon-trash" vpicsid="#vpicsid#"></span>
+        <cfif isfirst IS 0>
+            <span class="vpic-makefirst ui-icon ui-icon-star" vpicsid="#vpicsid#"></span>
+        </cfif>
+    </div>
+</cfoutput>
+{% endfor %}
+
+<div class="upload-form" id="vpics_upload">
+    <form method="POST" action="{% url "backoffice:vehicle-pictures" pk=vehicle_marketing.id %}" enctype="multipart/form-data" id="vpic_form">
+        {{ form.image }}
+        <cfinput type="file" name="picup" />
+        <cfinput type="hidden" name="vehicleid" value="#URL.vehicleid#" />
+        <button type="submit" name="upload_vpic" class="btn" 111onclick="return uploadMedia('uploadVPic');">Upload</button>
+        <div class="spinner floatright" id="spinner-vpic" method="uploadVPic"></div>
+        {% csrf_token %}
+    </form>
+</div>
