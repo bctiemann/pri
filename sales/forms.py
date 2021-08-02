@@ -291,7 +291,8 @@ class ReservationRentalDetailsForm(forms.ModelForm):
 
     class Meta:
         model = Reservation
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('confirmation_code',)
 
 
 # 2nd-phase form; extends ReservationRentalDetailsForm with Customer fields so it inherits all the first form's validations

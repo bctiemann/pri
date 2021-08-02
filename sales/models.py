@@ -136,11 +136,11 @@ class TaxRate(models.Model):
             response = client.tax_rates_by_postal_code(include={'country': self.country, 'postalCode': self.postal_code})
             response.raise_for_status()
             result = response.json()
-            self.total_rate = decimal.Decimal(result['totalRate'])
+            self.total_rate = result['totalRate']
             self.detail = result['rates']
             self.date_updated = now()
         except HTTPError:
-            self.total_rate = decimal.Decimal(settings.DEFAULT_TAX_RATE)
+            self.total_rate = settings.DEFAULT_TAX_RATE
         self.save()
 
     def save(self, *args, **kwargs):

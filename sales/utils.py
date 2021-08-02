@@ -1,3 +1,5 @@
+import decimal
+
 from django.conf import settings
 
 from sales.models import Reservation, Coupon, TaxRate
@@ -45,6 +47,7 @@ class RentalPriceCalculator(PriceCalculator):
     tax_rate = None
     coupon = None
     customer = None
+    cents = decimal.Decimal('0.01')
 
     def __init__(self, vehicle_marketing, num_days, coupon_code=None, email=None, extra_miles=None, tax_zip=None):
         self.vehicle_marketing = vehicle_marketing
@@ -62,6 +65,9 @@ class RentalPriceCalculator(PriceCalculator):
             self.customer = Customer.objects.get(user__email=email)
         except Customer.DoesNotExist:
             pass
+
+    def quantize_currency(self, value):
+        return decimal.Decimal(value).quantize(self.cents, decimal.ROUND_HALF_UP)
 
     @property
     def multi_day_discount_pct(self):
@@ -87,11 +93,11 @@ class RentalPriceCalculator(PriceCalculator):
         return 0
 
     def get_tax_amount(self, value):
-        return self.tax_rate.total_rate * value
+        return float(self.tax_rate.total_rate) * value
 
     @property
     def base_price(self):
-        return self.vehicle_marketing.price_per_day * self.num_days
+        return float(self.vehicle_marketing.price_per_day * self.num_days)
 
     @property
     def post_multi_day_discount_subtotal(self):
@@ -130,7 +136,7 @@ class RentalPriceCalculator(PriceCalculator):
     @property
     def total_with_tax(self):
         tax_amount = self.get_tax_amount(self.pre_tax_subtotal)
-        return self.pre_tax_subtotal + tax_amount
+        return self.quantize_currency(self.pre_tax_subtotal + tax_amount)
 
     @property
     def reservation_deposit(self):
