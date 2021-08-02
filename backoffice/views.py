@@ -173,3 +173,12 @@ class VehiclePicturesView(CreateView):
 
     def get_success_url(self):
         return reverse('backoffice:vehicle-detail', kwargs={'pk': self.vehicle_marketing.vehicle_id})
+
+
+class VehicleMediaPromoteView(APIView):
+
+    def post(self, request, vehicle_id, media_type, pk):
+        response = {
+            'success': True
+        }
+        return Response(response)

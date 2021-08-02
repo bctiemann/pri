@@ -253,7 +253,7 @@ var refreshMedia = function() {
         });
         $('.vpic-makefirst').click(function() {
             var vpicsid = $(this).attr('vpicsid');
-            editMedia('promoteVPic', vpicsid);
+            editMedia('promote', 'picture', vpicsid);
         });
         $('#vpic_form').submit(function() {
             return uploadMedia('uploadVPic', vehicleid);
@@ -345,13 +345,15 @@ var refreshMedia = function() {
     });
 };
 
-var editMedia = function(method, mediaid) {
+var editMedia = function(method, mediaType, mediaId) {
     var params = {
         component: 'media',
         method: method,
-        mediaid: mediaid || null,
+        media_type: mediaType,
+        media_id: mediaId,
     }
-    $.post('ajax_post.cfm',params,function(data) {
+    let url = `${mediaType}/${mediaId}/${method}/`;
+    $.post(url, params, function(data) {
 console.log(data);
         if (data.success) {
             refreshMedia();

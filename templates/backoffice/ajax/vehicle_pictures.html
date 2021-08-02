@@ -24,10 +24,12 @@
         <a href="#OnSite#pics/PRI-#vpicsid#.#fext#" target="_blank">
             <img class="vpic" src="{{ picture.image.url }}" />
         </a>
-        <span class="vpic-delete ui-icon ui-icon-trash" vpicsid="#vpicsid#"></span>
+        <span class="vpic-delete ui-icon ui-icon-trash" vpicsid="{{ picture.id }}"></span>
+        {% if not picture.is_first %}
         <cfif isfirst IS 0>
-            <span class="vpic-makefirst ui-icon ui-icon-star" vpicsid="#vpicsid#"></span>
+            <span class="vpic-makefirst ui-icon ui-icon-star" vpicsid="{{ picture.id }}"></span>
         </cfif>
+        {% endif %}
     </div>
 </cfoutput>
 {% endfor %}
