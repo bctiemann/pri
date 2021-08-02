@@ -16,7 +16,8 @@ urlpatterns = [
     path('track_activity/', views.TrackActivityView.as_view(), name='track-activity'),
 
     path('vehicles/', views.VehicleListView.as_view(), name='vehicle-list'),
-    path('vehicles/create/', views.VehicleCreateView.as_view(), name='vehicle-create'),
+    path('vehicles/active/', views.VehicleListView.as_view(active_only=True), name='vehicle-list-active'),
+    path('vehicles/create/', views.VehicleCreateView.as_view(is_create_view=True), name='vehicle-create'),
     path('vehicles/<int:pk>/', views.VehicleDetailView.as_view(), name='vehicle-detail'),
     path('vehicles/<int:pk>/showcase/', views.VehicleShowcaseView.as_view(), name='vehicle-showcase'),
     path('vehicles/<int:pk>/thumbnail/', views.VehicleThumbnailView.as_view(), name='vehicle-thumbnail'),

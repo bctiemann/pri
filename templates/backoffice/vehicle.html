@@ -6,11 +6,11 @@
     <h1 class="pageheader">
         Vehicles
         <ul class="nav_subpage">
-            <a href="{% url "backoffice:vehicle-list" %}">
-                <li class="selected">List Active</li>
+            <a href="{% url "backoffice:vehicle-list-active" %}">
+                <li {% if active_only %}class="selected"{% endif %}>List Active</li>
             </a>
             <a href="{% url "backoffice:vehicle-list" %}">
-                <li class="selected">List All</li>
+                <li {% if is_unfiltered_list_view %}class="selected"{% endif %}>List All</li>
             </a>
             {% for vehicle_type in vehicle_types %}
                 <a href="{% url "backoffice:vehicle-list" vehicle_type=vehicle_type.value %}">
@@ -18,7 +18,7 @@
                 </a>
             {% endfor %}
             <a href="{% url "backoffice:vehicle-create" %}">
-                <li>Add</li>
+                <li {% if is_create_view %}class="selected"{% endif %}>Add</li>
             </a>
         </ul>
     </h1>

@@ -13,9 +13,10 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView, LogoutView, INTERNAL_RESET_SESSION_TOKEN
 from django.http import Http404, HttpResponseRedirect
 
-from fleet.models import VehicleType, Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo
+from fleet.models import VehicleType, VehicleStatus, Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo
 from backoffice.forms import (
-    VehicleForm, VehicleShowcaseForm, VehicleThumbnailForm, VehicleInspectionForm, VehiclePictureForm, VehicleMarketingForm
+    VehicleForm, VehicleShowcaseForm, VehicleThumbnailForm, VehicleInspectionForm, VehiclePictureForm,
+    VehicleMarketingForm
 )
 from users.views import LoginView
 from users.models import User
@@ -51,7 +52,6 @@ class LogoutView(LogoutView):
 # API view to track admin activity
 
 class TrackActivityView(APIView):
-
     authentication_classes = (BasicAuthentication, SessionAuthentication)
 
     def post(self, request):
@@ -65,23 +65,32 @@ class TrackActivityView(APIView):
 # Template generics-based CRUD views
 
 class VehicleViewMixin:
+    model = Vehicle
+    active_only = False
+    is_create_view = False
+
+    @property
+    def is_unfiltered_list_view(self):
+        return not self.active_only and not self.kwargs.get('vehicle_type') and not self.is_create_view
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['vehicle_types'] = VehicleType
+        context['active_only'] = self.active_only
+        context['is_unfiltered_list_view'] = self.is_unfiltered_list_view
         if 'vehicle_type' in self.kwargs:
             context['selected_vehicle_type'] = self.kwargs['vehicle_type']
             context['vehicle_list'] = context['vehicle_list'].filter(vehicle_type=self.kwargs['vehicle_type'])
+        elif self.active_only:
+            context['vehicle_list'] = context['vehicle_list'].filter(status=VehicleStatus.READY.value)
         return context
 
 
 class VehicleListView(VehicleViewMixin, ListView):
-    model = Vehicle
     template_name = 'backoffice/vehicle_list.html'
 
 
 class VehicleDetailView(VehicleViewMixin, UpdateView):
-    model = Vehicle
     template_name = 'backoffice/vehicle_detail.html'
     form_class = VehicleForm
     marketing_form_class = VehicleMarketingForm
@@ -119,7 +128,6 @@ class VehicleDetailView(VehicleViewMixin, UpdateView):
 
 class VehicleCreateView(VehicleViewMixin, CreateView):
     template_name = 'backoffice/vehicle_detail.html'
-    model = Vehicle
     form_class = VehicleForm
 
     def form_valid(self, form):
@@ -136,6 +144,11 @@ class VehicleCreateView(VehicleViewMixin, CreateView):
         )
         self.object = vehicle
         return HttpResponseRedirect(self.get_success_url())
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['is_create_view'] = True
+        return context
 
     def get_success_url(self):
         return reverse('backoffice:vehicle-detail', kwargs={'pk': self.object.id})
