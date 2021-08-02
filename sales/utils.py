@@ -136,7 +136,7 @@ class RentalPriceCalculator(PriceCalculator):
     @property
     def total_with_tax(self):
         tax_amount = self.get_tax_amount(self.pre_tax_subtotal)
-        return self.quantize_currency(self.pre_tax_subtotal + tax_amount)
+        return self.pre_tax_subtotal + tax_amount
 
     @property
     def reservation_deposit(self):
@@ -147,15 +147,15 @@ class RentalPriceCalculator(PriceCalculator):
             num_days=self.num_days,
             tax_rate=self.tax_rate.total_rate,
             customer_id=self.customer.id if self.customer else None,
-            base_price=self.base_price,
-            multi_day_discount=self.get_multi_day_discount(self.base_price),
+            base_price=self.quantize_currency(self.base_price),
+            multi_day_discount=self.quantize_currency(self.get_multi_day_discount(self.base_price)),
             multi_day_discount_pct=self.multi_day_discount_pct,
-            coupon_discount=self.get_coupon_discount(self.post_multi_day_discount_subtotal),
-            customer_discount=self.get_customer_discount(self.post_coupon_discount_subtotal),
+            coupon_discount=self.quantize_currency(self.get_coupon_discount(self.post_multi_day_discount_subtotal)),
+            customer_discount=self.quantize_currency(self.get_customer_discount(self.post_coupon_discount_subtotal)),
             extra_miles=self.extra_miles,
-            extra_miles_cost=self.extra_miles_cost,
-            subtotal=self.pre_tax_subtotal,
-            total_with_tax=self.total_with_tax,
-            reservation_deposit=self.reservation_deposit,
-            tax_amount=self.get_tax_amount(self.pre_tax_subtotal),
+            extra_miles_cost=self.quantize_currency(self.extra_miles_cost),
+            subtotal=self.quantize_currency(self.pre_tax_subtotal),
+            total_with_tax=self.quantize_currency(self.total_with_tax),
+            reservation_deposit=self.quantize_currency(self.reservation_deposit),
+            tax_amount=self.quantize_currency(self.get_tax_amount(self.pre_tax_subtotal)),
         )
