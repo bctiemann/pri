@@ -12,6 +12,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView, LogoutView, INTERNAL_RESET_SESSION_TOKEN
 from django.http import Http404, HttpResponseRedirect
+from django.db.models import Q
 
 from fleet.models import VehicleType, VehicleStatus, Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo
 from backoffice.forms import (
@@ -73,21 +74,47 @@ class VehicleViewMixin:
     def is_unfiltered_list_view(self):
         return not self.active_only and not self.kwargs.get('vehicle_type') and not self.is_create_view
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if 'vehicle_type' in self.kwargs:
+            queryset = queryset.filter(vehicle_type=self.kwargs['vehicle_type'])
+        elif self.active_only:
+            queryset = queryset.filter(status=VehicleStatus.READY.value)
+
+        # TODO: ordering
+
+        return queryset
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['vehicle_types'] = VehicleType
         context['active_only'] = self.active_only
         context['is_unfiltered_list_view'] = self.is_unfiltered_list_view
-        if 'vehicle_type' in self.kwargs:
-            context['selected_vehicle_type'] = self.kwargs['vehicle_type']
-            context['vehicle_list'] = context['vehicle_list'].filter(vehicle_type=self.kwargs['vehicle_type'])
-        elif self.active_only:
-            context['vehicle_list'] = context['vehicle_list'].filter(status=VehicleStatus.READY.value)
+        context['selected_vehicle_type'] = self.kwargs.get('vehicle_type')
         return context
 
 
 class VehicleListView(VehicleViewMixin, ListView):
     template_name = 'backoffice/vehicle_list.html'
+    search_term = None
+    # Set this to allow pagination
+    # paginate_by = 10
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        self.search_term = self.request.GET.get('query')
+        if self.search_term:
+            queryset = queryset.filter(
+                Q(make__icontains=self.search_term) |
+                Q(model__icontains=self.search_term) |
+                Q(year__icontains=self.search_term)
+            )
+        return queryset
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['search_term'] = self.search_term
+        return context
 
 
 class VehicleDetailView(VehicleViewMixin, UpdateView):

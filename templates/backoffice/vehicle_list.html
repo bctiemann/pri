@@ -61,7 +61,6 @@
         ORDER BY #URL.sortby# #URL.sortdir#
         LIMIT #Pages.offset#,#Pages.thispage#
     </CFQUERY>
-    {% endcomment %}
 
     <CFOUTPUT>
     <div class="pager">
@@ -69,25 +68,14 @@
     #Pages.pages#
     </div>
     </CFOUTPUT>
+    {% endcomment %}
 
-    <cfform method="POST" action="#CGI.SCRIPT_NAME#">
-        <cftry>
-            <cfset query = Form.query>
-            <cfcatch>
-                <cfset query = "">
-            </cfcatch>
-        </cftry>
-        <cfinput type="search" name="query" value="#query#" />
-        <cfinput type="submit" name="search" value="Search" />
-    </cfform>
+    {% include "backoffice/includes/paginator.html" %}
 
-    <cfoutput>
+    {% include "backoffice/includes/search_form.html" %}
+
     <table class="data alternating" page="#CGI.SCRIPT_NAME#" sortedby="#URL.sortby#" sorteddir="#URL.sortdir#"
-    <cfif IsDefined("URL.type") AND IsValid("integer",URL.type)>
-        filter="type=#URL.type#"
-    </cfif>>
-    </cfoutput>
-    <tr>
+     <tr>
         <cfoutput>
         <th defaultdir="DESC" col="vehicleid">ID</th>
         <th defaultdir="ASC" col="make">Make</th>

@@ -813,13 +813,11 @@ p.info {
 	font-size: 11px;
 }
 
+
 div.pager {
-	margin-right: 10%;
-}
-div.pageslink {
 	float: right;
 	margin-top: 15px;
-	margin-right: 10px;
+	margin-right: 10%;
 }
 
 
