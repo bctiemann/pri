@@ -199,7 +199,7 @@ class VehicleThumbnailView(UpdateView):
         return reverse('backoffice:vehicle-detail', kwargs={'pk': self.object.vehicle_id})
 
 
-class VehicleInspectionlView(UpdateView):
+class VehicleInspectionView(UpdateView):
     template_name = 'backoffice/ajax/inspection.html'
     model = VehicleMarketing
     form_class = VehicleInspectionForm
