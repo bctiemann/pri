@@ -67,6 +67,7 @@ class RentalPriceCalculator(PriceCalculator):
             pass
 
     def quantize_currency(self, value):
+        # return f'{decimal.Decimal(value).quantize(self.cents, decimal.ROUND_HALF_UP)}'
         return decimal.Decimal(value).quantize(self.cents, decimal.ROUND_HALF_UP)
 
     @property
