@@ -423,6 +423,10 @@ h1.pageheader li.selected {
 	background-color: #efefef;
 }
 
+.nav_subpage a {
+	display: inline-block;
+}
+
 
 table.pageheader {
 	border-collapse: collapse;

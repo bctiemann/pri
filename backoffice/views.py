@@ -13,7 +13,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView, LogoutView, INTERNAL_RESET_SESSION_TOKEN
 from django.http import Http404, HttpResponseRedirect
 
-from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo
+from fleet.models import VehicleType, Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo
 from backoffice.forms import (
     VehicleForm, VehicleShowcaseForm, VehicleThumbnailForm, VehicleInspectionForm, VehiclePictureForm, VehicleMarketingForm
 )
@@ -68,8 +68,9 @@ class VehicleViewMixin:
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['vehicle_model'] = Vehicle
+        context['vehicle_types'] = VehicleType
         if 'vehicle_type' in self.kwargs:
+            context['selected_vehicle_type'] = self.kwargs['vehicle_type']
             context['vehicle_list'] = context['vehicle_list'].filter(vehicle_type=self.kwargs['vehicle_type'])
         return context
 

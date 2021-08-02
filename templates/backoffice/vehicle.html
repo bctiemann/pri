@@ -6,10 +6,20 @@
     <h1 class="pageheader">
         Vehicles
         <ul class="nav_subpage">
-            {% for vehicle_type in vehicle_model.VehicleType %}
-                <a href="{% url "backoffice:vehicle-list" vehicle_type=vehicle_type.value %}"><li>{{ vehicle_type.label }}s</li></a>
+            <a href="{% url "backoffice:vehicle-list" %}">
+                <li class="selected">List Active</li>
+            </a>
+            <a href="{% url "backoffice:vehicle-list" %}">
+                <li class="selected">List All</li>
+            </a>
+            {% for vehicle_type in vehicle_types %}
+                <a href="{% url "backoffice:vehicle-list" vehicle_type=vehicle_type.value %}">
+                    <li {% if vehicle_type.value == selected_vehicle_type %}class="selected"{% endif %}>{{ vehicle_type.label }}s</li>
+                </a>
             {% endfor %}
-            <a href="{% url "backoffice:vehicle-create" %}"><li>Add</li></a>
+            <a href="{% url "backoffice:vehicle-create" %}">
+                <li>Add</li>
+            </a>
         </ul>
     </h1>
 {% endblock %}
