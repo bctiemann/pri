@@ -159,7 +159,7 @@ class VehicleCreateView(VehicleViewMixin, CreateView):
 
     def form_valid(self, form):
         vehicle = form.save(commit=False)
-        vehicle.slug = slugify(f'{vehicle.make} {vehicle.model}')
+        vehicle.slug = vehicle.get_slug()
         vehicle.save()
         vehicle_marketing = VehicleMarketing.objects.create(
             vehicle_id=vehicle.id,

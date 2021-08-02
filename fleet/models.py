@@ -96,6 +96,11 @@ class Vehicle(models.Model):
     def vehicle_marketing(self):
         return VehicleMarketing.objects.filter(vehicle_id=self.id).first()
 
+    # TODO: Either expose the slug in the backoffice vehicle form and make it controllable, or add collision
+    # checking to this method for creating new records
+    def get_slug(self):
+        return slugify(f'{self.make} {self.model}')
+
     # This is the string representation of the vehicle object; will be used in the admin, templates, etc. as a default
     def __str__(self):
         return f'[{self.id}] {self.vehicle_name}'
@@ -166,9 +171,6 @@ class VehicleMarketing(models.Model):
         if self.specs:
             return self.specs.get('headline')
         return ''
-
-    def get_slug(self):
-        return slugify(f'{self.make} {self.model}')
 
     def __str__(self):
         return f'[{self.id}] {self.vehicle_name}'
