@@ -173,6 +173,7 @@
             </td>
         </tr>
 
+        {% if vehicle %}
         <tr class="divider">
             <td colspan="2">
                 <h3>Front Site Data</h3>
@@ -267,6 +268,7 @@
             <td>Miles Included</td>
             <td><cfinput name="milesinc" value="#VehicleFront.milesinc#" maxlength="5" required="yes" /></td>
         </tr>
+        {% endif %}
 
         <tr>
             <td></td>
@@ -278,9 +280,11 @@
                         Add
                     {% endif %}
                 </button>
+                {% if vehicle %}
                 <cfif vehicleid>
                     <button class="btn delete" type="submit" name="delete" onclick="return confirmDelete(this.form, 'vehicle')">Delete Vehicle</button>
                 </cfif>
+                {% endif %}
             </td>
         </tr>
     </table>

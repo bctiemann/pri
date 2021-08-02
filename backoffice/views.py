@@ -5,6 +5,7 @@ from rest_framework.authentication import BasicAuthentication, SessionAuthentica
 from django.shortcuts import render, reverse
 from django.urls import reverse_lazy
 from django.utils.dateparse import parse_datetime
+from django.utils.text import slugify
 from django.views.generic import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
@@ -120,6 +121,24 @@ class VehicleCreateView(VehicleViewMixin, CreateView):
     model = Vehicle
     form_class = VehicleForm
 
+    def form_valid(self, form):
+        vehicle = form.save(commit=False)
+        vehicle.slug = slugify(f'{vehicle.make} {vehicle.model}')
+        vehicle.save()
+        vehicle_marketing = VehicleMarketing.objects.create(
+            vehicle_id=vehicle.id,
+            make=vehicle.make,
+            model=vehicle.model,
+            year=vehicle.year,
+            slug=vehicle.slug,
+            weighting=vehicle.weighting,
+        )
+        self.object = vehicle
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('backoffice:vehicle-detail', kwargs={'pk': self.object.id})
+
 
 class VehicleShowcaseView(UpdateView):
     template_name = 'backoffice/ajax/showcase.html'
@@ -152,6 +171,7 @@ class VehiclePicturesView(CreateView):
     template_name = 'backoffice/ajax/vehicle_pictures.html'
     model = VehiclePicture
     form_class = VehiclePictureForm
+    vehicle_marketing = None
 
     def dispatch(self, request, *args, **kwargs):
         try:

@@ -110,6 +110,16 @@ class VehicleMarketing(models.Model):
     # This links the record to the Vehicle object, which is where potentially sensitive business data
     # is stored. Cannot be a ForeignKey because the databases are kept segregated. See pri/db_routers.py
     vehicle_id = models.IntegerField(null=True, blank=True, help_text='ID of Vehicle object this corresponds to')
+
+    # These fields are redundant with the Vehicle class, and will be updated concurrently with that table when
+    # edited via the backoffice form. This is to avoid any joins or queries against the Vehicle table when pulling
+    # data for the front-end site.
+    make = models.CharField(max_length=255, blank=True)
+    model = models.CharField(max_length=255, blank=True)
+    year = models.IntegerField(null=True, blank=True)
+    slug = models.SlugField(max_length=50, blank=True)
+    vehicle_type = models.CharField(choices=VehicleType.choices, max_length=20)
+    status = models.IntegerField(choices=VehicleStatus.choices, default=VehicleStatus.BUILDING)
     weighting = models.IntegerField(null=True, blank=True)
 
     # Hero shot (front page)
@@ -126,16 +136,6 @@ class VehicleMarketing(models.Model):
     inspection_image = models.ImageField(null=True, blank=True, width_field='inspection_width', height_field='inspection_height', upload_to=get_vehicle_picture_path)
     inspection_width = models.IntegerField(null=True, blank=True)
     inspection_height = models.IntegerField(null=True, blank=True)
-
-    # These fields are redundant with the Vehicle class, and will be updated concurrently with that table when
-    # edited via the backoffice form. This is to avoid any joins or queries against the Vehicle table when pulling
-    # data for the front-end site.
-    make = models.CharField(max_length=255, blank=True)
-    model = models.CharField(max_length=255, blank=True)
-    year = models.IntegerField(null=True, blank=True)
-    slug = models.SlugField(max_length=50, blank=True)
-    vehicle_type = models.CharField(choices=VehicleType.choices, max_length=20)
-    status = models.IntegerField(choices=VehicleStatus.choices, default=VehicleStatus.BUILDING)
 
     # These fields are for public display/marketing purposes only and are not sensitive.
     horsepower = models.IntegerField(null=True, blank=True)
