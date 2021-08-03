@@ -80,9 +80,6 @@ class VehicleViewMixin:
             queryset = queryset.filter(vehicle_type=self.kwargs['vehicle_type'])
         elif self.active_only:
             queryset = queryset.filter(status=VehicleStatus.READY.value)
-
-        # TODO: ordering
-
         return queryset
 
     def get_context_data(self, *args, **kwargs):
