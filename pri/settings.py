@@ -188,7 +188,7 @@ USE_L10N = True
 USE_TZ = True
 
 
-TEST_RUNNER = 'pri.test_runner.PytestTestRunner'
+# TEST_RUNNER = 'pri.test_runner.PytestTestRunner'
 
 
 # Static files (CSS, JavaScript, Images)

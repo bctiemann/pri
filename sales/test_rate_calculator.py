@@ -20,10 +20,10 @@ from sales.utils import RentalPriceCalculator
 @pytest.fixture
 def vehicle_mock_1(mocker):
     vehicle_1 = mocker.MagicMock(spec=VehicleMarketing)
-    vehicle_1.price_per_day = 950
-    vehicle_1.discount_2_day = 10
-    vehicle_1.discount_3_day = 20
-    vehicle_1.discount_7_day = 40
+    vehicle_1.return_value.price_per_day = 950
+    vehicle_1.return_value.discount_2_day = 10
+    vehicle_1.return_value.discount_3_day = 20
+    vehicle_1.return_value.discount_7_day = 40
     # vehicle_1.return_value = mocker.MagicMock()
     return vehicle_1
 
@@ -42,22 +42,22 @@ def coupon_mock_1(mocker):
     coupon_1 = mocker.MagicMock(spec=Coupon)
     coupon_1.amount = 15.00
     # coupon_1.get_discount_value = mocker.MagicMock()
-    coupon_1.get_discount_value.return_value = 15.00
+    coupon_1.return_value.get_discount_value.return_value = 15.00
     return coupon_1
 
 
 @pytest.fixture
-def customer_1(mocker):
+def customer_mock_1(mocker):
     customer_1 = mocker.MagicMock(spec=Customer)
-    customer_1.discount_pct = 10
+    customer_1.return_value.discount_pct = 10
     return customer_1
 
 
 @pytest.fixture(autouse=True)
-def _mock_db_connection(mocker, tax_rate_1, coupon_mock_1, customer_1):
+def _mock_db_connection(mocker, tax_rate_1, coupon_mock_1, customer_mock_1):
     mocker.patch('sales.models.TaxRate.objects.get_or_create', tax_rate_1)
     mocker.patch('sales.models.Coupon.objects.get', coupon_mock_1)
-    mocker.patch('users.models.Customer.objects.get', customer_1)
+    mocker.patch('users.models.Customer.objects.get', customer_mock_1)
 
 
 @pytest.fixture
@@ -105,25 +105,26 @@ class TestRentalPriceCalculatorTestCase:
             amount=15.00,
         )
 
-    # @pytest.mark.parametrize(
-    #     'vehicle, num_days, coupon_code, email, extra_miles, tax_zip',
-    #     [
-    #         (
-    #             vehicle_mock_1,
-    #             2,
-    #             None,
-    #             None,
-    #             200,
-    #             '07430',
-    #         ),
-    #     ],
-    # )
-    def test_get_rental_price_data(self, vehicle_mock_1, num_days, coupon_mock_1, email, extra_miles, tax_zip):
+    @pytest.mark.parametrize(
+        'vehicle, num_days, coupon_code, email, extra_miles, tax_zip',
+        [
+            (
+                vehicle_mock_1,
+                2,
+                None,
+                None,
+                200,
+                '07430',
+            ),
+        ],
+        indirect=True
+    )
+    def test_get_rental_price_data(self, vehicle, num_days, coupon_code, email, extra_miles, tax_zip):
         num_days = 2
         rental_price_calculator = RentalPriceCalculator(
-            vehicle_mock_1,
+            vehicle,
             num_days,
-            coupon_mock_1,
+            coupon_code,
             email,
             extra_miles,
             tax_zip,
