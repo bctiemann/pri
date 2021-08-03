@@ -732,15 +732,15 @@ $(document).ready(function() {
     // Table sorting by column headers
     $('table.data th').click(function() {
         let col = $(this).attr('col');
+        let defaultSort = $(this).attr('default-sort');
         let table = $(this).closest('table');
         let sortedBy = table.attr('sortedby');
         let sortBy = '';
         let sortColumn = sortedBy.replace('-', '');
-        let baseCol = col.replace('-', '');
-        if (baseCol === sortColumn) {
+        if (col === sortColumn) {
             sortBy = sortedBy[0] === '-' ? sortColumn : `-${sortColumn}`;
         } else {
-            sortBy = col;
+            sortBy = defaultSort === 'desc' ? `-${col}` : col;
         }
         if (sortBy) {
             location.href = `?sortby=${sortBy}`;
@@ -748,10 +748,11 @@ $(document).ready(function() {
     });
 
     // Column sort direction switching
-    var sortedby = $('table.data').attr('sortedby');
-    var sorteddir = $('table.data').attr('sorteddir');
-    if (sortedby && sorteddir) {
-        $('th[col=' + sortedby + ']').addClass('sort_selected').addClass(sorteddir.toLowerCase());
+    let sortedBy = $('table.data').attr('sortedby');
+    let sortColumn = sortedBy.replace('-', '');
+    let sortDirClass = sortedBy[0] === '-' ? 'desc' : 'asc';
+    if (sortedBy) {
+        $('th[col=' + sortColumn + ']').addClass('sort_selected').addClass(sortDirClass);
     }
 
     // Autoformat JSON specs field
