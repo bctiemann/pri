@@ -168,7 +168,7 @@
 <ul class="navmenu">
 <CFIF YourID.acclev IS NOT 5>
 	<li>
-	<a class="tnav {% block page_vehicles_class %}selected{% endblock %}" href="{% url "backoffice:vehicle-list" %}">Vehicles</a>
+	<a class="tnav {% if page_group == 'vehicles' %}selected{% endif %}" href="{% url "backoffice:vehicle-list" %}">Vehicles</a>
 	</li>
 </CFIF>
 <CFIF YourID.acclev IS 1 OR YourID.acclev IS 2>

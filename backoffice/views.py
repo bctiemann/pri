@@ -67,6 +67,7 @@ class TrackActivityView(APIView):
 
 class VehicleViewMixin:
     model = Vehicle
+    page_group = 'vehicles'
     active_only = False
     is_create_view = False
 
@@ -88,6 +89,7 @@ class VehicleViewMixin:
         context['active_only'] = self.active_only
         context['is_unfiltered_list_view'] = self.is_unfiltered_list_view
         context['selected_vehicle_type'] = self.kwargs.get('vehicle_type')
+        context['page_group'] = self.page_group
         return context
 
 
