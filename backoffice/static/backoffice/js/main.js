@@ -743,7 +743,7 @@ $(document).ready(function() {
             sortBy = col;
         }
         if (sortBy) {
-            location = `?sortby=${sortBy}`;
+            location.href = `?sortby=${sortBy}`;
         }
     });
 
