@@ -748,7 +748,7 @@ $(document).ready(function() {
     });
 
     // Column sort direction switching
-    let sortedBy = $('table.data').attr('sortedby');
+    let sortedBy = $('table.data').attr('sortedby') || '';
     let sortColumn = sortedBy.replace('-', '');
     let sortDirClass = sortedBy[0] === '-' ? 'desc' : 'asc';
     if (sortedBy) {
@@ -896,7 +896,8 @@ $(document).ready(function() {
         showSurveyDetails($(this).attr('itemid'));
     });
     $('tr.click-to-edit').click(function() {
-        window.location = '?edit=1&' + $(this).attr('idfield') + '=' + $(this).attr('itemid');
+        let itemId = $(this).attr('itemid');
+        window.location.href = `/backoffice/vehicles/${itemId}/`;
     });
 
     // Schedule conflict checking in reservation / rental pages
