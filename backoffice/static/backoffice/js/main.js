@@ -731,21 +731,24 @@ $(document).ready(function() {
 
     // Table sorting by column headers
     $('table.data th').click(function() {
-        var col = $(this).attr('col');
-        var defaultdir = $(this).attr('defaultdir');
-        var table = $(this).closest('table');
-        var page = table.attr('page');
-        var sortedby = table.attr('sortedby');
-        var sorteddir = table.attr('sorteddir');
-        var filter = table.attr('filter') || '';
-        var sortdir = '';
-        if (col == sortedby) {
-            sortdir = sorteddir == 'ASC' ? 'DESC' : 'ASC';
+        let col = $(this).attr('col');
+        let table = $(this).closest('table');
+        let sortedBy = table.attr('sortedby');
+        let sortBy = '';
+        let sortColumn = sortedBy.replace('-', '');
+        let baseCol = col.replace('-', '');
+        if (baseCol === sortColumn) {
+            if (sortedBy[0] === '-') {
+                sortBy = sortColumn;
+            } else {
+                sortBy = `-${sortColumn}`;
+            }
         } else {
-            sortdir = defaultdir;
+            sortBy = col;
         }
-        if (col && sortdir) {
-            location = page + '?sortby=' + col + '&sortdir=' + sortdir + (filter ? '&' + filter : '');
+        if (sortBy) {
+            let url = `?sortby=${sortBy}`;
+            location = url;
         }
     });
 

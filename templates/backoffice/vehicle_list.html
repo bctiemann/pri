@@ -74,18 +74,16 @@
 
     {% include "backoffice/includes/search_form.html" %}
 
-    <table class="data alternating" page="#CGI.SCRIPT_NAME#" sortedby="#URL.sortby#" sorteddir="#URL.sortdir#"
+    <table class="data alternating" sortedby="{{ sortby }}">
      <tr>
-        <cfoutput>
-        <th defaultdir="DESC" col="vehicleid">ID</th>
-        <th defaultdir="ASC" col="make">Make</th>
-        <th defaultdir="ASC" col="model">Model</th>
-        <th defaultdir="ASC" col="year">Year</th>
+        <th col="-id">ID</th>
+        <th col="make">Make</th>
+        <th col="model">Model</th>
+        <th col="year">Year</th>
         <th>Type</th>
-        <th defaultdir="ASC" col="status">Status</th>
+        <th col="status">Status</th>
         <th>Toll Tag</th>
         <th>Notes</th>
-        </cfoutput>
     </tr>
     {% for vehicle in vehicle_list %}
         <tr class="clickable click-to-edit" idfield="vehicleid" itemid="{{ vehicle.id }}">

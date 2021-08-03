@@ -509,7 +509,7 @@ table.data th {
 	background: none;
 	color: #555;
 }
-table.data th[defaultdir] {
+table.data th[col] {
 	cursor: pointer;
 	color: #000;
 }

@@ -97,6 +97,7 @@ class VehicleViewMixin:
 class VehicleListView(VehicleViewMixin, ListView):
     template_name = 'backoffice/vehicle_list.html'
     search_term = None
+    default_sort = '-id'
     # Set this to allow pagination
     # paginate_by = 10
 
@@ -109,11 +110,13 @@ class VehicleListView(VehicleViewMixin, ListView):
                 Q(model__icontains=self.search_term) |
                 Q(year__icontains=self.search_term)
             )
+        queryset = queryset.order_by(self.request.GET.get('sortby', self.default_sort))
         return queryset
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['search_term'] = self.search_term
+        context['sortby'] = self.request.GET.get('sortby', self.default_sort)
         return context
 
 
