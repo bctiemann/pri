@@ -738,17 +738,12 @@ $(document).ready(function() {
         let sortColumn = sortedBy.replace('-', '');
         let baseCol = col.replace('-', '');
         if (baseCol === sortColumn) {
-            if (sortedBy[0] === '-') {
-                sortBy = sortColumn;
-            } else {
-                sortBy = `-${sortColumn}`;
-            }
+            sortBy = sortedBy[0] === '-' ? sortColumn : `-${sortColumn}`;
         } else {
             sortBy = col;
         }
         if (sortBy) {
-            let url = `?sortby=${sortBy}`;
-            location = url;
+            location = `?sortby=${sortBy}`;
         }
     });
 
