@@ -17,10 +17,10 @@ from django.core.files.storage import default_storage
 # TextChoices and IntegerChoices are enum classes with internal and verbose values; if a CharField is set to use
 # this object for its choices, it will be represented in the admin with a select dropdown of acceptable values.
 
-class VehicleType(models.TextChoices):
-    CAR = ('car', 'Road Car')
-    BIKE = ('bike', 'Bike')
-    TRACK = ('track', 'Track Car')
+class VehicleType(models.IntegerChoices):
+    CAR = (1, 'Road Car')
+    BIKE = (2, 'Bike')
+    TRACK = (3, 'Track Car')
 
 
 class VehicleStatus(models.IntegerChoices):
@@ -69,7 +69,7 @@ class Vehicle(models.Model):
     year = models.IntegerField(null=True, blank=True)
     slug = models.SlugField(max_length=50, blank=True)
     id_old = models.IntegerField(null=True, blank=True)
-    vehicle_type = models.CharField(choices=VehicleType.choices, max_length=20)
+    vehicle_type = models.IntegerField(choices=VehicleType.choices, default=VehicleType.CAR)
     status = models.IntegerField(choices=VehicleStatus.choices, default=VehicleStatus.BUILDING)
     external_owner = models.ForeignKey('consignment.Consigner', null=True, blank=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -123,7 +123,7 @@ class VehicleMarketing(models.Model):
     model = models.CharField(max_length=255, blank=True)
     year = models.IntegerField(null=True, blank=True)
     slug = models.SlugField(max_length=50, blank=True)
-    vehicle_type = models.CharField(choices=VehicleType.choices, max_length=20)
+    vehicle_type = models.IntegerField(choices=VehicleType.choices, default=VehicleType.CAR)
     status = models.IntegerField(choices=VehicleStatus.choices, default=VehicleStatus.BUILDING)
     weighting = models.IntegerField(null=True, blank=True)
 

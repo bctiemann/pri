@@ -149,6 +149,12 @@ class LegacyPostView(APIView):
             view = GetVehiclesView()
             return view.get(request)
 
+        # TODO: 'getVehicle'
+        # TODO: 'getVehiclePics'
+        # TODO: 'validateRentalIdentity'
+        # TODO: 'validateRentalPayment'
+        # TODO: 'getNews'
+
         return Response({})
 
 

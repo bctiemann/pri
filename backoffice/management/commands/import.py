@@ -6,19 +6,14 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils.text import slugify
 
-from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus, TransmissionType, Location
+from fleet.models import Vehicle, VehicleMarketing, TransmissionType, Location
 from users.models import Customer, User, MusicGenre
 from sales.models import Reservation
-from consignment.models import Consigner, ConsignmentVehicle
+from consignment.models import Consigner
 from pri.cipher import AESCipher
 
 logger = logging.getLogger(__name__)
 
-VEHICLE_TYPE_MAP = {
-    1: VehicleType.CAR,
-    2: VehicleType.BIKE,
-    3: VehicleType.TRACK,
-}
 
 TRANSMISSION_TYPE_MAP = {
     1: TransmissionType.MANUAL,
@@ -92,7 +87,7 @@ class Command(BaseCommand):
                     year=old['year'],
                     slug=slug,
                     id_old=old['vehicleid'],
-                    vehicle_type=VEHICLE_TYPE_MAP.get(old['type']),
+                    vehicle_type=old['type'],
                     status=0,
                     plate=old['plate'],
                     vin=old['vin'],
@@ -117,7 +112,7 @@ class Command(BaseCommand):
                     make=old['make'],
                     model=old['model'],
                     year=old['year'],
-                    vehicle_type=VEHICLE_TYPE_MAP.get(old['type']),
+                    vehicle_type=old['type'],
                     status=old_front['status'],
                     horsepower=old_front['hp'],
                     torque=old_front['tq'],
@@ -312,19 +307,18 @@ class Command(BaseCommand):
                 )
 
         if 'do_consignmentvehicles' in self.enabled:
-            if clear_existing:
-                ConsignmentVehicle.objects.all().delete()
             back_cursor.execute("""SELECT * FROM ConsignmentVehicles""")
             for old in back_cursor.fetchall():
                 print(old)
                 try:
                     consigner = Consigner.objects.get(id_old=old['consignerid'])
                 except Consigner.DoesNotExist:
-                    pass
+                    consigner = None
                 try:
                     vehicle = Vehicle.objects.get(id_old=old['vehicleid'])
                 except Vehicle.DoesNotExist:
-                    pass
-                vehicle.external_owner = consigner
-                vehicle.save()
+                    vehicle = None
+                if vehicle and consigner:
+                    vehicle.external_owner = consigner
+                    vehicle.save()
 
