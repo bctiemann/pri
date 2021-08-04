@@ -24,5 +24,5 @@ urlpatterns = [
     path('vehicles/<int:pk>/inspection/', views.VehicleInspectionView.as_view(), name='vehicle-inspection'),
     path('vehicles/<int:pk>/pictures/', views.VehiclePicturesView.as_view(), name='vehicle-pictures'),
     path('vehicles/<int:vehicle_id>/<str:media_type>/<int:pk>/promote/', views.VehicleMediaPromoteView.as_view(), name='vehicle-media-promote'),
-    path('vehicles/<str:vehicle_type>/', views.VehicleListView.as_view(), name='vehicle-list'),
+    path('vehicles/type_<int:vehicle_type>/', views.VehicleListView.as_view(), name='vehicle-list'),
 ]

@@ -77,6 +77,7 @@ class VehicleViewMixin:
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        print(self.kwargs)
         if 'vehicle_type' in self.kwargs:
             queryset = queryset.filter(vehicle_type=self.kwargs['vehicle_type'])
         elif self.active_only:
