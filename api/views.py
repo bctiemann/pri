@@ -14,7 +14,7 @@ from sales.models import Reservation, generate_code
 from sales.enums import ReservationType
 from users.models import User, Customer, generate_password
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture
-from api.serializers import VehicleSerializer
+from api.serializers import VehicleSerializer, VehicleDetailSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +25,17 @@ class GetVehiclesView(APIView):
         vehicles = VehicleMarketing.objects.all()
         serializer = VehicleSerializer(vehicles, many=True)
         return Response(serializer.data)
+
+
+class GetVehicleView(APIView):
+
+    def get(self, request, vehicle_id):
+        try:
+            vehicle = VehicleMarketing.objects.get(pk=vehicle_id)
+        except VehicleMarketing.DoesNotExist:
+            raise Http404
+        serializer = VehicleDetailSerializer(vehicle)
+        return Response({'vehicle': serializer.data})
 
 
 class ValidateRentalDetailsView(APIView):

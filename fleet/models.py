@@ -1,11 +1,13 @@
 import uuid
 import os
+import json
 
 from encrypted_fields import fields
 from django_countries.fields import CountryField
 from PIL import Image
 from io import BytesIO
 from phonenumber_field.modelfields import PhoneNumberField
+from precise_bbcode.bbcode import get_parser
 
 from django.conf import settings
 from django.db import models
@@ -176,6 +178,19 @@ class VehicleMarketing(models.Model):
         if self.specs:
             return self.specs.get('headline')
         return ''
+
+    @property
+    def specs_json(self):
+        return json.dumps(self.specs)
+
+    @property
+    def extra_miles_choices(self):
+        return list(settings.EXTRA_MILES_PRICES.values())
+
+    @property
+    def blurb_parsed(self):
+        parser = get_parser()
+        return parser.render(self.blurb)
 
     def __str__(self):
         return f'[{self.id}] {self.vehicle_name}'
