@@ -137,6 +137,11 @@ class VehicleMarketing(models.Model):
     thumbnail_width = models.IntegerField(null=True, blank=True)
     thumbnail_height = models.IntegerField(null=True, blank=True)
 
+    # Mobile app vehicle listing table icon
+    mobile_thumbnail_image = models.ImageField(null=True, blank=True, width_field='mobile_thumbnail_width', height_field='mobile_thumbnail_height', upload_to=get_vehicle_picture_path)
+    mobile_thumbnail_width = models.IntegerField(null=True, blank=True)
+    mobile_thumbnail_height = models.IntegerField(null=True, blank=True)
+
     # Vector from multiple angles, used for marking damage on rentals
     inspection_image = models.ImageField(null=True, blank=True, width_field='inspection_width', height_field='inspection_height', upload_to=get_vehicle_picture_path)
     inspection_width = models.IntegerField(null=True, blank=True)

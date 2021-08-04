@@ -84,6 +84,8 @@ urlpatterns = [
 
     # Handle legacy calls from mobile app
     path('ajax_post.cfm', api_views.LegacyPostView.as_view(), name='legacy-post'),
+    path('pics/PRI-<int:vehicle_picture_id>.jpg', api_views.LegacyVehiclePicView.as_view(), name='legacy-vehicle-picture'),
+    path('images/<int:vehicle_id>-thumb-mobile.png', api_views.LegacyVehicleMobileThumbnailView.as_view(), name='legacy-vehicle-mobile-thumbnail'),
 
     # This is an example of an app's own namespaced urls.py being included in the main one at a mount point.
     # This app contains the legacy site's administrative/business UI.

@@ -7,12 +7,13 @@ from rest_framework.exceptions import APIException
 from django.urls import reverse_lazy, reverse
 from django.db import IntegrityError
 from django.contrib.auth import authenticate, login
+from django.http import Http404, HttpResponseRedirect
 
 from sales.forms import ReservationRentalDetailsForm, ReservationRentalPaymentForm, ReservationRentalLoginForm
 from sales.models import Reservation, generate_code
 from sales.enums import ReservationType
 from users.models import User, Customer, generate_password
-from fleet.models import Vehicle, VehicleMarketing
+from fleet.models import Vehicle, VehicleMarketing, VehiclePicture
 from api.serializers import VehicleSerializer
 
 logger = logging.getLogger(__name__)
@@ -149,3 +150,23 @@ class LegacyPostView(APIView):
             return view.get(request)
 
         return Response({})
+
+
+class LegacyVehicleMobileThumbnailView(APIView):
+
+    def get(self, request, vehicle_id):
+        try:
+            vehicle_marketing = VehicleMarketing.objects.get(pk=vehicle_id)
+        except VehicleMarketing.DoesNotExist:
+            raise Http404
+        return HttpResponseRedirect(vehicle_marketing.mobile_thumbnail_image.url)
+
+
+class LegacyVehiclePicView(APIView):
+
+    def get(self, request, vehicle_picture_id):
+        try:
+            vehicle_picture = VehiclePicture.objects.get(pk=vehicle_picture_id)
+        except VehiclePicture.DoesNotExist:
+            raise Http404
+        return HttpResponseRedirect(vehicle_picture.image.url)
