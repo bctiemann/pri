@@ -12,8 +12,18 @@ from sales.forms import ReservationRentalDetailsForm, ReservationRentalPaymentFo
 from sales.models import Reservation, generate_code
 from sales.enums import ReservationType
 from users.models import User, Customer, generate_password
+from fleet.models import Vehicle, VehicleMarketing
+from api.serializers import VehicleSerializer
 
 logger = logging.getLogger(__name__)
+
+
+class GetVehiclesView(APIView):
+
+    def get(self, request):
+        vehicles = VehicleMarketing.objects.all()
+        serializer = VehicleSerializer(vehicles, many=True)
+        return Response(serializer.data)
 
 
 class ValidateRentalDetailsView(APIView):
@@ -126,3 +136,16 @@ class ValidateRentalPaymentView(APIView):
             'customer_site_url': reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': confirmation_code}),
         }
         return Response(response)
+
+
+# Single entrypoint to handle all API calls from mobile app
+class LegacyPostView(APIView):
+
+    def post(self, request):
+        method = request.POST.get('method')
+
+        if method == 'getVehicles':
+            view = GetVehiclesView()
+            return view.get(request)
+
+        return Response({})
