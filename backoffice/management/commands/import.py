@@ -9,7 +9,7 @@ from django.utils.text import slugify
 from django.core.files.temp import NamedTemporaryFile
 from django.core.files import File
 
-from fleet.models import Vehicle, VehicleMarketing, TransmissionType, Location, get_vehicle_picture_path
+from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, TransmissionType, Location, get_vehicle_picture_path
 from users.models import Customer, User, MusicGenre
 from sales.models import Reservation
 from consignment.models import Consigner
@@ -37,10 +37,11 @@ class Command(BaseCommand):
 
     enabled = {
         'do_vehicles': True,
-        # 'do_customers': True,
-        # 'do_reservations': True,
-        # 'do_consigners': True,
-        # 'do_consignmentvehicles': True,
+        'do_vehicle_pics': True,
+        'do_customers': True,
+        'do_reservations': True,
+        'do_consigners': True,
+        'do_consignmentvehicles': True,
     }
 
     def add_arguments(self, parser):
@@ -61,6 +62,27 @@ class Command(BaseCommand):
         url = f'{SITE_ROOT}images/{vehicle_id_old}-showcase.jpg'
         image_tempfile = self.get_image_tempfile(url)
         vehicle_marketing.showcase_image.save(get_vehicle_picture_path(None, 'temp.jpg'), File(image_tempfile))
+        vehicle_marketing.save()
+
+    def import_thumbnail_image(self, vehicle_marketing, vehicle_id_old):
+        url = f'{SITE_ROOT}images/{vehicle_id_old}-thumb.jpg'
+        image_tempfile = self.get_image_tempfile(url)
+        vehicle_marketing.thumbnail_image.save(get_vehicle_picture_path(None, 'temp.jpg'), File(image_tempfile))
+        vehicle_marketing.save()
+
+    def import_vehicle_picture_image(self, vehicle_picture, vehicle_pic_id_old, ext):
+        url = f'{SITE_ROOT}pics/PRI-{vehicle_pic_id_old}.{ext}'
+        image_tempfile = self.get_image_tempfile(url)
+        vehicle_picture.image.save(get_vehicle_picture_path(None, f'temp.{ext}'), File(image_tempfile))
+        thumb_url = f'{SITE_ROOT}pics/PRI-{vehicle_pic_id_old}.thumb.{ext}'
+        thumb_tempfile = self.get_image_tempfile(thumb_url)
+        vehicle_picture.thumbnail.save(get_vehicle_picture_path(None, f'temp.{ext}'), File(thumb_tempfile))
+        vehicle_picture.save()
+
+    def import_inspection_image(self, vehicle_marketing, vehicle_id_old):
+        url = f'{SITE_SEC_ROOT}spork/carcheck/{vehicle_id_old}.png'
+        image_tempfile = self.get_image_tempfile(url)
+        vehicle_marketing.inspection_image.save(get_vehicle_picture_path(None, 'temp.png'), File(image_tempfile))
         vehicle_marketing.save()
 
     def handle(self, *args, **options):
@@ -153,6 +175,29 @@ class Command(BaseCommand):
                 new.status = old_front['status']
                 new.save()
                 self.import_showcase_image(new_front, old['vehicleid'])
+                self.import_thumbnail_image(new_front, old['vehicleid'])
+                self.import_inspection_image(new_front, old['vehicleid'])
+
+        if 'do_vehicle_pics' in self.enabled:
+            if clear_existing:
+                VehiclePicture.objects.all().delete()
+            front_cursor.execute("""SELECT * FROM VPics""")
+            for old in front_cursor.fetchall():
+                print(old)
+                try:
+                    vehicle = Vehicle.objects.get(id_old=old['vehicleid'])
+                except Vehicle.DoesNotExist:
+                    continue
+                try:
+                    vehicle_marketing = VehicleMarketing.objects.get(vehicle_id=vehicle.id)
+                except VehicleMarketing.DoesNotExist:
+                    continue
+                print(vehicle_marketing)
+                new = VehiclePicture.objects.create(
+                    vehicle_marketing=vehicle_marketing,
+                    is_first=old['isfirst'],
+                )
+                self.import_vehicle_picture_image(new, old['vpicsid'], old['fext'])
 
         if 'do_customers' in self.enabled:
             if clear_existing:

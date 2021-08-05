@@ -19,19 +19,15 @@
 <h3>Pics (1000x672)</h3>
 
 {% for picture in vehicle_marketing.pics.all %}
-<cfoutput query="VPics">
     <div class="vpic-container">
-        <a href="#OnSite#pics/PRI-#vpicsid#.#fext#" target="_blank">
-            <img class="vpic" src="{{ picture.image.url }}" />
+        <a href="{{ picture.image.url }}" target="_blank">
+            <img class="vpic" src="{{ picture.thumbnail.url }}" />
         </a>
         <span class="vpic-delete ui-icon ui-icon-trash" vpicsid="{{ picture.id }}"></span>
         {% if not picture.is_first %}
-        <cfif isfirst IS 0>
             <span class="vpic-makefirst ui-icon ui-icon-star" vpicsid="{{ picture.id }}"></span>
-        </cfif>
         {% endif %}
     </div>
-</cfoutput>
 {% endfor %}
 
 <div class="upload-form" id="vpics_upload">

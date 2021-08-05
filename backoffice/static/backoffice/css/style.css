@@ -1057,7 +1057,7 @@ img.showcase,
 img.thumbnail {
 	border: 1px solid #888;
 	border-radius: 2px;
-	width: 150px;
+	/*width: 150px;*/
 }
 .vpic-container .ui-icon,
 .vvid-container .ui-icon,
