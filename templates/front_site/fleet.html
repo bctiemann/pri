@@ -76,8 +76,8 @@
                             <div class="ih-item circle effect4 left_to_right price-bubble">
                                 <a href="#OnSecSite#reserve.cfm?vid=#vehicleid#">
                                 <div class="img">
-                                    <img class="click-to-reserve" src="images/ClickToReserve.png" />
-                                    <img src="images/price-bg.jpg" alt="img"><span class="price-centered"><p class="price">#NumberFormat(VehicleFront.price,"$,")#</p>/day</span>
+                                    <img class="click-to-reserve" src="{% static "images/ClickToReserve.png" %}" />
+                                    <img src="{% static "images/price-bg.jpg" %}" alt="img"><span class="price-centered"><p class="price">#NumberFormat(VehicleFront.price,"$,")#</p>/day</span>
                                 </div>
                                 <div class="info">
                                     <h3>Reserve Now</h3>
