@@ -1,12 +1,15 @@
 import MySQLdb
 import logging
 import json
+import requests
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils.text import slugify
+from django.core.files.temp import NamedTemporaryFile
+from django.core.files import File
 
-from fleet.models import Vehicle, VehicleMarketing, TransmissionType, Location
+from fleet.models import Vehicle, VehicleMarketing, TransmissionType, Location, get_vehicle_picture_path
 from users.models import Customer, User, MusicGenre
 from sales.models import Reservation
 from consignment.models import Consigner
@@ -26,15 +29,18 @@ LOCATION_MAP = {
     2: Location.TAMPA,
 }
 
+SITE_ROOT = 'http://172.16.0.5/prinew/root/'
+SITE_SEC_ROOT = 'http://172.16.0.5/prinew/secure/'
+
 
 class Command(BaseCommand):
 
     enabled = {
         'do_vehicles': True,
-        'do_customers': True,
-        'do_reservations': True,
-        'do_consigners': True,
-        'do_consignmentvehicles': True,
+        # 'do_customers': True,
+        # 'do_reservations': True,
+        # 'do_consigners': True,
+        # 'do_consignmentvehicles': True,
     }
 
     def add_arguments(self, parser):
@@ -43,6 +49,19 @@ class Command(BaseCommand):
 
     def decrypt(self, value):
         return self.aes.decrypt(value) if value else ''
+
+    def get_image_tempfile(self, url):
+        r = requests.get(url)
+        img_temp = NamedTemporaryFile(delete=True)
+        img_temp.write(r.content)
+        img_temp.flush()
+        return img_temp
+
+    def import_showcase_image(self, vehicle_marketing, vehicle_id_old):
+        url = f'{SITE_ROOT}images/{vehicle_id_old}-showcase.jpg'
+        image_tempfile = self.get_image_tempfile(url)
+        vehicle_marketing.showcase_image.save(get_vehicle_picture_path(None, 'temp.jpg'), File(image_tempfile))
+        vehicle_marketing.save()
 
     def handle(self, *args, **options):
         key = options.get('key', None)
@@ -133,6 +152,7 @@ class Command(BaseCommand):
                 )
                 new.status = old_front['status']
                 new.save()
+                self.import_showcase_image(new_front, old['vehicleid'])
 
         if 'do_customers' in self.enabled:
             if clear_existing:

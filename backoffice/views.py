@@ -184,7 +184,19 @@ class VehicleCreateView(VehicleViewMixin, CreateView):
         return reverse('backoffice:vehicle-detail', kwargs={'pk': self.object.id})
 
 
-class VehicleShowcaseView(UpdateView):
+# Image AJAX subviews for vehicle assets
+
+class VehicleMarketingLookupMixin:
+
+    def get_object(self):
+        try:
+            obj = VehicleMarketing.objects.get(vehicle_id=self.kwargs['pk'])
+        except VehicleMarketing.DoesNotExist:
+            raise Http404
+        return obj
+
+
+class VehicleShowcaseView(VehicleMarketingLookupMixin, UpdateView):
     template_name = 'backoffice/ajax/showcase.html'
     model = VehicleMarketing
     form_class = VehicleShowcaseForm
@@ -193,7 +205,7 @@ class VehicleShowcaseView(UpdateView):
         return reverse('backoffice:vehicle-detail', kwargs={'pk': self.object.vehicle_id})
 
 
-class VehicleThumbnailView(UpdateView):
+class VehicleThumbnailView(VehicleMarketingLookupMixin, UpdateView):
     template_name = 'backoffice/ajax/thumbnail.html'
     model = VehicleMarketing
     form_class = VehicleThumbnailForm
@@ -202,7 +214,7 @@ class VehicleThumbnailView(UpdateView):
         return reverse('backoffice:vehicle-detail', kwargs={'pk': self.object.vehicle_id})
 
 
-class VehicleInspectionView(UpdateView):
+class VehicleInspectionView(VehicleMarketingLookupMixin, UpdateView):
     template_name = 'backoffice/ajax/inspection.html'
     model = VehicleMarketing
     form_class = VehicleInspectionForm
@@ -219,7 +231,7 @@ class VehiclePicturesView(CreateView):
 
     def dispatch(self, request, *args, **kwargs):
         try:
-            self.vehicle_marketing = VehicleMarketing.objects.get(pk=kwargs['pk'])
+            self.vehicle_marketing = VehicleMarketing.objects.get(vehicle_id=kwargs['pk'])
         except VehicleMarketing.DoesNotExist:
             raise Http404
         return super().dispatch(request, *args, **kwargs)

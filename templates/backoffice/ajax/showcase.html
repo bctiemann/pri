@@ -20,7 +20,7 @@
 {% endif %}
 
 <div class="upload-form" id="showcase_upload">
-    <form method="POST" action="{% url "backoffice:vehicle-showcase" pk=vehiclemarketing.pk %}" enctype="multipart/form-data" id="showcase_form">
+    <form method="POST" action="{% url "backoffice:vehicle-showcase" pk=vehiclemarketing.vehicle_id %}" enctype="multipart/form-data" id="showcase_form">
         {{ form.showcase_image }}
         <cfinput type="file" name="showcaseup" />
         <cfinput type="hidden" name="vehicleid" value="#URL.vehicleid#" />
