@@ -45,23 +45,33 @@
     </div>
     </section>
 
-
+    {% comment %}
     <CFQUERY NAME="tweets" DATASOURCE="#FDSN#">
     SELECT text,stamp FROM tweets
     ORDER BY stamp DESC
     LIMIT 2
     </CFQUERY>
+    {% endcomment %}
 
     <section class='footer-container l-col-4'>
-    <span>Twitter</span> <small><i><a target="_blank" href="http://twitter.com/PerfRentals">@PerfRentals</a></i></small>
-    <br /><br />
-    <CFIF tweets.recordcount GT 0>
-    <CFOUTPUT QUERY="tweets">
-    <p class="tweet">#text#<br /><small class="er">#DateFormat(stamp,"mm/dd/yy")# @ #TimeFormat(stamp,"HH:mm")#</small></p><br />
-    </CFOUTPUT>
-    <CFELSE>
-    No tweets.
-    </CFIF>
+
+        {# Official Twitter timeline embed #}
+        <a class="twitter-timeline" data-width="320" data-height="200" data-theme="dark" href="https://twitter.com/PerfRentals?ref_src=twsrc%5Etfw">Tweets by PerfRentals</a>
+        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+        {# Locally cached tweets feed #}
+        {% comment %}
+        <span>Twitter</span> <small><i><a target="_blank" href="http://twitter.com/PerfRentals">@PerfRentals</a></i></small>
+        <br /><br />
+        <CFIF tweets.recordcount GT 0>
+        <CFOUTPUT QUERY="tweets">
+        <p class="tweet">#text#<br /><small class="er">#DateFormat(stamp,"mm/dd/yy")# @ #TimeFormat(stamp,"HH:mm")#</small></p><br />
+        </CFOUTPUT>
+        <CFELSE>
+        No tweets.
+        </CFIF>
+        {% endcomment %}
+
     </section>
     <section class='footer-container l-col-4 l-lastcol'>
     <span>Follow Performance Rentals</span>
