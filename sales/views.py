@@ -64,3 +64,12 @@ class ReserveView(NavMenuMixin, FormView):
         context['payment_form'] = self.get_payment_form()
         context['login_form'] = self.get_login_form()
         return context
+
+
+class PerformanceExperienceView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/performance_experience.html'
+
+    def get_context_data(self, slug=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['vehicle_type'] = VehicleType
+        return context
