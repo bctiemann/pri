@@ -224,10 +224,7 @@ class Command(BaseCommand):
                 try:
                     customer = Customer.objects.get(user__isnull=False, user=user)
                 except Customer.DoesNotExist:
-                    try:
-                        music_genre = MusicGenre.objects.get(pk=old['musicgenre'])
-                    except MusicGenre.DoesNotExist:
-                        music_genre = None
+                    music_genre = MusicGenre.objects.filter(pk=old['musicgenre']).first()
                     new = Customer.objects.create(
                         user=user,
                         id_old=old['customerid'],
@@ -309,14 +306,8 @@ class Command(BaseCommand):
             back_cursor.execute("""SELECT * FROM Reservations""")
             for old in back_cursor.fetchall():
                 print(old['reservationid'])
-                try:
-                    customer = Customer.objects.get(id_old=old['customerid'])
-                except Customer.DoesNotExist:
-                    customer = None
-                try:
-                    vehicle = Vehicle.objects.get(id_old=old['vehicleid'])
-                except Vehicle.DoesNotExist:
-                    vehicle = None
+                customer = Customer.objects.filter(id_old=old['customerid']).first()
+                vehicle = Vehicle.objects.filter(id_old=old['vehicleid']).first()
                 new = Reservation.objects.create(
                     customer=customer,
                     vehicle=vehicle,
@@ -375,14 +366,8 @@ class Command(BaseCommand):
             back_cursor.execute("""SELECT * FROM ConsignmentVehicles""")
             for old in back_cursor.fetchall():
                 print(old)
-                try:
-                    consigner = Consigner.objects.get(id_old=old['consignerid'])
-                except Consigner.DoesNotExist:
-                    consigner = None
-                try:
-                    vehicle = Vehicle.objects.get(id_old=old['vehicleid'])
-                except Vehicle.DoesNotExist:
-                    vehicle = None
+                consigner = Consigner.objects.filter(id_old=old['consignerid']).first()
+                vehicle = Vehicle.objects.filter(id_old=old['vehicleid']).first()
                 if vehicle and consigner:
                     vehicle.external_owner = consigner
                     vehicle.save()

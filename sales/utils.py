@@ -33,6 +33,7 @@ class PriceCalculator:
 class RentalPriceCalculator(PriceCalculator):
     """
     Price is calculated as follows:
+    - Calculator is inited with vehicle, # days, coupon code, email, extra miles, and tax zip
     - Base price is daily rate * number of days
     - Subtract multi-day discount
     - Subtract coupon discount
@@ -52,19 +53,11 @@ class RentalPriceCalculator(PriceCalculator):
     def __init__(self, vehicle_marketing, num_days, coupon_code=None, email=None, extra_miles=None, tax_zip=None):
         self.vehicle_marketing = vehicle_marketing
         self.num_days = num_days
+        self.coupon = Coupon.objects.filter(code=coupon_code).first()
+        self.customer = Customer.objects.filter(user__email=email).first()
         self.extra_miles = int(extra_miles)
         self.tax_zip = tax_zip
         self.tax_rate, tax_rate_created = TaxRate.objects.get_or_create(postal_code=tax_zip)
-
-        try:
-            self.coupon = Coupon.objects.get(code=coupon_code)
-        except Coupon.DoesNotExist:
-            pass
-
-        try:
-            self.customer = Customer.objects.get(user__email=email)
-        except Customer.DoesNotExist:
-            pass
 
     def quantize_currency(self, value):
         # return f'{decimal.Decimal(value).quantize(self.cents, decimal.ROUND_HALF_UP)}'
@@ -80,20 +73,28 @@ class RentalPriceCalculator(PriceCalculator):
             return self.vehicle_marketing.discount_2_day
         return 0
 
-    def get_multi_day_discount(self, value):
+    def get_multi_day_discount(self, value=None):
+        if not value:
+            value = self.base_price
         return value * self.multi_day_discount_pct / 100
 
-    def get_coupon_discount(self, value):
+    def get_coupon_discount(self, value=None):
         if not self.coupon:
             return 0
+        if not value:
+            value = self.post_multi_day_discount_subtotal
         return self.coupon.get_discount_value(value)
 
-    def get_customer_discount(self, value):
+    def get_customer_discount(self, value=None):
+        if not value:
+            value = self.post_coupon_discount_subtotal
         if self.customer and self.customer.discount_pct:
             return value * self.customer.discount_pct / 100
         return 0
 
-    def get_tax_amount(self, value):
+    def get_tax_amount(self, value=None):
+        if not value:
+            value = self.pre_tax_subtotal
         return float(self.tax_rate.total_rate) * value
 
     @property
@@ -149,14 +150,14 @@ class RentalPriceCalculator(PriceCalculator):
             tax_rate=self.tax_rate.total_rate,
             customer_id=self.customer.id if self.customer else None,
             base_price=self.quantize_currency(self.base_price),
-            multi_day_discount=self.quantize_currency(self.get_multi_day_discount(self.base_price)),
+            multi_day_discount=self.quantize_currency(self.get_multi_day_discount()),
             multi_day_discount_pct=self.multi_day_discount_pct,
-            coupon_discount=self.quantize_currency(self.get_coupon_discount(self.post_multi_day_discount_subtotal)),
-            customer_discount=self.quantize_currency(self.get_customer_discount(self.post_coupon_discount_subtotal)),
+            coupon_discount=self.quantize_currency(self.get_coupon_discount()),
+            customer_discount=self.quantize_currency(self.get_customer_discount()),
             extra_miles=self.extra_miles,
             extra_miles_cost=self.quantize_currency(self.extra_miles_cost),
             subtotal=self.quantize_currency(self.pre_tax_subtotal),
             total_with_tax=self.quantize_currency(self.total_with_tax),
             reservation_deposit=self.quantize_currency(self.reservation_deposit),
-            tax_amount=self.quantize_currency(self.get_tax_amount(self.pre_tax_subtotal)),
+            tax_amount=self.quantize_currency(self.get_tax_amount()),
         )

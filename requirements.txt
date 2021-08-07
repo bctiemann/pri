@@ -17,3 +17,4 @@ english-words==1.0.3
 django-precise-bbcode==1.2.13
 django-credit-cards==0.4.1
 python-dateutil==2.8.2
+pytest-django==4.4.0
