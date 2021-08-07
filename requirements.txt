@@ -15,3 +15,5 @@ django-localflavor==3.1
 avalara==21.6.0
 english-words==1.0.3
 django-precise-bbcode==1.2.13
+django-credit-cards==0.4.1
+python-dateutil==2.8.2
