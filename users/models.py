@@ -154,7 +154,6 @@ class User(AbstractBaseUser):
 class Customer(models.Model):
     user = models.OneToOneField('users.User', null=True, blank=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
-    id_old = models.IntegerField(null=True, blank=True)
 
     first_name = models.CharField(_('first name'), max_length=30)
     last_name = models.CharField(_('last name'), max_length=30)

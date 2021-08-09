@@ -26,7 +26,6 @@ class BaseReservation(models.Model):
 
     vehicle = models.ForeignKey('fleet.Vehicle', null=True, blank=True, on_delete=models.SET_NULL)
     customer = models.ForeignKey('users.Customer', null=True, blank=True, on_delete=models.SET_NULL)
-    id_old = models.IntegerField(null=True, blank=True)
     reserved_at = models.DateTimeField(auto_now_add=True)
     out_at = models.DateTimeField(null=True, blank=True)
     back_at = models.DateTimeField(null=True, blank=True)

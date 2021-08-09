@@ -58,29 +58,29 @@ class Command(BaseCommand):
         img_temp.flush()
         return img_temp
 
-    def import_showcase_image(self, vehicle_marketing, vehicle_id_old):
-        url = f'{SITE_ROOT}images/{vehicle_id_old}-showcase.jpg'
+    def import_showcase_image(self, vehicle_marketing, vehicle_id):
+        url = f'{SITE_ROOT}images/{vehicle_id}-showcase.jpg'
         image_tempfile = self.get_image_tempfile(url)
         vehicle_marketing.showcase_image.save(get_vehicle_picture_path(None, 'temp.jpg'), File(image_tempfile))
         vehicle_marketing.save()
 
-    def import_thumbnail_image(self, vehicle_marketing, vehicle_id_old):
-        url = f'{SITE_ROOT}images/{vehicle_id_old}-thumb.jpg'
+    def import_thumbnail_image(self, vehicle_marketing, vehicle_id):
+        url = f'{SITE_ROOT}images/{vehicle_id}-thumb.jpg'
         image_tempfile = self.get_image_tempfile(url)
         vehicle_marketing.thumbnail_image.save(get_vehicle_picture_path(None, 'temp.jpg'), File(image_tempfile))
         vehicle_marketing.save()
 
-    def import_vehicle_picture_image(self, vehicle_picture, vehicle_pic_id_old, ext):
-        url = f'{SITE_ROOT}pics/PRI-{vehicle_pic_id_old}.{ext}'
+    def import_vehicle_picture_image(self, vehicle_picture, vehicle_pic_id, ext):
+        url = f'{SITE_ROOT}pics/PRI-{vehicle_pic_id}.{ext}'
         image_tempfile = self.get_image_tempfile(url)
         vehicle_picture.image.save(get_vehicle_picture_path(None, f'temp.{ext}'), File(image_tempfile))
-        thumb_url = f'{SITE_ROOT}pics/PRI-{vehicle_pic_id_old}.thumb.{ext}'
+        thumb_url = f'{SITE_ROOT}pics/PRI-{vehicle_pic_id}.thumb.{ext}'
         thumb_tempfile = self.get_image_tempfile(thumb_url)
         vehicle_picture.thumbnail.save(get_vehicle_picture_path(None, f'temp.{ext}'), File(thumb_tempfile))
         vehicle_picture.save()
 
-    def import_inspection_image(self, vehicle_marketing, vehicle_id_old):
-        url = f'{SITE_SEC_ROOT}spork/carcheck/{vehicle_id_old}.png'
+    def import_inspection_image(self, vehicle_marketing, vehicle_id):
+        url = f'{SITE_SEC_ROOT}spork/carcheck/{vehicle_id}.png'
         image_tempfile = self.get_image_tempfile(url)
         vehicle_marketing.inspection_image.save(get_vehicle_picture_path(None, 'temp.png'), File(image_tempfile))
         vehicle_marketing.save()
@@ -123,11 +123,11 @@ class Command(BaseCommand):
                 print(old['make'], old['model'])
                 slug = slugify(f'{old["make"]}-{old["model"]}')
                 new = Vehicle.objects.create(
+                    id=old['vehicleid'],
                     make=old['make'],
                     model=old['model'],
                     year=old['year'],
                     slug=slug,
-                    id_old=old['vehicleid'],
                     vehicle_type=old['type'],
                     status=0,
                     plate=old['plate'],
@@ -147,6 +147,7 @@ class Command(BaseCommand):
                 front_cursor.execute("""SELECT * FROM VehiclesFront where vehicleid=%s""", old['vehicleid'])
                 old_front = front_cursor.fetchone()
                 new_front = VehicleMarketing.objects.create(
+                    id=new.id,
                     vehicle_id=new.id,
                     slug=slug,
                     weighting=old['weighting'],
@@ -185,7 +186,7 @@ class Command(BaseCommand):
             for old in front_cursor.fetchall():
                 print(old)
                 try:
-                    vehicle = Vehicle.objects.get(id_old=old['vehicleid'])
+                    vehicle = Vehicle.objects.get(id=old['vehicleid'])
                 except Vehicle.DoesNotExist:
                     continue
                 try:
@@ -226,8 +227,8 @@ class Command(BaseCommand):
                 except Customer.DoesNotExist:
                     music_genre = MusicGenre.objects.filter(pk=old['musicgenre']).first()
                     new = Customer.objects.create(
+                        id=old['customerid'],
                         user=user,
-                        id_old=old['customerid'],
                         first_name=old['fname'],
                         last_name=old['lname'],
                         address_line_1=self.decrypt(old['addr']),
@@ -306,12 +307,12 @@ class Command(BaseCommand):
             back_cursor.execute("""SELECT * FROM Reservations""")
             for old in back_cursor.fetchall():
                 print(old['reservationid'])
-                customer = Customer.objects.filter(id_old=old['customerid']).first()
-                vehicle = Vehicle.objects.filter(id_old=old['vehicleid']).first()
+                customer = Customer.objects.filter(id=old['customerid']).first()
+                vehicle = Vehicle.objects.filter(id=old['vehicleid']).first()
                 new = Reservation.objects.create(
+                    id=old['reservationid'],
                     customer=customer,
                     vehicle=vehicle,
-                    id_old=old['customerid'],
                     out_at=old['dateout'],
                     back_at=old['dateback'],
                     rate=old['rate'],
@@ -352,10 +353,10 @@ class Command(BaseCommand):
                         )
                     user.save()
                 new = Consigner.objects.create(
+                    id=old['consignerid'],
                     user=user,
                     first_name=old['fname'],
                     last_name=old['lname'],
-                    id_old=old['consignerid'],
                     notes=notes,
                     account_number=account_number,
                     routing_number=routing_number,
@@ -366,8 +367,8 @@ class Command(BaseCommand):
             back_cursor.execute("""SELECT * FROM ConsignmentVehicles""")
             for old in back_cursor.fetchall():
                 print(old)
-                consigner = Consigner.objects.filter(id_old=old['consignerid']).first()
-                vehicle = Vehicle.objects.filter(id_old=old['vehicleid']).first()
+                consigner = Consigner.objects.filter(id=old['consignerid']).first()
+                vehicle = Vehicle.objects.filter(id=old['vehicleid']).first()
                 if vehicle and consigner:
                     vehicle.external_owner = consigner
                     vehicle.save()

@@ -17,7 +17,7 @@ class CustomerAdmin(admin.ModelAdmin):
     search_fields = ('user__email', 'first_name', 'last_name',)
     fieldsets = (
         (None, {
-            'fields': ('user', 'first_name', 'last_name', 'id_old',)
+            'fields': ('user', 'first_name', 'last_name',)
         }),
         ('Mailing address', {
             'fields': ('address_line_1', 'address_line_2', 'city', 'state', 'zip',)

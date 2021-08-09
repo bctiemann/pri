@@ -70,7 +70,6 @@ class Vehicle(models.Model):
     model = models.CharField(max_length=255, blank=True)
     year = models.IntegerField(null=True, blank=True)
     slug = models.SlugField(max_length=50, blank=True)
-    id_old = models.IntegerField(null=True, blank=True)
     vehicle_type = models.IntegerField(choices=VehicleType.choices, default=VehicleType.CAR)
     status = models.IntegerField(choices=VehicleStatus.choices, default=VehicleStatus.BUILDING)
     external_owner = models.ForeignKey('consignment.Consigner', null=True, blank=True, on_delete=models.SET_NULL)
