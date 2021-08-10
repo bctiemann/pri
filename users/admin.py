@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from users.models import User, Customer, MusicGenre
+from users.models import User, Employee, Customer, MusicGenre
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -8,6 +8,11 @@ class UserAdmin(admin.ModelAdmin):
     readonly_fields = ('created_by', 'last_login',)
     search_fields = ('email',)
     list_filter = ('is_admin',)
+
+
+class EmployeeAdmin(admin.ModelAdmin):
+    list_display = ('id', 'first_name', 'last_name', 'user',)
+    search_fields = ('user__email', 'first_name', 'last_name',)
 
 
 class CustomerAdmin(admin.ModelAdmin):
@@ -51,5 +56,6 @@ class MusicGenreAdmin(admin.ModelAdmin):
 
 
 admin.site.register(User, UserAdmin)
+admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(Customer, CustomerAdmin)
 admin.site.register(MusicGenre, MusicGenreAdmin)

@@ -12,7 +12,7 @@
                 <CFIF Authority IS 1>!</CFIF>
             </td>
             <td>{{ admin_user.full_name }}</td>
-            <td class="numeric small {{ admin_user.last_activity_class }}">
+            <td class="numeric small {{ admin_user.last_activity_css_class }}">
                 {{ admin_user.admin_last_activity|date:"M d y h:iA" }}
             </td>
             <td>

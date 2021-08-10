@@ -1,5 +1,5 @@
 import random
-from localflavor.us.models import USStateField, USZipCodeField
+from localflavor.us.models import USStateField, USZipCodeField, USSocialSecurityNumberField
 from phonenumber_field.modelfields import PhoneNumberField
 from encrypted_fields import fields
 from english_words import english_words_lower_set
@@ -32,6 +32,10 @@ class LowercaseEmailField(models.EmailField):
         if isinstance(value, str):
             return value.lower()
         return value
+
+
+class EncryptedUSSocialSecurityNumberField(fields.EncryptedFieldMixin, USSocialSecurityNumberField):
+    pass
 
 
 class UserManager(BaseUserManager):
@@ -133,7 +137,7 @@ class User(AbstractBaseUser):
         return (timezone.now() - self.admin_last_activity).total_seconds() > settings.ADMIN_SLEEP_TIMEOUT_SECS
 
     @property
-    def last_activity_class(self):
+    def last_activity_css_class(self):
         if not self.admin_last_activity:
             return None
         last_activity_age_secs = (timezone.now() - self.admin_last_activity).total_seconds()
@@ -148,6 +152,56 @@ class User(AbstractBaseUser):
         if self.customer:
             return f'{self.customer.first_name} {self.customer.last_name}'
         return self.email
+
+
+class Employee(models.Model):
+
+    class Status(models.IntegerChoices):
+        EMPLOYED = (1, 'Employed')
+        SUSPENDED = (2, 'Suspended')
+        FIRED = (3, 'Fired')
+        QUIT = (4, 'Quit')
+
+    class EmploymentType(models.IntegerChoices):
+        CONTRACTOR = (1, '1099')
+        FULLTIME = (2, 'Fulltime')
+        CORP = (3, 'Corp')
+
+    class AccessLevel(models.IntegerChoices):
+        ADMIN = (1, 'Admin')
+        RESERVATIONS = (2, 'Reservations')
+        MAINTENANCE = (3, 'Maintenance')
+        MARKETING = (4, 'Marketing')
+        BBS = (5, 'BBS Only')
+
+    user = models.OneToOneField('users.User', null=True, blank=True, on_delete=models.SET_NULL)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    first_name = models.CharField(_('first name'), max_length=30)
+    last_name = models.CharField(_('last name'), max_length=30)
+
+    # Mailing address, license, and ssn are encrypted
+    address_line_1 = fields.EncryptedCharField(max_length=255)
+    address_line_2 = fields.EncryptedCharField(max_length=255, blank=True)
+    city = models.CharField(max_length=255)
+    state = USStateField()
+    zip = USZipCodeField()
+    work_phone = PhoneNumberField(blank=True)
+    mobile_phone = PhoneNumberField(blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    ssn = EncryptedUSSocialSecurityNumberField(null=True, blank=True)
+    license_number = fields.EncryptedCharField(max_length=30, blank=True)
+    license_state = USStateField(blank=True)
+
+    # Employment details
+    hired_on = models.DateField(null=True, blank=True)
+    status = models.IntegerField(choices=Status.choices, default=Status.EMPLOYED)
+    position = models.CharField(max_length=100, blank=True)
+    employment_type = models.IntegerField(choices=EmploymentType.choices, default=EmploymentType.FULLTIME)
+    hourly_rate = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    access_level = models.IntegerField(choices=AccessLevel.choices, default=AccessLevel.BBS)
+    rfid = fields.EncryptedCharField(max_length=255, blank=True)
+    notes = fields.EncryptedTextField(blank=True)
 
 
 # Customer contains all business data for a customer, and optionally is linked to a login user
