@@ -86,7 +86,7 @@ class User(AbstractBaseUser):
     )
     is_admin = models.BooleanField(default=False, help_text='Designates whether this user has access to the admin and backoffice sites.')
     notes = models.TextField(blank=True)
-    date_joined = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('User', null=True, blank=True, on_delete=models.SET_NULL)
     last_login = models.DateTimeField(null=True, blank=True)
     admin_last_activity = models.DateTimeField(null=True, blank=True)
@@ -202,6 +202,26 @@ class Employee(models.Model):
     access_level = models.IntegerField(choices=AccessLevel.choices, default=AccessLevel.BBS)
     rfid = fields.EncryptedCharField(max_length=255, blank=True)
     notes = fields.EncryptedTextField(blank=True)
+
+    @property
+    def reservations_access(self):
+        return self.access_level in (self.AccessLevel.ADMIN, self.AccessLevel.RESERVATIONS)
+
+    @property
+    def maintenance_access(self):
+        return self.access_level in (self.AccessLevel.ADMIN, self.AccessLevel.MAINTENANCE)
+
+    @property
+    def marketing_access(self):
+        return self.access_level in (self.AccessLevel.ADMIN, self.AccessLevel.MARKETING)
+
+    @property
+    def admin_access(self):
+        return self.access_level == self.AccessLevel.ADMIN
+
+    @property
+    def any_privileged_access(self):
+        return self.access_level != self.AccessLevel.BBS
 
 
 # Customer contains all business data for a customer, and optionally is linked to a login user
