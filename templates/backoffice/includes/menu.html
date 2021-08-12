@@ -217,7 +217,7 @@
 --->
     <CFIF YourID.acclev IS 1>
     <li>
-        <a class="tnav <CFIF scrpt IS "employees.cfm">selected</CFIF>" href="employees.cfm">Employees</a>
+        <a class="tnav {% if page_group == 'employees' %}>selected{% endif %}" href="{% url "backoffice:employee-list" %}">Employees</a>
     </li>
     </CFIF>
 <!---

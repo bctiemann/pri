@@ -1,0 +1,162 @@
+{% extends "backoffice/employee.html" %}
+
+{% block content %}
+
+    {% if employee %}
+        <h2>Edit Employee</h2>
+    {% else %}
+        <h2>Add Employee</h2>
+    {% endif %}
+
+    {{ form }}
+    <cfoutput>
+    <cfform method="POST" action="#CGI.SCRIPT_NAME#">
+    <table class="inputform employees">
+        <tr>
+            <td>First Name</td>
+            <td><cfinput name="fname" value="#Employee.fname#" required="yes" maxlength="150" message="Enter a first name." /></td>
+        </tr>
+        <tr>
+            <td>Last Name</td>
+            <td><cfinput name="lname" value="#Employee.lname#" required="yes" maxlength="150" message="Enter a last name." /></td>
+        </tr>
+        <tr>
+            <td>Username</td>
+            <td><cfinput name="username" value="#Employee.username#" required="yes" maxlength="50" message="Enter a username." /></td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td><cfinput type="email" name="email" value="#Employee.email#" required="yes" validate="email" maxlength="255" message="Enter an email address." /></td>
+        </tr>
+        <tr>
+            <td>Password</td>
+            <td><cfinput name="pass" value="#pass_dec#" required="yes" maxlength="255" message="Enter a password." /></td>
+        </tr>
+        <tr>
+            <td>RFID</td>
+            <td><cfinput name="rfid" value="#Employee.rfid#" required="yes" maxlength="255" message="Enter an RFID tag." /></td>
+        </tr>
+        <tr>
+            <td>Position</td>
+            <td><cfinput name="position" value="#Employee.position#" required="yes" maxlength="100" message="Enter a position." /></td>
+        </tr>
+        <tr>
+            <td>SSN</td>
+            <td><cfinput name="ssn" class="ssn short" value="#Employee.ssn#" validate="ssn" maxlength="255" message="Enter an SSN." /></td>
+        </tr>
+        <tr>
+            <td>Employment Type</td>
+            <td>
+                <cfselect name="emptype">
+                    <option value="1" <cfif Employee.emptype IS 1>selected</cfif>>1099</option>
+                    <option value="2" <cfif Employee.emptype IS 2>selected</cfif>>Fulltime</option>
+                    <option value="3" <cfif Employee.emptype IS 3>selected</cfif>>Corp</option>
+                </cfselect>
+            </td>
+        </tr>
+        <tr>
+            <td>Hourly Rate</td>
+            <cfset rate = Employee.rate GT 0 ? Employee.rate : 1.00>
+            <td class="currency"><span class="currency-prefix">$</span><cfinput name="rate" value="#rate#" maxlength="10" message="Enter an rate." class="short" /></td>
+        </tr>
+        <tr>
+            <td class="label">Access Level</td>
+            <cfset acclev = Admin.acclev GT 0 ? Admin.acclev : 5>
+            <td class="data">
+                <cfselect name="acclev">
+                    <option value="1" <cfif acclev IS 1>selected</cfif>>Admin</option>
+                    <option value="2" <cfif acclev IS 2>selected</cfif>>Reservations</option>
+                    <option value="3" <cfif acclev IS 3>selected</cfif>>Maintenance</option>
+                    <option value="4" <cfif acclev IS 4>selected</cfif>>Marketing</option>
+                    <option value="5" <cfif acclev IS 5>selected</cfif>>BBS Only</option>
+                </cfselect>
+            </td>
+        </tr>
+        <cfif employeeid GT 0>
+        <tr>
+            <td>Status</td>
+            <td>
+                <cfselect name="status">
+                    <option value="1" <CFIF Employee.status IS 1>selected</CFIF>>Employed</option>
+                    <option value="2" <CFIF Employee.status IS 2>selected</CFIF>>Suspended</option>
+                    <option value="3" <CFIF Employee.status IS 3>selected</CFIF>>Fired</option>
+                    <option value="4" <CFIF Employee.status IS 4>selected</CFIF>>Quit</option>
+                </cfselect>
+                <small>Setting other than Employed will remove all admin access.</small>
+            </td>
+        </tr>
+        </cfif>
+        <tr>
+            <td>Address</td>
+            <td><cfinput name="addr" value="#Employee.addr#" maxlength="150" /></td>
+        </tr>
+        <tr>
+            <td>Address Cont</td>
+            <td><cfinput name="addr2" value="#Employee.addr2#" maxlength="100" /></td>
+        </tr>
+        <tr>
+            <td>City</td>
+            <td><cfinput name="city" value="#Employee.city#" maxlength="100" /></td>
+        </tr>
+        <tr>
+            <td>State</td>
+            <td>
+                <cfselect name="state">
+                    <cfloop array="#states#" index="state">
+                        <option value="#state.abbr#" <CFIF Employee.state IS state.abbr>selected</CFIF>>#state.name#</option>
+                    </cfloop>
+                </cfselect>
+            </td>
+        </tr>
+        <tr>
+            <td>ZIP</td>
+            <td><cfinput name="zip" value="#Employee.zip#" maxlength="10" class="short" /></td>
+        </tr>
+        <tr>
+            <td>Home Phone</td>
+            <td><cfinput name="tel" class="phone short" value="#Employee.tel#" maxlength="20" /></td>
+        </tr>
+        <tr>
+            <td>Mobile Phone</td>
+            <td><cfinput name="cel" class="phone short" value="#Employee.cel#" maxlength="20" /></td>
+        </tr>
+        <tr>
+            <td>Date of Birth</td>
+            <td><cfinput name="dob" class="dob short" value="#DateFormat(Employee.dob,"MM/DD/YYYY")#" maxlength="20" /></td>
+        </tr>
+        <tr>
+            <td>License Number</td>
+            <td><cfinput name="licenseno" value="#Employee.licenseno#" maxlength="30" /></td>
+        </tr>
+        <tr>
+            <td>License State</td>
+            <td>
+                <cfselect name="licensestate">
+                    <cfloop array="#states#" index="state">
+                        <option value="#state.abbr#" <CFIF Employee.licensestate IS state.abbr>selected</CFIF>>#state.name#</option>
+                    </cfloop>
+                </cfselect>
+            </td>
+        </tr>
+        <tr>
+            <td class="align-top">Notes</td>
+            <td><cftextarea name="notes">#Employee.notes#</cftextarea></td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>
+                <button class="btn" type="submit" name="submit"><cfif employeeid>Edit<cfelse>Add</cfif></button>
+                <cfif employeeid>
+                    <button class="btn delete" type="submit" name="delete" onclick="return confirmDelete(this.form, 'employee')">Delete Employee</button>
+                </cfif>
+            </td>
+        </tr>
+    </table>
+    <cfinput type="hidden" name="employeeid" value="#employeeid#" />
+    <cfinput type="hidden" name="adminid" value="#Employee.adminid#" />
+    <cfinput type="hidden" name="fnc" value="edit" />
+    </cfform>
+    </cfoutput>
+
+{% endblock %}

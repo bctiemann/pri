@@ -896,8 +896,7 @@ $(document).ready(function() {
         showSurveyDetails($(this).attr('itemid'));
     });
     $('tr.click-to-edit').click(function() {
-        let itemId = $(this).attr('itemid');
-        window.location.href = `/backoffice/vehicles/${itemId}/`;
+        window.location.href = $(this).attr('destination');
     });
 
     // Schedule conflict checking in reservation / rental pages

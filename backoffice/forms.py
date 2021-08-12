@@ -2,6 +2,7 @@ from django import forms
 
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture
 from consignment.models import Consigner
+from users.models import Employee
 
 
 # TODO: Add slug to the visible form fields and set on both models
@@ -47,3 +48,10 @@ class VehiclePictureForm(forms.ModelForm):
     class Meta:
         model = VehiclePicture
         fields = ('image',)
+
+
+class EmployeeForm(forms.ModelForm):
+
+    class Meta:
+        model = Employee
+        fields = '__all__'
