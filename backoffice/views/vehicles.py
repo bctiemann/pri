@@ -7,6 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.http import Http404, HttpResponseRedirect
 from django.db.models import Q
 
+from . import ListViewMixin
 from fleet.models import VehicleType, VehicleStatus, Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo
 from backoffice.forms import (
     VehicleForm, VehicleShowcaseForm, VehicleThumbnailForm, VehicleInspectionForm, VehiclePictureForm,
@@ -20,11 +21,10 @@ class VehicleViewMixin:
     model = Vehicle
     page_group = 'vehicles'
     active_only = False
-    is_create_view = False
 
     @property
     def is_unfiltered_list_view(self):
-        return not self.active_only and not self.kwargs.get('vehicle_type') and not self.is_create_view
+        return not self.active_only and not self.kwargs.get('vehicle_type') and super().is_unfiltered_list_view
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -39,16 +39,13 @@ class VehicleViewMixin:
         context = super().get_context_data(*args, **kwargs)
         context['vehicle_types'] = VehicleType
         context['active_only'] = self.active_only
-        context['is_unfiltered_list_view'] = self.is_unfiltered_list_view
         context['selected_vehicle_type'] = self.kwargs.get('vehicle_type')
-        context['page_group'] = self.page_group
         return context
 
 
-class VehicleListView(VehicleViewMixin, ListView):
+class VehicleListView(VehicleViewMixin, ListViewMixin, ListView):
     template_name = 'backoffice/vehicle_list.html'
-    search_term = None
-    default_sort = '-id'
+    # search_fields = ('make', 'model', 'year',)
     # Set this to allow pagination
     # paginate_by = 10
 
@@ -64,14 +61,8 @@ class VehicleListView(VehicleViewMixin, ListView):
         queryset = queryset.order_by(self.request.GET.get('sortby', self.default_sort))
         return queryset
 
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        context['search_term'] = self.search_term
-        context['sortby'] = self.request.GET.get('sortby', self.default_sort)
-        return context
 
-
-class VehicleDetailView(VehicleViewMixin, UpdateView):
+class VehicleDetailView(VehicleViewMixin, ListViewMixin, UpdateView):
     template_name = 'backoffice/vehicle_detail.html'
     form_class = VehicleForm
     marketing_form_class = VehicleMarketingForm
@@ -107,7 +98,7 @@ class VehicleDetailView(VehicleViewMixin, UpdateView):
         return reverse('backoffice:vehicle-detail', kwargs={'pk': self.object.id})
 
 
-class VehicleCreateView(VehicleViewMixin, CreateView):
+class VehicleCreateView(VehicleViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/vehicle_detail.html'
     form_class = VehicleForm
 
@@ -125,11 +116,6 @@ class VehicleCreateView(VehicleViewMixin, CreateView):
         )
         self.object = vehicle
         return HttpResponseRedirect(self.get_success_url())
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        context['is_create_view'] = True
-        return context
 
     def get_success_url(self):
         return reverse('backoffice:vehicle-detail', kwargs={'pk': self.object.id})

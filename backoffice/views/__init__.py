@@ -49,3 +49,46 @@ class TrackActivityView(APIView):
         return Response({
             'is_sleeping': request.user.is_sleeping,
         })
+
+
+# Mixin for handling navigation pill states in page groups
+
+class ListViewMixin:
+    page_group = None
+    is_create_view = False
+    search_term = None
+    search_fields = None
+    default_sort = '-id'
+
+    @property
+    def is_unfiltered_list_view(self):
+        return not self.kwargs.get('pk') and not self.is_create_view
+
+    # def __init__(self, **kwargs):
+    #     super().__init__(**kwargs)
+    #     self.search_term = self.request.GET.get('query')
+
+    # def get_queryset(self):
+    #     print('in here')
+    #     queryset = super().get_queryset()
+    #     self.search_term = self.request.GET.get('query')
+    #     print(self.search_term, self.search_fields)
+    #     if self.search_term and self.search_fields:
+    #         filters = {f'{field}__icontains': self.search_term for field in self.search_fields}
+    #         print('filters: ', filters)
+    #         queryset = queryset.filter(
+    #             Q(first_name__icontains=self.search_term) |
+    #             Q(last_name__icontains=self.search_term) |
+    #             Q(user__email__icontains=self.search_term)
+    #         )
+    #     queryset = queryset.order_by(self.request.GET.get('sortby', self.default_sort))
+    #     return queryset
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['is_unfiltered_list_view'] = self.is_unfiltered_list_view
+        context['page_group'] = self.page_group
+        context['is_create_view'] = self.is_create_view
+        context['search_term'] = self.search_term
+        context['sortby'] = self.request.GET.get('sortby', self.default_sort)
+        return context
