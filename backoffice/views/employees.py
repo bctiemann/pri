@@ -5,7 +5,6 @@ from django.shortcuts import render, reverse
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView
 from django.http import Http404, HttpResponseRedirect
-from django.db.models import Q
 
 from . import ListViewMixin
 from users.models import Employee
@@ -21,22 +20,7 @@ class EmployeeViewMixin:
 
 class EmployeeListView(EmployeeViewMixin, ListViewMixin, ListView):
     template_name = 'backoffice/employee_list.html'
-    # TODO: search_fields in mixin
-    # search_fields = ('first_name', 'last_name', 'user__email',)
-    # Set this to allow pagination
-    # paginate_by = 10
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        self.search_term = self.request.GET.get('query')
-        if self.search_term:
-            queryset = queryset.filter(
-                Q(first_name__icontains=self.search_term) |
-                Q(last_name__icontains=self.search_term) |
-                Q(user__email__icontains=self.search_term)
-            )
-        queryset = queryset.order_by(self.request.GET.get('sortby', self.default_sort))
-        return queryset
+    search_fields = ('first_name', 'last_name', 'user__email',)
 
 
 class EmployeeDetailView(EmployeeViewMixin, ListViewMixin, UpdateView):

@@ -6,6 +6,7 @@ from django.urls import reverse_lazy
 from django.utils.dateparse import parse_datetime
 from django.views.generic import TemplateView
 from django.contrib.auth.views import LogoutView
+from django.db.models import Q
 
 from users.views import LoginView
 from users.models import User
@@ -51,7 +52,7 @@ class TrackActivityView(APIView):
         })
 
 
-# Mixin for handling navigation pill states in page groups
+# Mixin for handling filtering/sorting and navigation pill states in page groups
 
 class ListViewMixin:
     page_group = None
@@ -64,25 +65,16 @@ class ListViewMixin:
     def is_unfiltered_list_view(self):
         return not self.kwargs.get('pk') and not self.is_create_view
 
-    # def __init__(self, **kwargs):
-    #     super().__init__(**kwargs)
-    #     self.search_term = self.request.GET.get('query')
-
-    # def get_queryset(self):
-    #     print('in here')
-    #     queryset = super().get_queryset()
-    #     self.search_term = self.request.GET.get('query')
-    #     print(self.search_term, self.search_fields)
-    #     if self.search_term and self.search_fields:
-    #         filters = {f'{field}__icontains': self.search_term for field in self.search_fields}
-    #         print('filters: ', filters)
-    #         queryset = queryset.filter(
-    #             Q(first_name__icontains=self.search_term) |
-    #             Q(last_name__icontains=self.search_term) |
-    #             Q(user__email__icontains=self.search_term)
-    #         )
-    #     queryset = queryset.order_by(self.request.GET.get('sortby', self.default_sort))
-    #     return queryset
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        self.search_term = self.request.GET.get('query')
+        if self.search_term and self.search_fields:
+            or_condition = Q()
+            for field in self.search_fields:
+                or_condition.add(Q(**{f'{field}__icontains': self.search_term}), Q.OR)
+            queryset = queryset.filter(or_condition)
+        queryset = queryset.order_by(self.request.GET.get('sortby', self.default_sort))
+        return queryset
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)

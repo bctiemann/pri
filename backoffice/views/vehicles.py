@@ -5,7 +5,6 @@ from django.shortcuts import render, reverse
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView
 from django.http import Http404, HttpResponseRedirect
-from django.db.models import Q
 
 from . import ListViewMixin
 from fleet.models import VehicleType, VehicleStatus, Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo
@@ -28,7 +27,6 @@ class VehicleViewMixin:
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        print(self.kwargs)
         if 'vehicle_type' in self.kwargs:
             queryset = queryset.filter(vehicle_type=self.kwargs['vehicle_type'])
         elif self.active_only:
@@ -45,21 +43,9 @@ class VehicleViewMixin:
 
 class VehicleListView(VehicleViewMixin, ListViewMixin, ListView):
     template_name = 'backoffice/vehicle_list.html'
-    # search_fields = ('make', 'model', 'year',)
+    search_fields = ('make', 'model', 'year',)
     # Set this to allow pagination
     # paginate_by = 10
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        self.search_term = self.request.GET.get('query')
-        if self.search_term:
-            queryset = queryset.filter(
-                Q(make__icontains=self.search_term) |
-                Q(model__icontains=self.search_term) |
-                Q(year__icontains=self.search_term)
-            )
-        queryset = queryset.order_by(self.request.GET.get('sortby', self.default_sort))
-        return queryset
 
 
 class VehicleDetailView(VehicleViewMixin, ListViewMixin, UpdateView):
