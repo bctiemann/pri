@@ -42,6 +42,7 @@ class LogoutView(LogoutView):
 # API view to track admin activity
 
 class TrackActivityView(APIView):
+    # AuthZ/authE are handled already in middleware; these are necessary here to provide request.user
     authentication_classes = (BasicAuthentication, SessionAuthentication)
 
     def post(self, request):
@@ -61,10 +62,12 @@ class ListViewMixin:
     search_fields = None
     default_sort = '-id'
 
+    # Can be overridden for certain page groups that need further conditions for when to highlight the "List All" pill
     @property
     def is_unfiltered_list_view(self):
         return not self.kwargs.get('pk') and not self.is_create_view
 
+    # Filtering and sorting occurs here; define search_fields on each page group's ListView
     def get_queryset(self):
         queryset = super().get_queryset()
         self.search_term = self.request.GET.get('query')
