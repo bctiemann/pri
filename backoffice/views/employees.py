@@ -3,7 +3,7 @@ from rest_framework.response import Response
 
 from django.shortcuts import render, reverse
 from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 
 from . import ListViewMixin
@@ -27,14 +27,9 @@ class EmployeeDetailView(EmployeeViewMixin, ListViewMixin, UpdateView):
     template_name = 'backoffice/employee_detail.html'
     form_class = EmployeeForm
 
-    def post(self, request, *args, **kwargs):
-        # marketing_form = VehicleMarketingForm(request.POST)
-        # print(marketing_form.data)
-        # print(marketing_form.is_valid())
-        # print(marketing_form.cleaned_data)
-        result = super().post(request, *args, **kwargs)
-        # VehicleMarketing.objects.filter(vehicle_id=self.object.id).update(**marketing_form.cleaned_data)
-        return result
+    # def post(self, request, *args, **kwargs):
+    #     result = super().post(request, *args, **kwargs)
+    #     return result
 
     def get_success_url(self):
         return reverse('backoffice:employee-detail', kwargs={'pk': self.object.id})
@@ -46,3 +41,10 @@ class EmployeeCreateView(EmployeeViewMixin, ListViewMixin, CreateView):
 
     def get_success_url(self):
         return reverse('backoffice:employee-detail', kwargs={'pk': self.object.id})
+
+
+class EmployeeDeleteView(DeleteView):
+    model = Employee
+
+    def get_success_url(self):
+        return reverse('backoffice:employee-list')

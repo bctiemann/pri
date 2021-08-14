@@ -10,7 +10,7 @@
 
     {{ form }}
     <cfoutput>
-    <cfform method="POST" action="#CGI.SCRIPT_NAME#">
+    <form method="POST" action="#CGI.SCRIPT_NAME#">
     <table class="inputform employees">
         <tr>
             <td>First Name</td>
@@ -148,7 +148,14 @@
             <td>
                 <button class="btn" type="submit" name="submit"><cfif employeeid>Edit<cfelse>Add</cfif></button>
                 <cfif employeeid>
-                    <button class="btn delete" type="submit" name="delete" onclick="return confirmDelete(this.form, 'employee')">Delete Employee</button>
+                    <button
+                        class="btn delete"
+                        type="submit"
+                        name="delete"
+                        onclick="return confirmDelete(this.form, '{% url "backoffice:employee-delete" pk=employee.id %}', 'employee')"
+                    >
+                        Delete Employee
+                    </button>
                 </cfif>
             </td>
         </tr>
@@ -156,7 +163,8 @@
     <cfinput type="hidden" name="employeeid" value="#employeeid#" />
     <cfinput type="hidden" name="adminid" value="#Employee.adminid#" />
     <cfinput type="hidden" name="fnc" value="edit" />
-    </cfform>
+        {% csrf_token %}
+    </form>
     </cfoutput>
 
 {% endblock %}

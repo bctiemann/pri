@@ -85,8 +85,10 @@ console.log(data);
 };
 
 
-var confirmDelete = function(form, type) {
-    if (confirm('This ' + type + ' will be deleted. Are you sure?')) {
+var confirmDelete = function(form, deleteUrl, objectName) {
+    const confirmStr = `This ${objectName} will be deleted. Are you sure?`
+    if (confirm(confirmStr)) {
+        form.action = deleteUrl;
         form.submit();
     }
     return false;
