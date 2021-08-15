@@ -147,6 +147,7 @@
             <td></td>
             <td>
                 <button class="btn" type="submit" name="submit"><cfif employeeid>Edit<cfelse>Add</cfif></button>
+                {% if employee %}
                 <cfif employeeid>
                     <button
                         class="btn delete"
@@ -157,6 +158,7 @@
                         Delete Employee
                     </button>
                 </cfif>
+                {% endif %}
             </td>
         </tr>
     </table>

@@ -5,6 +5,7 @@ from django.shortcuts import render, reverse
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from . import ListViewMixin
 from users.models import Employee
@@ -18,7 +19,9 @@ class EmployeeViewMixin:
     page_group = 'employees'
 
 
-class EmployeeListView(EmployeeViewMixin, ListViewMixin, ListView):
+class EmployeeListView(PermissionRequiredMixin, EmployeeViewMixin, ListViewMixin, ListView):
+    # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
+    permission_required = ('users.view_employee',)
     template_name = 'backoffice/employee_list.html'
     search_fields = ('first_name', 'last_name', 'user__email',)
 

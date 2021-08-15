@@ -6,7 +6,7 @@ from english_words import english_words_lower_set
 
 from django.conf import settings
 from django.db import models
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
@@ -70,7 +70,7 @@ class UserManager(BaseUserManager):
 
 
 # User is based on the internal Django authentication model, used for all password logins
-class User(AbstractBaseUser):
+class User(PermissionsMixin, AbstractBaseUser):
     email = LowercaseEmailField(
         verbose_name='email address',
         max_length=191,
@@ -106,15 +106,15 @@ class User(AbstractBaseUser):
     def __str__(self):
         return self.email
 
-    def has_perm(self, perm, obj=None):
-        "Does the user have a specific permission?"
-        # Simplest possible answer: Yes, always
-        return True
+    # def has_perm(self, perm, obj=None):
+    #     "Does the user have a specific permission?"
+    #     # Simplest possible answer: Yes, always
+    #     return True
 
-    def has_module_perms(self, app_label):
-        "Does the user have permissions to view the app `app_label`?"
-        # Simplest possible answer: Yes, always
-        return True
+    # def has_module_perms(self, app_label):
+    #     "Does the user have permissions to view the app `app_label`?"
+    #     # Simplest possible answer: Yes, always
+    #     return True
 
     def set_password(self, raw_password):
         self.date_password_changed = timezone.now()
