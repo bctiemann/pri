@@ -61,7 +61,7 @@ class PermissionsMiddleware(object):
 
         if request.user.is_authenticated:
             # May want to use the more granular Django permissions system instead of just allowing all is_admin
-            if resolved.app_name == 'backoffice' and not request.user.is_admin:
+            if resolved.app_name == 'backoffice' and not request.user.is_backoffice:
                 logger.info(f'{request.user} not authorized for backoffice.')
                 raise PermissionDenied
 

@@ -168,7 +168,7 @@
 
 <div id="menu_vehicles" class="popupbox">
 <ul class="navmenu">
-{% if user.employee.any_privileged_access %}
+{% if perms.fleet.view_vehicle %}
 <CFIF YourID.acclev IS NOT 5>
 	<li>
 	<a class="tnav {% if page_group == 'vehicles' %}selected{% endif %}" href="{% url "backoffice:vehicle-list" %}">Vehicles</a>
@@ -215,11 +215,13 @@
         <a class="tnav <CFIF scrpt IS "timesheet.cfm">selected</CFIF>" href="timesheet.cfm">Time Sheet</a>
     </li>
 --->
+    {% if perms.users %}
     <CFIF YourID.acclev IS 1>
     <li>
         <a class="tnav {% if page_group == 'employees' %}>selected{% endif %}" href="{% url "backoffice:employee-list" %}">Employees</a>
     </li>
     </CFIF>
+    {% endif %}
 <!---
     <CFIF YourID.acclev IS 1>
     <li>

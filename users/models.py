@@ -84,7 +84,8 @@ class User(PermissionsMixin, AbstractBaseUser):
             'Unselect this instead of deleting accounts.'
         ),
     )
-    is_admin = models.BooleanField(default=False, help_text='Designates whether this user has access to the admin and backoffice sites.')
+    is_admin = models.BooleanField(default=False, help_text='Designates whether this user has access to the admin site.')
+    is_backoffice = models.BooleanField(default=False, help_text='Designates whether this user has access to the backoffice site.')
     notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('User', null=True, blank=True, on_delete=models.SET_NULL)
