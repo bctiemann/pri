@@ -1,4 +1,4 @@
-{% extends "backoffice/vehicle.html" %}
+{% extends "backoffice/employee/base.html" %}
 
 {% block content %}
 
@@ -77,28 +77,19 @@
     <table class="data alternating" sortedby="{{ sortby }}">
      <tr>
         <th col="id" default-sort="desc">ID</th>
-        <th col="make">Make</th>
-        <th col="model">Model</th>
-        <th col="year">Year</th>
-        <th>Type</th>
+        <th col="last_name" colspan="2">Name</th>
+        <th col="user__email">Email</th>
         <th col="status">Status</th>
-        <th>Toll Tag</th>
-        <th>Notes</th>
+        <th col="hired_on" default-sort="desc">Hired</th>
     </tr>
-    {% for vehicle in vehicle_list %}
-        <tr class="clickable click-to-edit" destination="{% url "backoffice:vehicle-detail" pk=vehicle.id %}">
-            <td><a href="{% url "backoffice:vehicle-detail" pk=vehicle.id %}">{{ vehicle.id }}</a></td>
-            <td>{{ vehicle.make }}</td>
-            <td>{{ vehicle.model }}</td>
-            <td>{{ vehicle.year }}</td>
-            <td>
-                {{ vehicle.get_vehicle_type_display }}
-            </td>
-            <td>
-                {{ vehicle.get_status_display }}
-            </td>
-            <td>{{ vehicle.toll_tag_number }}</td>
-            <td>{{ vehicle.notes }}</td>
+    {% for employee in employee_list %}
+        <tr class="clickable click-to-edit" destination="{% url "backoffice:employee-detail" pk=employee.id %}">
+            <td><a href="{% url "backoffice:employee-detail" pk=employee.id %}">{{ employee.id }}</a></td>
+            <td>{{ employee.first_name }}</td>
+            <td>{{ employee.last_name }}</td>
+            <td>{{ employee.user.email }}</td>
+            <td>{{ employee.get_status_display }}</td>
+            <td>{{ employee.hired_on|default_if_none:"" }}</td>
         </tr>
     {% endfor %}
     </table>

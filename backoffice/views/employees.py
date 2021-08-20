@@ -22,12 +22,12 @@ class EmployeeViewMixin:
 class EmployeeListView(PermissionRequiredMixin, EmployeeViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_employee',)
-    template_name = 'backoffice/employee_list.html'
+    template_name = 'backoffice/employee/list.html'
     search_fields = ('first_name', 'last_name', 'user__email',)
 
 
 class EmployeeDetailView(EmployeeViewMixin, ListViewMixin, UpdateView):
-    template_name = 'backoffice/employee_detail.html'
+    template_name = 'backoffice/employee/detail.html'
     form_class = EmployeeForm
 
     # def post(self, request, *args, **kwargs):
@@ -39,7 +39,7 @@ class EmployeeDetailView(EmployeeViewMixin, ListViewMixin, UpdateView):
 
 
 class EmployeeCreateView(EmployeeViewMixin, ListViewMixin, CreateView):
-    template_name = 'backoffice/employee_detail.html'
+    template_name = 'backoffice/employee/detail.html'
     form_class = EmployeeForm
 
     def get_success_url(self):

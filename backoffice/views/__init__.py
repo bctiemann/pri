@@ -18,7 +18,7 @@ class AdminViewMixin:
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['admin_users'] = User.objects.filter(is_admin=True)
+        context['admin_users'] = User.objects.filter(is_backoffice=True)
         return context
 
 
