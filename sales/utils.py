@@ -111,7 +111,7 @@ class RentalPriceCalculator(PriceCalculator):
     @property
     def post_coupon_discount_subtotal(self):
         subtotal = self.post_multi_day_discount_subtotal
-        coupon_discount = self.get_coupon_discount(subtotal)
+        coupon_discount = float(self.get_coupon_discount(subtotal))
         subtotal -= coupon_discount
         return subtotal
 

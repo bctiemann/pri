@@ -29,6 +29,7 @@ class RentalPriceCalculatorTestCase(TestCase):
         )
         self.coupon_1 = Coupon.objects.create(
             amount=15.00,
+            code='TEST',
         )
 
     def test_get_rental_price_data(self):
@@ -42,7 +43,20 @@ class RentalPriceCalculatorTestCase(TestCase):
             vehicle_marketing, num_days, coupon_code, email, extra_miles, tax_zip,
         )
         price_data = rental_price_calculator.get_price_data()
-        print(price_data)
 
         self.assertEqual(price_data['total_with_tax'], Decimal('1215.53'))
+
+    def test_get_rental_price_data_with_coupon(self):
+        vehicle_marketing = self.vehicle_1
+        num_days = 2
+        coupon_code = 'TEST'
+        email = None
+        extra_miles = 200
+        tax_zip = '07430'
+        rental_price_calculator = RentalPriceCalculator(
+            vehicle_marketing, num_days, coupon_code, email, extra_miles, tax_zip,
+        )
+        price_data = rental_price_calculator.get_price_data()
+
+        self.assertEqual(price_data['total_with_tax'], Decimal('1201.13'))
 
