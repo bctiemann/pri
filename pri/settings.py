@@ -221,6 +221,23 @@ EXTRA_MILES_PRICES = {
     250: {'value': 250, 'label': '250 miles ($400)', 'cost': 400},
 }
 
+JOY_RIDE_PRICES = {
+    '1_pax': 250,
+    '2_pax': 450,
+    '3_pax': 675,
+    '4_pax': 900,
+    'cost_per_pax_gt_4': 200
+}
+
+PERFORMANCE_EXPERIENCE_PRICES = {
+    '1_drv': 450,
+    '2_drv': 800,
+    '3_drv': 1100,
+    '4_drv': 1300,
+    'cost_per_drv_gt_4': 300,
+    'cost_per_pax': 75
+}
+
 # Backoffice site seconds of idle until push to "sleeping" page
 ADMIN_SLEEP_TIMEOUT_SECS = 1500
 

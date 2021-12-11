@@ -7,33 +7,73 @@ from users.models import Customer
 
 
 class PriceCalculator:
+    """
+    Abstract base class implementing utility methods for calculating price structure
+    Unimplemented methods must be implemented in subclasses such as RentalPriceCalculator.
+    This is because the interim prices must be returned as properties as well as included
+    as part of the chain of calculations that go into get_price_data().
+    """
 
-    # rental_duration = None
-    # sales_tax = None
-    # customer_id = None
-    # num_drivers = None
-    # total_cost_raw = None
-    # total_cost = None
-    # coupon_discount = None
-    # customer_discount = None
-    # customer_discount_pct = None
-    # multi_day_discount = None
-    # multi_day_discount_pct = None
-    # extra_miles_cost = None
-    # subtotal = None
-    # total_with_tax = 0
-    # reservation_deposit = None
-    # tax_amount = None
-    # delivery = None
-    # deposit = None
-    
-    pass
+    tax_zip = None
+    tax_rate = None
+    coupon = None
+    customer = None
+    cents = decimal.Decimal('0.01')
+
+    def __init__(self, coupon_code=None, email=None, tax_zip=None):
+        self.coupon = Coupon.objects.filter(code=coupon_code).first()
+        self.customer = Customer.objects.filter(user__email=email).first()
+        self.tax_zip = tax_zip
+        self.tax_rate, tax_rate_created = TaxRate.objects.get_or_create(postal_code=tax_zip)
+
+    def quantize_currency(self, value):
+        # return f'{decimal.Decimal(value).quantize(self.cents, decimal.ROUND_HALF_UP)}'
+        return decimal.Decimal(value).quantize(self.cents, decimal.ROUND_HALF_UP)
+
+    def get_coupon_discount(self, value=None):
+        if not self.coupon:
+            return 0
+        if value is None:
+            raise NotImplementedError
+        return self.coupon.get_discount_value(value)
+
+    def get_customer_discount(self, value=None):
+        if value is None:
+            raise NotImplementedError
+        if self.customer and self.customer.discount_pct:
+            return value * self.customer.discount_pct / 100
+        return 0
+
+    def get_tax_amount(self, value=None):
+        if value is None:
+            raise NotImplementedError
+        return float(self.tax_rate.total_rate) * value
+
+    @property
+    def base_price(self):
+        raise NotImplementedError
+
+    @property
+    def pre_tax_subtotal(self):
+        raise NotImplementedError
+
+    @property
+    def total_with_tax(self):
+        tax_amount = self.get_tax_amount(self.pre_tax_subtotal)
+        return self.pre_tax_subtotal + tax_amount
+
+    @property
+    def reservation_deposit(self):
+        raise NotImplementedError
+
+    def get_price_data(self):
+        raise NotImplementedError
 
 
 class RentalPriceCalculator(PriceCalculator):
     """
     Price is calculated as follows:
-    - Calculator is inited with vehicle, # days, coupon code, email, extra miles, and tax zip
+    - Calculator is inited with vehicle, # days, extra miles, coupon code, email, and tax zip
     - Base price is daily rate * number of days
     - Subtract multi-day discount
     - Subtract coupon discount
@@ -44,24 +84,12 @@ class RentalPriceCalculator(PriceCalculator):
     vehicle_marketing = None
     num_days = None
     extra_miles = None
-    tax_zip = None
-    tax_rate = None
-    coupon = None
-    customer = None
-    cents = decimal.Decimal('0.01')
 
-    def __init__(self, vehicle_marketing, num_days, coupon_code=None, email=None, extra_miles=None, tax_zip=None):
+    def __init__(self, vehicle_marketing, num_days, extra_miles, **kwargs):
         self.vehicle_marketing = vehicle_marketing
         self.num_days = num_days
-        self.coupon = Coupon.objects.filter(code=coupon_code).first()
-        self.customer = Customer.objects.filter(user__email=email).first()
         self.extra_miles = int(extra_miles)
-        self.tax_zip = tax_zip
-        self.tax_rate, tax_rate_created = TaxRate.objects.get_or_create(postal_code=tax_zip)
-
-    def quantize_currency(self, value):
-        # return f'{decimal.Decimal(value).quantize(self.cents, decimal.ROUND_HALF_UP)}'
-        return decimal.Decimal(value).quantize(self.cents, decimal.ROUND_HALF_UP)
+        super().__init__(**kwargs)
 
     @property
     def multi_day_discount_pct(self):
@@ -79,23 +107,19 @@ class RentalPriceCalculator(PriceCalculator):
         return value * self.multi_day_discount_pct / 100
 
     def get_coupon_discount(self, value=None):
-        if not self.coupon:
-            return 0
         if not value:
             value = self.post_multi_day_discount_subtotal
-        return self.coupon.get_discount_value(value)
+        return super().get_coupon_discount(value)
 
     def get_customer_discount(self, value=None):
         if not value:
             value = self.post_coupon_discount_subtotal
-        if self.customer and self.customer.discount_pct:
-            return value * self.customer.discount_pct / 100
-        return 0
+        return super().get_customer_discount(value)
 
     def get_tax_amount(self, value=None):
         if not value:
             value = self.pre_tax_subtotal
-        return float(self.tax_rate.total_rate) * value
+        return super().get_tax_amount(value)
 
     @property
     def base_price(self):
@@ -136,11 +160,6 @@ class RentalPriceCalculator(PriceCalculator):
         return subtotal
 
     @property
-    def total_with_tax(self):
-        tax_amount = self.get_tax_amount(self.pre_tax_subtotal)
-        return self.pre_tax_subtotal + tax_amount
-
-    @property
     def reservation_deposit(self):
         return self.total_with_tax / 2
 
@@ -161,3 +180,21 @@ class RentalPriceCalculator(PriceCalculator):
             reservation_deposit=self.quantize_currency(self.reservation_deposit),
             tax_amount=self.quantize_currency(self.get_tax_amount()),
         )
+
+
+class PerformanceExperiencePriceCalculator(PriceCalculator):
+    """
+    Price is calculated as follows:
+    - Calculator is inited with # drivers, # passengers, coupon code, email, and tax zip
+    - Base price is per-driver rate * number of drivers, + per-passenger rate * number of passengers
+    - Subtract coupon discount
+    - Subtract customer ("promotional") discount
+    - Add sales tax
+    """
+    num_drivers = None
+    num_passengers = None
+
+    def __init__(self, num_drivers, num_passengers, **kwargs):
+        self.num_drivers = num_drivers
+        self.num_passengers = num_passengers
+        super().__init__(**kwargs)
