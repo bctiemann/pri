@@ -92,6 +92,9 @@ class RentalPriceCalculator(PriceCalculator):
     - Subtract customer ("promotional") discount
     - Add extra miles surcharge
     - Add sales tax
+
+    Interim subtotals (e.g. post_multi_day_discount_subtotal) are for forensics and to return
+    in price_data if necessary
     """
     vehicle_marketing = None
 
