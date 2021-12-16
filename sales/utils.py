@@ -11,8 +11,8 @@ class PriceCalculator(ABC):
     """
     Abstract base class implementing utility methods for calculating price structure
     Unimplemented methods must be implemented in subclasses such as RentalPriceCalculator.
-    This is because the interim prices must be returned as properties as well as included
-    as part of the chain of calculations that go into get_price_data().
+    coupon_discount and customer_discount are common to all calculators; subclasses with other
+    specific types of discounts should implement getter methods on a similar pattern.
     """
 
     tax_zip = None
@@ -36,12 +36,12 @@ class PriceCalculator(ABC):
         if not self.coupon:
             return 0
         if value is None:
-            raise NotImplementedError
+            raise ValueError('No base value provided.')
         return self.coupon.get_discount_value(value)
 
     def get_customer_discount(self, value=None):
         if value is None:
-            raise NotImplementedError
+            raise ValueError('No base value provided.')
         if self.customer and self.customer.discount_pct:
             return value * self.customer.discount_pct / 100
         return 0
@@ -71,10 +71,6 @@ class PriceCalculator(ABC):
         tax_amount = self.get_tax_amount(self.pre_tax_subtotal)
         return self.pre_tax_subtotal + tax_amount
 
-    @property
-    def reservation_deposit(self):
-        raise NotImplementedError
-
     def get_price_data(self):
         raise NotImplementedError
 
@@ -87,7 +83,7 @@ class RentalPriceCalculator(PriceCalculator):
     - Subtract multi-day discount
     - Subtract coupon discount
     - Subtract customer ("promotional") discount
-    - Add extra miles cost
+    - Add extra miles surcharge
     - Add sales tax
     """
     vehicle_marketing = None
@@ -132,6 +128,10 @@ class RentalPriceCalculator(PriceCalculator):
         self.subtotal = self.post_extra_miles_surcharge_subtotal
 
     @property
+    def base_price(self):
+        return float(self.vehicle_marketing.price_per_day * self.num_days)
+
+    @property
     def multi_day_discount_pct(self):
         if self.num_days >= 7:
             return self.vehicle_marketing.discount_7_day
@@ -143,12 +143,8 @@ class RentalPriceCalculator(PriceCalculator):
 
     def get_multi_day_discount(self, value=None):
         if not value:
-            value = self.base_price
+            raise ValueError('No base value provided.')
         return value * self.multi_day_discount_pct / 100
-
-    @property
-    def base_price(self):
-        return float(self.vehicle_marketing.price_per_day * self.num_days)
 
     def get_extra_miles_cost(self):
         try:
