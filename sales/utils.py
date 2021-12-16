@@ -17,8 +17,15 @@ class PriceCalculator(ABC):
 
     tax_zip = None
     tax_rate = None
+
     coupon = None
+    coupon_discount = None
+    post_coupon_discount_subtotal = None
+
     customer = None
+    customer_discount = None
+    post_customer_discount_subtotal = None
+
     subtotal = 0.0
     cents = decimal.Decimal('0.01')
 
@@ -87,15 +94,12 @@ class RentalPriceCalculator(PriceCalculator):
     - Add sales tax
     """
     vehicle_marketing = None
-    num_days = None
-    extra_miles = None
 
+    num_days = None
     multi_day_discount = None
     post_multi_day_discount_subtotal = None
-    coupon_discount = None
-    post_coupon_discount_subtotal = None
-    customer_discount = None
-    post_customer_discount_subtotal = None
+
+    extra_miles = None
     extra_miles_surcharge = None
     post_extra_miles_surcharge_subtotal = None
 
