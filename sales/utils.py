@@ -19,6 +19,7 @@ class PriceCalculator(ABC):
     tax_rate = None
     coupon = None
     customer = None
+    subtotal = 0.0
     cents = decimal.Decimal('0.01')
 
     def __init__(self, coupon_code=None, email=None, tax_zip=None):
@@ -47,8 +48,14 @@ class PriceCalculator(ABC):
 
     def get_tax_amount(self, value=None):
         if value is None:
-            raise NotImplementedError
+            value = self.pre_tax_subtotal
         return float(self.tax_rate.total_rate) * value
+
+    def apply_discount(self, value=None):
+        return self.subtotal - float(value)
+
+    def apply_surcharge(self, value=None):
+        return self.subtotal + float(value)
 
     @property
     def base_price(self):
@@ -56,7 +63,8 @@ class PriceCalculator(ABC):
 
     @property
     def pre_tax_subtotal(self):
-        raise NotImplementedError
+        # subtotal should be incrementally calculated in __init__() and returned as its final value
+        return self.subtotal
 
     @property
     def total_with_tax(self):
@@ -86,11 +94,42 @@ class RentalPriceCalculator(PriceCalculator):
     num_days = None
     extra_miles = None
 
+    multi_day_discount = None
+    post_multi_day_discount_subtotal = None
+    coupon_discount = None
+    post_coupon_discount_subtotal = None
+    customer_discount = None
+    post_customer_discount_subtotal = None
+    extra_miles_surcharge = None
+    post_extra_miles_surcharge_subtotal = None
+
     def __init__(self, vehicle_marketing, num_days, extra_miles, **kwargs):
+        super().__init__(**kwargs)
         self.vehicle_marketing = vehicle_marketing
         self.num_days = num_days
         self.extra_miles = int(extra_miles)
-        super().__init__(**kwargs)
+
+        self.subtotal = self.base_price
+
+        # Multi-day discount
+        self.multi_day_discount = self.get_multi_day_discount(value=self.base_price)
+        self.post_multi_day_discount_subtotal = self.apply_discount(value=self.multi_day_discount)
+        self.subtotal = self.post_multi_day_discount_subtotal
+
+        # Coupon discount
+        self.coupon_discount = self.get_coupon_discount(value=self.post_multi_day_discount_subtotal)
+        self.post_coupon_discount_subtotal = self.apply_discount(value=self.coupon_discount)
+        self.subtotal = self.post_coupon_discount_subtotal
+
+        # Customer (promotional) discount
+        self.customer_discount = self.get_customer_discount(value=self.post_coupon_discount_subtotal)
+        self.post_customer_discount_subtotal = self.apply_discount(value=self.customer_discount)
+        self.subtotal = self.post_customer_discount_subtotal
+
+        # Extra miles surcharge
+        self.extra_miles_surcharge = self.get_extra_miles_cost()
+        self.post_extra_miles_surcharge_subtotal = self.apply_surcharge(value=self.extra_miles_surcharge)
+        self.subtotal = self.post_extra_miles_surcharge_subtotal
 
     @property
     def multi_day_discount_pct(self):
@@ -107,58 +146,15 @@ class RentalPriceCalculator(PriceCalculator):
             value = self.base_price
         return value * self.multi_day_discount_pct / 100
 
-    def get_coupon_discount(self, value=None):
-        if not value:
-            value = self.post_multi_day_discount_subtotal
-        return super().get_coupon_discount(value)
-
-    def get_customer_discount(self, value=None):
-        if not value:
-            value = self.post_coupon_discount_subtotal
-        return super().get_customer_discount(value)
-
-    def get_tax_amount(self, value=None):
-        if not value:
-            value = self.pre_tax_subtotal
-        return super().get_tax_amount(value)
-
     @property
     def base_price(self):
         return float(self.vehicle_marketing.price_per_day * self.num_days)
 
-    @property
-    def post_multi_day_discount_subtotal(self):
-        subtotal = self.base_price
-        multi_day_discount = self.get_multi_day_discount(subtotal)
-        subtotal -= multi_day_discount
-        return subtotal
-
-    @property
-    def post_coupon_discount_subtotal(self):
-        subtotal = self.post_multi_day_discount_subtotal
-        coupon_discount = float(self.get_coupon_discount(subtotal))
-        subtotal -= coupon_discount
-        return subtotal
-
-    @property
-    def post_customer_discount_subtotal(self):
-        subtotal = self.post_coupon_discount_subtotal
-        customer_discount = self.get_customer_discount(subtotal)
-        subtotal -= customer_discount
-        return subtotal
-
-    @property
-    def extra_miles_cost(self):
+    def get_extra_miles_cost(self):
         try:
             return settings.EXTRA_MILES_PRICES.get(self.extra_miles)['cost']
         except TypeError:
             return 0
-
-    @property
-    def pre_tax_subtotal(self):
-        subtotal = self.post_customer_discount_subtotal
-        subtotal += self.extra_miles_cost
-        return subtotal
 
     @property
     def reservation_deposit(self):
@@ -170,12 +166,12 @@ class RentalPriceCalculator(PriceCalculator):
             tax_rate=self.tax_rate.total_rate,
             customer_id=self.customer.id if self.customer else None,
             base_price=self.quantize_currency(self.base_price),
-            multi_day_discount=self.quantize_currency(self.get_multi_day_discount()),
+            multi_day_discount=self.quantize_currency(self.multi_day_discount),
             multi_day_discount_pct=self.multi_day_discount_pct,
-            coupon_discount=self.quantize_currency(self.get_coupon_discount()),
-            customer_discount=self.quantize_currency(self.get_customer_discount()),
+            coupon_discount=self.quantize_currency(self.coupon_discount),
+            customer_discount=self.quantize_currency(self.customer_discount),
             extra_miles=self.extra_miles,
-            extra_miles_cost=self.quantize_currency(self.extra_miles_cost),
+            extra_miles_cost=self.quantize_currency(self.extra_miles_surcharge),
             subtotal=self.quantize_currency(self.pre_tax_subtotal),
             total_with_tax=self.quantize_currency(self.total_with_tax),
             reservation_deposit=self.quantize_currency(self.reservation_deposit),

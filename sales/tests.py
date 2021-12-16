@@ -51,6 +51,7 @@ class RentalPriceCalculatorTestCase(TestCase):
         )
         price_data = rental_price_calculator.get_price_data()
 
+        self.assertEqual(price_data['extra_miles_cost'], Decimal('330.00'))
         self.assertEqual(price_data['total_with_tax'], Decimal('1311.49'))
 
     def test_get_rental_price_data_with_coupon(self):
@@ -68,6 +69,7 @@ class RentalPriceCalculatorTestCase(TestCase):
         )
         price_data = rental_price_calculator.get_price_data()
 
+        self.assertEqual(price_data['coupon_discount'], Decimal('15.00'))
         self.assertEqual(price_data['total_with_tax'], Decimal('1295.49'))
 
     def test_get_rental_price_data_with_customer_discount(self):
@@ -85,5 +87,7 @@ class RentalPriceCalculatorTestCase(TestCase):
         )
         price_data = rental_price_calculator.get_price_data()
 
+        self.assertEqual(price_data['customer_id'], 1)
+        self.assertEqual(price_data['customer_discount'], Decimal('90.00'))
         self.assertEqual(price_data['total_with_tax'], Decimal('1215.53'))
 
