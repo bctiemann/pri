@@ -115,24 +115,24 @@ class RentalPriceCalculator(PriceCalculator):
         self.subtotal = self.base_price
 
         # Multi-day discount
-        self.multi_day_discount = self.get_multi_day_discount(value=self.base_price)
-        self.post_multi_day_discount_subtotal = self.apply_discount(value=self.multi_day_discount)
-        self.subtotal = self.post_multi_day_discount_subtotal
+        self.multi_day_discount = self.get_multi_day_discount(value=self.subtotal)
+        self.subtotal = self.apply_discount(value=self.multi_day_discount)
+        self.post_multi_day_discount_subtotal = self.subtotal
 
         # Coupon discount
-        self.coupon_discount = self.get_coupon_discount(value=self.post_multi_day_discount_subtotal)
-        self.post_coupon_discount_subtotal = self.apply_discount(value=self.coupon_discount)
-        self.subtotal = self.post_coupon_discount_subtotal
+        self.coupon_discount = self.get_coupon_discount(value=self.subtotal)
+        self.subtotal = self.apply_discount(value=self.coupon_discount)
+        self.post_coupon_discount_subtotal = self.subtotal
 
         # Customer (promotional) discount
-        self.customer_discount = self.get_customer_discount(value=self.post_coupon_discount_subtotal)
-        self.post_customer_discount_subtotal = self.apply_discount(value=self.customer_discount)
-        self.subtotal = self.post_customer_discount_subtotal
+        self.customer_discount = self.get_customer_discount(value=self.subtotal)
+        self.subtotal = self.apply_discount(value=self.customer_discount)
+        self.post_customer_discount_subtotal = self.subtotal
 
         # Extra miles surcharge
         self.extra_miles_surcharge = self.get_extra_miles_cost()
-        self.post_extra_miles_surcharge_subtotal = self.apply_surcharge(value=self.extra_miles_surcharge)
-        self.subtotal = self.post_extra_miles_surcharge_subtotal
+        self.subtotal = self.apply_surcharge(value=self.extra_miles_surcharge)
+        self.post_extra_miles_surcharge_subtotal = self.subtotal
 
     @property
     def base_price(self):
