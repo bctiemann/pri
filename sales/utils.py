@@ -1,4 +1,5 @@
 import decimal
+from abc import ABC
 
 from django.conf import settings
 
@@ -6,7 +7,7 @@ from sales.models import Reservation, Coupon, TaxRate
 from users.models import Customer
 
 
-class PriceCalculator:
+class PriceCalculator(ABC):
     """
     Abstract base class implementing utility methods for calculating price structure
     Unimplemented methods must be implemented in subclasses such as RentalPriceCalculator.
