@@ -80,56 +80,96 @@ def tax_zip():
     return '07430'
 
 
-# class RentalPriceCalculatorTestCase(TestCase):
-# @pytest.mark.django_db
-class TestRentalPriceCalculatorTestCase:
+@pytest.mark.parametrize(
+    "vehicle, num_days, coupon_code, email, extra_miles, tax_zip",
+    [(vehicle_mock_1, 1, None, None, 200, "07430"), (vehicle_mock_1, 2, None, None, 200, "07430")]
+)
+def test_something(vehicle, num_days, coupon_code, email, extra_miles, tax_zip):
+    assert num_days > 0
 
-    databases = ('default', 'front',)
 
-    def setUp(self) -> None:
-        self.vehicle_1 = VehicleMarketing.objects.create(
-            price_per_day=500,
-            discount_2_day=10,
-            discount_3_day=20,
-            discount_7_day=40,
-            security_deposit=5000.00,
-        )
-        self.tax_rate_1 = TaxRate.objects.create(
-            postal_code='07430',
-            total_rate=0.06625,
-        )
-        self.customer_1 = Customer.objects.create(
-            discount_pct=10,
-        )
-        self.coupon_1 = Coupon.objects.create(
-            amount=15.00,
-        )
-
-    @pytest.mark.parametrize(
-        'vehicle, num_days, coupon_code, email, extra_miles, tax_zip',
-        [
-            (
-                vehicle_mock_1,
-                2,
-                None,
-                None,
-                200,
-                '07430',
-            ),
-        ],
-        indirect=True
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'vehicle, num_days, coupon_code, email, extra_miles, tax_zip',
+    [
+        (
+            vehicle_mock_1,
+            2,
+            None,
+            None,
+            200,
+            '07430',
+        ),
+    ],
+    # indirect=True
+)
+def test_get_rental_price_data(vehicle, num_days, coupon_code, email, extra_miles, tax_zip):
+    num_days = 2
+    # vehicle_marketing, num_days, extra_miles, coupon_code = coupon_code, email = email, tax_zip = tax_zip,
+    rental_price_calculator = RentalPriceCalculator(
+        vehicle,
+        num_days,
+        extra_miles,
+        coupon_code=coupon_code,
+        email=email,
+        tax_zip=tax_zip,
     )
-    def test_get_rental_price_data(self, vehicle, num_days, coupon_code, email, extra_miles, tax_zip):
-        num_days = 2
-        rental_price_calculator = RentalPriceCalculator(
-            vehicle,
-            num_days,
-            coupon_code,
-            email,
-            extra_miles,
-            tax_zip,
-        )
-        price_data = rental_price_calculator.get_price_data()
-        print(price_data)
-        assert None == None
+    print(rental_price_calculator)
+    price_data = rental_price_calculator.get_price_data()
+    print(price_data)
+    assert None == None
 
+
+# # class RentalPriceCalculatorTestCase(TestCase):
+# # @pytest.mark.django_db
+# class TestRentalPriceCalculatorTestCase:
+#
+#     databases = ('default', 'front',)
+#
+#     def setUp(self) -> None:
+#         self.vehicle_1 = VehicleMarketing.objects.create(
+#             price_per_day=500,
+#             discount_2_day=10,
+#             discount_3_day=20,
+#             discount_7_day=40,
+#             security_deposit=5000.00,
+#         )
+#         self.tax_rate_1 = TaxRate.objects.create(
+#             postal_code='07430',
+#             total_rate=0.06625,
+#         )
+#         self.customer_1 = Customer.objects.create(
+#             discount_pct=10,
+#         )
+#         self.coupon_1 = Coupon.objects.create(
+#             amount=15.00,
+#         )
+#
+#     @pytest.mark.parametrize(
+#         'vehicle, num_days, coupon_code, email, extra_miles, tax_zip',
+#         [
+#             (
+#                 vehicle_mock_1,
+#                 2,
+#                 None,
+#                 None,
+#                 200,
+#                 '07430',
+#             ),
+#         ],
+#         indirect=True
+#     )
+#     def test_get_rental_price_data(self, vehicle, num_days, coupon_code, email, extra_miles, tax_zip):
+#         num_days = 2
+#         rental_price_calculator = RentalPriceCalculator(
+#             vehicle,
+#             num_days,
+#             coupon_code,
+#             email,
+#             extra_miles,
+#             tax_zip,
+#         )
+#         price_data = rental_price_calculator.get_price_data()
+#         print(price_data)
+#         assert None == None
+#
