@@ -9,7 +9,7 @@ from users.models import Customer
 
 class PriceCalculator(ABC):
     """
-    Abstract base class implementing utility methods for calculating price structure
+    Abstract base class implementing utility methods for calculating price structure.
     Unimplemented methods must be implemented in subclasses such as RentalPriceCalculator.
     coupon_discount and customer_discount are common to all calculators; subclasses with other
     specific types of discounts should implement getter methods on a similar pattern.
@@ -30,10 +30,19 @@ class PriceCalculator(ABC):
     cents = decimal.Decimal('0.01')
 
     def __init__(self, coupon_code=None, email=None, tax_zip=None):
-        self.coupon = Coupon.objects.filter(code=coupon_code).first()
-        self.customer = Customer.objects.filter(user__email=email).first()
-        self.tax_zip = tax_zip
-        self.tax_rate, tax_rate_created = TaxRate.objects.get_or_create(postal_code=tax_zip)
+        self.coupon = self.get_coupon(coupon_code)
+        self.customer = self.get_customer(email)
+        self.tax_rate = self.get_tax_rate(tax_zip)
+
+    def get_coupon(self, coupon_code):
+        return Coupon.objects.filter(code=coupon_code).first()
+
+    def get_customer(self, email):
+        return Customer.objects.filter(user__email=email).first()
+
+    def get_tax_rate(self, tax_zip):
+        tax_rate, tax_rate_created = TaxRate.objects.get_or_create(postal_code=tax_zip)
+        return tax_rate
 
     def quantize_currency(self, value):
         # return f'{decimal.Decimal(value).quantize(self.cents, decimal.ROUND_HALF_UP)}'

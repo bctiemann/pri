@@ -43,7 +43,7 @@ def coupon_mock_1(mocker):
     coupon_1 = mocker.MagicMock(spec=Coupon)
     coupon_1.amount = 15.00
     # coupon_1.get_discount_value = mocker.MagicMock()
-    coupon_1.get_discount_value.return_value = 15.00
+    coupon_1.return_value.get_discount_value.return_value = 15.00
     return coupon_1
 
 
@@ -100,9 +100,14 @@ def customer_mock_1(mocker):
     ],
     # indirect=True
 )
-def test_get_rental_price_data(request, vehicle, num_days, coupon_code, email, extra_miles, tax_zip, expected_total):
-    num_days = 2
+def test_get_rental_price_data(mocker, request, vehicle, num_days, coupon_code, coupon_mock_1, email, customer_mock_1, tax_rate_1, extra_miles, tax_zip, expected_total):
+    # num_days = 2
     # vehicle_marketing, num_days, extra_miles, coupon_code = coupon_code, email = email, tax_zip = tax_zip,
+
+    # mocker.patch('sales.utils.PriceCalculator.get_tax_rate', return_value=tax_rate_1)
+    # mocker.patch('sales.utils.PriceCalculator.get_coupon', coupon_mock_1)
+    # mocker.patch('sales.utils.PriceCalculator.get_customer', customer_mock_1)
+
     rental_price_calculator = RentalPriceCalculator(
         request.getfixturevalue(vehicle),
         num_days,

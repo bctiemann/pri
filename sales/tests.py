@@ -36,6 +36,15 @@ class RentalPriceCalculatorTestCase(TestCase):
             code='TEST',
         )
 
+    def test_get_tax_rate_from_avalara_api(self):
+        """
+        Make live query to Avalara API and check that a valid response is returned
+        """
+        tax_rate = TaxRate.objects.create(
+            postal_code='34210'
+        )
+        assert tax_rate.total_rate == 0.07
+
     def test_get_rental_price_data(self):
         """
         2-day rental, 200 extra miles, no coupon, no customer discount
