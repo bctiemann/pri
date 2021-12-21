@@ -343,4 +343,4 @@ class ReservationRentalPaymentForm(ReservationRentalDetailsForm):
 # If the customer already exists, this form will be shown and processed instead of ReservationRentalPaymentForm
 class ReservationRentalLoginForm(ReservationRentalDetailsForm):
 
-    password = forms.CharField(widget=forms.PasswordInput())
+    password = forms.CharField(widget=forms.PasswordInput(), required=False)

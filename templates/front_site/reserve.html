@@ -333,7 +333,7 @@
                 <td>
                     <button type="submit" name="details_btn" class="btn reserve-rental-details-btn">Continue</button>
                     <div class="spinner next-form-spinner details-spinner"></div>
-                    <button type="submit">Submit</button>
+{#                    <button type="submit">Submit</button>#}
                 </td>
             </tr>
             </cfif>
@@ -460,7 +460,7 @@
         <p class="alert-message"></p>
     </div>
 
-    <div id="reservation_payment" <cfif NOT IsDefined("IdentityResult") OR (IsDefined("IdentityResult") AND NOT IdentityResult.success) OR (IsDefined("LoginResult") AND NOT LoginResult.success)>class="hidden"</cfif>>
+    <div id="reservation_payment" {# <cfif NOT IsDefined("IdentityResult") OR (IsDefined("IdentityResult") AND NOT IdentityResult.success) OR (IsDefined("LoginResult") AND NOT LoginResult.success)> #}class="hidden"{# </cfif> #}>
 
         <p class="reservation-info">
         We'll need a credit card to secure your reservation. Once the reservation is confirmed, you'll get access to the
