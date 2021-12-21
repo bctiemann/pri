@@ -231,12 +231,12 @@ class ReservationRentalDetailsForm(forms.ModelForm):
     @property
     def price_data(self):
         price_calculator = RentalPriceCalculator(
-            self.cleaned_data['vehicle_marketing'],
-            self.num_days,
-            self.cleaned_data['coupon_code'],
-            self.cleaned_data['email'],
-            self.cleaned_data['extra_miles'],
-            self.tax_zip,
+            vehicle_marketing=self.cleaned_data['vehicle_marketing'],
+            num_days=self.num_days,
+            extra_miles=self.cleaned_data['extra_miles'],
+            coupon_code=self.cleaned_data.get('coupon_code'),
+            email=self.cleaned_data.get('email'),
+            tax_zip=self.tax_zip,
         )
         return price_calculator.get_price_data()
         # subtotal = self.subtotal

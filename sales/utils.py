@@ -158,7 +158,7 @@ class RentalPriceCalculator(PriceCalculator):
         return 0
 
     def get_multi_day_discount(self, value=None):
-        if not value:
+        if value is None:
             raise ValueError('No base value provided.')
         return value * self.multi_day_discount_pct / 100
 
