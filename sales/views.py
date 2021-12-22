@@ -57,9 +57,10 @@ class ReserveView(NavMenuMixin, FormView):
 
     def get_context_data(self, slug=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        try:
-            context['vehicle'] = VehicleMarketing.objects.get(slug=slug, status=VehicleStatus.READY)
-        except VehicleMarketing.DoesNotExist:
+        # We filter() rather than get() because vehicle_marketing.slug is not unique (we may have multiple of the
+        # same vehicle)
+        context['vehicle'] = VehicleMarketing.objects.filter(slug=slug, status=VehicleStatus.READY).first()
+        if not context['vehicle']:
             raise Http404
         context['payment_form'] = self.get_payment_form()
         context['login_form'] = self.get_login_form()
