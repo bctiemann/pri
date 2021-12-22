@@ -1,3 +1,5 @@
+{% load static bbcode_tags %}
+
 {% comment %}
 <cfquery name="Showcase" datasource="#DSN#">
     SELECT vehicleid,make,model,type FROM Vehicles
@@ -36,28 +38,29 @@
 
             <cftry>
                 <cfset headline = specsStruct.headline>
-                <h1 class="cartitle headline">#headline#</h1>
+                <h1 class="cartitle headline">{{ showcase_vehicle.headline }}</h1>
                 <cfcatch type="Any">
                 </cfcatch>
             </cftry>
 
             <div class="showcasecontent">
-                #parseNewlines(ShowcaseFront.blurb)#
+                {{ showcase_vehicle.blurb|bbcode|safe }}
             </div>
             <p class="readmore">
-                <a href="vehicle.cfm?vid=#vehicleid#">Read more</a>
+                <a href="{% url "vehicle" slug=showcase_vehicle.slug %}">Read more</a>
             </p>
 
             <div class="carstats">
                 <h3 class="statsheader">Quick Stats</h3>
                 <table class="labeled">
                     <tr>
-                        <td>Power:</td> <td>#ShowcaseFront.hp# bhp</td>
+                        <td>Power:</td> <td>{{ showcase_vehicle.horsepower }} bhp</td>
                     </tr>
                     <tr>
-                        <td>Torque:</td> <td>#ShowcaseFront.tq# ft-lbs</td>
+                        <td>Torque:</td> <td>{{ showcase_vehicle.torque }} ft-lbs</td>
                     </tr>
                     <tr>
+                        {% comment %}
                         <cfif ShowcaseFront.trans IS 1>
                             <cfset transtype = "manual">
                         <cfelseif ShowcaseFront.trans IS 2>
@@ -65,18 +68,30 @@
                         <cfelseif ShowcaseFront.trans IS 3>
                             <cfset transtype = "auto">
                         </cfif>
-                        <td>Transmission:</td> <td>#ShowcaseFront.gears#-speed #transtype#</td>
+                        {% endcomment %}
+                        <td>Transmission:</td>
+                        <td>
+                            {{ showcase_vehicle.gears }}-speed {{ showcase_vehicle.get_transmission_type_display|lower }}
+                        </td>
                     </tr>
                     <tr>
-                        <td>Top speed:</td> <td>#ShowcaseFront.topspeed# mph</td>
+                        <td>Top speed:</td> <td>{{ showcase_vehicle.top_speed }} mph</td>
                     </tr>
                     <cftry>
                         <cfloop array="#specsStruct.speclist#" index="spec">
+                        {% for spec in showcase_vehicle.specs.speclist %}
+                            {% if not spec.hide_front %}
                             <cfif NOT IsDefined("spec.hide_front") OR NOT spec.hide_front>
                             <tr>
-                                <td>#spec.spec#:</td> <td>#spec.value# <cfif NOT IsDefined("spec.hide_unit") OR NOT spec.hide_unit>#spec.unit#</cfif></td>
+                                <td>{{ spec.spec }}:</td>
+                                <td>
+                                    {{ spec.value }} {% if not spec.hide_unit %}{{ spec.unit }}{% endif %}
+{#                                    <cfif NOT IsDefined("spec.hide_unit") OR NOT spec.hide_unit>#spec.unit#</cfif>#}
+                                </td>
                             </tr>
                             </cfif>
+                            {% endif %}
+                        {% endfor %}
                         </cfloop>
                         <cfcatch type="Any">
                         </cfcatch>
@@ -91,10 +106,13 @@
 
                         <!-- normal -->
                         <div class="ih-item circle effect3 right_to_left price-bubble">
-                            <a href="#OnSecSite#reserve.cfm?vid=#vehicleid#">
+                            <a href="{% url "reserve" slug=showcase_vehicle.slug %}">
                             <div class="img">
-                                <img class="click-to-reserve" src="images/ClickToReserve.png" />
-                                <img src="images/price-bg.jpg" alt="img"><span class="price-centered"><p class="price">#NumberFormat(ShowcaseFront.price,"$,")#</p>/day</span>
+                                <img class="click-to-reserve" src="{% static "images/ClickToReserve.png" %}" />
+                                <img src="{% static "images/price-bg.jpg" %}" alt="img" />
+                                <span class="price-centered">
+                                    <p class="price">${{ showcase_vehicle.price_per_day|floatformat }}</p>/day
+                                </span>
                             </div>
                             <div class="info">
                                 <h3>Reserve Now</h3>
@@ -104,7 +122,16 @@
                                         <cfset adjective = "amazing">
                                     </cfcatch>
                                 </cftry>
-                                <p><cfif type IS 1>Drive<cfelseif type IS 2>Ride</cfif> our #adjective#<br />#make# #model#!</p>
+                                <p>
+                                    {% if showcase_vehicle.vehicle_type == vehicle_type.CAR.value %}
+                                        Drive
+                                    {% elif showcase_vehicle.vehicle_type == vehicle_type.BIKE.value %}
+                                        Ride
+                                    {% endif %}
+                                    our {{ showcase_vehicle.specs.adjective }}<br />
+                                    {{ showcase_vehicle.make }} {{ showcase_vehicle.model }}!
+{#                                    <cfif type IS 1>Drive<cfelseif type IS 2>Ride</cfif> our #adjective#<br />#make# #model#!#}
+                                </p>
                             </div>
                             </a>
                         </div>

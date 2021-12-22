@@ -175,7 +175,7 @@ class VehicleMarketing(models.Model):
     @property
     def headline(self):
         if self.specs:
-            return self.specs.get('headline')
+            return self.specs.get('headline') or ''
         return ''
 
     @property
