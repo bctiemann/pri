@@ -244,6 +244,8 @@ class VehiclePicture(models.Model):
                 temp_thumb.close()
                 super().save(*args, **kwargs)
 
+    class Meta:
+        ordering = ('-is_first',)
 
 class VehicleVideo(models.Model):
     pass

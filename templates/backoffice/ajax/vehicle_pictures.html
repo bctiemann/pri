@@ -1,3 +1,4 @@
+{% comment %}
 <CFIF NOT (Login IS False AND YourID.adminid GT 0)>
     Invalid access.
     <CFABORT>
@@ -15,6 +16,7 @@
     WHERE vehicleid = <CFQUERYPARAM value="#URL.vehicleid#" CFSQLType="CF_SQL_NUMERIC">
     ORDER BY isfirst DESC,vpicsid ASC
 </cfquery>
+{% endcomment %}
 
 <h3>Pics (1000x672)</h3>
 

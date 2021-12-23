@@ -177,6 +177,17 @@ class VehiclePicturesView(CreateView):
 class VehicleMediaPromoteView(APIView):
 
     def post(self, request, vehicle_id, media_type, pk):
+        try:
+            vehicle = VehicleMarketing.objects.get(pk=vehicle_id)
+        except VehicleMarketing.DoesNotExist:
+            raise Http404
+        try:
+            vehicle_picture = VehiclePicture.objects.get(pk=pk, vehicle_marketing=vehicle)
+        except VehiclePicture.DoesNotExist:
+            raise Http404
+        vehicle.pics.all().update(is_first=False)
+        vehicle_picture.is_first = True
+        vehicle_picture.save()
         response = {
             'success': True
         }
