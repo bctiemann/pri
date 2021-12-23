@@ -1,4 +1,4 @@
-{% load static %}
+{% load static tz %}
 
 <footer class='l-footer'>
     <nav>
@@ -33,13 +33,24 @@
     <span>News</span>
     <ul class='object-list'>
     <CFIF news.recordcount GT 0>
-    <CFOUTPUT QUERY="news">
-        <li><a href="#OnSite#news.cfm?newsid=#newsid#">#subject#</a></li>
-        <small><CFIF len(thenews) GT 100>#left(thenews,100)#...<CFELSE>#thenews#</CFIF></small>
-    </CFOUTPUT>
-     <CFELSE>
-     <li>None.</li>
-     </CFIF>
+    {% timezone "UTC" %}
+        {% if footer_news_items %}
+            {% for news_item in footer_news_items %}
+            <CFOUTPUT QUERY="news">
+                <li>
+                    <a href="{% url "news-item" year=news_item.created_at.year month=news_item.created_at.month day=news_item.created_at.day slug=news_item.slug %}">
+                        {{ news_item.subject}}
+                    </a>
+                </li>
+                <small>{{ news_item.body|truncatechars:100 }}</small>
+            </CFOUTPUT>
+            {% endfor %}
+        {% else %}
+             <CFELSE>
+             <li>None.</li>
+             </CFIF>
+        {% endif %}
+    {% endtimezone %}
      </ul>
     <div class="ant-footer">
     <CFINCLUDE TEMPLATE="inc_footer_seo.cfm">

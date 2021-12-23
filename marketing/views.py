@@ -12,6 +12,7 @@ class NavMenuMixin:
         context['ready_vehicles'] = VehicleMarketing.objects.filter(status=VehicleStatus.READY).order_by('-weighting')
         context['cars'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.CAR)
         context['bikes'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.BIKE)
+        context['footer_news_items'] = NewsItem.objects.all()[0:3]
         return context
 
 
