@@ -1,6 +1,14 @@
 from django.db import models
 
 
+class SiteContent(models.Model):
+    page = models.CharField(max_length=100)
+    content = models.TextField(blank=True)
+
+    def __str__(self):
+        return f'{self.page}'
+
+
 class NewsletterSubscription(models.Model):
     pass
 
@@ -12,9 +20,8 @@ class NewsItem(models.Model):
     subject = models.CharField(max_length=255, blank=True)
     body = models.TextField(blank=True)
 
-    @property
-    def year(self):
-        return self.created_at.year
+    def __str__(self):
+        return f'{self.id} {self.created_at.date()} {self.slug}'
 
     class Meta:
         ordering = ('-created_at',)

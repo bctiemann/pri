@@ -2,7 +2,7 @@ from django.views.generic import TemplateView, FormView, CreateView
 from django.http import Http404
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
-from marketing.models import NewsItem
+from marketing.models import NewsItem, SiteContent
 
 
 # This mixin allows us to include the common query for cars and bikes into every view, for the nav menu
@@ -67,17 +67,41 @@ class VehicleView(NavMenuMixin, TemplateView):
 class ServicesView(NavMenuMixin, TemplateView):
     template_name = 'front_site/services.html'
 
+    def get_context_data(self, slug=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        site_content = SiteContent.objects.get(page='services')
+        context['content'] = site_content.content
+        return context
+
 
 class SpecialsView(NavMenuMixin, TemplateView):
     template_name = 'front_site/specials.html'
+
+    def get_context_data(self, slug=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        site_content = SiteContent.objects.get(page='specials')
+        context['content'] = site_content.content
+        return context
 
 
 class AboutView(NavMenuMixin, TemplateView):
     template_name = 'front_site/about.html'
 
+    def get_context_data(self, slug=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        site_content = SiteContent.objects.get(page='about')
+        context['content'] = site_content.content
+        return context
+
 
 class PoliciesView(NavMenuMixin, TemplateView):
     template_name = 'front_site/policies.html'
+
+    def get_context_data(self, slug=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        site_content = SiteContent.objects.get(page='policies')
+        context['content'] = site_content.content
+        return context
 
 
 class NewsView(NavMenuMixin, TemplateView):
@@ -100,6 +124,12 @@ class NewsView(NavMenuMixin, TemplateView):
 
 class ContactView(NavMenuMixin, TemplateView):
     template_name = 'front_site/contact.html'
+
+    def get_context_data(self, slug=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        site_content = SiteContent.objects.get(page='contact')
+        context['content'] = site_content.content
+        return context
 
 
 class TermsConditionsView(NavMenuMixin, TemplateView):

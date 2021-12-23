@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from marketing.models import NewsItem
+from marketing.models import NewsItem, SiteContent
 
 
 class NewsItemAdmin(admin.ModelAdmin):
@@ -8,4 +8,9 @@ class NewsItemAdmin(admin.ModelAdmin):
     search_fields = ('subject', 'body',)
 
 
+class SiteContentAdmin(admin.ModelAdmin):
+    list_display = ('page',)
+
+
 admin.site.register(NewsItem, NewsItemAdmin)
+admin.site.register(SiteContent, SiteContentAdmin)

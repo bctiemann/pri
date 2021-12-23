@@ -5,13 +5,7 @@
 <div class="well">
     <div class='section-header'>Rental Policies</div>
 
-    <cfquery name="Content" datasource="#DSN#" cachedWithin="#t10Min#">
-        SELECT policies FROM vars
-    </cfquery>
-
-    <cfoutput>
-#Content.policies#
-    </cfoutput>
+    {{ content|safe }}
 
 </div>
 </div>

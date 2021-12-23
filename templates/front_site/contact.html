@@ -5,13 +5,7 @@
 <div class="well">
     <div class='section-header'>Contact Us</div>
 
-    <cfquery name="Content" datasource="#DSN#" cachedWithin="#t10Min#">
-        SELECT contact FROM vars
-    </cfquery>
-
-    <cfoutput>
-#Content.contact#
-    </cfoutput>
+    {{ content|safe }}
 
 </div>
 </div>

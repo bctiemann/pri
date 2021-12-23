@@ -13,7 +13,7 @@ from django.utils.text import slugify
 from django.core.files.temp import NamedTemporaryFile
 from django.core.files import File
 
-from marketing.models import NewsItem
+from marketing.models import NewsItem, SiteContent
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, TransmissionType, Location, get_vehicle_picture_path
 from users.models import Customer, Employee, User, MusicGenre
 from sales.models import Reservation
@@ -48,7 +48,8 @@ class Command(BaseCommand):
         # 'do_consigners': True,
         # 'do_consignmentvehicles': True,
         # 'do_admins': True,
-        'do_newsitems': True,
+        # 'do_newsitems': True
+        'do_sitecontent': True,
     }
 
     def add_arguments(self, parser):
@@ -441,6 +442,24 @@ class Command(BaseCommand):
                     news_item.author_id = author.id
                 except User.DoesNotExist:
                     pass
-                # news_item.created_at = old['stamp'].replace(tzinfo=pytz.timezone(settings.TIME_ZONE))
                 news_item.created_at = old['stamp'].replace(tzinfo=pytz.utc)
                 news_item.save()
+
+        if 'do_sitecontent' in self.enabled:
+            if clear_existing:
+                SiteContent.objects.all().delete()
+            for page in (
+                ('about', 'about',),
+                ('policies', 'policies',),
+                ('contact', 'contact',),
+                ('servicescont', 'services',),
+                ('reservations', 'specials',),
+            ):
+                db_key, page_key = page
+                back_cursor.execute(f"""SELECT {db_key} FROM vars""")
+                old_content = back_cursor.fetchone()
+                print(old_content)
+                new = SiteContent.objects.create(
+                    page=page_key,
+                    content=old_content[db_key],
+                )
