@@ -2,6 +2,7 @@ import MySQLdb
 import logging
 import json
 import requests
+import re
 from html2bbcode import parser
 
 from django.conf import settings
@@ -425,6 +426,9 @@ class Command(BaseCommand):
             for old in front_cursor.fetchall():
                 print(old)
                 parsed_body = self.bbcode_parser.feed(old['thenews'])
+                parsed_body = re.sub('[\r\n]{3,}', '\r\n\r\n', parsed_body)
+                parsed_body = re.sub('\[/?p\](\r\n)?', '', parsed_body)
+
                 news_item = NewsItem.objects.create(
                     subject=old['subject'],
                     body=parsed_body,
