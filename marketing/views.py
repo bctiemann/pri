@@ -84,3 +84,15 @@ class NewsView(NavMenuMixin, TemplateView):
 
 class ContactView(NavMenuMixin, TemplateView):
     template_name = 'front_site/contact.html'
+
+
+class TermsConditionsView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/terms.html'
+
+
+class PrivacyPolicyView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/privacy.html'
+
+
+class MediaInquiriesView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/media.html'

@@ -85,7 +85,7 @@
         <li><a href="#OnSecSite#newsletter.cfm" rel="publisher">Subscribe to our Newsletter</a></li>
         </cfoutput>
     </ul>
-    <a target="_blank" href="https://itunes.apple.com/us/app/pri-cars/id456142248?mt=8"><img class="app-store" src="images/appstore.png" /></a>
+    <a target="_blank" href="https://itunes.apple.com/us/app/pri-cars/id456142248?mt=8"><img class="app-store" src="{% static "images/appstore.png" %}" /></a>
     </section>
     </div>
     </div>
@@ -97,10 +97,10 @@
     <div class='l-container'>
     <ul>
         <cfoutput>
-        <li><a href="#OnSite#terms.cfm">Terms & Conditions</a></li>
-        <li><a href="#OnSite#privacy.cfm">Privacy Policy</a></li>
-        <li><a href="#OnSite#media.cfm">Media Inquiries</a></li>
-        <li><a href="#OnSite#terms.cfm">Copyright &copy; 2007-<CFOUTPUT>#DateFormat(Now(),"yyyy")#</CFOUTPUT> Performance Rentals, Inc. All Rights Reserved.	</a></li>
+        <li><a href="{% url "terms-and-conditions" %}">Terms & Conditions</a></li>
+        <li><a href="{% url "privacy-policy" %}">Privacy Policy</a></li>
+        <li><a href="{% url "media-inquiries" %}">Media Inquiries</a></li>
+        <li><a href="{% url "terms-and-conditions" %}">Copyright &copy; 2007-{% now "Y" %}{# <CFOUTPUT>#DateFormat(Now(),"yyyy")#</CFOUTPUT> #} Performance Rentals, Inc. All Rights Reserved.	</a></li>
         </cfoutput>
     </ul>
     </div>

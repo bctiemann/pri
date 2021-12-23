@@ -86,6 +86,10 @@ urlpatterns = [
     path('news/', marketing_views.NewsView.as_view(), name='news'),
     path('contact/', marketing_views.ContactView.as_view(), name='contact'),
 
+    path('terms/', marketing_views.TermsConditionsView.as_view(), name='terms-and-conditions'),
+    path('privacy/', marketing_views.PrivacyPolicyView.as_view(), name='privacy-policy'),
+    path('media/', marketing_views.MediaInquiriesView.as_view(), name='media-inquiries'),
+
     path('api/vehicles/', api_views.GetVehiclesView.as_view(), name='get-vehicles'),
     path('api/vehicles/<int:vehicle_id>/', api_views.GetVehicleView.as_view(), name='get-vehicle'),
     path('api/validate/rental/details/', api_views.ValidateRentalDetailsView.as_view(), name='validate-rental-details'),
