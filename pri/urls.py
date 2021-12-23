@@ -84,6 +84,7 @@ urlpatterns = [
     path('about/', marketing_views.AboutView.as_view(), name='about'),
     path('policies/', marketing_views.PoliciesView.as_view(), name='policies'),
     path('news/', marketing_views.NewsView.as_view(), name='news'),
+    path('news/<int:year>/<int:month>/<int:day>/<str:slug>/', marketing_views.NewsView.as_view(), name='news-item'),
     path('contact/', marketing_views.ContactView.as_view(), name='contact'),
 
     path('terms/', marketing_views.TermsConditionsView.as_view(), name='terms-and-conditions'),

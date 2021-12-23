@@ -84,7 +84,16 @@ class NewsView(NavMenuMixin, TemplateView):
 
     def get_context_data(self, slug=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['news_items'] = NewsItem.objects.all()[0:10]
+        slug = self.kwargs.get('slug')
+        if slug:
+            context['news_items'] = NewsItem.objects.filter(
+                slug=self.kwargs.get('slug'),
+                created_at__year=self.kwargs['year'],
+                created_at__month=self.kwargs['month'],
+                created_at__day=self.kwargs['day'],
+            )
+        else:
+            context['news_items'] = NewsItem.objects.all()[0:10]
         return context
 
 

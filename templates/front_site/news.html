@@ -1,11 +1,12 @@
 {% extends "front_site/base.html" %}
-{% load bbcode_tags %}
+{% load bbcode_tags tz %}
 
 {% block content %}
 <div class="l-container">
 <div class="well">
     <div class='section-header'>News</div>
 
+    {% comment %}
     <cfquery name="News" datasource="#FDSN#" cachedWithin="#tMin#">
         SELECT newsid,stamp,thenews,subject FROM News
         <cfif IsDefined("URL.newsid") AND IsNumeric(URL.newsid)>
@@ -14,21 +15,30 @@
         ORDER BY stamp DESC
         LIMIT 10
     </cfquery>
+    {% endcomment %}
 
+    {% timezone "UTC" %}
     <cfoutput query="News">
     {% for news_item in news_items %}
     <div class="news">
-        <h4><a href="news.cfm?newsid=#newsid#">{{ news_item.created_at|date:"n/d/Y" }} - {{ news_item.subject }}</a></h4>
+        <h4>
+            <a href="{% url "news-item" year=news_item.created_at.year month=news_item.created_at.month day=news_item.created_at.day slug=news_item.slug %}">
+                {{ news_item.created_at|date:"n/d/Y" }} - {{ news_item.subject }}
+            </a>
+        </h4>
         <p>
             {{ news_item.body|bbcode|safe }}
         </p>
     </div>
     {% endfor %}
     </cfoutput>
+    {% endtimezone %}
 
+    {% if news_items|length == 1 %}
     <cfif IsDefined("URL.newsid") AND IsNumeric(URL.newsid)>
     <p><a href="{% url "news" %}">View all news</a></p>
     </cfif>
+    {% endif %}
 
 </div>
 </div>

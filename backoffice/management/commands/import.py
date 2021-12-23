@@ -1,6 +1,8 @@
 import MySQLdb
 import logging
 import json
+
+import pytz
 import requests
 import re
 from html2bbcode import parser
@@ -430,6 +432,7 @@ class Command(BaseCommand):
                 parsed_body = re.sub('\[/?p\](\r\n)?', '', parsed_body)
 
                 news_item = NewsItem.objects.create(
+                    slug=slugify(old['subject']),
                     subject=old['subject'],
                     body=parsed_body,
                 )
@@ -438,5 +441,6 @@ class Command(BaseCommand):
                     news_item.author_id = author.id
                 except User.DoesNotExist:
                     pass
-                news_item.created_at = old['stamp']
+                # news_item.created_at = old['stamp'].replace(tzinfo=pytz.timezone(settings.TIME_ZONE))
+                news_item.created_at = old['stamp'].replace(tzinfo=pytz.utc)
                 news_item.save()
