@@ -1,4 +1,5 @@
 {% extends "front_site/base.html" %}
+{% load bbcode_tags %}
 
 {% block content %}
 <div class="l-container">
@@ -15,16 +16,18 @@
     </cfquery>
 
     <cfoutput query="News">
+    {% for news_item in news_items %}
     <div class="news">
-        <h4><a href="news.cfm?newsid=#newsid#">#DateFormat(stamp,"M/DD/YY")# - #subject#</a></h4>
+        <h4><a href="news.cfm?newsid=#newsid#">{{ news_item.created_at|date:"n/d/Y" }} - {{ news_item.subject }}</a></h4>
         <p>
-        #thenews#
+            {{ news_item.body|bbcode|safe }}
         </p>
     </div>
+    {% endfor %}
     </cfoutput>
 
     <cfif IsDefined("URL.newsid") AND IsNumeric(URL.newsid)>
-    <p><a href="news.cfm">View all news</a></p>
+    <p><a href="{% url "news" %}">View all news</a></p>
     </cfif>
 
 </div>

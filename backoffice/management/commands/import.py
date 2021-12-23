@@ -9,8 +9,9 @@ from django.utils.text import slugify
 from django.core.files.temp import NamedTemporaryFile
 from django.core.files import File
 
+from marketing.models import NewsItem
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, TransmissionType, Location, get_vehicle_picture_path
-from users.models import Customer, User, MusicGenre
+from users.models import Customer, Employee, User, MusicGenre
 from sales.models import Reservation
 from consignment.models import Consigner
 from pri.cipher import AESCipher
@@ -36,12 +37,14 @@ SITE_SEC_ROOT = 'http://172.16.0.5/prinew/secure/'
 class Command(BaseCommand):
 
     enabled = {
-        'do_vehicles': True,
-        'do_vehicle_pics': True,
-        'do_customers': True,
-        'do_reservations': True,
-        'do_consigners': True,
-        'do_consignmentvehicles': True,
+        # 'do_vehicles': True,
+        # 'do_vehicle_pics': True,
+        # 'do_customers': True,
+        # 'do_reservations': True,
+        # 'do_consigners': True,
+        # 'do_consignmentvehicles': True,
+        # 'do_admins': True,
+        'do_newsitems': True,
     }
 
     def add_arguments(self, parser):
@@ -373,3 +376,52 @@ class Command(BaseCommand):
                     vehicle.external_owner = consigner
                     vehicle.save()
 
+        if 'do_admins' in self.enabled:
+            if clear_existing:
+                Employee.objects.all().delete()
+            back_cursor.execute("""SELECT * FROM admin""")
+            for old in back_cursor.fetchall():
+                print(old)
+                try:
+                    password = self.decrypt(old['pass'])
+                except ValueError:
+                    password = old['pass']
+                name_parts = old['fullname'].split(' ')
+                first_name = name_parts[0]
+                last_name = name_parts[1] if len(name_parts) > 1 else ''
+                user = None
+                if old['email']:
+                    try:
+                        user = User.objects.get(email=old['email'])
+                    except User.DoesNotExist:
+                        user = User.objects.create_user(
+                            email=old['email'],
+                            password=password,
+                        )
+                    user.id_orig = old['adminid']
+                    user.notes = old['about']
+                    user.created_at = old['stamp']
+                    user.is_backoffice = True
+                    user.is_admin = old['acclev'] == Employee.AccessLevel.ADMIN.value
+                    user.save()
+                    employee = Employee.objects.create(
+                        user=user,
+                        first_name=first_name,
+                        last_name=last_name,
+                        access_level=old['acclev'],
+                    )
+                    employee.created_at = old['stamp']
+                    employee.save()
+
+        if 'do_newsitems' in self.enabled:
+            if clear_existing:
+                NewsItem.objects.all().delete()
+            front_cursor.execute("""SELECT * FROM News""")
+            for old in front_cursor.fetchall():
+                print(old)
+                news_item = NewsItem.objects.create(
+                    subject=old['subject'],
+                    body=old['thenews'],
+                )
+                news_item.created_at = old['stamp']
+                news_item.save()

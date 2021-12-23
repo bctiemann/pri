@@ -2,6 +2,7 @@ from django.views.generic import TemplateView, FormView, CreateView
 from django.http import Http404
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
+from marketing.models import NewsItem
 
 
 # This mixin allows us to include the common query for cars and bikes into every view, for the nav menu
@@ -80,6 +81,11 @@ class PoliciesView(NavMenuMixin, TemplateView):
 
 class NewsView(NavMenuMixin, TemplateView):
     template_name = 'front_site/news.html'
+
+    def get_context_data(self, slug=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['news_items'] = NewsItem.objects.all()[0:10]
+        return context
 
 
 class ContactView(NavMenuMixin, TemplateView):

@@ -4,14 +4,14 @@ from users.models import User, Employee, Customer, MusicGenre
 
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('id', 'email', 'customer', 'is_admin', 'last_login', 'is_sleeping',)
+    list_display = ('id', 'email', 'customer', 'is_admin', 'is_backoffice', 'last_login', 'is_sleeping', 'created_at',)
     readonly_fields = ('created_by', 'last_login',)
     search_fields = ('email',)
-    list_filter = ('is_admin',)
+    list_filter = ('is_admin', 'is_backoffice',)
 
 
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'first_name', 'last_name', 'user',)
+    list_display = ('id', 'first_name', 'last_name', 'user', 'created_at',)
     search_fields = ('user__email', 'first_name', 'last_name',)
 
 

@@ -6,7 +6,13 @@ class NewsletterSubscription(models.Model):
 
 
 class NewsItem(models.Model):
-    pass
+    created_by = models.ForeignKey('users.User', null=True, on_delete=models.SET_NULL)
+    created_at = models.DateTimeField(auto_now_add=True)
+    subject = models.CharField(max_length=255, blank=True)
+    body = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ('-created_at',)
 
 
 class SurveyResponse(models.Model):
