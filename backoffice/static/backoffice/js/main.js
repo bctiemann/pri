@@ -250,7 +250,7 @@ var refreshMedia = function() {
         $('.vpic-delete').click(function() {
             var vpicsid = $(this).attr('vpicsid');
             if (confirm('Really delete this picture?')) {
-                editMedia('deleteVPic', vpicsid);
+                editMedia('delete', 'picture', vpicsid);
             }
         });
         $('.vpic-makefirst').click(function() {
