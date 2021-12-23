@@ -6,7 +6,7 @@ class NewsletterSubscription(models.Model):
 
 
 class NewsItem(models.Model):
-    created_by = models.ForeignKey('users.User', null=True, on_delete=models.SET_NULL)
+    author_id = models.IntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     subject = models.CharField(max_length=255, blank=True)
     body = models.TextField(blank=True)

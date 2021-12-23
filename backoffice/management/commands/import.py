@@ -2,6 +2,7 @@ import MySQLdb
 import logging
 import json
 import requests
+from html2bbcode import parser
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -50,6 +51,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--key', dest='key',)
         parser.add_argument('--clear_existing', dest='clear_existing', default=False, action='store_true',)
+        parser.add_argument('--map', '--config', default=None, help='map.conf file for html2bbcode')
 
     def decrypt(self, value):
         return self.aes.decrypt(value) if value else ''
@@ -95,6 +97,8 @@ class Command(BaseCommand):
             raise SystemExit
 
         self.aes = AESCipher(key)
+
+        self.bbcode_parser = parser.HTML2BBCode(options.get('map'))
 
         legacy_db = settings.DATABASES['default_legacy']
         legacy_front_db = settings.DATABASES['front_legacy']
@@ -149,6 +153,7 @@ class Command(BaseCommand):
                     new.policy_phone = ''
                 front_cursor.execute("""SELECT * FROM VehiclesFront where vehicleid=%s""", old['vehicleid'])
                 old_front = front_cursor.fetchone()
+                parsed_blurb = bbcode_parser.feed(old_front['blurb'])
                 new_front = VehicleMarketing.objects.create(
                     id=new.id,
                     vehicle_id=new.id,
@@ -166,7 +171,7 @@ class Command(BaseCommand):
                     gears=old_front['gears'],
                     location=LOCATION_MAP.get(old_front['location']),
                     tight_fit=old_front['tightfit'],
-                    blurb=old_front['blurb'],
+                    blurb=parsed_blurb,
                     specs=json.loads(old_front['specs']),
                     origin_country='GB' if old_front['origin'] == 'UK' else old_front['origin'],
                     price_per_day=old_front['price'],
@@ -419,9 +424,15 @@ class Command(BaseCommand):
             front_cursor.execute("""SELECT * FROM News""")
             for old in front_cursor.fetchall():
                 print(old)
+                parsed_body = self.bbcode_parser.feed(old['thenews'])
                 news_item = NewsItem.objects.create(
                     subject=old['subject'],
-                    body=old['thenews'],
+                    body=parsed_body,
                 )
+                try:
+                    author = User.objects.get(id_orig=old['adminid'])
+                    news_item.author_id = author.id
+                except User.DoesNotExist:
+                    pass
                 news_item.created_at = old['stamp']
                 news_item.save()

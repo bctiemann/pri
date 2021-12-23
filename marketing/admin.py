@@ -4,7 +4,7 @@ from marketing.models import NewsItem
 
 
 class NewsItemAdmin(admin.ModelAdmin):
-    list_display = ('id', 'subject', 'created_at', 'created_by',)
+    list_display = ('id', 'subject', 'created_at',)
     search_fields = ('subject', 'body',)
 
 
