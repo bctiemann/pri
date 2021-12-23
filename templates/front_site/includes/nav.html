@@ -4,7 +4,7 @@
 
 <section class="upper">
     <div class="l-container">
-        <a class="banner" href="#">
+        <a class="banner" href="{% url "home" %}">
             <p class="highlight" style="font-size: 22px;">{{ title_bar_line_1 }}</p>
             <p>{{ title_bar_line_2 }}</p>
         </a>
@@ -54,12 +54,12 @@ ORDER BY weighting DESC
         {% endfor %}
         </ul>
     </li>
-    <li class='services'><a href='#OnSite#services.cfm'>Our Services</a></li>
-    <li class='services'><a href='#OnSite#specials.cfm'>Specials</a></li>
-    <li class='services'><a href='#OnSite#about.cfm'>About Us</a></li>
-    <li class='services'><a href='#OnSite#policies.cfm'>Policies</a></li>
-    <li class='services'><a href='#OnSite#news.cfm'>News</a></li>
-    <li class='services'><a href='#OnSite#contact.cfm'>Contact</a></li>
+    <li class='services'><a href='{% url "services" %}'>Our Services</a></li>
+    <li class='services'><a href='{% url "specials" %}'>Specials</a></li>
+    <li class='services'><a href='{% url "about" %}'>About Us</a></li>
+    <li class='services'><a href='{% url "policies" %}'>Policies</a></li>
+    <li class='services'><a href='{% url "news" %}'>News</a></li>
+    <li class='services'><a href='{% url "contact" %}'>Contact</a></li>
 </ul>
 
 

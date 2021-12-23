@@ -1,0 +1,18 @@
+{% extends "front_site/base.html" %}
+
+{% block content %}
+<div class="l-container">
+<div class="well">
+    <div class='section-header'>About PRI</div>
+
+    <cfquery name="Content" datasource="#DSN#" cachedWithin="#t10Min#">
+        SELECT about FROM vars
+    </cfquery>
+
+    <cfoutput>
+#Content.about#
+    </cfoutput>
+
+</div>
+</div>
+{% endblock %}

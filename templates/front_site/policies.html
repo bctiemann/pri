@@ -1,0 +1,18 @@
+{% extends "front_site/base.html" %}
+
+{% block content %}
+<div class="l-container">
+<div class="well">
+    <div class='section-header'>Rental Policies</div>
+
+    <cfquery name="Content" datasource="#DSN#" cachedWithin="#t10Min#">
+        SELECT policies FROM vars
+    </cfquery>
+
+    <cfoutput>
+#Content.policies#
+    </cfoutput>
+
+</div>
+</div>
+{% endblock %}

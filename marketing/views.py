@@ -60,3 +60,27 @@ class VehicleView(NavMenuMixin, TemplateView):
         if not context['vehicle']:
             raise Http404
         return context
+
+
+class ServicesView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/services.html'
+
+
+class SpecialsView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/specials.html'
+
+
+class AboutView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/about.html'
+
+
+class PoliciesView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/policies.html'
+
+
+class NewsView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/news.html'
+
+
+class ContactView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/contact.html'

@@ -7,23 +7,24 @@
     <ul>
         <cfoutput>
         <li><a href="{% url "fleet" %}">Fleet &amp; Rates</a></li>
-        <li><a href="#OnSite#services.cfm">Services</a></li>
-        <li><a href="#OnSite#specials.cfm">Specials</a></li>
-        <li><a href="#OnSite#about.cfm">About Us</a></li>
-        <li><a href="#OnSite#policies.cfm">Policies</a></li>
-        <li><a href="#OnSite#news.cfm">News</a></li>
-        <li><a href="#OnSite#contact.cfm">Contact</a></li>
+        <li><a href="{% url "services" %}">Services</a></li>
+        <li><a href="{% url "specials" %}">Specials</a></li>
+        <li><a href="{% url "about" %}">About Us</a></li>
+        <li><a href="{% url "policies" %}">Policies</a></li>
+        <li><a href="{% url "news" %}">News</a></li>
+        <li><a href="{% url "contact" %}">Contact</a></li>
         </cfoutput>
     </ul>
     </div>
     </nav>
 
-
+    {% comment %}
     <CFQUERY NAME="news" DATASOURCE="#FDSN#">
     SELECT newsid,subject,thenews FROM News
     ORDER BY stamp DESC
     LIMIT 3
     </CFQUERY>
+    {% endcomment %}
 
     <section class="quick-links">
     <div class='l-container' style="position: relative; z-index: 10;">
