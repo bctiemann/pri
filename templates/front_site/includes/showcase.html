@@ -1,4 +1,4 @@
-{% load static bbcode_tags %}
+{% load static bbcode_tags humanize %}
 
 {% comment %}
 <cfquery name="Showcase" datasource="#DSN#">
@@ -111,7 +111,7 @@
                                 <img class="click-to-reserve" src="{% static "images/ClickToReserve.png" %}" />
                                 <img src="{% static "images/price-bg.jpg" %}" alt="img" />
                                 <span class="price-centered">
-                                    <p class="price">${{ showcase_vehicle.price_per_day|floatformat }}</p>/day
+                                    <p class="price">${{ showcase_vehicle.price_per_day|floatformat:0|intcomma }}</p>/day
                                 </span>
                             </div>
                             <div class="info">

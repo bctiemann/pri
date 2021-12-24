@@ -1,6 +1,5 @@
 {% extends "front_site/base.html" %}
-{% load static %}
-{% load bbcode_tags %}
+{% load static bbcode_tags humanize vehicle_tags %}
 
 {% comment %}
 <cfset vid = IsDefined("URL.vid") ? URL.vid : IsDefined("URL.carid") ? URL.carid : "">
@@ -80,7 +79,7 @@
 {% block content %}
 <div class="l-container well">
 
-
+    {% comment %}
     <CFQUERY NAME="tPics" DATASOURCE="#FDSN#">
         SELECT vpicsid,vehicleid,fext,isfirst FROM VPics
         WHERE vehicleid = <CFQUERYPARAM value="#tCar.vehicleid#" CFSQLType="CF_SQL_INTEGER">
@@ -91,7 +90,7 @@
         WHERE vehicleid = <CFQUERYPARAM value="#tCar.vehicleid#" CFSQLType="CF_SQL_INTEGER">
         ORDER BY isfirst DESC, vvidsid ASC
     </CFQUERY>
-
+    {% endcomment %}
 
     <div class="flexslider">
         <h1 class="car-make-model overlay-text">
@@ -110,14 +109,14 @@
 
 
 
-    <CFOUTPUT QUERY="tfCar">
+{#    <CFOUTPUT QUERY="tfCar">#}
 
     <div class="float-right">
 
         <div class="the-numbers"></div>
 
         <p class="newsletterblurb">
-        Interested in more information about this <cfif type IS 1>car<cfelseif type IS 2>bike</cfif>? Sign up for our <a
+        Interested in more information about this {{ vehicle.vehicle_type_casual }}? Sign up for our <a
         class="pic" href="#OnSecSite#newsletter.cfm">newsletter</a> and receive updates about
         this and other vehicles, as well as special discounts from PRI!
         </p>
@@ -135,23 +134,23 @@
         </tr>
         <tr>
             <td>
-                <span class="price">#NumberFormat(price,"$,")#</span> / 24 hrs
+                <span class="price">${{ vehicle.price_per_day|floatformat:0|intcomma }}</span> / 24 hrs
             </td>
             <td>
-                <span class="price">#NumberFormat(price * 2 * (1 - disc2day/100),"$,")#</span> / 48 hrs
+                <span class="price">${{ vehicle|multi_day_discounted_price:2|floatformat:0|intcomma }}</span> / 48 hrs
             </td>
             <td>
-                <span class="price">#NumberFormat(price * 3 * (1 - disc3day/100),"$,")#</span> / 72 hrs
+                <span class="price">${{ vehicle|multi_day_discounted_price:3|floatformat:0|intcomma }}</span> / 72 hrs
             </td>
             <td>
-                <span class="price">#NumberFormat(price * 7 * (1 - disc7day/100),"$,")#</span> / 7 days
+                <span class="price">${{ vehicle|multi_day_discounted_price:7|floatformat:0|intcomma }}</span> / 7 days
             </td>
         </tr>
         <tr class="milesinc">
-            <td>#NumberFormat(milesinc * 1 )# mi</td>
-            <td>#NumberFormat(milesinc * 2 )# mi</td>
-            <td>#NumberFormat(milesinc * 3 )# mi</td>
-            <td>#NumberFormat(milesinc * 7 )# mi</td>
+            <td>{{ vehicle|multi_day_miles_included:1 }} mi</td>
+            <td>{{ vehicle|multi_day_miles_included:2 }} mi</td>
+            <td>{{ vehicle|multi_day_miles_included:3 }} mi</td>
+            <td>{{ vehicle|multi_day_miles_included:7 }} mi</td>
         </tr>
         <tr>
             <td colspan="4" class="fineprint">Overage is $1.95/mile. Purchase miles in advance for discounted rates.</th>
@@ -163,8 +162,12 @@
     <div class="ih-item circle effect4 left_to_right price-bubble">
         <a href="{% url "reserve" slug=vehicle.slug %}">
         <div class="img">
-            <img class="click-to-reserve" src="images/ClickToReserve.png" />
-            <img src="images/price-bg.jpg" alt="img"><span class="price-centered"><p class="price">#NumberFormat(price,"$,")#</p>/day</span>
+            <img class="click-to-reserve" src="{% static "images/ClickToReserve.png" %}" />
+            <img src="{% static "images/price-bg.jpg" %}" alt="img">
+            <span class="price-centered">
+                <p class="price">${{ vehicle.price_per_day|floatformat:"0"|intcomma}}</p>
+                /day
+            </span>
         </div>
         <div class="info">
             <h3>Reserve Now</h3>
@@ -177,8 +180,7 @@
         {{ vehicle.blurb|bbcode|safe }}
     </div>
 
-    </CFOUTPUT>
-
+{#    </CFOUTPUT>#}
 
 
     <CFIF tVids.recordcount GT 0>
@@ -217,31 +219,31 @@
 <script type="text/javascript">
 //var words = new Array();
 
-<CFOUTPUT QUERY="tfCar">
+//<CFOUTPUT QUERY="tfCar">
 words = [
 {
-    text: '#gears#-speed',
-    subtext: '<CFIF trans IS 1>manual<CFELSEIF trans IS 2>paddle-shift<CFELSEIF trans IS 3>auto</CFIF>',
+    text: '{{ vehicle.gears }}-speed',
+    subtext: '{{ vehicle.get_transmission_type_display|lower }}',
     weight: 6,
 },
 {
-    text: '#hp#',
+    text: '{{ vehicle.horsepower }}',
     subtext: 'bhp',
     weight: 9,
 },
 {
-    text: '#tq#',
+    text: '{{ vehicle.torque }}',
     subtext: 'ft-lbs',
     weight: 10,
 },
 {
-    text: '#topspeed#',
+    text: '{{ vehicle.top_speed }}',
     subtext: 'mph',
     weight: 9,
 },
 ];
 
-var specs = #specs#;
+var specs = {{ vehicle.specs_json|safe }};
 
 for (var k in specs.speclist) {
     var spec = specs.speclist[k];
@@ -252,7 +254,7 @@ for (var k in specs.speclist) {
     });
 }
 
-</CFOUTPUT>
+//</CFOUTPUT>
 
 $('.the-numbers').jQCloud(words, {
     width: 450,

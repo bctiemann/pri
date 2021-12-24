@@ -21,7 +21,7 @@ from django.core.files.storage import default_storage
 
 class VehicleType(models.IntegerChoices):
     CAR = (1, 'Road Car')
-    BIKE = (2, 'Bike')
+    BIKE = (2, 'Motorcycle')
     TRACK = (3, 'Track Car')
 
 
@@ -113,6 +113,12 @@ class Vehicle(models.Model):
 
 class VehicleMarketing(models.Model):
 
+    VEHICLE_TYPE_MAP = {
+        VehicleType.CAR: 'car',
+        VehicleType.BIKE: 'bike',
+        VehicleType.TRACK: 'track car',
+    }
+
     # This links the record to the Vehicle object, which is where potentially sensitive business data
     # is stored. Cannot be a ForeignKey because the databases are kept segregated. See pri/db_routers.py
     vehicle_id = models.IntegerField(null=True, blank=True, help_text='ID of Vehicle object this corresponds to')
@@ -172,6 +178,11 @@ class VehicleMarketing(models.Model):
     def vehicle_name(self):
         return f'{self.year} {self.make} {self.model}'
 
+    # For use in marketing copy
+    @property
+    def vehicle_type_casual(self):
+        return self.VEHICLE_TYPE_MAP.get(self.vehicle_type)
+
     @property
     def headline(self):
         if self.specs:
@@ -190,6 +201,13 @@ class VehicleMarketing(models.Model):
     def blurb_parsed(self):
         parser = get_parser()
         return parser.render(self.blurb)
+
+    def get_multi_day_discounted_price(self, num_days):
+        discount_pct = getattr(self, f'discount_{num_days}_day', 0)
+        return float(self.price_per_day) * num_days * (1 - discount_pct / 100)
+
+    def get_multi_day_miles_included(self, num_days):
+        return self.miles_included * num_days
 
     def __str__(self):
         return f'[{self.id}] {self.vehicle_name}'
