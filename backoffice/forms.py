@@ -1,6 +1,6 @@
 from django import forms
 
-from fleet.models import Vehicle, VehicleMarketing, VehiclePicture
+from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo
 from consignment.models import Consigner
 from users.models import Employee
 
@@ -45,9 +45,20 @@ class VehicleInspectionForm(forms.ModelForm):
 
 class VehiclePictureForm(forms.ModelForm):
 
+    # TODO: validate image and thumbnail (prevent saving if nothing uploaded)
+
     class Meta:
         model = VehiclePicture
         fields = ('image',)
+
+
+class VehicleVideoForm(forms.ModelForm):
+
+    # TODO: validate video and thumbnail (prevent saving if nothing uploaded)
+
+    class Meta:
+        model = VehicleVideo
+        fields = ('video', 'thumbnail', 'length', 'title', 'blurb',)
 
 
 class EmployeeForm(forms.ModelForm):

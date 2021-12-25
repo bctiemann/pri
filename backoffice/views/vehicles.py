@@ -9,7 +9,7 @@ from django.http import Http404, HttpResponseRedirect
 from . import ListViewMixin
 from fleet.models import VehicleType, VehicleStatus, Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo
 from backoffice.forms import (
-    VehicleForm, VehicleShowcaseForm, VehicleThumbnailForm, VehicleInspectionForm, VehiclePictureForm,
+    VehicleForm, VehicleShowcaseForm, VehicleThumbnailForm, VehicleInspectionForm, VehiclePictureForm, VehicleVideoForm,
     VehicleMarketingForm
 )
 
@@ -172,6 +172,20 @@ class VehiclePicturesView(CreateView):
 
     def get_success_url(self):
         return reverse('backoffice:vehicle-detail', kwargs={'pk': self.vehicle_marketing.vehicle_id})
+
+
+class VehicleVideosView(CreateView):
+    template_name = 'backoffice/ajax/vehicle_videos.html'
+    model = VehicleVideo
+    form_class = VehicleVideoForm
+    vehicle_marketing = None
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.vehicle_marketing = VehicleMarketing.objects.get(vehicle_id=kwargs['pk'])
+        except VehicleMarketing.DoesNotExist:
+            raise Http404
+        return super().dispatch(request, *args, **kwargs)
 
 
 class VehicleMediaPromoteView(APIView):

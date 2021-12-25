@@ -22,9 +22,11 @@
 
 {% for picture in vehicle_marketing.pics.all %}
     <div class="vpic-container">
-        <a href="{{ picture.image.url }}" target="_blank">
-            <img class="vpic" src="{{ picture.thumbnail.url }}" />
-        </a>
+        {% if picture.image and picture.thumbnail %}
+            <a href="{{ picture.image.url }}" target="_blank">
+                <img class="vpic" src="{{ picture.thumbnail.url }}" />
+            </a>
+        {% endif %}
         <span class="vpic-delete ui-icon ui-icon-trash" vpicsid="{{ picture.id }}"></span>
         {% if not picture.is_first %}
             <span class="vpic-makefirst ui-icon ui-icon-star" vpicsid="{{ picture.id }}"></span>

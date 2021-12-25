@@ -14,7 +14,10 @@ from django.core.files.temp import NamedTemporaryFile
 from django.core.files import File
 
 from marketing.models import NewsItem, SiteContent
-from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, TransmissionType, Location, get_vehicle_picture_path
+from fleet.models import (
+    Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, TransmissionType, Location,
+    get_vehicle_picture_path, get_vehicle_video_path
+)
 from users.models import Customer, Employee, User, MusicGenre
 from sales.models import Reservation
 from consignment.models import Consigner
@@ -43,13 +46,14 @@ class Command(BaseCommand):
     enabled = {
         # 'do_vehicles': True,
         # 'do_vehicle_pics': True,
+        'do_vehicle_vids': True,
         # 'do_customers': True,
         # 'do_reservations': True,
         # 'do_consigners': True,
         # 'do_consignmentvehicles': True,
         # 'do_admins': True,
         # 'do_newsitems': True
-        'do_sitecontent': True,
+        # 'do_sitecontent': True,
     }
 
     def add_arguments(self, parser):
@@ -87,6 +91,15 @@ class Command(BaseCommand):
         thumb_tempfile = self.get_image_tempfile(thumb_url)
         vehicle_picture.thumbnail.save(get_vehicle_picture_path(None, f'temp.{ext}'), File(thumb_tempfile))
         vehicle_picture.save()
+
+    def import_vehicle_video(self, vehicle_video, vehicle_vid_id, ext, thumb_ext):
+        url = f'{SITE_ROOT}vids/PRI-{vehicle_vid_id}.{ext}'
+        video_tempfile = self.get_image_tempfile(url)
+        vehicle_video.video.save(get_vehicle_video_path(None, f'temp.{ext}'), File(video_tempfile))
+        thumb_url = f'{SITE_ROOT}vids/PRI-{vehicle_vid_id}.thumb.{thumb_ext}'
+        thumb_tempfile = self.get_image_tempfile(thumb_url)
+        vehicle_video.thumbnail.save(get_vehicle_video_path(None, f'temp.{thumb_ext}'), File(thumb_tempfile))
+        vehicle_video.save()
 
     def import_inspection_image(self, vehicle_marketing, vehicle_id):
         url = f'{SITE_SEC_ROOT}spork/carcheck/{vehicle_id}.png'
@@ -157,7 +170,7 @@ class Command(BaseCommand):
                     new.policy_phone = ''
                 front_cursor.execute("""SELECT * FROM VehiclesFront where vehicleid=%s""", old['vehicleid'])
                 old_front = front_cursor.fetchone()
-                parsed_blurb = bbcode_parser.feed(old_front['blurb'])
+                parsed_blurb = self.bbcode_parser.feed(old_front['blurb'])
                 new_front = VehicleMarketing.objects.create(
                     id=new.id,
                     vehicle_id=new.id,
@@ -211,6 +224,27 @@ class Command(BaseCommand):
                     is_first=old['isfirst'],
                 )
                 self.import_vehicle_picture_image(new, old['vpicsid'], old['fext'])
+
+        if 'do_vehicle_vids' in self.enabled:
+            if clear_existing:
+                VehicleVideo.objects.all().delete()
+            front_cursor.execute("""SELECT * FROM VVids""")
+            for old in front_cursor.fetchall():
+                print(old)
+                try:
+                    vehicle = Vehicle.objects.get(id=old['vehicleid'])
+                except Vehicle.DoesNotExist:
+                    continue
+                try:
+                    vehicle_marketing = VehicleMarketing.objects.get(vehicle_id=vehicle.id)
+                except VehicleMarketing.DoesNotExist:
+                    continue
+                print(vehicle_marketing)
+                new = VehicleVideo.objects.create(
+                    vehicle_marketing=vehicle_marketing,
+                    is_first=old['isfirst'],
+                )
+                self.import_vehicle_video(new, old['vvidsid'], old['fext'], old['thumbext'])
 
         if 'do_customers' in self.enabled:
             if clear_existing:

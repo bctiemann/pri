@@ -3,11 +3,16 @@ from prettyjson import PrettyJSONWidget
 from django.contrib import admin
 from django.db.models import JSONField
 
-from fleet.models import Vehicle, VehicleMarketing, VehiclePicture
+from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo
 
 
 class VehiclePictureInline(admin.TabularInline):
     model = VehiclePicture
+    fk_name = 'vehicle_marketing'
+
+
+class VehicleVideoInline(admin.TabularInline):
+    model = VehicleVideo
     fk_name = 'vehicle_marketing'
 
 
@@ -20,7 +25,7 @@ class VehicleMarketingAdmin(admin.ModelAdmin):
     formfield_overrides = {
         JSONField: {'widget': PrettyJSONWidget}
     }
-    inlines = (VehiclePictureInline,)
+    inlines = (VehiclePictureInline, VehicleVideoInline,)
     prepopulated_fields = {"slug": ("model",)}
     fieldsets = (
         (None, {

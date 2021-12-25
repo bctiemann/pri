@@ -1,0 +1,59 @@
+{% load bbcode_tags %}
+
+<h3>Vids <button class="btn" id="activate_vvid_form" style="margin-left: 100px;">Add</button></h3>
+
+{% for video in vehicle_marketing.vids.all %}
+    <div class="vvid-container">
+        <img class="vvid" src="{{ video.video.url }}" vvidsid="{{ video.id }}" />
+        <span class="vvid-delete ui-icon ui-icon-trash" vvidsid="{{ video.id }}"></span>
+        {% if not picture.is_first %}
+            <span class="vvid-makefirst ui-icon ui-icon-star" vvidsid="{{ video.id }}"></span>
+        {% endif %}
+        <cfif FileExists("#VideoUploads#PRI-#vvidsid#.mp4")>
+            <a href="#OnSite#vids/PRI-#vvidsid#.mp4" target="_blank"><span class="vvid-video vvid-mp4" vvidsid="#vvidsid#">MP4</span></a>
+        </cfif>
+        <cfif FileExists("#VideoUploads#PRI-#vvidsid#.webm")>
+            <a href="#OnSite#vids/PRI-#vvidsid#.webm" target="_blank"><span class="vvid-video vvid-webm" vvidsid="#vvidsid#">WebM</span></a>
+        </cfif>
+
+        <h4>{{ video.title }}</h4>
+        <p>{{ video.blurb|bbcode|safe }}</p>
+    </div>
+{% endfor %}
+
+<div class="upload-form" id="vvids_upload">
+
+    <div id="webm_status"></div>
+    <div id="mp4_status"></div>
+
+    <form method="POST" enctype="multipart/form-data" id="vvid_form">
+        <table class="inputform">
+            <tr>
+                <td>Thumbnail Image</td>
+                <td>{{ form.thumbnail }}</td>
+            </tr>
+            <tr>
+                <td>Length (s)</td>
+                <td>{{ form.length }}</td>
+            </tr>
+            <tr>
+                <td>Title</td>
+                <td>{{ form.title }}</td>
+            </tr>
+            <tr>
+                <td class="align-top">Blurb</td>
+                <td>{{ form.blurb }}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <button type="submit" name="upload_vvid" id="upload_vvid" class="btn">Upload</button>
+                    <button type="button" name="deactivate_vvid_form" id="deactivate_vvid_form" class="btn">Cancel</button>
+                    <div class="spinner floatright" id="spinner-vvid" method="uploadVVid"></div>
+                </td>
+            </tr>
+        </table>
+        <cfinput type="hidden" name="vehicleid" value="#URL.vehicleid#" />
+        <cfinput type="hidden" name="vvidsid" value="" />
+    </form>
+</div>

@@ -91,7 +91,7 @@ class User(PermissionsMixin, AbstractBaseUser):
     created_by = models.ForeignKey('User', null=True, blank=True, on_delete=models.SET_NULL)
     last_login = models.DateTimeField(null=True, blank=True)
     admin_last_activity = models.DateTimeField(null=True, blank=True)
-    id_orig = models.IntegerField(null=True)
+    id_orig = models.IntegerField(null=True, blank=True)
 
     USERNAME_FIELD = 'email'
 

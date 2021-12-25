@@ -265,8 +265,27 @@ class VehiclePicture(models.Model):
     class Meta:
         ordering = ('-is_first',)
 
+
 class VehicleVideo(models.Model):
-    pass
+    vehicle_marketing = models.ForeignKey('fleet.VehicleMarketing', null=True, on_delete=models.CASCADE, related_name='vids')
+    video = models.FileField(blank=True, upload_to=get_vehicle_video_path)
+    file_extension = models.CharField(max_length=4, blank=True)
+    thumbnail = models.ImageField(blank=True, width_field='thumb_width', height_field='thumb_height', upload_to=get_vehicle_picture_path)
+    thumb_width = models.IntegerField(null=True, blank=True)
+    thumb_height = models.IntegerField(null=True, blank=True)
+    thumb_extension = models.CharField(max_length=4, blank=True)
+    length = models.IntegerField(null=True, blank=True)
+    title = models.CharField(max_length=255, blank=True)
+    blurb = models.TextField(blank=True)
+    is_first = models.BooleanField(default=False)
+
+    # Currently this is a stub, as we have no videos. We may need to build this out better to improve the workflow of
+    # uploading new videos, but for now the admin can be used to populate them manually.
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ('-is_first',)
 
 
 class TollTag(models.Model):

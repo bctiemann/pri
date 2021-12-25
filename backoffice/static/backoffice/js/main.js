@@ -241,7 +241,7 @@ var showPastRentals = function() {
 var refreshMedia = function() {
     var vehicleid = $('#vehicleid').val();
     var vpicsUrl = 'pictures/';
-    var vvidsUrl = 'ajax_vvids.cfm?vehicleid=' + vehicleid;
+    var vvidsUrl = 'videos/';
     var showcaseUrl = 'showcase/';
     var thumbnailUrl = 'thumbnail/';
     var inspectionUrl = 'inspection/';
