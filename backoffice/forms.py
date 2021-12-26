@@ -43,6 +43,13 @@ class VehicleInspectionForm(forms.ModelForm):
         fields = ('inspection_image',)
 
 
+class VehicleMobileThumbForm(forms.ModelForm):
+
+    class Meta:
+        model = VehicleMarketing
+        fields = ('mobile_thumbnail_image',)
+
+
 class VehiclePictureForm(forms.ModelForm):
 
     # TODO: validate image and thumbnail (prevent saving if nothing uploaded)

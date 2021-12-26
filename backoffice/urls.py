@@ -24,6 +24,7 @@ urlpatterns = [
     path('vehicles/<int:pk>/showcase/', vehicles.VehicleShowcaseView.as_view(), name='vehicle-showcase'),
     path('vehicles/<int:pk>/thumbnail/', vehicles.VehicleThumbnailView.as_view(), name='vehicle-thumbnail'),
     path('vehicles/<int:pk>/inspection/', vehicles.VehicleInspectionView.as_view(), name='vehicle-inspection'),
+    path('vehicles/<int:pk>/mobile_thumb/', vehicles.VehicleMobileThumbView.as_view(), name='vehicle-mobile-thumb'),
     path('vehicles/<int:pk>/pictures/', vehicles.VehiclePicturesView.as_view(), name='vehicle-pictures'),
     path('vehicles/<int:pk>/videos/', vehicles.VehicleVideosView.as_view(), name='vehicle-videos'),
     path('vehicles/<int:vehicle_id>/<str:media_type>/<int:pk>/promote/', vehicles.VehicleMediaPromoteView.as_view(), name='vehicle-media-promote'),

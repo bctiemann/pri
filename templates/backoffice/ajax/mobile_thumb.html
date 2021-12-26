@@ -1,0 +1,22 @@
+<h3>Mobile App Thumbnail (80x80)</h3>
+
+{% if vehiclemarketing.mobile_thumbnail_image %}
+<cfif FileExists("#MobileThumbUploads##URL.vehicleid#-thumb-mobile.png")>
+    <cfoutput>
+    <CFSET unix_time = DateDiff("s", CreateDate(1970,1,1), Now()) />
+    <img class="mobilethumb" src="{{ vehiclemarketing.mobile_thumbnail_image.url }}" />
+    </cfoutput>
+</cfif>
+{% endif %}
+
+<div class="upload-form" id="inspection_upload">
+    <form method="POST" action="{% url "backoffice:vehicle-mobile-thumb" pk=vehiclemarketing.vehicle_id %}" enctype="multipart/form-data" id="mobilethumb_form">
+        {{ form.mobile_thumbnail_image }}
+        <cfinput type="file" name="mobilethumbup" />
+        <cfinput type="hidden" name="vehicleid" value="#URL.vehicleid#" />
+        <button type="submit" name="upload_mobilethumb" class="btn">Upload</button>
+        <div class="spinner floatright" id="spinner-mobilethumb" method="uploadMobileThumb"></div>
+        {% csrf_token %}
+    </form>
+</div>
+

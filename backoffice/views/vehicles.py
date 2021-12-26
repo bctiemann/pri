@@ -9,8 +9,8 @@ from django.http import Http404, HttpResponseRedirect
 from . import ListViewMixin
 from fleet.models import VehicleType, VehicleStatus, Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo
 from backoffice.forms import (
-    VehicleForm, VehicleShowcaseForm, VehicleThumbnailForm, VehicleInspectionForm, VehiclePictureForm, VehicleVideoForm,
-    VehicleMarketingForm
+    VehicleForm, VehicleShowcaseForm, VehicleThumbnailForm, VehicleInspectionForm, VehicleMobileThumbForm,
+    VehiclePictureForm, VehicleVideoForm, VehicleMarketingForm
 )
 
 
@@ -141,6 +141,15 @@ class VehicleInspectionView(VehicleMarketingLookupMixin, UpdateView):
     template_name = 'backoffice/ajax/inspection.html'
     model = VehicleMarketing
     form_class = VehicleInspectionForm
+
+    def get_success_url(self):
+        return reverse('backoffice:vehicle-detail', kwargs={'pk': self.object.vehicle_id})
+
+
+class VehicleMobileThumbView(VehicleMarketingLookupMixin, UpdateView):
+    template_name = 'backoffice/ajax/mobile_thumb.html'
+    model = VehicleMarketing
+    form_class = VehicleMobileThumbForm
 
     def get_success_url(self):
         return reverse('backoffice:vehicle-detail', kwargs={'pk': self.object.vehicle_id})
