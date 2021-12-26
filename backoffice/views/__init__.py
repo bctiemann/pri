@@ -60,7 +60,7 @@ class ListViewMixin:
     is_create_view = False
     search_term = None
     search_fields = None
-    default_sort = '-id'
+    default_sort = 'id'
 
     # Can be overridden for certain page groups that need further conditions for when to highlight the "List All" pill
     @property

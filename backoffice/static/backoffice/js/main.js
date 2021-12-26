@@ -265,12 +265,12 @@ var refreshMedia = function() {
         $('.vvid-delete').click(function() {
             var vvidsid = $(this).attr('vvidsid');
             if (confirm('Really delete this video?')) {
-                editMedia('deleteVVid', vvidsid);
+                editMedia('delete', 'video', vvidsid);
             }
         });
         $('.vvid-makefirst').click(function() {
             var vvidsid = $(this).attr('vvidsid');
-            editMedia('promoteVVid', vvidsid);
+            editMedia('promote', 'video', vvidsid);
         });
         $('#activate_vvid_form').click(function() {
             $('img.vvid').removeClass('selected');

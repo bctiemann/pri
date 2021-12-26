@@ -227,7 +227,13 @@ class VehicleMediaPromoteView(APIView):
             vehicle_picture.is_first = True
             vehicle_picture.save()
         elif media_type == 'video':
-            pass
+            try:
+                vehicle_video = VehicleVideo.objects.get(pk=pk, vehicle_marketing=vehicle)
+            except VehicleVideo.DoesNotExist:
+                raise Http404
+            vehicle.vids.all().update(is_first=False)
+            vehicle_video.is_first = True
+            vehicle_video.save()
         response = {
             'success': True
         }
@@ -248,9 +254,13 @@ class VehicleMediaDeleteView(APIView):
                 raise Http404
             vehicle_picture.delete()
         elif media_type == 'video':
-            pass
+            try:
+                vehicle_video = VehicleVideo.objects.get(pk=pk, vehicle_marketing=vehicle)
+            except VehicleVideo.DoesNotExist:
+                raise Http404
+            vehicle_video.delete()
 
-        # TODO: delete file from disk
+        # TODO: delete files from disk
 
         response = {
             'success': True

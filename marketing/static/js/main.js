@@ -414,11 +414,10 @@ console.log('left');
 
 var switchVideo = function(vvidsid) {
     var videoPlayer = videojs('vehicle_video');
-    videoPlayer.src([
-        { type: "video/mp4", src: 'vids/PRI-' + vvidsid + '.mp4' },
-        { type: "video/webm", src: 'vids/PRI-' + vvidsid + '.webm' },
-    ]);
-    videoPlayer.poster('vids/PRI-' + vvidsid + '.jpg');
+    videoPlayer.src(videos[vvidsid].src);
+    if (videos[vvidsid].poster) {
+        videoPlayer.poster(videos[vvidsid].poster);
+    }
     $('.vvid-blurb-caption').html($('.vvid-thumbnail[vvidsid=' + vvidsid + '] p.vvid-blurb').html());
 };
 

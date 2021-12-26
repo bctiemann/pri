@@ -216,15 +216,15 @@
 
         <script src="http://vjs.zencdn.net/5.8.7/video.js"></script>
 
-        <div class="vvid-blurb-caption"></div>
+        <div class="vvid-blurb-caption">{{ vehicle.vids.first.blurb|bbcode|safe }}</div>
 
         <div class="vvid-thumbs">
         {% for video in vehicle.vids.all %}
         <cfoutput query="tVids">
             <div class="vvid-thumbnail" vvidsid="{{ video.id }}">
-                <img src="{{ video.thumbnail.url }}" title="{{ video.title }} - #length#" />
+                <img src="{{ video.thumbnail.url }}" title="{{ video.title }} - {{ video.length_formatted }}" />
                 <p>{{ video.title }}</p>
-                <p>Run time: #length#</p>
+                <p>Run time: {{ video.length_formatted }}</p>
                 <p class="vvid-blurb hidden">{{ video.blurb|bbcode|safe }}</p>
             </div>
         </cfoutput>
@@ -280,6 +280,23 @@ $('.the-numbers').jQCloud(words, {
     steps: 10,
     fontSize: ['90px', '80px', '60px', '50px', '40px']
 });
+
+let videos = {};
+{% for video in vehicle.vids.all %}
+    let video = {src: []};
+
+    {% if video.video_mp4 %}
+        video.src.push({type: 'video/mp4', src: '{{ video.video_mp4.url }}'});
+    {% endif %}
+    {% if video.video_webm %}
+        video.src.push({type: 'video/webm', src: '{{ video.video_webm.url }}'});
+    {% endif %}
+    {% if video.poster %}
+        video.poster = '{{ video.poster.url }}';
+    {% endif %}
+
+    videos[{{ video.id }}] = video;
+{% endfor %}
 
 </script>
 

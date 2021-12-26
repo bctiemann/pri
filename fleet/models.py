@@ -1,6 +1,7 @@
 import uuid
 import os
 import json
+import time
 
 from encrypted_fields import fields
 from django_countries.fields import CountryField
@@ -287,6 +288,10 @@ class VehicleVideo(models.Model):
     # uploading new videos, but for now the admin can be used to populate them manually.
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+
+    @property
+    def length_formatted(self):
+        return time.strftime('%M:%S', time.gmtime(self.length))
 
     class Meta:
         ordering = ('-is_first',)
