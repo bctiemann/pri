@@ -10,10 +10,11 @@ from html2bbcode import parser
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils.text import slugify
+from django.utils import timezone
 from django.core.files.temp import NamedTemporaryFile
 from django.core.files import File
 
-from marketing.models import NewsItem, SiteContent
+from marketing.models import NewsItem, SiteContent, NewsletterSubscription
 from fleet.models import (
     Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, TransmissionType, Location,
     get_vehicle_picture_path, get_vehicle_video_path
@@ -44,9 +45,9 @@ SITE_SEC_ROOT = 'http://172.16.0.5/prinew/secure/'
 class Command(BaseCommand):
 
     enabled = {
-        'do_vehicles': True,
-        'do_vehicle_pics': True,
-        'do_vehicle_vids': True,
+        # 'do_vehicles': True,
+        # 'do_vehicle_pics': True,
+        # 'do_vehicle_vids': True,
         # 'do_customers': True,
         # 'do_reservations': True,
         # 'do_consigners': True,
@@ -54,6 +55,7 @@ class Command(BaseCommand):
         # 'do_admins': True,
         # 'do_newsitems': True
         # 'do_sitecontent': True,
+        'do_newslettersubscriptions': True,
     }
 
     def add_arguments(self, parser):
@@ -504,3 +506,19 @@ class Command(BaseCommand):
                     page=page_key,
                     content=old_content[db_key],
                 )
+
+        if 'do_newslettersubscriptions' in self.enabled:
+            if clear_existing:
+                NewsletterSubscription.objects.all().delete()
+            front_cursor.execute("""SELECT * FROM Newsletter""")
+            for old in front_cursor.fetchall():
+                print(old)
+                new = NewsletterSubscription.objects.create(
+                    email=old['email'],
+                    full_name=old['name'],
+                    confirmed_at=timezone.now() if old['confirmed'] else None,
+                    hash=old['tkt'] or None,
+                    ip=old['ip'],
+                )
+                new.created_at = old['stamp'] or timezone.now()
+                new.save()

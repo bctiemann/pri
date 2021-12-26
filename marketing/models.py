@@ -1,5 +1,7 @@
 from django.db import models
 
+from users.models import LowercaseEmailField
+
 
 class SiteContent(models.Model):
     page = models.CharField(max_length=100)
@@ -10,7 +12,12 @@ class SiteContent(models.Model):
 
 
 class NewsletterSubscription(models.Model):
-    pass
+    email = LowercaseEmailField(null=True)
+    full_name = models.CharField(max_length=255, blank=True)
+    confirmed_at = models.DateTimeField(null=True, blank=True)
+    hash = models.UUIDField(null=True, blank=True)
+    ip = models.GenericIPAddressField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class NewsItem(models.Model):
