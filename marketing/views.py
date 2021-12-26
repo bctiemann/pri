@@ -74,6 +74,24 @@ class NewsletterView(NavMenuMixin, TemplateView):
         return context
 
 
+class NewsletterDoneView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/newsletter_done.html'
+
+    def get_context_data(self, slug=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['recaptcha_site_key'] = settings.RECAPTCHA_SITE_KEY
+        return context
+
+
+class NewsletterConfirmView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/newsletter_confirm.html'
+
+    def get_context_data(self, slug=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['recaptcha_site_key'] = settings.RECAPTCHA_SITE_KEY
+        return context
+
+
 class ServicesView(NavMenuMixin, TemplateView):
     template_name = 'front_site/services.html'
 

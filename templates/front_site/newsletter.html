@@ -64,76 +64,7 @@
 
     <div class="reservation-form-sidebar">
 
-
-    <cfif IsDefined("URL.confirm")>
-
-        <cftry>
-
-            <cfif NOT IsDefined("URL.email")>
-                <cfthrow message="You have followed an invalid link.">
-            </cfif>
-            <cfif NOT IsValid("regex",URL.email,re_email)>
-                <cfthrow message="The email address you have attempted to subscribe is invalid.">
-            </cfif>
-
-            <cfinvoke
-                component="cfc/porknbeans"
-                method="mailCrypt"
-                returnVariable="mcrypt"
-                argumentCollection="#URL#">
-            </cfinvoke>
-
-            <cfif #mcrypt# neq #URL.ckd#>
-                <cfthrow message="You have followed an invalid link.">
-            </cfif>
-
-            <cfquery name="tmail" datasource="#FDSN#">
-                SELECT name,email,confirmed FROM Newsletter
-                WHERE LOWER(email) = <CFQUERYPARAM value="#lcase(URL.email)#" CFSQLType="CF_SQL_VARCHAR">
-            </cfquery>
-            <cfquery datasource="#FDSN#">
-                UPDATE Newsletter SET confirmed = 1
-                WHERE LOWER(email) = <CFQUERYPARAM value="#lcase(URL.email)#" CFSQLType="CF_SQL_VARCHAR">
-            </cfquery>
-
-            <cfoutput>
-            <p class="reservation-info">
-            Your subscription to our newsletter has been confirmed!
-            </p>
-            <p class="reservation-info">
-            If you would like to unsubscribe at any time, visit: <a href="#OnSecSite#unsubscribe.cfm">#OnSecSite#unsubscribe.cfm</a>
-            </p>
-            </cfoutput>
-
-            <cfif tmail.confirmed IS 0>
-                <cfsavecontent variable="messageBody">
-                    <cfinclude template="email_templates/newsletter_subscribe_confirmed.cfm">
-                </cfsavecontent>
-                <cfmail from="#siteemail# (Performance Rentals)" TO="#tmail.email# (#tmail.name#)" SUBJECT="Performance Rentals Newsletter Confirmed">
-                    <cfoutput>#messageBody#</cfoutput>
-                </cfmail>
-            </cfif>
-
-            <cfcatch type="Any">
-                <div class="exception" id="newsletter_confirm_error">
-                    <cfoutput>
-                    <h3>An error occurred</h3>
-                    <p class="alert-message">#cfcatch.message#</p>
-                    </cfoutput>
-                </div>
-            </cfcatch>
-        </cftry>
-
-    <cfelseif IsDefined("URL.done")>
-
-        <h3>Welcome!</h3>
-
-        <p class="reservation-info">
-        We've received your newsletter subscription request. You should receive an email shortly confirming your subscription.
-        </p>
-
-    <cfelse>
-
+    {% block newsletter_content %}
         <cfform method="POST" name="reservation_form" action="newsletter.cfm" onsubmit="return false;" autocomplete="on">
         <cfoutput>
 
@@ -144,42 +75,42 @@
         </div>
         </cfif>
 
-            <div id="subscribe_payment">
+        <div id="subscribe_payment">
 
-                <h3>Sign up for our newsletter!</h3>
-                <p class="reservation-info">
-                We often have all sorts of discounts, incentives and special events here at Performance Rentals. Sign up with your name and
-                email address below, and we'll let you know what's happening! Of course, you may also <a href="unsubscribe.cfm">unsubscribe</a> at any time.
-                </p>
+            <h3>Sign up for our newsletter!</h3>
+            <p class="reservation-info">
+            We often have all sorts of discounts, incentives and special events here at Performance Rentals. Sign up with your name and
+            email address below, and we'll let you know what's happening! Of course, you may also <a href="unsubscribe.cfm">unsubscribe</a> at any time.
+            </p>
 
-                <table class="inputform payment">
-                    <tr>
-                        <td>Your Name</td>
-                        <td><cfinput name="name" value="#Newsletter.name#" class="#StructKeyExists(fieldErrors,"name") ? 'field-error' : ''#" /></td>
-                    </tr>
-                    <tr>
-                        <td>Your Email</td>
-                        <td><cfinput name="email" value="#Newsletter.email#" class="#StructKeyExists(fieldErrors,"email") ? 'field-error' : ''#" /></td>
-                    </tr>
+            <table class="inputform payment">
+                <tr>
+                    <td>Your Name</td>
+                    <td><cfinput name="name" value="#Newsletter.name#" class="#StructKeyExists(fieldErrors,"name") ? 'field-error' : ''#" /></td>
+                </tr>
+                <tr>
+                    <td>Your Email</td>
+                    <td><cfinput name="email" value="#Newsletter.email#" class="#StructKeyExists(fieldErrors,"email") ? 'field-error' : ''#" /></td>
+                </tr>
 
-                    <tr>
-                        <td class="align-top">Verification</td>
-                        <td>
-                            <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key}}"></div>
-                            <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-                        </td>
-                    </tr>
+                <tr>
+                    <td class="align-top">Verification</td>
+                    <td>
+                        <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key}}"></div>
+                        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+                    </td>
+                </tr>
 
-                    <tr class="buttons">
-                        <td></td>
-                        <td>
-                            <button type="submit" name="subscribe_btn" class="btn subscribe-complete-btn">Subscribe</button>
-                            <div class="spinner next-form-spinner payment-spinner"></div>
-                        </td>
-                    </tr>
-                </table>
+                <tr class="buttons">
+                    <td></td>
+                    <td>
+                        <button type="submit" name="subscribe_btn" class="btn subscribe-complete-btn">Subscribe</button>
+                        <div class="spinner next-form-spinner payment-spinner"></div>
+                    </td>
+                </tr>
+            </table>
 
-            </div>
+        </div>
 
         <div class="exception hidden" id="reservation_payment_error">
             <h3>An error occurred</h3>
@@ -189,9 +120,7 @@
         </cfoutput>
         <cfinput type="hidden" name="reservation_type" value="subscribe" />
         </cfform>
-
-    </cfif>
-
+    {% endblock %}
 
     </div>
 

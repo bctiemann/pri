@@ -80,6 +80,8 @@ urlpatterns = [
     path('performance_experience/', sales_views.PerformanceExperienceView.as_view(), name='performance-experience'),
 
     path('newsletter/', marketing_views.NewsletterView.as_view(), name='newsletter'),
+    path('newsletter/done/', marketing_views.NewsletterDoneView.as_view(), name='newsletter-done'),
+    path('newsletter/confirm/', marketing_views.NewsletterConfirmView.as_view(), name='newsletter-confirm'),
 
     path('services/', marketing_views.ServicesView.as_view(), name='services'),
     path('specials/', marketing_views.SpecialsView.as_view(), name='specials'),

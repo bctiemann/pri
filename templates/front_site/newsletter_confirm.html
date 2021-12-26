@@ -1,0 +1,61 @@
+{% extends "front_site/newsletter.html" %}
+
+{% block newsletter_content %}
+        <cftry>
+
+            <cfif NOT IsDefined("URL.email")>
+                <cfthrow message="You have followed an invalid link.">
+            </cfif>
+            <cfif NOT IsValid("regex",URL.email,re_email)>
+                <cfthrow message="The email address you have attempted to subscribe is invalid.">
+            </cfif>
+
+            <cfinvoke
+                component="cfc/porknbeans"
+                method="mailCrypt"
+                returnVariable="mcrypt"
+                argumentCollection="#URL#">
+            </cfinvoke>
+
+            <cfif #mcrypt# neq #URL.ckd#>
+                <cfthrow message="You have followed an invalid link.">
+            </cfif>
+
+            <cfquery name="tmail" datasource="#FDSN#">
+                SELECT name,email,confirmed FROM Newsletter
+                WHERE LOWER(email) = <CFQUERYPARAM value="#lcase(URL.email)#" CFSQLType="CF_SQL_VARCHAR">
+            </cfquery>
+            <cfquery datasource="#FDSN#">
+                UPDATE Newsletter SET confirmed = 1
+                WHERE LOWER(email) = <CFQUERYPARAM value="#lcase(URL.email)#" CFSQLType="CF_SQL_VARCHAR">
+            </cfquery>
+
+            <cfoutput>
+            <p class="reservation-info">
+            Your subscription to our newsletter has been confirmed!
+            </p>
+            <p class="reservation-info">
+            If you would like to unsubscribe at any time, visit: <a href="#OnSecSite#unsubscribe.cfm">#OnSecSite#unsubscribe.cfm</a>
+            </p>
+            </cfoutput>
+
+            <cfif tmail.confirmed IS 0>
+                <cfsavecontent variable="messageBody">
+                    <cfinclude template="email_templates/newsletter_subscribe_confirmed.cfm">
+                </cfsavecontent>
+                <cfmail from="#siteemail# (Performance Rentals)" TO="#tmail.email# (#tmail.name#)" SUBJECT="Performance Rentals Newsletter Confirmed">
+                    <cfoutput>#messageBody#</cfoutput>
+                </cfmail>
+            </cfif>
+
+            <cfcatch type="Any">
+                <div class="exception" id="newsletter_confirm_error">
+                    <cfoutput>
+                    <h3>An error occurred</h3>
+                    <p class="alert-message">#cfcatch.message#</p>
+                    </cfoutput>
+                </div>
+            </cfcatch>
+        </cftry>
+
+{% endblock %}
