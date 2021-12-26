@@ -255,6 +255,11 @@ DEFAULT_TAX_RATE = '0.07'
 TITLE_BAR_LINE_1 = 'Sports car rentals for the automotive enthusiast'
 TITLE_BAR_LINE_2 = 'Serving the NYC area and beyond'
 
+# ReCAPTCHA keys
+RECAPTCHA_SITE_KEY: None
+RECAPTCHA_SECRET_KEY: None
+
+
 
 # Local overrides from env.yaml
 with open(os.path.join(BASE_DIR, 'env.yaml')) as f:

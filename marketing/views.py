@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.views.generic import TemplateView, FormView, CreateView
 from django.http import Http404
 
@@ -61,6 +62,15 @@ class VehicleView(NavMenuMixin, TemplateView):
         context['vehicle'] = VehicleMarketing.objects.filter(slug=slug, status=VehicleStatus.READY).first()
         if not context['vehicle']:
             raise Http404
+        return context
+
+
+class NewsletterView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/newsletter.html'
+
+    def get_context_data(self, slug=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['recaptcha_site_key'] = settings.RECAPTCHA_SITE_KEY
         return context
 
 

@@ -79,6 +79,8 @@ urlpatterns = [
 
     path('performance_experience/', sales_views.PerformanceExperienceView.as_view(), name='performance-experience'),
 
+    path('newsletter/', marketing_views.NewsletterView.as_view(), name='newsletter'),
+
     path('services/', marketing_views.ServicesView.as_view(), name='services'),
     path('specials/', marketing_views.SpecialsView.as_view(), name='specials'),
     path('about/', marketing_views.AboutView.as_view(), name='about'),

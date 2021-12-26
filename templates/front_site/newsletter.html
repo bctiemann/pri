@@ -1,0 +1,200 @@
+{% extends "front_site/base.html" %}
+{% load static %}
+
+{% comment %}
+<!--- If a form was submitted, the user had JS turned off, so we have to process the sequential logic. --->
+<cfset fieldErrors = StructNew()>
+<cfset formError = "">
+<cfif IsDefined("Form.reservation_type")>
+
+    <!--- Validate the first page (identity and rental date/specs) --->
+    <cfset ret = StructAppend(Form, Variables)>
+    <cfinvoke
+        component="cfc/porknbeans"
+        method="subscribeNewsletter"
+        returnVariable="NewsletterResult"
+        argumentCollection="#Form#">
+    </cfinvoke>
+    <cfset fieldErrors = NewsletterResult.fieldErrors>
+
+    <!--- Push to confirmation page if successful --->
+    <cfif NewsletterResult.success>
+        <cfset redirectUrl = "newsletter.cfm?done=1">
+        <cflocation url=#redirectUrl#>
+    </cfif>
+
+    <!--- We're still here, so bind the form variables for redisplay --->
+    <cfset Newsletter = Form>
+    <cfset formError = NOT NewsletterResult.success ? NewsletterResult.error : "">
+
+<!--- If the user has JS on, pull a blank Newsletter object to populate the form --->
+<cfelse>
+
+    <cfset Newsletter = {
+        "name" = "",
+        "email" = ""
+    }>
+
+</cfif>
+
+<CFINCLUDE TEMPLATE="inc_states.cfm">
+<CFINCLUDE TEMPLATE="inc_header.cfm">
+<title>Performance Rentals</title>
+<CFINCLUDE TEMPLATE="inc_meta.cfm">
+<CFINCLUDE TEMPLATE="inc_styles.cfm">
+<CFINCLUDE TEMPLATE="inc_js.cfm">
+</head>
+<body>
+
+<div class="wrapper">
+
+<CFINCLUDE TEMPLATE="inc_nav.cfm">
+
+<section class="l-content">
+{% endcomment %}
+
+{% block content %}
+<div class="l-container">
+<div class="well" style="padding-bottom: 100px;">
+    <div class='section-header'>Newsletter</div>
+
+    <div class="reservation-pics-sidebar">
+        <img src="{% static "images/newsletter.png" %}" />
+    </div>
+
+    <div class="reservation-form-sidebar">
+
+
+    <cfif IsDefined("URL.confirm")>
+
+        <cftry>
+
+            <cfif NOT IsDefined("URL.email")>
+                <cfthrow message="You have followed an invalid link.">
+            </cfif>
+            <cfif NOT IsValid("regex",URL.email,re_email)>
+                <cfthrow message="The email address you have attempted to subscribe is invalid.">
+            </cfif>
+
+            <cfinvoke
+                component="cfc/porknbeans"
+                method="mailCrypt"
+                returnVariable="mcrypt"
+                argumentCollection="#URL#">
+            </cfinvoke>
+
+            <cfif #mcrypt# neq #URL.ckd#>
+                <cfthrow message="You have followed an invalid link.">
+            </cfif>
+
+            <cfquery name="tmail" datasource="#FDSN#">
+                SELECT name,email,confirmed FROM Newsletter
+                WHERE LOWER(email) = <CFQUERYPARAM value="#lcase(URL.email)#" CFSQLType="CF_SQL_VARCHAR">
+            </cfquery>
+            <cfquery datasource="#FDSN#">
+                UPDATE Newsletter SET confirmed = 1
+                WHERE LOWER(email) = <CFQUERYPARAM value="#lcase(URL.email)#" CFSQLType="CF_SQL_VARCHAR">
+            </cfquery>
+
+            <cfoutput>
+            <p class="reservation-info">
+            Your subscription to our newsletter has been confirmed!
+            </p>
+            <p class="reservation-info">
+            If you would like to unsubscribe at any time, visit: <a href="#OnSecSite#unsubscribe.cfm">#OnSecSite#unsubscribe.cfm</a>
+            </p>
+            </cfoutput>
+
+            <cfif tmail.confirmed IS 0>
+                <cfsavecontent variable="messageBody">
+                    <cfinclude template="email_templates/newsletter_subscribe_confirmed.cfm">
+                </cfsavecontent>
+                <cfmail from="#siteemail# (Performance Rentals)" TO="#tmail.email# (#tmail.name#)" SUBJECT="Performance Rentals Newsletter Confirmed">
+                    <cfoutput>#messageBody#</cfoutput>
+                </cfmail>
+            </cfif>
+
+            <cfcatch type="Any">
+                <div class="exception" id="newsletter_confirm_error">
+                    <cfoutput>
+                    <h3>An error occurred</h3>
+                    <p class="alert-message">#cfcatch.message#</p>
+                    </cfoutput>
+                </div>
+            </cfcatch>
+        </cftry>
+
+    <cfelseif IsDefined("URL.done")>
+
+        <h3>Welcome!</h3>
+
+        <p class="reservation-info">
+        We've received your newsletter subscription request. You should receive an email shortly confirming your subscription.
+        </p>
+
+    <cfelse>
+
+        <cfform method="POST" name="reservation_form" action="newsletter.cfm" onsubmit="return false;" autocomplete="on">
+        <cfoutput>
+
+        <cfif Len(formError) GT 0>
+        <div class="exception" id="reservation_form_error">
+            <h3>An error occurred</h3>
+            <p class="alert-message">#formError#</p>
+        </div>
+        </cfif>
+
+            <div id="subscribe_payment">
+
+                <h3>Sign up for our newsletter!</h3>
+                <p class="reservation-info">
+                We often have all sorts of discounts, incentives and special events here at Performance Rentals. Sign up with your name and
+                email address below, and we'll let you know what's happening! Of course, you may also <a href="unsubscribe.cfm">unsubscribe</a> at any time.
+                </p>
+
+                <table class="inputform payment">
+                    <tr>
+                        <td>Your Name</td>
+                        <td><cfinput name="name" value="#Newsletter.name#" class="#StructKeyExists(fieldErrors,"name") ? 'field-error' : ''#" /></td>
+                    </tr>
+                    <tr>
+                        <td>Your Email</td>
+                        <td><cfinput name="email" value="#Newsletter.email#" class="#StructKeyExists(fieldErrors,"email") ? 'field-error' : ''#" /></td>
+                    </tr>
+
+                    <tr>
+                        <td class="align-top">Verification</td>
+                        <td>
+                            <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key}}"></div>
+                            <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+                        </td>
+                    </tr>
+
+                    <tr class="buttons">
+                        <td></td>
+                        <td>
+                            <button type="submit" name="subscribe_btn" class="btn subscribe-complete-btn">Subscribe</button>
+                            <div class="spinner next-form-spinner payment-spinner"></div>
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+
+        <div class="exception hidden" id="reservation_payment_error">
+            <h3>An error occurred</h3>
+            <p class="alert-message"></p>
+        </div>
+
+        </cfoutput>
+        <cfinput type="hidden" name="reservation_type" value="subscribe" />
+        </cfform>
+
+    </cfif>
+
+
+    </div>
+
+</div>
+</div>
+{% endblock %}
