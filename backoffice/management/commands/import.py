@@ -44,8 +44,8 @@ SITE_SEC_ROOT = 'http://172.16.0.5/prinew/secure/'
 class Command(BaseCommand):
 
     enabled = {
-        # 'do_vehicles': True,
-        # 'do_vehicle_pics': True,
+        'do_vehicles': True,
+        'do_vehicle_pics': True,
         'do_vehicle_vids': True,
         # 'do_customers': True,
         # 'do_reservations': True,
@@ -105,6 +105,12 @@ class Command(BaseCommand):
         url = f'{SITE_SEC_ROOT}spork/carcheck/{vehicle_id}.png'
         image_tempfile = self.get_image_tempfile(url)
         vehicle_marketing.inspection_image.save(get_vehicle_picture_path(None, 'temp.png'), File(image_tempfile))
+        vehicle_marketing.save()
+
+    def import_mobile_thumb_image(self, vehicle_marketing, vehicle_id):
+        url = f'{SITE_ROOT}images/{vehicle_id}-thumb-mobile.png'
+        image_tempfile = self.get_image_tempfile(url)
+        vehicle_marketing.mobile_thumbnail_image.save(get_vehicle_picture_path(None, 'temp.png'), File(image_tempfile))
         vehicle_marketing.save()
 
     def handle(self, *args, **options):
@@ -203,6 +209,7 @@ class Command(BaseCommand):
                 self.import_showcase_image(new_front, old['vehicleid'])
                 self.import_thumbnail_image(new_front, old['vehicleid'])
                 self.import_inspection_image(new_front, old['vehicleid'])
+                self.import_mobile_thumb_image(new_front, old['vehicleid'])
 
         if 'do_vehicle_pics' in self.enabled:
             if clear_existing:
