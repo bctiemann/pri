@@ -151,9 +151,13 @@ class User(PermissionsMixin, AbstractBaseUser):
 
     @property
     def full_name(self):
-        if self.customer:
+        try:
             return f'{self.customer.first_name} {self.customer.last_name}'
-        return self.email
+        except Customer.DoesNotExist:
+            try:
+                return f'{self.employee.first_name} {self.employee.last_name}'
+            except Employee.DoesNotExist:
+                return self.email
 
 
 class Employee(models.Model):
