@@ -196,6 +196,20 @@ class VehicleVideosView(CreateView):
             raise Http404
         return super().dispatch(request, *args, **kwargs)
 
+    def form_valid(self, form):
+        vehicle_video = form.save(commit=False)
+        vehicle_video.vehicle_marketing = self.vehicle_marketing
+        vehicle_video.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['vehicle_marketing'] = self.vehicle_marketing
+        return context
+
+    def get_success_url(self):
+        return reverse('backoffice:vehicle-detail', kwargs={'pk': self.vehicle_marketing.vehicle_id})
+
 
 class VehicleMediaPromoteView(APIView):
 

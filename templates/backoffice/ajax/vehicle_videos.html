@@ -4,17 +4,21 @@
 
 {% for video in vehicle_marketing.vids.all %}
     <div class="vvid-container">
-        <img class="vvid" src="{{ video.video.url }}" vvidsid="{{ video.id }}" />
+        <img class="vvid" src="{{ video.thumbnail.url }}" vvidsid="{{ video.id }}" />
         <span class="vvid-delete ui-icon ui-icon-trash" vvidsid="{{ video.id }}"></span>
         {% if not picture.is_first %}
             <span class="vvid-makefirst ui-icon ui-icon-star" vvidsid="{{ video.id }}"></span>
         {% endif %}
+        {% if video.video_mp4 %}
         <cfif FileExists("#VideoUploads#PRI-#vvidsid#.mp4")>
-            <a href="#OnSite#vids/PRI-#vvidsid#.mp4" target="_blank"><span class="vvid-video vvid-mp4" vvidsid="#vvidsid#">MP4</span></a>
+            <a href="{{ video.video_mp4.url }}" target="_blank"><span class="vvid-video vvid-mp4" vvidsid="{{ video.id }}">MP4</span></a>
         </cfif>
+        {% endif %}
+        {% if video.video_webm %}
         <cfif FileExists("#VideoUploads#PRI-#vvidsid#.webm")>
-            <a href="#OnSite#vids/PRI-#vvidsid#.webm" target="_blank"><span class="vvid-video vvid-webm" vvidsid="#vvidsid#">WebM</span></a>
+            <a href="{{ video.video_webm.url }}" target="_blank"><span class="vvid-video vvid-webm" vvidsid="{{ video.id }}">WebM</span></a>
         </cfif>
+        {% endif %}
 
         <h4>{{ video.title }}</h4>
         <p>{{ video.blurb|bbcode|safe }}</p>
@@ -26,8 +30,20 @@
     <div id="webm_status"></div>
     <div id="mp4_status"></div>
 
-    <form method="POST" enctype="multipart/form-data" id="vvid_form">
+    <form method="POST" action="{% url "backoffice:vehicle-videos" pk=vehicle_marketing.vehicle_id %}" enctype="multipart/form-data" id="vvid_form">
         <table class="inputform">
+            <tr>
+                <td>Video File (.mp4)</td>
+                <td>{{ form.video_mp4 }}</td>
+            </tr>
+            <tr>
+                <td>Video File (.webm)</td>
+                <td>{{ form.video_webm }}</td>
+            </tr>
+            <tr>
+                <td>Poster Image</td>
+                <td>{{ form.poster }}</td>
+            </tr>
             <tr>
                 <td>Thumbnail Image</td>
                 <td>{{ form.thumbnail }}</td>
@@ -55,5 +71,6 @@
         </table>
         <cfinput type="hidden" name="vehicleid" value="#URL.vehicleid#" />
         <cfinput type="hidden" name="vvidsid" value="" />
+        {% csrf_token %}
     </form>
 </div>

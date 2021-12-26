@@ -268,8 +268,12 @@ class VehiclePicture(models.Model):
 
 class VehicleVideo(models.Model):
     vehicle_marketing = models.ForeignKey('fleet.VehicleMarketing', null=True, on_delete=models.CASCADE, related_name='vids')
-    video = models.FileField(blank=True, upload_to=get_vehicle_video_path)
+    video_mp4 = models.FileField(blank=True, upload_to=get_vehicle_video_path)
+    video_webm = models.FileField(blank=True, upload_to=get_vehicle_video_path)
     file_extension = models.CharField(max_length=4, blank=True)
+    poster = models.ImageField(blank=True, width_field='poster_width', height_field='poster_height', upload_to=get_vehicle_picture_path)
+    poster_width = models.IntegerField(null=True, blank=True)
+    poster_height = models.IntegerField(null=True, blank=True)
     thumbnail = models.ImageField(blank=True, width_field='thumb_width', height_field='thumb_height', upload_to=get_vehicle_picture_path)
     thumb_width = models.IntegerField(null=True, blank=True)
     thumb_height = models.IntegerField(null=True, blank=True)

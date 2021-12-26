@@ -65,7 +65,7 @@ class VehicleVideoForm(forms.ModelForm):
 
     class Meta:
         model = VehicleVideo
-        fields = ('video', 'thumbnail', 'length', 'title', 'blurb',)
+        fields = ('video_mp4', 'video_webm', 'poster', 'thumbnail', 'length', 'title', 'blurb',)
 
 
 class EmployeeForm(forms.ModelForm):

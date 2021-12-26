@@ -183,15 +183,30 @@
 {#    </CFOUTPUT>#}
 
 
+    {% if vehicle.vids.exists %}
     <CFIF tVids.recordcount GT 0>
 
         <cfsetting showDebugOutput="No">
 
         <cfoutput>
-            <video id="vehicle_video" class="video-js" controls preload="auto" width="530" height="298"
-                poster="vids/PRI-#tVids.vvidsid#.jpg" data-setup="{}">
-                <source src="vids/PRI-#tVids.vvidsid#.mp4" type='video/mp4'>
-                <source src="vids/PRI-#tVids.vvidsid#.webm" type='video/webm'>
+            <video
+                id="vehicle_video"
+                class="video-js"
+                controls
+                preload="auto"
+                width="530"
+                height="298"
+                {% if vehicle.vids.first.poster %}
+                    poster="{{ vehicle.vids.first.poster.url }}"
+                {% endif %}
+                data-setup="{}"
+            >
+                {% if vehicle.vids.first.video_mp4 %}
+                    <source src="{{ vehicle.vids.first.video_mp4.url }}" type='video/mp4'>
+                {% endif %}
+                {% if vehicle.vids.first.video_webm %}
+                    <source src="{{ vehicle.vids.first.video_webm.url }}" type='video/webm'>
+                {% endif %}
             <p class="vjs-no-js">
             To view this video please enable JavaScript, and consider upgrading to a web browser that
             <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
@@ -204,17 +219,20 @@
         <div class="vvid-blurb-caption"></div>
 
         <div class="vvid-thumbs">
+        {% for video in vehicle.vids.all %}
         <cfoutput query="tVids">
-            <div class="vvid-thumbnail" vvidsid="#vvidsid#">
-                <img src="vids/PRI-#vvidsid#.#thumbext#" title="#title# - #length#" />
-                <p>#title#</p>
+            <div class="vvid-thumbnail" vvidsid="{{ video.id }}">
+                <img src="{{ video.thumbnail.url }}" title="{{ video.title }} - #length#" />
+                <p>{{ video.title }}</p>
                 <p>Run time: #length#</p>
-                <p class="vvid-blurb hidden">#parseNewlines(blurb)#</p>
+                <p class="vvid-blurb hidden">{{ video.blurb|bbcode|safe }}</p>
             </div>
         </cfoutput>
+        {% endfor %}
         </div>
 
     </CFIF>
+    {% endif %}
 
 <script type="text/javascript">
 //var words = new Array();
