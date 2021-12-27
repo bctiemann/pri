@@ -19,6 +19,7 @@ class PriceCalculator(ABC):
 
     tax_zip = None
     tax_rate = None
+    effective_date = None
 
     promotion = None
     promotion_discount = None
@@ -36,6 +37,8 @@ class PriceCalculator(ABC):
     cents = decimal.Decimal('0.01')
 
     def __init__(self, coupon_code=None, email=None, tax_zip=None, effective_date=None):
+        self.tax_zip = tax_zip
+        self.effective_date = effective_date
         self.promotion = self.get_effective_promotion(effective_date=effective_date)
         self.coupon = self.get_coupon(coupon_code)
         self.customer = self.get_customer(email)
@@ -76,6 +79,8 @@ class PriceCalculator(ABC):
             return 0
         if value is None:
             raise ValueError('No base value provided.')
+        if self.coupon.is_expired(self.effective_date):
+            return 0
         return self.coupon.get_discount_value(value)
 
     def get_customer_discount(self, value=None):

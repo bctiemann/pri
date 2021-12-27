@@ -36,6 +36,11 @@ class RentalPriceCalculatorTestCase(TestCase):
             amount=15.00,
             code='TEST',
         )
+        self.coupon_2 = Coupon.objects.create(
+            amount=15.00,
+            code='EXPIRED',
+            end_date=date(2021, 12, 31),
+        )
         self.promotion_1 = Promotion.objects.create(
             percent=20,
             name='Father\'s Day',
@@ -79,13 +84,33 @@ class RentalPriceCalculatorTestCase(TestCase):
         email = None
         extra_miles = 200
         tax_zip = '07430'
+        effective_date = date(2022, 6, 12)
         rental_price_calculator = RentalPriceCalculator(
-            vehicle_marketing, num_days, extra_miles, coupon_code=coupon_code, email=email, tax_zip=tax_zip,
+            vehicle_marketing, num_days, extra_miles, coupon_code=coupon_code, email=email, tax_zip=tax_zip, effective_date=effective_date
         )
         price_data = rental_price_calculator.get_price_data()
 
         self.assertEqual(price_data['coupon_discount'], Decimal('15.00'))
         self.assertEqual(price_data['total_with_tax'], Decimal('1295.49'))
+
+    def test_get_rental_price_data_with_expired_coupon(self):
+        """
+        2-day rental, 200 extra miles, $15 coupon (expired), no customer discount
+        """
+        vehicle_marketing = self.vehicle_1
+        num_days = 2
+        coupon_code = 'EXPIRED'
+        email = None
+        extra_miles = 200
+        tax_zip = '07430'
+        effective_date = date(2022, 6, 12)
+        rental_price_calculator = RentalPriceCalculator(
+            vehicle_marketing, num_days, extra_miles, coupon_code=coupon_code, email=email, tax_zip=tax_zip, effective_date=effective_date
+        )
+        price_data = rental_price_calculator.get_price_data()
+
+        self.assertEqual(price_data['coupon_discount'], Decimal('0.00'))
+        self.assertEqual(price_data['total_with_tax'], Decimal('1311.49'))
 
     def test_get_rental_price_data_with_customer_discount(self):
         """
@@ -121,7 +146,6 @@ class RentalPriceCalculatorTestCase(TestCase):
             vehicle_marketing, num_days, extra_miles, coupon_code=coupon_code, email=email, tax_zip=tax_zip, effective_date=effective_date
         )
         price_data = rental_price_calculator.get_price_data()
-        print(price_data)
 
         self.assertEqual(price_data['promotion_discount'], Decimal('180.00'))
         self.assertEqual(price_data['total_with_tax'], Decimal('1119.56'))

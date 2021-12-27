@@ -191,6 +191,13 @@ class Promotion(models.Model):
     def get_discounted_value(self, value):
         return value - self.get_discount_value(value)
 
+    def is_expired(self, effective_date):
+        if effective_date is None:
+            return False
+        if self.end_date is None:
+            return False
+        return effective_date > self.end_date
+
     def __str__(self):
         return f'{self.name} ({self.value_str})'
 
