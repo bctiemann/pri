@@ -6,7 +6,7 @@
     <div class="vvid-container">
         <img class="vvid" src="{{ video.thumbnail.url }}" vvidsid="{{ video.id }}" />
         <span class="vvid-delete ui-icon ui-icon-trash" vvidsid="{{ video.id }}"></span>
-        {% if not picture.is_first %}
+        {% if not video.is_first %}
             <span class="vvid-makefirst ui-icon ui-icon-star" vvidsid="{{ video.id }}"></span>
         {% endif %}
         {% if video.video_mp4 %}
