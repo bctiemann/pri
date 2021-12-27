@@ -23,6 +23,7 @@ class ServiceType(models.TextChoices):
     RENTAL = ('rental', 'Rental')
     PERFORMANCE_EXPERIENCE = ('perfexp', 'Performance Experience')
     JOY_RIDE = ('joyride', 'Joy Ride')
+    GIFT_CERTIFICATE = ('giftcert', 'Gift Certificate')
 
 
 # Concrete base model class which is used to supply common fields to both the Reservation and Rental model classes.
@@ -166,6 +167,10 @@ class Charge(models.Model):
     pass
 
 
+# Promotions are time-bound discounts that apply to all customers, such as a holiday special. They may or may not
+# be restricted to a certain service type (such as Performance Experiences only).
+# Typically only one Promotion should be active at a given time, though this is not currently enforced in code and the
+# behavior if multiple Promotions are active is to choose the first valid one in the database.
 class Promotion(models.Model):
     name = models.CharField(max_length=255, blank=True)
     amount = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
@@ -202,6 +207,9 @@ class Promotion(models.Model):
         return f'{self.name} ({self.value_str})'
 
 
+# A Coupon is a Promotion that is identified by a code that a customer has to enter. It also differs from a Promotion
+# in that it might or might not have an end date (expiration date), and if it has a start date it will be ignored.
+# Many coupons can be active at the same time.
 class Coupon(Promotion):
     code = models.CharField(max_length=50, unique=True, db_index=True)
 
