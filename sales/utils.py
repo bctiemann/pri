@@ -36,19 +36,18 @@ class PriceCalculator(ABC):
     subtotal = 0.0
     cents = decimal.Decimal('0.01')
 
-    def __init__(self, coupon_code=None, email=None, tax_zip=None, effective_date=None):
-        self.tax_zip = tax_zip
+    def __init__(self, coupon_code, email, tax_zip, effective_date):
         self.effective_date = effective_date
-        self.promotion = self.get_effective_promotion(effective_date=effective_date)
+        self.promotion = self.get_effective_promotion()
         self.coupon = self.get_coupon(coupon_code)
         self.customer = self.get_customer(email)
         self.tax_rate = self.get_tax_rate(tax_zip)
 
     # May be overridden to apply further filtering, such as for a specific service type
-    def get_effective_promotion(self, effective_date):
-        if not effective_date:
+    def get_effective_promotion(self):
+        if not self.effective_date:
             return None
-        return self.get_effective_promotions(effective_date=effective_date).first()
+        return self.get_effective_promotions(effective_date=self.effective_date).first()
 
     def get_effective_promotions(self, effective_date):
         return Promotion.objects.filter((Q(start_date__isnull=True) | Q(start_date__lte=effective_date)), end_date__gte=effective_date)

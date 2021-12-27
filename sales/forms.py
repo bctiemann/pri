@@ -237,6 +237,7 @@ class ReservationRentalDetailsForm(forms.ModelForm):
             coupon_code=self.cleaned_data.get('coupon_code'),
             email=self.cleaned_data.get('email'),
             tax_zip=self.tax_zip,
+            effective_date=self.cleaned_data.get('out_date'),
         )
         return price_calculator.get_price_data()
         # subtotal = self.subtotal

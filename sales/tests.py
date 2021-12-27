@@ -66,8 +66,9 @@ class RentalPriceCalculatorTestCase(TestCase):
         email = None
         extra_miles = 200
         tax_zip = '07430'
+        effective_date = None
         rental_price_calculator = RentalPriceCalculator(
-            vehicle_marketing, num_days, extra_miles, coupon_code=coupon_code, email=email, tax_zip=tax_zip,
+            vehicle_marketing, num_days, extra_miles, coupon_code=coupon_code, email=email, tax_zip=tax_zip, effective_date=effective_date
         )
         price_data = rental_price_calculator.get_price_data()
 
@@ -122,8 +123,9 @@ class RentalPriceCalculatorTestCase(TestCase):
         email = 'email@test.com'
         extra_miles = 200
         tax_zip = '07430'
+        effective_date = None
         rental_price_calculator = RentalPriceCalculator(
-            vehicle_marketing, num_days, extra_miles, coupon_code=coupon_code, email=email, tax_zip=tax_zip,
+            vehicle_marketing, num_days, extra_miles, coupon_code=coupon_code, email=email, tax_zip=tax_zip, effective_date=effective_date
         )
         price_data = rental_price_calculator.get_price_data()
 
