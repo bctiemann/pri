@@ -15,6 +15,7 @@ from sales.forms import ReservationRentalDetailsForm, ReservationRentalPaymentFo
 from marketing.forms import NewsletterSubscribeForm
 from sales.models import Reservation, generate_code
 from sales.enums import ReservationType
+from sales.tasks import send_email
 from users.models import User, Customer, generate_password
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture
 from api.serializers import VehicleSerializer, VehicleDetailSerializer
@@ -190,9 +191,17 @@ class ValidateNewsletterSubscriptionView(APIView):
                 'errors': ['ReCAPTCHA failure.'],
             })
 
-        # TODO:
-        # create NewsletterSubscription
-        # Send out email with confirmation link
+        newsletter_subscription = form.save()
+
+        email_subject = 'Performance Rentals Newsletter Confirmation'
+        email_context = {
+            'subscription': newsletter_subscription,
+        }
+        send_email(
+            [form.cleaned_data['email']], email_subject, email_context,
+            text_template='front_site/email/newsletter_subscribe_confirm.txt',
+            html_template='front_site/email/newsletter_subscribe_confirm.html'
+        )
 
         response = {
             'success': form.is_valid(),

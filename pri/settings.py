@@ -203,6 +203,8 @@ MEDIA_URL = '/media/'
 
 COMPANY_NAME = 'Performance Rentals'
 SUPPORT_EMAIL = 'support@performance.rentals'
+SITE_EMAIL = 'info@performancerentals.us'
+DEBUG_EMAIL = 'btman@mac.com'
 
 # Choices for country picker for vehicle origins
 COUNTRIES_ONLY = ['US', 'JP', 'IT', 'GB', 'DE']
