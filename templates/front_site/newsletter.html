@@ -65,15 +65,17 @@
     <div class="reservation-form-sidebar">
 
     {% block newsletter_content %}
-        <cfform method="POST" name="reservation_form" action="newsletter.cfm" onsubmit="return false;" autocomplete="on">
+        <form method="POST" name="reservation_form" id="reservation_form" action="{% url "newsletter" %}" onsubmit="return false;" autocomplete="on">
         <cfoutput>
 
+        {% if form.errors %}
         <cfif Len(formError) GT 0>
         <div class="exception" id="reservation_form_error">
             <h3>An error occurred</h3>
             <p class="alert-message">#formError#</p>
         </div>
         </cfif>
+        {% endif %}
 
         <div id="subscribe_payment">
 
@@ -86,11 +88,11 @@
             <table class="inputform payment">
                 <tr>
                     <td>Your Name</td>
-                    <td><cfinput name="name" value="#Newsletter.name#" class="#StructKeyExists(fieldErrors,"name") ? 'field-error' : ''#" /></td>
+                    <td>{{ form.full_name }}</td>
                 </tr>
                 <tr>
                     <td>Your Email</td>
-                    <td><cfinput name="email" value="#Newsletter.email#" class="#StructKeyExists(fieldErrors,"email") ? 'field-error' : ''#" /></td>
+                    <td>{{ form.email }}</td>
                 </tr>
 
                 <tr>
@@ -119,7 +121,8 @@
 
         </cfoutput>
         <cfinput type="hidden" name="reservation_type" value="subscribe" />
-        </cfform>
+        {% csrf_token %}
+        </form>
     {% endblock %}
 
     </div>

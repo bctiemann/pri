@@ -1,15 +1,18 @@
 import logging
+import requests
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import APIException
 
+from django.conf import settings
 from django.urls import reverse_lazy, reverse
 from django.db import IntegrityError
 from django.contrib.auth import authenticate, login
 from django.http import Http404, HttpResponseRedirect
 
 from sales.forms import ReservationRentalDetailsForm, ReservationRentalPaymentForm, ReservationRentalLoginForm
+from marketing.forms import NewsletterSubscribeForm
 from sales.models import Reservation, generate_code
 from sales.enums import ReservationType
 from users.models import User, Customer, generate_password
@@ -146,6 +149,57 @@ class ValidateRentalPaymentView(APIView):
             'errors_html': form.errors.as_ul(),
             'reservation_type': 'rental',
             'customer_site_url': reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': confirmation_code}),
+        }
+        return Response(response)
+
+
+class ValidateNewsletterSubscriptionView(APIView):
+
+    # authentication_classes = ()
+    # permission_classes = ()
+
+    # form_type is passed in via the url pattern in urls.py as a kwarg to .as_view()
+    form_type = None
+
+    def verify_recaptcha(self, recaptcha_response):
+        payload = {
+            'secret': settings.RECAPTCHA_SECRET_KEY,
+            'response': recaptcha_response,
+        }
+        return requests.post(settings.RECAPTCHA_VERIFY_URL, data=payload)
+
+
+    def post(self, request):
+        # form_class = self._get_form_class()
+        form = NewsletterSubscribeForm(request.POST)
+        # form = form_class(request.POST)
+        print(form.data)
+        print(self.form_type)
+        print(form.is_valid())
+        print(form.errors.as_json())
+        if not form.is_valid():
+            return Response({
+                'success': False,
+                'errors': form.errors,
+            })
+
+        recaptcha_response = self.verify_recaptcha(form.data.get('g-recaptcha-response'))
+        recaptcha_result = recaptcha_response.json()
+        if not recaptcha_result['success']:
+            return Response({
+                'success': False,
+                'errors': 'ReCAPTCHA failure',
+            })
+
+        # TODO:
+        # create NewsletterSubscription
+        # Send out email with confirmation link
+
+        response = {
+            'success': form.is_valid(),
+            'errors': form.errors,
+            'errors_html': form.errors.as_ul(),
+            'success_url': reverse('newsletter-done'),
         }
         return Response(response)
 

@@ -13,7 +13,7 @@ class SiteContent(models.Model):
 
 class NewsletterSubscription(models.Model):
     email = LowercaseEmailField(null=True)
-    full_name = models.CharField(max_length=255, blank=True)
+    full_name = models.CharField(max_length=255)
     confirmed_at = models.DateTimeField(null=True, blank=True)
     hash = models.UUIDField(null=True, blank=True)
     ip = models.GenericIPAddressField(null=True, blank=True)

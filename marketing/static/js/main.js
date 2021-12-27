@@ -119,7 +119,19 @@ var reserveValidateForm = function(reservationType, section) {
                     window.location.href = data.customer_site_url;
                 } else if (data.reservation_type == 'gift') {
                     window.location.href = 'gift.cfm?tag=' + data.tag;
+                // } else if (data.reservation_type == 'subscribe') {
+                //     window.location.href = 'newsletter.cfm?done=1';
+                // } else if (data.reservation_type == 'unsubscribe') {
+                //     window.location.href = 'unsubscribe.cfm?done=1';
+                } else if (data.reservation_type == 'subpay') {
+                    window.location.href = 'subpay.cfm?done=1';
+                } else if (data.reservation_type == 'survey') {
+                    window.location.href = 'survey.cfm?done=1';
                 }
+            } else if (section === 'subscribe') {
+                window.location.href = data.success_url;
+            } else if (section === 'unsubscribe') {
+
             }
         } else {
             $('.' + section + ' .btn').prop('disabled', false);
@@ -300,6 +312,18 @@ $('document').ready(function() {
     });
     $('.reserve-gift-complete-btn').click(function() {
         reserveValidateForm('buyGiftCert', 'payment');
+    });
+    $('.subscribe-complete-btn').click(function() {
+        reserveValidateForm('newsletter', 'subscribe');
+    });
+    $('.unsubscribe-complete-btn').click(function() {
+        reserveValidateForm('unsubscribeNewsletter', 'payment');
+    });
+    $('.subpay-complete-btn').click(function() {
+        reserveValidateForm('submitSubPay', 'payment');
+    });
+    $('.survey-complete-btn').click(function() {
+        reserveValidateForm('submitSurvey', 'payment');
     });
 
     $('.pick-vehicles-btn').click(function() {

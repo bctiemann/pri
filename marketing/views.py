@@ -1,9 +1,11 @@
 from django.conf import settings
 from django.views.generic import TemplateView, FormView, CreateView
 from django.http import Http404
+from django.urls import reverse
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
 from marketing.models import NewsItem, SiteContent
+from marketing.forms import NewsletterSubscribeForm
 
 
 # This mixin allows us to include the common query for cars and bikes into every view, for the nav menu
@@ -65,8 +67,9 @@ class VehicleView(NavMenuMixin, TemplateView):
         return context
 
 
-class NewsletterView(NavMenuMixin, TemplateView):
+class NewsletterView(NavMenuMixin, FormView):
     template_name = 'front_site/newsletter.html'
+    form_class = NewsletterSubscribeForm
 
     def get_context_data(self, slug=None, **kwargs):
         context = super().get_context_data(**kwargs)
