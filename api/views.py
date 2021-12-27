@@ -168,7 +168,6 @@ class ValidateNewsletterSubscriptionView(APIView):
         }
         return requests.post(settings.RECAPTCHA_VERIFY_URL, data=payload)
 
-
     def post(self, request):
         # form_class = self._get_form_class()
         form = NewsletterSubscribeForm(request.POST)
