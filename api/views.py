@@ -187,7 +187,7 @@ class ValidateNewsletterSubscriptionView(APIView):
         if not recaptcha_result['success']:
             return Response({
                 'success': False,
-                'errors': 'ReCAPTCHA failure',
+                'errors': ['ReCAPTCHA failure.'],
             })
 
         # TODO:
