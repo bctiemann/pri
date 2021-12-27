@@ -2,8 +2,10 @@ import decimal
 from abc import ABC
 
 from django.conf import settings
+from django.utils import timezone
+from django.db.models import Q
 
-from sales.models import Reservation, Coupon, TaxRate
+from sales.models import ServiceType, Reservation, Promotion, Coupon, TaxRate
 from users.models import Customer
 
 
@@ -18,6 +20,10 @@ class PriceCalculator(ABC):
     tax_zip = None
     tax_rate = None
 
+    promotion = None
+    promotion_discount = None
+    post_promotion_discount_subtotal = None
+
     coupon = None
     coupon_discount = None
     post_coupon_discount_subtotal = None
@@ -29,10 +35,20 @@ class PriceCalculator(ABC):
     subtotal = 0.0
     cents = decimal.Decimal('0.01')
 
-    def __init__(self, coupon_code=None, email=None, tax_zip=None):
+    def __init__(self, coupon_code=None, email=None, tax_zip=None, effective_date=None):
+        self.promotion = self.get_effective_promotion(effective_date=effective_date)
         self.coupon = self.get_coupon(coupon_code)
         self.customer = self.get_customer(email)
         self.tax_rate = self.get_tax_rate(tax_zip)
+
+    # May be overridden to apply further filtering, such as for a specific service type
+    def get_effective_promotion(self, effective_date):
+        if not effective_date:
+            return None
+        return self.get_effective_promotions(effective_date=effective_date).first()
+
+    def get_effective_promotions(self, effective_date):
+        return Promotion.objects.filter((Q(start_date__isnull=True) | Q(start_date__lte=effective_date)), end_date__gte=effective_date)
 
     def get_coupon(self, coupon_code):
         return Coupon.objects.filter(code=coupon_code).first()
@@ -47,6 +63,13 @@ class PriceCalculator(ABC):
     def quantize_currency(self, value):
         # return f'{decimal.Decimal(value).quantize(self.cents, decimal.ROUND_HALF_UP)}'
         return decimal.Decimal(value).quantize(self.cents, decimal.ROUND_HALF_UP)
+
+    def get_promotion_discount(self, value=None):
+        if not self.promotion:
+            return 0
+        if value is None:
+            raise ValueError('No base value provided.')
+        return self.promotion.get_discount_value(value)
 
     def get_coupon_discount(self, value=None):
         if not self.coupon:
@@ -94,11 +117,10 @@ class PriceCalculator(ABC):
 class RentalPriceCalculator(PriceCalculator):
     """
     Price is calculated as follows:
-    - Calculator is inited with vehicle, # days, extra miles, coupon code, email, and tax zip
+    - Calculator is inited with vehicle, # days, extra miles, coupon code, email, tax zip, and effective date
     - Base price is daily rate * number of days
     - Subtract multi-day discount
-    - Subtract coupon discount
-    - Subtract customer ("promotional") discount
+    - Subtract largest of (coupon discount, customer discount, promotional discount)
     - Add extra miles surcharge
     - Add sales tax
 
@@ -110,6 +132,9 @@ class RentalPriceCalculator(PriceCalculator):
     num_days = None
     multi_day_discount = None
     post_multi_day_discount_subtotal = None
+
+    specific_discount = None
+    post_specific_discount_subtotal = None
 
     extra_miles = None
     extra_miles_surcharge = None
@@ -128,15 +153,26 @@ class RentalPriceCalculator(PriceCalculator):
         self.subtotal = self.apply_discount(value=self.multi_day_discount)
         self.post_multi_day_discount_subtotal = self.subtotal
 
-        # Coupon discount
+        # Find and apply greatest specific discount available
+        self.promotion_discount = self.get_promotion_discount(value=self.subtotal)
         self.coupon_discount = self.get_coupon_discount(value=self.subtotal)
-        self.subtotal = self.apply_discount(value=self.coupon_discount)
-        self.post_coupon_discount_subtotal = self.subtotal
-
-        # Customer (promotional) discount
         self.customer_discount = self.get_customer_discount(value=self.subtotal)
-        self.subtotal = self.apply_discount(value=self.customer_discount)
-        self.post_customer_discount_subtotal = self.subtotal
+        self.specific_discount = max(self.promotion_discount, self.coupon_discount, self.customer_discount)
+        self.subtotal = self.apply_discount(value=self.specific_discount)
+        self.post_specific_discount_subtotal = self.subtotal
+
+        # self.subtotal = self.apply_discount(value=self.promotion_discount)
+        # self.post_promotion_discount_subtotal = self.subtotal
+        #
+        # # Coupon discount
+        # self.coupon_discount = self.get_coupon_discount(value=self.subtotal)
+        # self.subtotal = self.apply_discount(value=self.coupon_discount)
+        # self.post_coupon_discount_subtotal = self.subtotal
+        #
+        # # Customer discount
+        # self.customer_discount = self.get_customer_discount(value=self.subtotal)
+        # self.subtotal = self.apply_discount(value=self.customer_discount)
+        # self.post_customer_discount_subtotal = self.subtotal
 
         # Extra miles surcharge
         self.extra_miles_surcharge = self.get_extra_miles_cost()
@@ -180,8 +216,10 @@ class RentalPriceCalculator(PriceCalculator):
             base_price=self.quantize_currency(self.base_price),
             multi_day_discount=self.quantize_currency(self.multi_day_discount),
             multi_day_discount_pct=self.multi_day_discount_pct,
+            promotion_discount=self.quantize_currency(self.promotion_discount),
             coupon_discount=self.quantize_currency(self.coupon_discount),
             customer_discount=self.quantize_currency(self.customer_discount),
+            specific_discount=self.quantize_currency(self.specific_discount),
             extra_miles=self.extra_miles,
             extra_miles_cost=self.quantize_currency(self.extra_miles_surcharge),
             subtotal=self.quantize_currency(self.pre_tax_subtotal),

@@ -19,6 +19,12 @@ def generate_code(reservation_type):
     return f'{RESERVATION_TYPE_CODE_MAP.get(reservation_type)}{alpha_str}{numeric_str}'
 
 
+class ServiceType(models.TextChoices):
+    RENTAL = ('rental', 'Rental')
+    PERFORMANCE_EXPERIENCE = ('perfexp', 'Performance Experience')
+    JOY_RIDE = ('joyride', 'Joy Ride')
+
+
 # Concrete base model class which is used to supply common fields to both the Reservation and Rental model classes.
 # Don't want to use an abstract model class because we want to be able to query both tables simultaneously in a union
 
@@ -160,10 +166,13 @@ class Charge(models.Model):
     pass
 
 
-class Coupon(models.Model):
-    code = models.CharField(max_length=50, unique=True, db_index=True)
+class Promotion(models.Model):
+    name = models.CharField(max_length=255, blank=True)
     amount = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
     percent = models.IntegerField(null=True, blank=True)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+    service_type = models.CharField(max_length=50, choices=ServiceType.choices, blank=True)
 
     @property
     def value_str(self):
@@ -176,11 +185,18 @@ class Coupon(models.Model):
         if self.amount:
             return self.amount
         elif self.percent:
-            return value * self.percent
+            return value * self.percent / 100
         return 0
 
     def get_discounted_value(self, value):
         return value - self.get_discount_value(value)
+
+    def __str__(self):
+        return f'{self.name} ({self.value_str})'
+
+
+class Coupon(Promotion):
+    code = models.CharField(max_length=50, unique=True, db_index=True)
 
     def __str__(self):
         return f'{self.code} ({self.value_str})'

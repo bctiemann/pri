@@ -1,10 +1,11 @@
 from decimal import Decimal
+from datetime import date
 
 from django.test import TestCase
 
 from fleet.models import VehicleMarketing
 from users.models import Customer, User
-from sales.models import TaxRate, Coupon
+from sales.models import TaxRate, Coupon, Promotion
 from sales.utils import RentalPriceCalculator
 
 
@@ -34,6 +35,11 @@ class RentalPriceCalculatorTestCase(TestCase):
         self.coupon_1 = Coupon.objects.create(
             amount=15.00,
             code='TEST',
+        )
+        self.promotion_1 = Promotion.objects.create(
+            percent=20,
+            name='Father\'s Day',
+            end_date=date(2022, 6, 11),
         )
 
     def test_get_tax_rate_from_avalara_api(self):
@@ -99,4 +105,24 @@ class RentalPriceCalculatorTestCase(TestCase):
         self.assertEqual(price_data['customer_id'], 1)
         self.assertEqual(price_data['customer_discount'], Decimal('90.00'))
         self.assertEqual(price_data['total_with_tax'], Decimal('1215.53'))
+
+    def test_get_rental_price_data_with_promotional_discount(self):
+        """
+        2-day rental, 200 extra miles, no coupon, 20% promotional discount
+        """
+        vehicle_marketing = self.vehicle_1
+        num_days = 2
+        coupon_code = None
+        email = None
+        extra_miles = 200
+        tax_zip = '07430'
+        effective_date = date(2022, 6, 10)
+        rental_price_calculator = RentalPriceCalculator(
+            vehicle_marketing, num_days, extra_miles, coupon_code=coupon_code, email=email, tax_zip=tax_zip, effective_date=effective_date
+        )
+        price_data = rental_price_calculator.get_price_data()
+        print(price_data)
+
+        self.assertEqual(price_data['promotion_discount'], Decimal('180.00'))
+        self.assertEqual(price_data['total_with_tax'], Decimal('1119.56'))
 
