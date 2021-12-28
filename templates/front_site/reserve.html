@@ -322,6 +322,13 @@
                 </td>
             </tr>
             <tr>
+                <td>Military ID?</td>
+                <td>
+                    {{ form.is_military }}
+                    <small class="tooltip" title="If you're active duty military, we'll apply a {{ vehicle.military_discount }}% discount."><span class="ui-icon ui-icon-info"></span></small>
+                </td>
+            </tr>
+            <tr>
                 <td class="align-top">Notes/Requests</td>
                 <td>
                     {{ form.notes }}

@@ -57,6 +57,10 @@ class ReservationRentalDetailsForm(forms.ModelForm):
         (0, _('I will be picking up the vehicle at PRI in Ringwood, NJ')),
         (1, _('I would like the vehicle to be delivered to me')),
     )
+    TRUE_FALSE_CHOICES = (
+        (True, 'Yes'),
+        (False, 'No')
+    )
     DATETIME_FORMAT = '%m/%d/%Y %H:%M'
     discount = None
     customer = None
@@ -79,6 +83,7 @@ class ReservationRentalDetailsForm(forms.ModelForm):
     extra_miles = forms.ChoiceField()
     email = forms.EmailField()
     coupon_code = forms.CharField(required=False)
+    is_military = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
     notes = forms.CharField(widget=forms.Textarea(), required=False)
 
     def __init__(self, *args, **kwargs):
@@ -238,6 +243,7 @@ class ReservationRentalDetailsForm(forms.ModelForm):
             email=self.cleaned_data.get('email'),
             tax_zip=self.tax_zip,
             effective_date=self.cleaned_data.get('out_date'),
+            is_military=self.cleaned_data.get('is_military'),
         )
         return price_calculator.get_price_data()
         # subtotal = self.subtotal

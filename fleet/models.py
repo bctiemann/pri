@@ -203,6 +203,10 @@ class VehicleMarketing(models.Model):
         return settings.EXTRA_MILES_OVERAGE_PER_MILE
 
     @property
+    def military_discount(self):
+        return settings.MILITARY_DISCOUNT_PCT
+
+    @property
     def blurb_parsed(self):
         parser = get_parser()
         return parser.render(self.blurb)
