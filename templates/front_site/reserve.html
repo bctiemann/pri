@@ -298,7 +298,7 @@
                         </cfloop>
                     </cfselect>
                     {% endcomment %}
-                    <small class="tooltip" title="You get #VehicleFront.milesinc# miles per day included with your rental. If you go beyond that amount, additional miles are charged at $1.95/mile. If you're planning on covering a lot of distance, buy additional miles now for a discount!">Pre-purchase and save! <span class="ui-icon ui-icon-info"></span></small>
+                    <small class="tooltip" title="You get {{ vehicle.miles_included }} miles per day included with your rental. If you go beyond that amount, additional miles are charged at ${{ vehicle.extra_miles_overage_per_mile }}/mile. If you're planning on covering a lot of distance, buy additional miles now for a discount!">Pre-purchase and save! <span class="ui-icon ui-icon-info"></span></small>
                 </td>
             </tr>
             <tr>

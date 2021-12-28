@@ -199,6 +199,10 @@ class VehicleMarketing(models.Model):
         return list(settings.EXTRA_MILES_PRICES.values())
 
     @property
+    def extra_miles_overage_per_mile(self):
+        return settings.EXTRA_MILES_OVERAGE_PER_MILE
+
+    @property
     def blurb_parsed(self):
         parser = get_parser()
         return parser.render(self.blurb)

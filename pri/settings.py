@@ -223,6 +223,7 @@ EXTRA_MILES_PRICES = {
     200: {'value': 200, 'label': '200 miles ($330)', 'cost': 330},
     250: {'value': 250, 'label': '250 miles ($400)', 'cost': 400},
 }
+EXTRA_MILES_OVERAGE_PER_MILE = 1.95
 
 JOY_RIDE_PRICES = {
     '1_pax': 250,

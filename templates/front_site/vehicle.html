@@ -153,7 +153,10 @@
             <td>{{ vehicle|multi_day_miles_included:7 }} mi</td>
         </tr>
         <tr>
-            <td colspan="4" class="fineprint">Overage is $1.95/mile. Purchase miles in advance for discounted rates.</th>
+            <td colspan="4" class="fineprint">
+                Overage is ${{ vehicle.extra_miles_overage_per_mile }}/mile.
+                Purchase miles in advance for discounted rates.
+            </th>
         </tr>
 
     </table>
