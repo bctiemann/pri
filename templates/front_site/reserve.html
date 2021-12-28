@@ -118,16 +118,18 @@
 <div class="well" style="padding-bottom: 100px;">
     <div class='section-header'>Reserve Your Vehicle</div>
 
+    {% comment %}
     <CFQUERY NAME="tPics" DATASOURCE="#FDSN#">
         SELECT vpicsid,vehicleid,fext,isfirst FROM VPics
         WHERE vehicleid = <CFQUERYPARAM value="#Vehicle.vehicleid#" CFSQLType="CF_SQL_INTEGER">
         ORDER BY RAND()
         LIMIT 5
     </CFQUERY>
+    {% endcomment %}
     <div class="reservation-pics-sidebar">
-        <cfoutput query="tPics">
-            <img src="pics/PRI-#vpicsid#.#fext#" />
-        </cfoutput>
+        {% for picture in vehicle.pics.all %}
+            <img src="{{ picture.image.url }}" />
+        {% endfor %}
     </div>
 
     <form method="POST" name="reservation_form" id="reservation_form" action="{% url "reserve" slug=vehicle.slug %}" onsubmit="return false;" autocomplete="on">
@@ -135,12 +137,14 @@
 
     <div class="reservation-form-sidebar">
 
+    {% if form.errors %}
     <cfif Len(formError) GT 0>
     <div class="exception" id="reservation_form_error">
         <h3>An error occurred</h3>
         <p class="alert-message">#formError#</p>
     </div>
     </cfif>
+    {% endif %}
 
     <div id="reservation_details">
 
