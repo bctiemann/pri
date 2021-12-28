@@ -203,7 +203,7 @@ class VehicleMarketing(models.Model):
         return settings.EXTRA_MILES_OVERAGE_PER_MILE
 
     @property
-    def military_discount(self):
+    def military_discount_pct(self):
         return settings.MILITARY_DISCOUNT_PCT
 
     @property
