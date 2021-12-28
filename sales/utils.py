@@ -33,15 +33,20 @@ class PriceCalculator(ABC):
     customer_discount = None
     post_customer_discount_subtotal = None
 
+    is_military = False
+    military_discount = None
+    post_military_discount_subtotal = None
+
     subtotal = 0.0
     cents = decimal.Decimal('0.01')
 
-    def __init__(self, coupon_code, email, tax_zip, effective_date):
+    def __init__(self, coupon_code, email, tax_zip, effective_date, is_military=False):
         self.effective_date = effective_date
         self.promotion = self.get_effective_promotion()
         self.coupon = self.get_coupon(coupon_code)
         self.customer = self.get_customer(email)
         self.tax_rate = self.get_tax_rate(tax_zip)
+        self.is_military = is_military
 
     # May be overridden to apply further filtering, such as for a specific service type
     def get_effective_promotion(self):
@@ -89,6 +94,13 @@ class PriceCalculator(ABC):
             return value * self.customer.discount_pct / 100
         return 0
 
+    def get_military_discount(self, value=None):
+        if value is None:
+            raise ValueError('No base value provided.')
+        if self.is_military:
+            return value * settings.MILITARY_DISCOUNT_PCT / 100
+        return 0
+
     def get_tax_amount(self, value=None):
         if value is None:
             value = self.pre_tax_subtotal
@@ -121,10 +133,18 @@ class PriceCalculator(ABC):
 class RentalPriceCalculator(PriceCalculator):
     """
     Price is calculated as follows:
-    - Calculator is inited with vehicle, # days, extra miles, coupon code, email, tax zip, and effective date
+    - Calculator is inited with:
+        - vehicle
+        - # days
+        - extra miles
+        - coupon code
+        - email
+        - tax zip
+        - effective date
+        - military status
     - Base price is daily rate * number of days
     - Subtract multi-day discount
-    - Subtract largest of (coupon discount, customer discount, promotional discount)
+    - Subtract largest of (coupon discount, customer discount, promotional discount, military discount)
     - Add extra miles surcharge
     - Add sales tax
 
@@ -161,22 +181,13 @@ class RentalPriceCalculator(PriceCalculator):
         self.promotion_discount = self.get_promotion_discount(value=self.subtotal)
         self.coupon_discount = self.get_coupon_discount(value=self.subtotal)
         self.customer_discount = self.get_customer_discount(value=self.subtotal)
-        self.specific_discount = max(self.promotion_discount, self.coupon_discount, self.customer_discount)
+        self.military_discount = self.get_military_discount(value=self.subtotal)
+
+        self.specific_discount = max(
+            self.promotion_discount, self.coupon_discount, self.customer_discount, self.military_discount
+         )
         self.subtotal = self.apply_discount(value=self.specific_discount)
         self.post_specific_discount_subtotal = self.subtotal
-
-        # self.subtotal = self.apply_discount(value=self.promotion_discount)
-        # self.post_promotion_discount_subtotal = self.subtotal
-        #
-        # # Coupon discount
-        # self.coupon_discount = self.get_coupon_discount(value=self.subtotal)
-        # self.subtotal = self.apply_discount(value=self.coupon_discount)
-        # self.post_coupon_discount_subtotal = self.subtotal
-        #
-        # # Customer discount
-        # self.customer_discount = self.get_customer_discount(value=self.subtotal)
-        # self.subtotal = self.apply_discount(value=self.customer_discount)
-        # self.post_customer_discount_subtotal = self.subtotal
 
         # Extra miles surcharge
         self.extra_miles_surcharge = self.get_extra_miles_cost()
@@ -223,6 +234,7 @@ class RentalPriceCalculator(PriceCalculator):
             promotion_discount=self.quantize_currency(self.promotion_discount),
             coupon_discount=self.quantize_currency(self.coupon_discount),
             customer_discount=self.quantize_currency(self.customer_discount),
+            military_discount=self.quantize_currency(self.military_discount),
             specific_discount=self.quantize_currency(self.specific_discount),
             extra_miles=self.extra_miles,
             extra_miles_cost=self.quantize_currency(self.extra_miles_surcharge),

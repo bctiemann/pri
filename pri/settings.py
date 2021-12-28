@@ -241,6 +241,8 @@ PERFORMANCE_EXPERIENCE_PRICES = {
     'cost_per_pax': 75
 }
 
+MILITARY_DISCOUNT_PCT = 10
+
 # Backoffice site seconds of idle until push to "sleeping" page
 ADMIN_SLEEP_TIMEOUT_SECS = 1500
 
