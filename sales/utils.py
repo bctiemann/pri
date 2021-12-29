@@ -2,7 +2,6 @@ import decimal
 from abc import ABC
 
 from django.conf import settings
-from django.utils import timezone
 from django.db.models import Q
 
 from sales.models import ServiceType, Reservation, Promotion, Coupon, TaxRate
@@ -36,6 +35,10 @@ class PriceCalculator(ABC):
     is_military = False
     military_discount = None
     post_military_discount_subtotal = None
+
+    specific_discount = None
+    specific_discount_label = ''
+    post_specific_discount = None
 
     subtotal = 0.0
     cents = decimal.Decimal('0.01')
@@ -101,6 +104,23 @@ class PriceCalculator(ABC):
             return value * settings.MILITARY_DISCOUNT_PCT / 100
         return 0
 
+    def calculate_specific_discount(self, value):
+        self.promotion_discount = self.get_promotion_discount(value=value)
+        self.coupon_discount = self.get_coupon_discount(value=value)
+        self.customer_discount = self.get_customer_discount(value=value)
+        self.military_discount = self.get_military_discount(value=value)
+
+        specific_discounts = [
+            dict(discount=self.promotion_discount, label='Promotional discount'),
+            dict(discount=self.coupon_discount, label='Coupon discount'),
+            dict(discount=self.customer_discount, label='Customer discount'),
+            dict(discount=self.military_discount, label='Military discount'),
+        ]
+
+        specific_discounts = sorted(specific_discounts, key=lambda x: x['discount'], reverse=True)
+        self.specific_discount = specific_discounts[0]['discount']
+        self.specific_discount_label = specific_discounts[0]['label']
+
     def get_tax_amount(self, value=None):
         if value is None:
             value = self.pre_tax_subtotal
@@ -165,11 +185,15 @@ class RentalPriceCalculator(PriceCalculator):
     post_extra_miles_surcharge_subtotal = None
 
     def __init__(self, vehicle_marketing, num_days, extra_miles, **kwargs):
+        # Initialize objects handled by superclass
         super().__init__(**kwargs)
+
+        # initialize objects specific to this calculator class
         self.vehicle_marketing = vehicle_marketing
         self.num_days = num_days
         self.extra_miles = int(extra_miles)
 
+        # Start by calculating the base price
         self.subtotal = self.base_price
 
         # Multi-day discount
@@ -178,14 +202,7 @@ class RentalPriceCalculator(PriceCalculator):
         self.post_multi_day_discount_subtotal = self.subtotal
 
         # Find and apply greatest specific discount available
-        self.promotion_discount = self.get_promotion_discount(value=self.subtotal)
-        self.coupon_discount = self.get_coupon_discount(value=self.subtotal)
-        self.customer_discount = self.get_customer_discount(value=self.subtotal)
-        self.military_discount = self.get_military_discount(value=self.subtotal)
-
-        self.specific_discount = max(
-            self.promotion_discount, self.coupon_discount, self.customer_discount, self.military_discount
-         )
+        self.calculate_specific_discount(value=self.subtotal)
         self.subtotal = self.apply_discount(value=self.specific_discount)
         self.post_specific_discount_subtotal = self.subtotal
 
@@ -193,6 +210,8 @@ class RentalPriceCalculator(PriceCalculator):
         self.extra_miles_surcharge = self.get_extra_miles_cost()
         self.subtotal = self.apply_surcharge(value=self.extra_miles_surcharge)
         self.post_extra_miles_surcharge_subtotal = self.subtotal
+
+        # Superclass handles sales tax and total from here
 
     @property
     def base_price(self):
@@ -236,6 +255,7 @@ class RentalPriceCalculator(PriceCalculator):
             customer_discount=self.quantize_currency(self.customer_discount),
             military_discount=self.quantize_currency(self.military_discount),
             specific_discount=self.quantize_currency(self.specific_discount),
+            specific_discount_label=self.specific_discount_label,
             extra_miles=self.extra_miles,
             extra_miles_cost=self.quantize_currency(self.extra_miles_surcharge),
             subtotal=self.quantize_currency(self.pre_tax_subtotal),

@@ -29,8 +29,8 @@ var reserveValidateForm = function(method, section) {
                     $('.price-rental-total').html(data.tcostRaw.toFixed(2));
                     $('.price-multi-day-discount').html(data.multi_day_discount.toFixed(2));
                     $('.price-multi-day-discount-pct').html(data.multi_day_discount_pct);
-                    $('.price-car-discount').html(data.car_discount.toFixed(2));
-                    $('.price-customer-discount').html(data.customer_discount.toFixed(2));
+                    $('.price-specific-discount').html(data.price_data.specific_discount.toFixed(2));
+                    $('.price-specific-discount-label').html(data.price_data.specific_discount_label);
                     $('.price-extra-miles').html(data.extra_miles);
                     $('.price-extra-miles-cost').html(data.extra_miles_cost.toFixed(2));
                     $('.price-subtotal').html(data.subtotal.toFixed(2));
