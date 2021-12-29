@@ -15,6 +15,7 @@ class PriceCalculator(ABC):
     coupon_discount and customer_discount are common to all calculators; subclasses with other
     specific types of discounts should implement getter methods on a similar pattern.
     """
+    service_type = None
 
     tax_zip = None
     tax_rate = None
@@ -51,14 +52,20 @@ class PriceCalculator(ABC):
         self.tax_rate = self.get_tax_rate(tax_zip)
         self.is_military = is_military
 
-    # May be overridden to apply further filtering, such as for a specific service type
     def get_effective_promotion(self):
         if not self.effective_date:
             return None
-        return self.get_effective_promotions(effective_date=self.effective_date).first()
-
-    def get_effective_promotions(self, effective_date):
-        return Promotion.objects.filter((Q(start_date__isnull=True) | Q(start_date__lte=effective_date)), end_date__gte=effective_date)
+        # Get all promotions in effect on the given date
+        effective_promotions = Promotion.objects.filter(
+            (Q(start_date__isnull=True) | Q(start_date__lte=self.effective_date)),
+            end_date__gte=self.effective_date,
+        )
+        # Restrict to a specific service type if given
+        if self.service_type:
+            effective_promotions = effective_promotions.filter(
+                Q(service_type='') | Q(service_type=self.service_type.value)
+            )
+        return effective_promotions.first()
 
     def get_coupon(self, coupon_code):
         return Coupon.objects.filter(code=coupon_code).first()
@@ -171,6 +178,8 @@ class RentalPriceCalculator(PriceCalculator):
     Interim subtotals (e.g. post_multi_day_discount_subtotal) are for forensics and to return
     in price_data if necessary
     """
+    service_type = ServiceType.RENTAL
+
     vehicle_marketing = None
 
     num_days = None
