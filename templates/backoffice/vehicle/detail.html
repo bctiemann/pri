@@ -60,7 +60,6 @@
     {% endif %}
 
     {{ form.errors }}
-    <cfoutput>
     {% if vehicle %}
         <form method="POST" action="{% url "backoffice:vehicle-detail" pk=vehicle.id %}">
     {% else %}
@@ -93,35 +92,35 @@
         </tr>
         <tr>
             <td>Plate</td>
-            <td><cfinput name="plate" value="#Vehicle.plate#" maxlength="10" /></td>
+            <td>{{ form.plate }}</td>
         </tr>
         <tr>
             <td>VIN</td>
-            <td><cfinput name="vin" value="#Vehicle.vin#" maxlength="50" /></td>
+            <td>{{ form.vin }}</td>
         </tr>
         <tr>
             <td>Mileage</td>
-            <td><cfinput name="mileage" value="#Vehicle.mileage#" maxlength="8" validate="integer" required="no" /></td>
+            <td>{{ form.mileage }}</td>
         </tr>
         <tr>
             <td class="align-top">Damage</td>
-            <td><cftextarea name="damage">#Vehicle.damage#</cftextarea></td>
+            <td>{{ form.damage }}</td>
         </tr>
         <tr>
             <td class="align-top">Notes</td>
-            <td><cftextarea name="notes">#Vehicle.notes#</cftextarea></td>
+            <td>{{ form.notes }}</td>
         </tr>
         <tr>
             <td>Insurance Policy No.</td>
-            <td><cfinput name="policyno" value="#policyno_dec#" maxlength="255" /></td>
+            <td>{{ form.policy_number }}</td>
         </tr>
         <tr>
             <td>Insurance Policy Company</td>
-            <td><cfinput name="policyco" value="#Vehicle.policyco#" maxlength="255" /></td>
+            <td>{{ form.policy_company }}</td>
         </tr>
         <tr>
             <td>Insurance Policy Telephone</td>
-            <td><cfinput name="policytel" value="#Vehicle.policytel#" maxlength="30" /></td>
+            <td>{{ form.policy_phone }}</td>
         </tr>
         <tr>
             <td>Status</td>
@@ -141,21 +140,13 @@
                         <option value="#tolltagid#" <cfif tolltagid IS TollTag.tolltagid>selected</cfif>>#tagnumber#<cfif TollTags.vehicleid GT 0> (#year# #make# #model#)<cfelseif altusage IS NOT ""> (#altusage#)</cfif></option>
                     </cfloop>
                 </cfselect>
+                {{ form.toll_tag }}
             </td>
         </tr>
         <tr>
             <td>Redirect to</td>
             <td>
-                <cfquery name="RedirectVehicles" datasource="#DSN#">
-                    SELECT * FROM Vehicles
-                    ORDER BY vehicleid
-                </cfquery>
-                <cfselect name="redirect">
-                    <option value="">(None)</option>
-                    <cfloop query="#RedirectVehicles#">
-                        <option value="#vehicleid#" <cfif vehicleid IS Vehicle.redirect>selected</cfif>>#year# #make# #model#</option>
-                    </cfloop>
-                </cfselect>
+                {{ form.redirect_to }}
             </td>
         </tr>
         <tr>
@@ -164,12 +155,7 @@
                 <p class="subtext">Set Fleet Display Priority</p>
             </td>
             <td>
-                <cfselect name="weighting">
-                    <option value="0" <cfif Vehicle.weighting IS 0>selected</cfif>>0 - Normal</option>
-                    <option value="1" <cfif Vehicle.weighting IS 1>selected</cfif>>+1</option>
-                    <option value="2" <cfif Vehicle.weighting IS 2>selected</cfif>>+2</option>
-                    <option value="3" <cfif Vehicle.weighting IS 3>selected</cfif>>+3</option>
-                </cfselect>
+                {{ form.weighting }}
             </td>
         </tr>
 
@@ -191,82 +177,68 @@
         </tr>
         <tr>
             <td>Top Speed (mph)</td>
-            <td><cfinput name="topspeed" size="10" value="#VehicleFront.topspeed#" maxlength="4" /></td>
+            <td>{{ marketing_form.top_speed }}</td>
         </tr>
         <tr>
             <td>Transmission Type</td>
             <td>
-                <cfselect name="trans">
-                    <option value="1" <cfif VehicleFront.trans IS 1>selected</cfif>>Manual</option>
-                    <option value="2" <cfif VehicleFront.trans IS 2>selected</cfif>>Flappy</option>
-                    <option value="3" <cfif VehicleFront.trans IS 3>selected</cfif>>Slushbox</option>
-                </cfselect>
+                {{ marketing_form.transmission_type }}
             </td>
         </tr>
         <tr>
             <td>Number of Gears</td>
-            <td><cfinput name="gears" size="4" value="#VehicleFront.gears#" maxlength="1" /></td>
+            <td>{{ marketing_form.gears }}</td>
         </tr>
         <tr>
             <td>Location</td>
             <td>
-                <cfselect name="location">
-                    <option value="1" <cfif VehicleFront.location IS 1>selected</cfif>>New York</option>
-                    <option value="2" <cfif VehicleFront.location IS 2>selected</cfif>>Florida</option>
-                </cfselect>
+                {{ marketing_form.location }}
             </td>
         </tr>
         <tr>
             <td>Tight Fit (think Elise)</td>
             <td>
-                <cfselect name="tightfit">
-                    <option value="0" <cfif VehicleFront.tightfit IS 0>selected</cfif>>No</option>
-                    <option value="1" <cfif VehicleFront.tightfit IS 1>selected</cfif>>Yes</option>
-                </cfselect>
+                {{ marketing_form.tight_fit }}
             </td>
         </tr>
         <tr>
-            <td class="align-top">Blurb</td>
-            <td><cftextarea name="blurb">#VehicleFront.blurb#</cftextarea></td>
+            <td class="align-top">Blurb<br /><small>BBcode allowed. Line breaks are parsed into HTML.</small></td>
+            <td>{{ marketing_form.blurb }}</td>
         </tr>
         <tr>
             <td class="align-top">Specs (JSON)<br /><small class="specs-model" title="model">Model</small></td>
             <td>
-                <cfset specs = VehicleFront.specs>
-                <cfif specs IS "">
-                    <cfset specs = "{}">
-                </cfif>
-                <cftextarea name="specs" id="specs" style="height: 240px;">#specs#</cftextarea>
+                {{ marketing_form.specs }}
                 <pre id="specs-output"></pre>
             </td>
         </tr>
         <tr>
-            <td>Country of Origin (two letter code)</td>
-            <td><cfinput name="origin" size="4" value="#VehicleFront.origin#" maxlength="2" /></td>
+            <td>Country of Origin</td>
+            <td>{{ marketing_form.origin_country }}</td>
         </tr>
         <tr>
             <td>Price Per Day</td>
-            <td><cfinput name="price" value="#VehicleFront.price#" maxlength="9" required="yes" /></td>
+            <td>{{ marketing_form.price_per_day }}</td>
         </tr>
         <tr>
             <td>2-Day Discount (%)</td>
-            <td><cfinput name="disc2day" value="#VehicleFront.disc2day#" maxlength="3" required="yes" /></td>
+            <td>{{ marketing_form.discount_2_day }}</td>
         </tr>
         <tr>
             <td>3-Day Discount (%)</td>
-            <td><cfinput name="disc3day" value="#VehicleFront.disc3day#" maxlength="3" required="yes" /></td>
+            <td>{{ marketing_form.discount_3_day }}</td>
         </tr>
         <tr>
             <td>7-Day Discount (%)</td>
-            <td><cfinput name="disc7day" value="#VehicleFront.disc7day#" maxlength="3" required="yes" /></td>
+            <td>{{ marketing_form.discount_7_day }}</td>
         </tr>
         <tr>
             <td>Deposit Amount</td>
-            <td><cfinput name="deposit" value="#VehicleFront.deposit#" maxlength="9" required="yes" /></td>
+            <td>{{ marketing_form.security_deposit }}</td>
         </tr>
         <tr>
             <td>Miles Included</td>
-            <td><cfinput name="milesinc" value="#VehicleFront.milesinc#" maxlength="5" required="yes" /></td>
+            <td>{{ marketing_form.miles_included }}</td>
         </tr>
         {% endif %}
 
@@ -288,11 +260,8 @@
             </td>
         </tr>
     </table>
-    <cfinput type="hidden" name="vehicleid" value="#vehicleid#" />
-    <cfinput type="hidden" name="fnc" value="edit" />
     {% csrf_token %}
     </form>
-    </cfoutput>
 
     <div id="specs_model">
 {

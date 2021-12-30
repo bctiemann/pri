@@ -4,11 +4,24 @@ from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo
 from consignment.models import Consigner
 from users.models import Employee
 
+TRUE_FALSE_CHOICES = (
+    (True, 'Yes'),
+    (False, 'No')
+)
+
 
 # TODO: Add slug to the visible form fields and set on both models
 
 class VehicleForm(forms.ModelForm):
+    WEIGHTING_CHOICES = (
+        (0, '0 - Normal'),
+        (1, '+1'),
+        (2, '+2'),
+        (3, '+3'),
+    )
+
     external_owner = forms.ModelChoiceField(queryset=Consigner.objects.all(), empty_label='PRI', required=False)
+    weighting = forms.ChoiceField(choices=WEIGHTING_CHOICES)
 
     class Meta:
         model = Vehicle
@@ -16,10 +29,11 @@ class VehicleForm(forms.ModelForm):
 
 
 class VehicleMarketingForm(forms.ModelForm):
+    tight_fit = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
 
     class Meta:
         model = VehicleMarketing
-        exclude = ('vehicle_id', 'slug', 'showcase_image', 'thumbnail_image', 'inspection_image',)
+        exclude = ('vehicle_id', 'slug', 'showcase_image', 'thumbnail_image', 'inspection_image', 'mobile_thumbnail_image',)
 
 
 class VehicleShowcaseForm(forms.ModelForm):

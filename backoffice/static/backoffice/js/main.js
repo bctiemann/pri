@@ -95,7 +95,7 @@ var confirmDelete = function(form, deleteUrl, objectName) {
 };
 
 var refreshSpecs = function() {
-    var specsJson = $('#specs').val();
+    var specsJson = $('#id_specs').val();
     if (specsJson) {
         try {
             $('#specs-output').html(JSON.stringify(JSON.parse(specsJson), null, 4));
@@ -759,7 +759,7 @@ $(document).ready(function() {
 
     // Autoformat JSON specs field
     refreshSpecs();
-    $('#specs').keyup(function() {
+    $('#id_specs').keyup(function() {
         refreshSpecs();
     });
 

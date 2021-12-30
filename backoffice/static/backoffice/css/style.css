@@ -684,6 +684,13 @@ table.inputform .divider .subtext {
 	display: inline-block;
 }
 
+/* Form field override styles */
+
+#id_specs {
+	height: 240px;
+}
+
+
 td.delbutton {
         font-family: Arial, MS Sans Serif;
         font-size: 12pt;
