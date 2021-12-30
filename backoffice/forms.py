@@ -1,4 +1,5 @@
 from django import forms
+from django.utils import timezone
 
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo
 from consignment.models import Consigner
@@ -8,6 +9,8 @@ TRUE_FALSE_CHOICES = (
     (True, 'Yes'),
     (False, 'No')
 )
+current_year = timezone.now().year
+birth_years = range(current_year - 18, current_year - 100, -1)
 
 
 # TODO: Add slug to the visible form fields and set on both models
@@ -83,7 +86,9 @@ class VehicleVideoForm(forms.ModelForm):
 
 
 class EmployeeForm(forms.ModelForm):
+    date_of_birth = forms.DateField(widget=forms.SelectDateWidget(years=birth_years))
 
     class Meta:
         model = Employee
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('user',)

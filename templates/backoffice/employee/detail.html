@@ -8,145 +8,134 @@
         <h2>Add Employee</h2>
     {% endif %}
 
-    {{ form }}
-    <cfoutput>
-    <form method="POST" action="#CGI.SCRIPT_NAME#">
+    {{ form.errors }}
+    {% if employee %}
+        <form method="POST" action="{% url "backoffice:employee-detail" pk=employee.id %}">
+    {% else %}
+        <form method="POST" action="{% url "backoffice:employee-create" %}">
+    {% endif %}
+
     <table class="inputform employees">
         <tr>
             <td>First Name</td>
-            <td><cfinput name="fname" value="#Employee.fname#" required="yes" maxlength="150" message="Enter a first name." /></td>
+            <td>{{ form.first_name }}</td>
         </tr>
         <tr>
             <td>Last Name</td>
-            <td><cfinput name="lname" value="#Employee.lname#" required="yes" maxlength="150" message="Enter a last name." /></td>
+            <td>{{ form.last_name }}</td>
         </tr>
         <tr>
             <td>Username</td>
-            <td><cfinput name="username" value="#Employee.username#" required="yes" maxlength="50" message="Enter a username." /></td>
+            <td>{{ form.username }}</td>
         </tr>
         <tr>
             <td>Email</td>
-            <td><cfinput type="email" name="email" value="#Employee.email#" required="yes" validate="email" maxlength="255" message="Enter an email address." /></td>
+            <td>{{ form.email }}</td>
         </tr>
         <tr>
             <td>Password</td>
-            <td><cfinput name="pass" value="#pass_dec#" required="yes" maxlength="255" message="Enter a password." /></td>
+            <td>{{ form.password }}</td>
         </tr>
         <tr>
             <td>RFID</td>
-            <td><cfinput name="rfid" value="#Employee.rfid#" required="yes" maxlength="255" message="Enter an RFID tag." /></td>
+            <td>{{ form.rfid }}</td>
         </tr>
         <tr>
             <td>Position</td>
-            <td><cfinput name="position" value="#Employee.position#" required="yes" maxlength="100" message="Enter a position." /></td>
+            <td>{{ form.position }}</td>
         </tr>
         <tr>
             <td>SSN</td>
-            <td><cfinput name="ssn" class="ssn short" value="#Employee.ssn#" validate="ssn" maxlength="255" message="Enter an SSN." /></td>
+            <td>{{ form.ssn }}</td>
         </tr>
         <tr>
             <td>Employment Type</td>
             <td>
-                <cfselect name="emptype">
-                    <option value="1" <cfif Employee.emptype IS 1>selected</cfif>>1099</option>
-                    <option value="2" <cfif Employee.emptype IS 2>selected</cfif>>Fulltime</option>
-                    <option value="3" <cfif Employee.emptype IS 3>selected</cfif>>Corp</option>
-                </cfselect>
+                {{ form.employment_type }}
             </td>
         </tr>
         <tr>
             <td>Hourly Rate</td>
             <cfset rate = Employee.rate GT 0 ? Employee.rate : 1.00>
-            <td class="currency"><span class="currency-prefix">$</span><cfinput name="rate" value="#rate#" maxlength="10" message="Enter an rate." class="short" /></td>
+            <td class="currency"><span class="currency-prefix">$</span>{{ form.hourly_rate }}</td>
         </tr>
         <tr>
             <td class="label">Access Level</td>
             <cfset acclev = Admin.acclev GT 0 ? Admin.acclev : 5>
             <td class="data">
-                <cfselect name="acclev">
-                    <option value="1" <cfif acclev IS 1>selected</cfif>>Admin</option>
-                    <option value="2" <cfif acclev IS 2>selected</cfif>>Reservations</option>
-                    <option value="3" <cfif acclev IS 3>selected</cfif>>Maintenance</option>
-                    <option value="4" <cfif acclev IS 4>selected</cfif>>Marketing</option>
-                    <option value="5" <cfif acclev IS 5>selected</cfif>>BBS Only</option>
-                </cfselect>
+                {{ form.access_level }}
             </td>
         </tr>
+        {% if employee %}
         <cfif employeeid GT 0>
         <tr>
             <td>Status</td>
             <td>
-                <cfselect name="status">
-                    <option value="1" <CFIF Employee.status IS 1>selected</CFIF>>Employed</option>
-                    <option value="2" <CFIF Employee.status IS 2>selected</CFIF>>Suspended</option>
-                    <option value="3" <CFIF Employee.status IS 3>selected</CFIF>>Fired</option>
-                    <option value="4" <CFIF Employee.status IS 4>selected</CFIF>>Quit</option>
-                </cfselect>
+                {{ form.status }}
                 <small>Setting other than Employed will remove all admin access.</small>
             </td>
         </tr>
         </cfif>
+        {% endif %}
         <tr>
             <td>Address</td>
-            <td><cfinput name="addr" value="#Employee.addr#" maxlength="150" /></td>
+            <td>{{ form.address_line_1 }}</td>
         </tr>
         <tr>
             <td>Address Cont</td>
-            <td><cfinput name="addr2" value="#Employee.addr2#" maxlength="100" /></td>
+            <td>{{ form.address_line_2 }}</td>
         </tr>
         <tr>
             <td>City</td>
-            <td><cfinput name="city" value="#Employee.city#" maxlength="100" /></td>
+            <td>{{ form.city }}</td>
         </tr>
         <tr>
             <td>State</td>
             <td>
-                <cfselect name="state">
-                    <cfloop array="#states#" index="state">
-                        <option value="#state.abbr#" <CFIF Employee.state IS state.abbr>selected</CFIF>>#state.name#</option>
-                    </cfloop>
-                </cfselect>
+                {{ form.state }}
             </td>
         </tr>
         <tr>
             <td>ZIP</td>
-            <td><cfinput name="zip" value="#Employee.zip#" maxlength="10" class="short" /></td>
+            <td>{{ form.zip }}</td>
         </tr>
         <tr>
-            <td>Home Phone</td>
-            <td><cfinput name="tel" class="phone short" value="#Employee.tel#" maxlength="20" /></td>
+            <td>Work Phone</td>
+            <td>{{ form.work_phone }}</td>
         </tr>
         <tr>
             <td>Mobile Phone</td>
-            <td><cfinput name="cel" class="phone short" value="#Employee.cel#" maxlength="20" /></td>
+            <td>{{ form.mobile_phone }}</td>
         </tr>
         <tr>
             <td>Date of Birth</td>
-            <td><cfinput name="dob" class="dob short" value="#DateFormat(Employee.dob,"MM/DD/YYYY")#" maxlength="20" /></td>
+            <td>{{ form.date_of_birth }}</td>
         </tr>
         <tr>
             <td>License Number</td>
-            <td><cfinput name="licenseno" value="#Employee.licenseno#" maxlength="30" /></td>
+            <td>{{ form.license_number }}</td>
         </tr>
         <tr>
             <td>License State</td>
             <td>
-                <cfselect name="licensestate">
-                    <cfloop array="#states#" index="state">
-                        <option value="#state.abbr#" <CFIF Employee.licensestate IS state.abbr>selected</CFIF>>#state.name#</option>
-                    </cfloop>
-                </cfselect>
+                {{ form.license_state }}
             </td>
         </tr>
         <tr>
             <td class="align-top">Notes</td>
-            <td><cftextarea name="notes">#Employee.notes#</cftextarea></td>
+            <td>{{ form.notes }}</td>
         </tr>
 
         <tr>
             <td></td>
             <td>
-                <button class="btn" type="submit" name="submit"><cfif employeeid>Edit<cfelse>Add</cfif></button>
+                <button class="btn" type="submit" name="submit">
+                    {% if employee %}
+                        Edit
+                    {% else %}
+                        Add
+                    {% endif %}
+                </button>
                 {% if employee %}
                 <cfif employeeid>
                     <button
@@ -162,11 +151,7 @@
             </td>
         </tr>
     </table>
-    <cfinput type="hidden" name="employeeid" value="#employeeid#" />
-    <cfinput type="hidden" name="adminid" value="#Employee.adminid#" />
-    <cfinput type="hidden" name="fnc" value="edit" />
-        {% csrf_token %}
+    {% csrf_token %}
     </form>
-    </cfoutput>
 
 {% endblock %}
