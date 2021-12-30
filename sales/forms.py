@@ -16,6 +16,10 @@ from users.models import Customer
 from sales.utils import RentalPriceCalculator
 
 
+# Rental forms
+
+# 1st phase: Rental Details
+
 class ReservationRentalDetailsForm(forms.ModelForm):
     error_css_class = 'field-error'
     TIME_CHOICES = (

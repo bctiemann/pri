@@ -1845,6 +1845,17 @@ table.inputform tr.buttons td {
 	padding-top: 10px;
 }
 
+/* Form field override styles */
+
+#id_cc_cvv {
+	width: 70px;
+}
+
+#id_zip {
+	width: 100px;
+}
+
+
 .hidden {
 	display: none;
 }
