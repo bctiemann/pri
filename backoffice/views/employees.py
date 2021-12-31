@@ -8,7 +8,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from . import ListViewMixin
-from users.models import Employee
+from users.models import User, Employee
 from backoffice.forms import EmployeeForm
 
 
@@ -41,6 +41,13 @@ class EmployeeDetailView(EmployeeViewMixin, ListViewMixin, UpdateView):
 class EmployeeCreateView(EmployeeViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/employee/detail.html'
     form_class = EmployeeForm
+
+    def form_valid(self, form):
+        user = User.objects.create_user(form.cleaned_data['email'], form.cleaned_data['password'])
+        self.object = form.save(commit=False)
+        self.object.user = user
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
         return reverse('backoffice:employee-detail', kwargs={'pk': self.object.id})

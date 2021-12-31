@@ -201,7 +201,7 @@ class Employee(models.Model):
 
     # Employment details
     hired_on = models.DateField(null=True, blank=True)
-    status = models.IntegerField(choices=Status.choices, default=Status.EMPLOYED)
+    status = models.IntegerField(choices=Status.choices, blank=True, default=Status.EMPLOYED)
     position = models.CharField(max_length=100, blank=True)
     employment_type = models.IntegerField(choices=EmploymentType.choices, default=EmploymentType.FULLTIME)
     hourly_rate = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)

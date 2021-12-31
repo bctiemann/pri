@@ -3,7 +3,7 @@ from django.utils import timezone
 
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo
 from consignment.models import Consigner
-from users.models import Employee
+from users.models import User, Employee
 
 TRUE_FALSE_CHOICES = (
     (True, 'Yes'),
@@ -86,7 +86,14 @@ class VehicleVideoForm(forms.ModelForm):
 
 
 class EmployeeForm(forms.ModelForm):
+    email = forms.EmailField(required=True)
+    password = forms.CharField(widget=forms.PasswordInput(), required=True)
     date_of_birth = forms.DateField(widget=forms.SelectDateWidget(years=birth_years))
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError(f'A user with email {email} already exists.')
 
     class Meta:
         model = Employee

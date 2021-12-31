@@ -1,13 +1,29 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.utils.translation import gettext, gettext_lazy as _
 
 from users.models import User, Employee, Customer, MusicGenre
 
 
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(BaseUserAdmin):
     list_display = ('id', 'email', 'customer', 'is_admin', 'is_backoffice', 'last_login', 'is_sleeping', 'created_at',)
     readonly_fields = ('created_by', 'last_login',)
     search_fields = ('email',)
     list_filter = ('is_admin', 'is_backoffice',)
+    ordering = ('-id',)
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        (_('Permissions'), {
+            'fields': ('is_active', 'groups', 'user_permissions'),
+        }),
+        (_('Important dates'), {'fields': ('last_login',)}),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'password1', 'password2'),
+        }),
+    )
 
 
 class EmployeeAdmin(admin.ModelAdmin):

@@ -25,16 +25,26 @@
             <td>{{ form.last_name }}</td>
         </tr>
         <tr>
-            <td>Username</td>
-            <td>{{ form.username }}</td>
-        </tr>
-        <tr>
             <td>Email</td>
-            <td>{{ form.email }}</td>
+            {% if employee %}
+                <td>
+                    {{ employee.user.email }}
+                    <input type="hidden" id="id_email" name="email" value="{{ employee.user.email }}" />
+                </td>
+            {% else %}
+                <td>{{ form.email }}</td>
+            {% endif %}
         </tr>
         <tr>
             <td>Password</td>
-            <td>{{ form.password }}</td>
+            {% if employee %}
+                <td>
+                    <a href="{% url "admin:auth_user_password_change" id=employee.user.id %}">Change password</a>
+                    <input type="hidden" id="id_password" name="password" value="{{ employee.user.password }}" />
+                </td>
+            {% else %}
+                <td>{{ form.password }}</td>
+            {% endif %}
         </tr>
         <tr>
             <td>RFID</td>
