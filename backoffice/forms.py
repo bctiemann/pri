@@ -97,6 +97,8 @@ class ReservationForm(forms.ModelForm):
     home_phone = PhoneNumberField()
     work_phone = PhoneNumberField()
     mobile_phone = PhoneNumberField()
+    out_at_date = forms.DateField(widget=forms.SelectDateWidget(attrs={'class': 'check-conflict'}))
+    out_at_time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time', 'class': 'check-conflict'}))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -116,6 +118,9 @@ class ReservationForm(forms.ModelForm):
             self.fields[field].widget.attrs['class'] = field_classes_str
             if self.instance.customer:
                 self.fields[field].initial = getattr(self.instance.customer, field, None) or getattr(self.instance.customer.user, field, None)
+
+        self.fields['out_at_date'].initial = self.instance.out_at
+        self.fields['out_at_time'].initial = self.instance.out_at
 
     class Meta:
         model = Reservation

@@ -124,6 +124,8 @@
         <tr>
             <td>Date Out</td>
             <td>
+                {{ form.out_at_date }} @ {{ form.out_at_time }}
+                {% comment %}
                 <cftry>
                     <cfset dateout = DateFormat(Reservation.dateout,"MM/DD/YYYY")>
                     <cfcatch type="Any">
@@ -166,6 +168,7 @@
                     <option value="20:00" <CFIF DateOutTime IS "20:00">selected</CFIF>>20:00</option>
                     <option value="00:00" <CFIF DateOutTime IS "00:00">selected</CFIF>>Other (special)</option>
                 </cfselect>
+                {% endcomment %}
                 <div class="schedule-conflict-warning ui-state-error hidden" onclick="showScheduleConflicts();">
                     <p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>
                     <strong>Schedule conflict.</strong> Click to view.</p>
