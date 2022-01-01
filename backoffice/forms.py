@@ -4,6 +4,7 @@ from django.utils import timezone
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo
 from consignment.models import Consigner
 from users.models import User, Employee
+from sales.models import Reservation
 
 TRUE_FALSE_CHOICES = (
     (True, 'Yes'),
@@ -83,6 +84,14 @@ class VehicleVideoForm(forms.ModelForm):
     class Meta:
         model = VehicleVideo
         fields = ('video_mp4', 'video_webm', 'poster', 'thumbnail', 'length', 'title', 'blurb',)
+
+
+class ReservationForm(forms.ModelForm):
+
+    class Meta:
+        model = Reservation
+        fields = '__all__'
+        # exclude = ('slug',)
 
 
 class EmployeeForm(forms.ModelForm):

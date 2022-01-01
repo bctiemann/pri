@@ -49,13 +49,13 @@ class Command(BaseCommand):
         # 'do_vehicle_pics': True,
         # 'do_vehicle_vids': True,
         # 'do_customers': True,
-        # 'do_reservations': True,
+        'do_reservations': True,
         # 'do_consigners': True,
         # 'do_consignmentvehicles': True,
         # 'do_admins': True,
         # 'do_newsitems': True
         # 'do_sitecontent': True,
-        'do_newslettersubscriptions': True,
+        # 'do_newslettersubscriptions': True,
     }
 
     def add_arguments(self, parser):
@@ -380,6 +380,7 @@ class Command(BaseCommand):
                     deposit_amount=old['depamount'],
                     confirmation_code=old['confcode'],
                     delivery_required=bool(old['delivery']),
+                    app_channel=Reservation.AppChannelChoices.MOBILE if old['iphone'] else Reservation.AppChannelChoices.WEB,
                     tax_percent=old['taxpct'],
                     delivery_zip=old['deliveryzip'],
                 )

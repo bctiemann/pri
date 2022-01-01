@@ -6,6 +6,7 @@ from django.conf import settings
 from fleet import views as fleet_views
 from backoffice import views
 from backoffice.views import vehicles
+from backoffice.views import reservations
 from backoffice.views import employees
 
 
@@ -30,6 +31,11 @@ urlpatterns = [
     path('vehicles/<int:vehicle_id>/<str:media_type>/<int:pk>/promote/', vehicles.VehicleMediaPromoteView.as_view(), name='vehicle-media-promote'),
     path('vehicles/<int:vehicle_id>/<str:media_type>/<int:pk>/delete/', vehicles.VehicleMediaDeleteView.as_view(), name='vehicle-media-delete'),
     path('vehicles/type_<int:vehicle_type>/', vehicles.VehicleListView.as_view(), name='vehicle-list'),
+
+    path('reservations/', reservations.ReservationListView.as_view(), name='reservation-list'),
+    path('reservations/create/', reservations.ReservationCreateView.as_view(is_create_view=True), name='reservation-create'),
+    path('reservations/<int:pk>/', reservations.ReservationDetailView.as_view(), name='reservation-detail'),
+    path('reservations/<int:pk>/delete/', reservations.ReservationDeleteView.as_view(), name='reservation-delete'),
 
     path('employees/', employees.EmployeeListView.as_view(), name='employee-list'),
     path('employees/create/', employees.EmployeeCreateView.as_view(is_create_view=True), name='employee-create'),

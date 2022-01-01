@@ -31,6 +31,11 @@ class ServiceType(models.TextChoices):
 
 class BaseReservation(models.Model):
 
+    class AppChannelChoices(models.TextChoices):
+        WEB = ('web', 'Web')
+        MOBILE = ('mobile', 'Mobile')
+        PHONE = ('phone', 'Phone')
+
     vehicle = models.ForeignKey('fleet.Vehicle', null=True, blank=True, on_delete=models.SET_NULL)
     customer = models.ForeignKey('users.Customer', null=True, blank=True, on_delete=models.SET_NULL)
     reserved_at = models.DateTimeField(auto_now_add=True)
@@ -44,6 +49,7 @@ class BaseReservation(models.Model):
     coupon_code = models.CharField(max_length=30, blank=True)
     deposit_amount = models.IntegerField(null=True, blank=True)
     confirmation_code = models.CharField(max_length=10, blank=True, unique=True)
+    app_channel = models.CharField(max_length=20, choices=AppChannelChoices.choices, blank=True, default=AppChannelChoices.WEB)
     delivery_required = models.BooleanField(default=False)
     tax_percent = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
     delivery_zip = USZipCodeField(blank=True)
@@ -69,6 +75,10 @@ class BaseReservation(models.Model):
     @property
     def back_date(self):
         return self.back_at.astimezone(pytz.timezone(settings.TIME_ZONE)).date()
+
+    @property
+    def num_days(self):
+        return (self.back_at - self.out_at).days
 
     class Meta:
         abstract = False

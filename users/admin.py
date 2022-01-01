@@ -6,7 +6,7 @@ from users.models import User, Employee, Customer, MusicGenre
 
 
 class UserAdmin(BaseUserAdmin):
-    list_display = ('id', 'email', 'customer', 'is_admin', 'is_backoffice', 'last_login', 'is_sleeping', 'created_at',)
+    list_display = ('id', 'email', 'customer', 'employee', 'is_admin', 'is_backoffice', 'last_login', 'is_sleeping', 'created_at',)
     readonly_fields = ('created_by', 'last_login',)
     search_fields = ('email',)
     list_filter = ('is_admin', 'is_backoffice',)

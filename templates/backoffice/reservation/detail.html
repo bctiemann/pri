@@ -1,0 +1,167 @@
+{% extends "backoffice/reservation/base.html" %}
+
+{% block content %}
+
+    {% if employee %}
+        <h2>Edit Employee</h2>
+    {% else %}
+        <h2>Add Employee</h2>
+    {% endif %}
+
+    {{ form.errors }}
+    {% if employee %}
+        <form method="POST" action="{% url "backoffice:employee-detail" pk=employee.id %}">
+    {% else %}
+        <form method="POST" action="{% url "backoffice:employee-create" %}">
+    {% endif %}
+
+    <table class="inputform employees">
+        <tr>
+            <td>First Name</td>
+            <td>{{ form.first_name }}</td>
+        </tr>
+        <tr>
+            <td>Last Name</td>
+            <td>{{ form.last_name }}</td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            {% if employee %}
+                <td>
+                    {{ employee.user.email }}
+                    <input type="hidden" id="id_email" name="email" value="{{ employee.user.email }}" />
+                </td>
+            {% else %}
+                <td>{{ form.email }}</td>
+            {% endif %}
+        </tr>
+        <tr>
+            <td>Password</td>
+            {% if employee %}
+                <td>
+                    <a href="{% url "admin:auth_user_password_change" id=employee.user.id %}">Change password</a>
+                    <input type="hidden" id="id_password" name="password" value="{{ employee.user.password }}" />
+                </td>
+            {% else %}
+                <td>{{ form.password }}</td>
+            {% endif %}
+        </tr>
+        <tr>
+            <td>RFID</td>
+            <td>{{ form.rfid }}</td>
+        </tr>
+        <tr>
+            <td>Position</td>
+            <td>{{ form.position }}</td>
+        </tr>
+        <tr>
+            <td>SSN</td>
+            <td>{{ form.ssn }}</td>
+        </tr>
+        <tr>
+            <td>Employment Type</td>
+            <td>
+                {{ form.employment_type }}
+            </td>
+        </tr>
+        <tr>
+            <td>Hourly Rate</td>
+            <cfset rate = Employee.rate GT 0 ? Employee.rate : 1.00>
+            <td class="currency"><span class="currency-prefix">$</span>{{ form.hourly_rate }}</td>
+        </tr>
+        <tr>
+            <td class="label">Access Level</td>
+            <cfset acclev = Admin.acclev GT 0 ? Admin.acclev : 5>
+            <td class="data">
+                {{ form.access_level }}
+            </td>
+        </tr>
+        {% if employee %}
+        <cfif employeeid GT 0>
+        <tr>
+            <td>Status</td>
+            <td>
+                {{ form.status }}
+                <small>Setting other than Employed will remove all admin access.</small>
+            </td>
+        </tr>
+        </cfif>
+        {% endif %}
+        <tr>
+            <td>Address</td>
+            <td>{{ form.address_line_1 }}</td>
+        </tr>
+        <tr>
+            <td>Address Cont</td>
+            <td>{{ form.address_line_2 }}</td>
+        </tr>
+        <tr>
+            <td>City</td>
+            <td>{{ form.city }}</td>
+        </tr>
+        <tr>
+            <td>State</td>
+            <td>
+                {{ form.state }}
+            </td>
+        </tr>
+        <tr>
+            <td>ZIP</td>
+            <td>{{ form.zip }}</td>
+        </tr>
+        <tr>
+            <td>Work Phone</td>
+            <td>{{ form.work_phone }}</td>
+        </tr>
+        <tr>
+            <td>Mobile Phone</td>
+            <td>{{ form.mobile_phone }}</td>
+        </tr>
+        <tr>
+            <td>Date of Birth</td>
+            <td>{{ form.date_of_birth }}</td>
+        </tr>
+        <tr>
+            <td>License Number</td>
+            <td>{{ form.license_number }}</td>
+        </tr>
+        <tr>
+            <td>License State</td>
+            <td>
+                {{ form.license_state }}
+            </td>
+        </tr>
+        <tr>
+            <td class="align-top">Notes</td>
+            <td>{{ form.notes }}</td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>
+                <button class="btn" type="submit" name="submit">
+                    {% if employee %}
+                        Edit
+                    {% else %}
+                        Add
+                    {% endif %}
+                </button>
+                {% if employee %}
+                <cfif employeeid>
+                    <button
+                        class="btn delete"
+                        type="submit"
+                        name="delete"
+                        onclick="return confirmDelete(this.form, '{% url "backoffice:employee-delete" pk=employee.id %}', 'employee')"
+                    >
+                        Delete Employee
+                    </button>
+                </cfif>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+    {% csrf_token %}
+    </form>
+
+{% endblock %}

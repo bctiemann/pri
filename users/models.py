@@ -210,6 +210,10 @@ class Employee(models.Model):
     notes = fields.EncryptedTextField(blank=True)
 
     @property
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
+
+    @property
     def reservations_access(self):
         return self.access_level in (self.AccessLevel.ADMIN, self.AccessLevel.RESERVATIONS)
 
@@ -228,6 +232,9 @@ class Employee(models.Model):
     @property
     def any_privileged_access(self):
         return self.access_level != self.AccessLevel.BBS
+
+    def __str__(self):
+        return f'[{self.id}] {self.first_name} {self.last_name}'
 
 
 # Customer contains all business data for a customer, and optionally is linked to a login user
@@ -289,6 +296,10 @@ class Customer(models.Model):
     registration_ip = models.GenericIPAddressField(null=True, blank=True, verbose_name='Registration IP')
     registration_long = models.FloatField(null=True, blank=True, verbose_name='Registration longitude')
     registration_lat = models.FloatField(null=True, blank=True, verbose_name='Registration latitude')
+
+    @property
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
 
     def __str__(self):
         return f'[{self.id}] {self.first_name} {self.last_name}'
