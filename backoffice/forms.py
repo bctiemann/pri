@@ -1,4 +1,5 @@
 import pytz
+import decimal
 
 from django.conf import settings
 from django import forms
@@ -94,6 +95,11 @@ class ReservationForm(forms.ModelForm):
 
     VEHICLE_CHOICES = []
 
+    DELIVERY_REQUIRED_CHOICES = (
+        (False, 'Pickup at PRI'),
+        (True, 'Delivery'),
+    )
+
     first_name = forms.CharField()
     last_name = forms.CharField()
     email = forms.EmailField()
@@ -104,6 +110,9 @@ class ReservationForm(forms.ModelForm):
     out_at_time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time', 'class': 'check-conflict'}))
     back_at_date = forms.DateField(widget=forms.SelectDateWidget(attrs={'class': 'check-conflict'}))
     back_at_time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time', 'class': 'check-conflict'}))
+    delivery_required = forms.ChoiceField(choices=DELIVERY_REQUIRED_CHOICES)
+    extra_miles = forms.ChoiceField()
+    send_email = forms.ChoiceField(choices=TRUE_FALSE_CHOICES)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -124,13 +133,21 @@ class ReservationForm(forms.ModelForm):
             if self.instance.customer:
                 self.fields[field].initial = getattr(self.instance.customer, field, None) or getattr(self.instance.customer.user, field, None)
 
-        out_at_localized = self.instance.out_at.astimezone(pytz.timezone(settings.TIME_ZONE))
-        self.fields['out_at_date'].initial = out_at_localized
-        self.fields['out_at_time'].initial = out_at_localized
+        if self.instance.out_at:
+            out_at_localized = self.instance.out_at.astimezone(pytz.timezone(settings.TIME_ZONE))
+            self.fields['out_at_date'].initial = out_at_localized
+            self.fields['out_at_time'].initial = out_at_localized
 
-        back_at_localized = self.instance.back_at.astimezone(pytz.timezone(settings.TIME_ZONE))
-        self.fields['back_at_date'].initial = back_at_localized
-        self.fields['back_at_time'].initial = back_at_localized
+        if self.instance.back_at:
+            back_at_localized = self.instance.back_at.astimezone(pytz.timezone(settings.TIME_ZONE))
+            self.fields['back_at_date'].initial = back_at_localized
+            self.fields['back_at_time'].initial = back_at_localized
+
+        for field in ['drivers', 'delivery_zip', 'tax_percent', 'miles_included', 'coupon_code']:
+            self.fields[field].widget.attrs['class'] = 'short'
+
+        self.fields['tax_percent'].initial = decimal.Decimal(settings.DEFAULT_TAX_RATE) * 100
+        self.fields['extra_miles'].choices = ((k, v['label']) for k, v in settings.EXTRA_MILES_PRICES.items())
 
     class Meta:
         model = Reservation

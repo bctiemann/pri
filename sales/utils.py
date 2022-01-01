@@ -93,7 +93,7 @@ class PriceCalculator(ABC):
             return 0
         if value is None:
             raise ValueError('No base value provided.')
-        if self.coupon.is_expired(self.effective_date):
+        if self.coupon.is_expired_on(self.effective_date):
             return 0
         return self.coupon.get_discount_value(value)
 

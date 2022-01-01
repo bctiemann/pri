@@ -20,7 +20,7 @@ from fleet.models import (
     get_vehicle_picture_path, get_vehicle_video_path
 )
 from users.models import Customer, Employee, User, MusicGenre
-from sales.models import Reservation
+from sales.models import Promotion, Coupon, Reservation
 from consignment.models import Consigner
 from pri.cipher import AESCipher
 
@@ -49,13 +49,14 @@ class Command(BaseCommand):
         # 'do_vehicle_pics': True,
         # 'do_vehicle_vids': True,
         # 'do_customers': True,
-        'do_reservations': True,
+        # 'do_reservations': True,
         # 'do_consigners': True,
         # 'do_consignmentvehicles': True,
         # 'do_admins': True,
         # 'do_newsitems': True
         # 'do_sitecontent': True,
         # 'do_newslettersubscriptions': True,
+        'do_coupons': True,
     }
 
     def add_arguments(self, parser):
@@ -523,3 +524,15 @@ class Command(BaseCommand):
                 )
                 new.created_at = old['stamp'] or timezone.now()
                 new.save()
+
+        if 'do_coupons' in self.enabled:
+            if clear_existing:
+                Coupon.objects.all().delete()
+            back_cursor.execute("""SELECT * FROM discounts""")
+            for old in back_cursor.fetchall():
+                print(old)
+                new = Coupon.objects.create(
+                    code=old['code'],
+                    name=old['code'],
+                    percent=old['amount'],
+                )

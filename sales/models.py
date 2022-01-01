@@ -26,6 +26,56 @@ class ServiceType(models.TextChoices):
     GIFT_CERTIFICATE = ('giftcert', 'Gift Certificate')
 
 
+# Promotions are time-bound discounts that apply to all customers, such as a holiday special. They may or may not
+# be restricted to a certain service type (such as Performance Experiences only).
+# Typically only one Promotion should be active at a given time, though this is not currently enforced in code and the
+# behavior if multiple Promotions are active is to choose the first valid one in the database.
+class Promotion(models.Model):
+    name = models.CharField(max_length=255, blank=True)
+    amount = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    percent = models.IntegerField(null=True, blank=True)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+    service_type = models.CharField(max_length=50, choices=ServiceType.choices, blank=True)
+
+    @property
+    def value_str(self):
+        if self.amount:
+            return f'${self.amount}'
+        if self.percent:
+            return f'{self.percent}%'
+
+    def get_discount_value(self, value):
+        if self.amount:
+            return self.amount
+        elif self.percent:
+            return value * self.percent / 100
+        return 0
+
+    def get_discounted_value(self, value):
+        return value - self.get_discount_value(value)
+
+    def is_expired_on(self, effective_date):
+        if effective_date is None:
+            return False
+        if self.end_date is None:
+            return False
+        return effective_date > self.end_date
+
+    def __str__(self):
+        return f'{self.name} ({self.value_str})'
+
+
+# A Coupon is a Promotion that is identified by a code that a customer has to enter. It also differs from a Promotion
+# in that it might or might not have an end date (expiration date), and if it has a start date it will be ignored.
+# Many coupons can be active at the same time.
+class Coupon(Promotion):
+    code = models.CharField(max_length=50, unique=True, db_index=True)
+
+    def __str__(self):
+        return f'{self.code} ({self.value_str})'
+
+
 # Concrete base model class which is used to supply common fields to both the Reservation and Rental model classes.
 # Don't want to use an abstract model class because we want to be able to query both tables simultaneously in a union
 
@@ -80,6 +130,10 @@ class BaseReservation(models.Model):
     def num_days(self):
         return (self.back_at - self.out_at).days
 
+    @property
+    def coupon(self):
+        return Coupon.objects.filter(models.Q(end_date__isnull=True) | models.Q(end_date__gte=self.out_date), code=self.coupon_code).first()
+
     class Meta:
         abstract = False
 
@@ -90,7 +144,7 @@ class Reservation(BaseReservation):
         UNCONFIRMED = (0, 'Unconfirmed')
         CONFIRMED = (1, 'Confirmed')
 
-    status = models.IntegerField(choices=StatusChoices.choices, default=StatusChoices.UNCONFIRMED, blank=True)
+    status = models.IntegerField(choices=StatusChoices.choices, default=StatusChoices.UNCONFIRMED)
 
 
 class Rental(BaseReservation):
@@ -175,53 +229,3 @@ class AdHocPayment(models.Model):
 
 class Charge(models.Model):
     pass
-
-
-# Promotions are time-bound discounts that apply to all customers, such as a holiday special. They may or may not
-# be restricted to a certain service type (such as Performance Experiences only).
-# Typically only one Promotion should be active at a given time, though this is not currently enforced in code and the
-# behavior if multiple Promotions are active is to choose the first valid one in the database.
-class Promotion(models.Model):
-    name = models.CharField(max_length=255, blank=True)
-    amount = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
-    percent = models.IntegerField(null=True, blank=True)
-    start_date = models.DateField(null=True, blank=True)
-    end_date = models.DateField(null=True, blank=True)
-    service_type = models.CharField(max_length=50, choices=ServiceType.choices, blank=True)
-
-    @property
-    def value_str(self):
-        if self.amount:
-            return f'${self.amount}'
-        if self.percent:
-            return f'{self.percent}%'
-
-    def get_discount_value(self, value):
-        if self.amount:
-            return self.amount
-        elif self.percent:
-            return value * self.percent / 100
-        return 0
-
-    def get_discounted_value(self, value):
-        return value - self.get_discount_value(value)
-
-    def is_expired(self, effective_date):
-        if effective_date is None:
-            return False
-        if self.end_date is None:
-            return False
-        return effective_date > self.end_date
-
-    def __str__(self):
-        return f'{self.name} ({self.value_str})'
-
-
-# A Coupon is a Promotion that is identified by a code that a customer has to enter. It also differs from a Promotion
-# in that it might or might not have an end date (expiration date), and if it has a start date it will be ignored.
-# Many coupons can be active at the same time.
-class Coupon(Promotion):
-    code = models.CharField(max_length=50, unique=True, db_index=True)
-
-    def __str__(self):
-        return f'{self.code} ({self.value_str})'

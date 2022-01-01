@@ -232,12 +232,14 @@
                 <cfset drivers = Reservation.drivers>
             </cfif>
             <td>
+                {{ form.drivers }}
                 <cfinput name="drivers" value="#drivers#" maxlength="2" class="short" />
             </td>
         </tr>
         <tr>
             <td>Delivery</td>
             <td>
+                {{ form.delivery_required }}
                 <cfselect name="delivery">
                     <option value="0" <CFIF Reservation.delivery IS 0>selected</CFIF>>Pickup at PRI</option>
                     <option value="1" <CFIF Reservation.delivery IS 1>selected</CFIF>>Delivery</option>
@@ -247,6 +249,7 @@
         <tr>
             <td>Delivery ZIP</td>
             <td>
+                {{ form.delivery_zip }}
                 <cfinput name="deliveryzip" value="#Reservation.deliveryzip#" class="short" />
                 <button class="btn" type="button" onclick="getTaxRate()">Get Tax Rate</button>
             </td>
@@ -254,21 +257,29 @@
         <tr>
             <td>Tax Rate</td>
             <td>
+                {{ form.tax_percent }}
                 <cfset taxpct = IsNumeric(Reservation.taxpct) ? Reservation.taxpct : salesTaxDefault>
                 <cfinput name="taxpct" value="#taxpct#" class="short" /> %
             </td>
         </tr>
+        {% if reservation %}
         <cfif reservationid>
         <tr>
             <td>Miles Included</td>
-            <td><cfinput name="milesinc" value="#Reservation.milesinc#" maxlength="10" class="short" /></td>
+            <td>
+                {{ form.miles_included }}
+                <cfinput name="milesinc" value="#Reservation.milesinc#" maxlength="10" class="short" />
+            </td>
         </tr>
+        {% else %}
         <cfelse>
         <cfinput type="hidden" name="milesinc" value="#Reservation.milesinc#" />
         </cfif>
+        {% endif %}
         <tr>
             <td>Extra Miles</td>
             <td>
+                {{ form.extra_miles }}
                 <cfselect name="xtramiles">
                     <cfloop from="1" to="#arrayLen(extraMilesPrices)#" index="i">
                         <cfset milesChoice = extraMilesPrices[i]>
@@ -280,6 +291,7 @@
         <tr>
             <td>Status</td>
             <td>
+                {{ form.status }}
                 <cfselect name="status">
                     <option value="0" <CFIF Reservation.status IS 0>selected</CFIF>>Unconfirmed</option>
                     <option value="1" <CFIF Reservation.status IS 1>selected</CFIF>>Confirmed</option>
@@ -287,10 +299,12 @@
             </td>
         </tr>
 
+        {% if not reservation %}
         <cfif reservationid IS 0>
         <tr>
             <td>Send Info Request Email?</td>
             <td>
+                {{ form.send_email }}
                 <cfselect name="doemail">
                     <option value="0">No</option>
                     <option value="1" <cfif customerid IS 0>selected</cfif>>Yes</option>
@@ -299,7 +313,9 @@
             </td>
         </tr>
         </cfif>
+        {% endif %}
 
+        {% comment %}
         <tr>
             <td>Date Override</td>
             <td>
@@ -309,9 +325,12 @@
                 </cfselect>
             </td>
         </tr>
+        {% endcomment %}
         <tr>
             <td>Discount/Coupon Code</td>
             <td>
+                {{ form.coupon_code }}
+                {% comment %}
                 <CFIF len(Reservation.coupon) GT 0>
                     <CFQUERY NAME="codecheck" DATASOURCE="#DSN#">
                         SELECT * FROM discounts
@@ -319,13 +338,19 @@
                     </CFQUERY>
                 </CFIF>
                 <cfinput name="coupon" value="#Reservation.coupon#" maxlength="30" />
+                {% endcomment %}
+                {% if reservation.coupon_code %}
                 <CFIF len(Reservation.coupon) GT 0>
-                    (<CFIF codecheck.recordcount IS 1>
-                         <span style="color:green">VALID</span> #codecheck.amount# %
+                    ({% if reservation.coupon %}
+                    <CFIF codecheck.recordcount IS 1>
+                         <span style="color:green">VALID</span> {{ reservation.coupon.value_str }}
+                    {% else %}
                      <CFELSE>
                          <span style="color:red">INVALID</span>
-                     </CFIF>)
+                     </CFIF>
+                    {% endif %})
                 </CFIF>
+                {% endif %}
             </td>
         </tr>
         <tr>
