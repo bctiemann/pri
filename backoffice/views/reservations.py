@@ -24,7 +24,7 @@ class ReservationListView(PermissionRequiredMixin, ReservationViewMixin, ListVie
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_reservation',)
     template_name = 'backoffice/reservation/list.html'
-    # search_fields = ('first_name', 'last_name', 'user__email',)
+    search_fields = ('customer__first_name', 'customer__last_name', 'customer__user__email', 'vehicle__make', 'confirmation_code',)
 
 
 class ReservationDetailView(ReservationViewMixin, ListViewMixin, UpdateView):

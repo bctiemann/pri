@@ -1,7 +1,8 @@
 from django import forms
 from django.utils import timezone
+from phonenumber_field.formfields import PhoneNumberField
 
-from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo
+from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, VehicleType
 from consignment.models import Consigner
 from users.models import User, Employee
 from sales.models import Reservation
@@ -87,6 +88,34 @@ class VehicleVideoForm(forms.ModelForm):
 
 
 class ReservationForm(forms.ModelForm):
+
+    VEHICLE_CHOICES = []
+
+    first_name = forms.CharField()
+    last_name = forms.CharField()
+    email = forms.EmailField()
+    home_phone = PhoneNumberField()
+    work_phone = PhoneNumberField()
+    mobile_phone = PhoneNumberField()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Populate vehicle choices
+        self.VEHICLE_CHOICES = []
+        self.VEHICLE_CHOICES.append(('Cars', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.CAR))))
+        self.VEHICLE_CHOICES.append(('Motorcycles', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.BIKE))))
+        self.fields['vehicle'].choices = self.VEHICLE_CHOICES
+
+        # Populate conditionally non-editable fields from linked customer
+        field_classes = ['newuserfield']
+        if self.instance.id:
+            field_classes.append('dont-edit')
+        field_classes_str = ' '.join(field_classes)
+        for field in ['first_name', 'last_name', 'email', 'home_phone', 'work_phone', 'mobile_phone']:
+            self.fields[field].widget.attrs['class'] = field_classes_str
+            if self.instance.customer:
+                self.fields[field].initial = getattr(self.instance.customer, field, None) or getattr(self.instance.customer.user, field, None)
 
     class Meta:
         model = Reservation
