@@ -40,8 +40,9 @@
         <tr>
             <td>Search Customer</td>
             <td>
-                <input name="customername" value="" maxlength="255" class="search" />
-                <input type="hidden" name="customerid" value="{{ reservation.customer.id }}" />
+                <input name="customername" id="customername" value="" maxlength="255" class="search" />
+                {{ form.customer }}
+{#                <input type="hidden" name="customer_id" value="{{ reservation.customer.id }}" />#}
             </td>
         </tr>
         <tr>
@@ -355,9 +356,13 @@
         </tr>
         <tr>
             <td class="align-top">Notes<br /><small>Customer Requests</small></td>
-            <td><cftextarea name="notes" class="customer-notes">#Reservation.notes#</cftextarea></td>
+            <td>
+                {{ form.customer_notes }}
+{#                <cftextarea name="notes" class="customer-notes">#Reservation.notes#</cftextarea>#}
+            </td>
         </tr>
 
+        {% if reservation %}
         <cfif reservationid>
 
         <cfquery name="VFront" datasource="#FDSN#">
@@ -416,7 +421,11 @@
 
         <tr>
             <td>Deposit Amount</td>
-            <td class="currency"><span class="currency-prefix">$</span><cfinput name="depamount" value="#Reservation.depamount#" maxlength="10" class="short" /></td>
+            <td class="currency">
+                <span class="currency-prefix">$</span>
+                {{ form.deposit_amount }}
+                <cfinput name="depamount" value="#Reservation.depamount#" maxlength="10" class="short" />
+            </td>
         </tr>
 
         <tr class="divider">
@@ -509,18 +518,28 @@
             </td>
         </tr>
 
+        {% else %}
         <cfelse>
             <cfinput type="hidden" name="depamount" /></td>
         </cfif>
+        {% endif %}
 
         <tr>
             <td></td>
             <td>
-                <button class="btn" type="submit" name="submit"><cfif reservationid>Edit<cfelse>Add</cfif></button>
+                <button class="btn" type="submit" name="submit">
+                    {% if reservation %}
+                        Edit
+                    {% else %}
+                        Add
+                    {% endif %}
+                </button>
+                {% if reservation %}
                 <cfif reservationid>
                     <button class="btn" type="submit" name="convert">Convert to Rental</button>
                     <button class="btn delete" type="submit" name="delete" onclick="return confirmDelete(this.form, 'reservation')">Delete Reservation</button>
                 </cfif>
+                {% endif %}
             </td>
         </tr>
     </table>

@@ -823,18 +823,19 @@ $(document).ready(function() {
         $('.newuserfield').val('').removeClass('dont-edit');
         $('.matched-customer').hide();
     }).autocomplete({
-        source: 'cfc/customers.cfc?method=getCustomers',
+        // source: 'cfc/customers.cfc?method=getCustomers',
+        source: '/api/customers/search/',
         select: function(event, ui) {
-            $('input#customerid').val(ui.item.customerid);
+            $('input#id_customer').val(ui.item.id);
             $('input#customername').val(ui.item.label);
 
-            $('input#fname').val(ui.item.fname).addClass('dont-edit');
-            $('input#lname').val(ui.item.lname).addClass('dont-edit');
-            $('input#email').val(ui.item.email).addClass('dont-edit');
-            $('input#hphone').val(ui.item.hphone).addClass('dont-edit');
-            $('input#wphone').val(ui.item.wphone).addClass('dont-edit');
-            $('input#mphone').val(ui.item.mphone).addClass('dont-edit');
-            $('.matched-customer').attr('customerid', ui.item.customerid).show();
+            $('input#id_first_name').val(ui.item.first_name).addClass('dont-edit');
+            $('input#id_last_name').val(ui.item.last_name).addClass('dont-edit');
+            $('input#id_email').val(ui.item.email).addClass('dont-edit');
+            $('input#id_home_phone').val(ui.item.home_phone).addClass('dont-edit');
+            $('input#id_work_phone').val(ui.item.work_phone).addClass('dont-edit');
+            $('input#id_mobile_phone').val(ui.item.mobile_phone).addClass('dont-edit');
+            $('.matched-customer').attr('customerid', ui.item.id).show();
 
             $('#doemail').val(0);
             return false;

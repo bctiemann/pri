@@ -102,6 +102,8 @@ urlpatterns = [
     path('api/validate/rental/login/', api_views.ValidateRentalPaymentView.as_view(form_type='login'), name='validate-rental-login'),
     path('api/validate/newsletter/subscribe/', api_views.ValidateNewsletterSubscriptionView.as_view(), name='validate-newsletter-subscription'),
 
+    path('api/customers/search/', api_views.SearchCustomersView.as_view(), name='search-customers'),
+
     # Handle legacy calls from mobile app
     path('ajax_post.cfm', api_views.LegacyPostView.as_view(), name='legacy-post'),
     path('pics/PRI-<int:vehicle_picture_id>.jpg', api_views.LegacyVehiclePicView.as_view(), name='legacy-vehicle-picture'),

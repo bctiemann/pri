@@ -72,6 +72,10 @@ class Promotion(models.Model):
 class Coupon(Promotion):
     code = models.CharField(max_length=50, unique=True, db_index=True)
 
+    def save(self, *args, **kwargs):
+        self.code = self.code.upper()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f'{self.code} ({self.value_str})'
 
@@ -120,19 +124,31 @@ class BaseReservation(models.Model):
 
     @property
     def out_date(self):
-        return self.out_at.astimezone(pytz.timezone(settings.TIME_ZONE)).date()
+        if self.out_at:
+            return self.out_at.astimezone(pytz.timezone(settings.TIME_ZONE)).date()
+        return None
 
     @property
     def back_date(self):
-        return self.back_at.astimezone(pytz.timezone(settings.TIME_ZONE)).date()
+        if self.back_at:
+            return self.back_at.astimezone(pytz.timezone(settings.TIME_ZONE)).date()
+        return None
 
     @property
     def num_days(self):
-        return (self.back_at - self.out_at).days
+        if self.out_at and self.back_at:
+            return (self.back_at - self.out_at).days
+        return 0
 
     @property
     def coupon(self):
-        return Coupon.objects.filter(models.Q(end_date__isnull=True) | models.Q(end_date__gte=self.out_date), code=self.coupon_code).first()
+        if self.coupon_code and self.out_date:
+            return Coupon.objects.filter(models.Q(end_date__isnull=True) | models.Q(end_date__gte=self.out_date), code=self.coupon_code).first()
+        return None
+
+    def save(self, *args, **kwargs):
+        self.coupon_code = self.coupon_code.upper()
+        super().save(*args, **kwargs)
 
     class Meta:
         abstract = False

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from fleet.models import Vehicle, VehicleMarketing
+from users.models import Customer
 
 
 class VehicleSerializer(serializers.ModelSerializer):
@@ -35,4 +36,17 @@ class VehicleDetailSerializer(serializers.ModelSerializer):
             'discount_2_day', 'discount_3_day', 'discount_7_day', 'miles_included', 'security_deposit', 'blurb', 'specs',
             'horsepower', 'torque', 'top_speed', 'transmission_type', 'gears', 'location', 'tight_fit', 'origin_country',
             'extramiles',
+        )
+
+
+class CustomerSearchSerializer(serializers.ModelSerializer):
+
+    email = serializers.EmailField(source='user.email')
+    label = serializers.CharField(source='full_name')
+    value = serializers.IntegerField(source='id')
+
+    class Meta:
+        model = Customer
+        fields = (
+            'label', 'value', 'id', 'first_name', 'last_name', 'email', 'home_phone', 'work_phone', 'mobile_phone',
         )

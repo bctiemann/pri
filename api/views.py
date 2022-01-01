@@ -4,10 +4,13 @@ import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import APIException
+from rest_framework.permissions import BasePermission
+from rest_framework.authentication import SessionAuthentication
 
 from django.conf import settings
 from django.urls import reverse_lazy, reverse
 from django.db import IntegrityError
+from django.db.models import Q
 from django.contrib.auth import authenticate, login
 from django.http import Http404, HttpResponseRedirect
 
@@ -16,11 +19,20 @@ from marketing.forms import NewsletterSubscribeForm
 from sales.models import Reservation, generate_code
 from sales.enums import ReservationType
 from sales.tasks import send_email
-from users.models import User, Customer, generate_password
+from users.models import User, Customer, Employee, generate_password
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture
-from api.serializers import VehicleSerializer, VehicleDetailSerializer
+from api.serializers import VehicleSerializer, VehicleDetailSerializer, CustomerSearchSerializer
 
 logger = logging.getLogger(__name__)
+
+
+class HasReservationsAccess(BasePermission):
+
+    def has_permission(self, request, view):
+        try:
+            return bool(request.user and request.user.employee and request.user.employee.reservations_access)
+        except Employee.DoesNotExist:
+            return False
 
 
 class GetVehiclesView(APIView):
@@ -210,6 +222,23 @@ class ValidateNewsletterSubscriptionView(APIView):
             'success_url': reverse('newsletter-done'),
         }
         return Response(response)
+
+
+# Backoffice API endpoints (authenticated)
+class SearchCustomersView(APIView):
+
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (HasReservationsAccess,)
+
+    def get(self, request):
+        term = request.GET.get('term', '')
+        if len(term) < 2:
+            return Response([])
+        customers = Customer.objects.filter(
+            Q(first_name__icontains=term) | Q(last_name__icontains=term) | Q(user__email__icontains=term)
+        )
+        serializer = CustomerSearchSerializer(customers, many=True)
+        return Response(serializer.data)
 
 
 # Single entrypoint to handle all API calls from mobile app

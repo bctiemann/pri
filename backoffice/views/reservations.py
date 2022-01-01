@@ -31,10 +31,6 @@ class ReservationDetailView(ReservationViewMixin, ListViewMixin, UpdateView):
     template_name = 'backoffice/reservation/detail.html'
     form_class = ReservationForm
 
-    # def post(self, request, *args, **kwargs):
-    #     result = super().post(request, *args, **kwargs)
-    #     return result
-
     def get_success_url(self):
         return reverse('backoffice:reservation-detail', kwargs={'pk': self.object.id})
 
@@ -42,13 +38,6 @@ class ReservationDetailView(ReservationViewMixin, ListViewMixin, UpdateView):
 class ReservationCreateView(ReservationViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/reservation/detail.html'
     form_class = ReservationForm
-
-    def form_valid(self, form):
-        user = User.objects.create_user(form.cleaned_data['email'], form.cleaned_data['password'])
-        self.object = form.save(commit=False)
-        self.object.user = user
-        self.object.save()
-        return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
         return reverse('backoffice:reservation-detail', kwargs={'pk': self.object.id})

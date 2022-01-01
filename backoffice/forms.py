@@ -1,3 +1,5 @@
+import datetime
+
 import pytz
 import decimal
 
@@ -8,7 +10,7 @@ from phonenumber_field.formfields import PhoneNumberField
 
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, VehicleType
 from consignment.models import Consigner
-from users.models import User, Employee
+from users.models import User, Employee, Customer
 from sales.models import Reservation
 
 TRUE_FALSE_CHOICES = (
@@ -100,19 +102,21 @@ class ReservationForm(forms.ModelForm):
         (True, 'Delivery'),
     )
 
-    first_name = forms.CharField()
-    last_name = forms.CharField()
-    email = forms.EmailField()
-    home_phone = PhoneNumberField()
-    work_phone = PhoneNumberField()
-    mobile_phone = PhoneNumberField()
+    customer = forms.ModelChoiceField(queryset=Customer.objects.all(), widget=forms.HiddenInput())
+    first_name = forms.CharField(required=False)
+    last_name = forms.CharField(required=False)
+    email = forms.EmailField(required=False)
+    home_phone = PhoneNumberField(required=False)
+    work_phone = PhoneNumberField(required=False)
+    mobile_phone = PhoneNumberField(required=False)
     out_at_date = forms.DateField(widget=forms.SelectDateWidget(attrs={'class': 'check-conflict'}))
     out_at_time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time', 'class': 'check-conflict'}))
     back_at_date = forms.DateField(widget=forms.SelectDateWidget(attrs={'class': 'check-conflict'}))
     back_at_time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time', 'class': 'check-conflict'}))
     delivery_required = forms.ChoiceField(choices=DELIVERY_REQUIRED_CHOICES)
     extra_miles = forms.ChoiceField()
-    send_email = forms.ChoiceField(choices=TRUE_FALSE_CHOICES)
+    send_email = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, required=False)
+    customer_notes = forms.CharField(widget=forms.Textarea(attrs={'class': 'customer-notes'}), required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -149,10 +153,20 @@ class ReservationForm(forms.ModelForm):
         self.fields['tax_percent'].initial = decimal.Decimal(settings.DEFAULT_TAX_RATE) * 100
         self.fields['extra_miles'].choices = ((k, v['label']) for k, v in settings.EXTRA_MILES_PRICES.items())
 
+    def clean(self):
+        self.cleaned_data['out_at'] = datetime.datetime.combine(
+            self.cleaned_data['out_at_date'],
+            self.cleaned_data['out_at_time'],
+        )
+        self.cleaned_data['back_at'] = datetime.datetime.combine(
+            self.cleaned_data['back_at_date'],
+            self.cleaned_data['back_at_time'],
+        )
+
     class Meta:
         model = Reservation
-        fields = '__all__'
-        # exclude = ('slug',)
+        # fields = '__all__'
+        exclude = ('confirmation_code',)
 
 
 class EmployeeForm(forms.ModelForm):
