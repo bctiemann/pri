@@ -103,6 +103,7 @@ urlpatterns = [
     path('api/validate/newsletter/subscribe/', api_views.ValidateNewsletterSubscriptionView.as_view(), name='validate-newsletter-subscription'),
 
     path('api/customers/search/', api_views.SearchCustomersView.as_view(), name='search-customers'),
+    path('api/tax_rate/', api_views.TaxRateByZipView.as_view(), name='tax-rate-by-zip'),
 
     # Handle legacy calls from mobile app
     path('ajax_post.cfm', api_views.LegacyPostView.as_view(), name='legacy-post'),

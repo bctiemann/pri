@@ -493,18 +493,18 @@ var sendGiftCertEmail = function(giftcertid) {
 };
 
 var getTaxRate = function() {
-    var zip = $('#deliveryzip').val() || $('#zipcode').val() || '';
-    $.post('ajax_post.cfm', {
-        component: 'reservations',
-        method: 'getSalesTax',
+    var zip = $('#id_delivery_zip').val() || $('#zipcode').val() || '';
+    $.post('/api/tax_rate/', {
+        // component: 'reservations',
+        // method: 'getSalesTax',
         zip: zip,
     },
     function(data) {
 console.log(data);
         if (data.success) {
-            $('#taxpct').val(data.tax_rate.toFixed(3));
-            $('#totalrate').val(data.tax_rate.toFixed(3));
-            $('#detail').val(JSON.stringify(data.salesTax));
+            $('#id_tax_percent').val(data.tax_rate.toFixed(3));
+            // $('#totalrate').val(data.tax_rate.toFixed(3));
+            // $('#detail').val(JSON.stringify(data.detail));
             refreshSalesTaxDetail();
         } else {
             alert(data.error);

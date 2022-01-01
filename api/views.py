@@ -19,6 +19,7 @@ from marketing.forms import NewsletterSubscribeForm
 from sales.models import Reservation, generate_code
 from sales.enums import ReservationType
 from sales.tasks import send_email
+from sales.utils import PriceCalculator
 from users.models import User, Customer, Employee, generate_password
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture
 from api.serializers import VehicleSerializer, VehicleDetailSerializer, CustomerSearchSerializer
@@ -224,23 +225,6 @@ class ValidateNewsletterSubscriptionView(APIView):
         return Response(response)
 
 
-# Backoffice API endpoints (authenticated)
-class SearchCustomersView(APIView):
-
-    authentication_classes = (SessionAuthentication,)
-    permission_classes = (HasReservationsAccess,)
-
-    def get(self, request):
-        term = request.GET.get('term', '')
-        if len(term) < 2:
-            return Response([])
-        customers = Customer.objects.filter(
-            Q(first_name__icontains=term) | Q(last_name__icontains=term) | Q(user__email__icontains=term)
-        )
-        serializer = CustomerSearchSerializer(customers, many=True)
-        return Response(serializer.data)
-
-
 # Single entrypoint to handle all API calls from mobile app
 class LegacyPostView(APIView):
 
@@ -278,3 +262,37 @@ class LegacyVehiclePicView(APIView):
         except VehiclePicture.DoesNotExist:
             raise Http404
         return HttpResponseRedirect(vehicle_picture.image.url)
+
+
+# Backoffice API endpoints (authenticated)
+
+class SearchCustomersView(APIView):
+
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (HasReservationsAccess,)
+
+    def get(self, request):
+        term = request.GET.get('term', '')
+        if len(term) < 2:
+            return Response([])
+        customers = Customer.objects.filter(
+            Q(first_name__icontains=term) | Q(last_name__icontains=term) | Q(user__email__icontains=term)
+        )
+        serializer = CustomerSearchSerializer(customers, many=True)
+        return Response(serializer.data)
+
+
+class TaxRateByZipView(APIView):
+
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (HasReservationsAccess,)
+
+    def post(self, request):
+        tax_zip = request.POST.get('zip')
+        price_calculator = PriceCalculator(coupon_code=None, email=None, tax_zip=tax_zip, effective_date=None)
+        tax_rate = price_calculator.tax_rate
+        return Response({
+            'success': True,
+            'tax_rate': float(tax_rate.total_rate) * 100,
+            'detail': tax_rate.detail,
+        })
