@@ -1,3 +1,6 @@
+import pytz
+
+from django.conf import settings
 from django import forms
 from django.utils import timezone
 from phonenumber_field.formfields import PhoneNumberField
@@ -99,6 +102,8 @@ class ReservationForm(forms.ModelForm):
     mobile_phone = PhoneNumberField()
     out_at_date = forms.DateField(widget=forms.SelectDateWidget(attrs={'class': 'check-conflict'}))
     out_at_time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time', 'class': 'check-conflict'}))
+    back_at_date = forms.DateField(widget=forms.SelectDateWidget(attrs={'class': 'check-conflict'}))
+    back_at_time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time', 'class': 'check-conflict'}))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -119,8 +124,13 @@ class ReservationForm(forms.ModelForm):
             if self.instance.customer:
                 self.fields[field].initial = getattr(self.instance.customer, field, None) or getattr(self.instance.customer.user, field, None)
 
-        self.fields['out_at_date'].initial = self.instance.out_at
-        self.fields['out_at_time'].initial = self.instance.out_at
+        out_at_localized = self.instance.out_at.astimezone(pytz.timezone(settings.TIME_ZONE))
+        self.fields['out_at_date'].initial = out_at_localized
+        self.fields['out_at_time'].initial = out_at_localized
+
+        back_at_localized = self.instance.back_at.astimezone(pytz.timezone(settings.TIME_ZONE))
+        self.fields['back_at_date'].initial = back_at_localized
+        self.fields['back_at_time'].initial = back_at_localized
 
     class Meta:
         model = Reservation

@@ -178,6 +178,8 @@
         <tr>
             <td>Date Returned</td>
             <td>
+                {{ form.back_at_date }} @ {{ form.back_at_time }}
+                {% comment %}
                 <cftry>
                     <cfset dateback = DateFormat(Reservation.dateback,"MM/DD/YYYY")>
                     <cfcatch type="Any">
@@ -220,6 +222,7 @@
                     <option value="20:00" <CFIF DateBackTime IS "20:00">selected</CFIF>>20:00</option>
                     <option value="00:00" <CFIF DateBackTime IS "00:00">selected</CFIF>>Other (special)</option>
                 </cfselect>
+                {% endcomment %}
             </td>
         </tr>
         <tr>
