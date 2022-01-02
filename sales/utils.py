@@ -176,6 +176,7 @@ class RentalPriceCalculator(PriceCalculator):
         - tax zip
         - effective date
         - military status
+        - Subtotal override
     - Base price is daily rate * number of days
     - Subtract multi-day discount
     - Subtract largest of (coupon discount, customer discount, promotional discount, military discount)
