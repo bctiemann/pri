@@ -1,7 +1,9 @@
 from rest_framework import serializers
+from django.urls import reverse
 
 from fleet.models import Vehicle, VehicleMarketing
 from users.models import Customer
+from sales.models import BaseReservation
 
 
 class VehicleSerializer(serializers.ModelSerializer):
@@ -49,4 +51,33 @@ class CustomerSearchSerializer(serializers.ModelSerializer):
         model = Customer
         fields = (
             'label', 'value', 'id', 'first_name', 'last_name', 'email', 'home_phone', 'work_phone', 'mobile_phone',
+        )
+
+
+class ScheduleConflictSerializer(serializers.ModelSerializer):
+
+    first_name = serializers.CharField(source='customer.first_name')
+    last_name = serializers.CharField(source='customer.last_name')
+    reservation_type = serializers.SerializerMethodField()
+    url = serializers.SerializerMethodField()
+    out_date = serializers.DateField(format='%m/%d/%Y')
+    back_date = serializers.DateField(format='%m/%d/%Y')
+
+    def get_reservation_type(self, obj):
+        if obj.is_rental:
+            return obj.ReservationType.RENTAL.label
+        elif obj.is_reservation:
+            return obj.ReservationType.RESERVATION.label
+
+    def get_url(self, obj):
+        if obj.is_reservation:
+            return reverse('backoffice:reservation-detail', kwargs={'pk': obj.id})
+        elif obj.is_rental:
+            return reverse('backoffice:reservation-detail', kwargs={'pk': obj.id})
+
+    class Meta:
+        model = BaseReservation
+        fields = (
+            'id', 'is_reservation', 'is_rental', 'first_name', 'last_name', 'reservation_type',
+            'out_date', 'back_date', 'reserved_at', 'num_days', 'url',
         )

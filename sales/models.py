@@ -85,10 +85,14 @@ class Coupon(Promotion):
 
 class BaseReservation(models.Model):
 
-    class AppChannelChoices(models.TextChoices):
+    class AppChannel(models.TextChoices):
         WEB = ('web', 'Web')
         MOBILE = ('mobile', 'Mobile')
         PHONE = ('phone', 'Phone')
+
+    class ReservationType(models.TextChoices):
+        RESERVATION = ('reservation', 'Unconfirmed Reservation')
+        RENTAL = ('rental', 'Confirmed Rental')
 
     vehicle = models.ForeignKey('fleet.Vehicle', null=True, blank=True, on_delete=models.SET_NULL)
     customer = models.ForeignKey('users.Customer', null=True, blank=True, on_delete=models.SET_NULL)
@@ -104,7 +108,7 @@ class BaseReservation(models.Model):
     is_military = models.BooleanField(default=False)
     deposit_amount = models.IntegerField(null=True, blank=True)
     confirmation_code = models.CharField(max_length=10, blank=True, unique=True)
-    app_channel = models.CharField(max_length=20, choices=AppChannelChoices.choices, blank=True, default=AppChannelChoices.WEB)
+    app_channel = models.CharField(max_length=20, choices=AppChannel.choices, blank=True, default=AppChannel.WEB)
     delivery_required = models.BooleanField(default=False)
     tax_percent = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
     delivery_zip = USZipCodeField(blank=True)
@@ -158,23 +162,23 @@ class BaseReservation(models.Model):
 
 class Reservation(BaseReservation):
 
-    class StatusChoices(models.IntegerChoices):
+    class Status(models.IntegerChoices):
         UNCONFIRMED = (0, 'Unconfirmed')
         CONFIRMED = (1, 'Confirmed')
 
-    status = models.IntegerField(choices=StatusChoices.choices, default=StatusChoices.UNCONFIRMED)
+    status = models.IntegerField(choices=Status.choices, default=Status.UNCONFIRMED)
 
 
 class Rental(BaseReservation):
 
-    class StatusChoices(models.IntegerChoices):
+    class Status(models.IntegerChoices):
         INCOMPLETE = (0, 'Incomplete')
         CONFIRMED = (1, 'Confirmed/Billed')
         IN_PROGRESS = (2, 'In Progress')
         COMPLETE = (3, 'Complete')
         CANCELLED = (4, 'Cancelled')
 
-    status = models.IntegerField(choices=StatusChoices.choices, default=StatusChoices.INCOMPLETE, blank=True)
+    status = models.IntegerField(choices=Status.choices, default=Status.INCOMPLETE, blank=True)
     mileage_out = models.IntegerField(null=True, blank=True)
     mileage_back = models.IntegerField(null=True, blank=True)
     abuse = models.TextField(blank=True)

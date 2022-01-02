@@ -587,7 +587,7 @@
             </td>
         </tr>
     </table>
-    <cfinput type="hidden" name="reservationid" value="#reservationid#" />
+    <input type="hidden" id="reservation_id" value="{{ reservation.id }}" />
     <cfinput type="hidden" name="fnc" value="edit" />
     <cfinput type="hidden" name="numdays" value="#Reservation.numdays#" />
     {% csrf_token %}

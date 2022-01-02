@@ -1,3 +1,4 @@
+import datetime
 import logging
 import requests
 
@@ -16,13 +17,13 @@ from django.http import Http404, HttpResponseRedirect
 
 from sales.forms import ReservationRentalDetailsForm, ReservationRentalPaymentForm, ReservationRentalLoginForm
 from marketing.forms import NewsletterSubscribeForm
-from sales.models import Reservation, generate_code
+from sales.models import BaseReservation, Reservation, Rental, generate_code
 from sales.enums import ReservationType
 from sales.tasks import send_email
 from sales.utils import PriceCalculator
 from users.models import User, Customer, Employee, generate_password
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture
-from api.serializers import VehicleSerializer, VehicleDetailSerializer, CustomerSearchSerializer
+from api.serializers import VehicleSerializer, VehicleDetailSerializer, CustomerSearchSerializer, ScheduleConflictSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -295,4 +296,41 @@ class TaxRateByZipView(APIView):
             'success': True,
             'tax_rate': float(tax_rate.total_rate) * 100,
             'detail': tax_rate.detail,
+        })
+
+
+class CheckScheduleConflictView(APIView):
+
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (HasReservationsAccess,)
+
+    def post(self, request):
+        out_at_date = datetime.datetime(
+            day=int(request.POST.get('out_at_date_day')),
+            month=int(request.POST.get('out_at_date_month')),
+            year=int(request.POST.get('out_at_date_year')),
+        )
+        out_at_time = datetime.datetime.strptime(request.POST.get('out_at_time'), '%H:%M:%S').time()
+        out_at = datetime.datetime.combine(out_at_date, out_at_time)
+
+        back_at_date = datetime.datetime(
+            day=int(request.POST.get('back_at_date_day')),
+            month=int(request.POST.get('back_at_date_month')),
+            year=int(request.POST.get('back_at_date_year')),
+        )
+        back_at_time = datetime.datetime.strptime(request.POST.get('back_at_time'), '%H:%M:%S').time()
+        back_at = datetime.datetime.combine(back_at_date, back_at_time)
+
+        vehicle = Vehicle.objects.get(pk=request.POST.get('vehicle_id'))
+
+        conflicts = BaseReservation.objects.filter(vehicle=vehicle, back_at__gte=out_at, out_at__lte=back_at)
+        conflicts = conflicts.exclude(pk=request.POST.get('reservation_id'))
+
+        serializer = ScheduleConflictSerializer(conflicts, many=True)
+
+        return Response({
+            'success': True,
+            'make': vehicle.make,
+            'model': vehicle.model,
+            'conflicts': serializer.data
         })

@@ -603,17 +603,21 @@ console.log(response);
 
 var checkScheduleConflict = function() {
     var params = {
-        component: 'reservations',
-        method: 'checkConflict',
-        dateout: $('#dateout').val(),
-        dateouttime: $('#dateouttime').val(),
-        dateback: $('#dateback').val(),
-        datebacktime: $('#datebacktime').val(),
-        vehicleid: $('#vehicleid').val(),
-        reservationid: $('#reservationid').val() || null,
-        rentalid: $('#rentalid').val() || null,
+        // component: 'reservations',
+        // method: 'checkConflict',
+        out_at_date_day: $('#id_out_at_date_day').val(),
+        out_at_date_month: $('#id_out_at_date_month').val(),
+        out_at_date_year: $('#id_out_at_date_year').val(),
+        out_at_time: $('#id_out_at_time').val(),
+        back_at_date_day: $('#id_back_at_date_day').val(),
+        back_at_date_month: $('#id_back_at_date_month').val(),
+        back_at_date_year: $('#id_back_at_date_year').val(),
+        back_at_time: $('#id_back_at_time').val(),
+        vehicle_id: $('#id_vehicle').val(),
+        reservation_id: $('#reservation_id').val() || null,
+        rental_id: $('#rental_id').val() || null,
     }
-    $.post('ajax_post.cfm',params,function(data) {
+    $.post('/api/check_schedule_conflict/',params,function(data) {
 console.log(data);
         if (data.success) {
             if (data.conflicts.length > 0) {
@@ -623,19 +627,19 @@ console.log(data);
                     conflict = data.conflicts[c];
                     var tr = $('<tr>');
                     tr.append($('<td>', {
-                        html: conflict.fname + ' ' + conflict.lname,
+                        html: conflict.first_name + ' ' + conflict.last_name,
                     })).append($('<td>').append(
                         $('<a>', {
-                            href: conflict.reservationid ? 'reservations.cfm?edit=1&reservationid=' + conflict.reservationid : 'rentals.cfm?edit=1&rentalid=' + conflict.rentalid,
-                            html: conflict.type,
+                            href: conflict.url,
+                            html: conflict.reservation_type,
                             target: '_blank',
                         })
                     )).append($('<td>', {
-                        html: conflict.dateout,
+                        html: conflict.out_date,
                     })).append($('<td>', {
-                        html: conflict.dateback,
+                        html: conflict.back_date,
                     })).append($('<td>', {
-                        html: conflict.numdays,
+                        html: conflict.num_days,
                     }));
                     $('#conflict_data tbody').append(tr);
                 }

@@ -104,6 +104,7 @@ class ReservationForm(forms.ModelForm):
     )
 
     customer = forms.ModelChoiceField(queryset=Customer.objects.all(), widget=forms.HiddenInput())
+    reservation = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     first_name = forms.CharField(required=False)
     last_name = forms.CharField(required=False)
     email = forms.EmailField(required=False)
