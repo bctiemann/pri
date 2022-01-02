@@ -51,7 +51,11 @@
             <td>
                 {{ form.first_name }}
                 <cfinput name="fname" value="#Customer.fname#" maxlength="255" class="newuserfield #Customer.customerid GT 0 ? 'dont-edit' : ''#" />
-                <span customerid="#Customer.customerid#" class="matched-customer ui-icon ui-icon-person"></span>
+                {% if reservation.customer %}
+                    <a class="matched-customer" href="{% url "backoffice:customer-detail" pk=reservation.customer.id %}">
+                        <span customerid="#Customer.customerid#" class=" ui-icon ui-icon-person"></span>
+                    </a>
+                {% endif %}
             </td>
         </tr>
         <tr>

@@ -839,7 +839,7 @@ $(document).ready(function() {
             $('input#id_home_phone').val(ui.item.home_phone).addClass('dont-edit');
             $('input#id_work_phone').val(ui.item.work_phone).addClass('dont-edit');
             $('input#id_mobile_phone').val(ui.item.mobile_phone).addClass('dont-edit');
-            $('.matched-customer').attr('customerid', ui.item.id).show();
+            $('.matched-customer').attr('href', ui.item.customer_url).show();
 
             $('#doemail').val(0);
             return false;
@@ -924,9 +924,9 @@ $(document).ready(function() {
     if ($('#customerid').val() == 0) {
         $('.matched-customer').hide();
     }
-    $('.matched-customer').click(function() {
-        window.open('customers.cfm?edit=1&customerid=' + $(this).attr('customerid'));
-    });
+    // $('.matched-customer').click(function() {
+    //     window.open('customers.cfm?edit=1&customerid=' + $(this).attr('customerid'));
+    // });
 
     refreshDrivers();
     refreshMedia();

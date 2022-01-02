@@ -46,11 +46,16 @@ class CustomerSearchSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email')
     label = serializers.CharField(source='full_name')
     value = serializers.IntegerField(source='id')
+    customer_url = serializers.SerializerMethodField()
+
+    def get_customer_url(self, obj):
+        return reverse('backoffice:customer-detail', kwargs={'pk': obj.id})
 
     class Meta:
         model = Customer
         fields = (
-            'label', 'value', 'id', 'first_name', 'last_name', 'email', 'home_phone', 'work_phone', 'mobile_phone',
+            'label', 'value', 'id', 'first_name', 'last_name', 'email',
+            'home_phone', 'work_phone', 'mobile_phone', 'customer_url',
         )
 
 

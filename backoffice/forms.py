@@ -199,11 +199,11 @@ class CustomerForm(forms.ModelForm):
     email = forms.EmailField(required=True)
     # password = forms.CharField(widget=forms.PasswordInput(), required=True)
     # date_of_birth = forms.DateField(widget=forms.SelectDateWidget(years=birth_years))
-    cc_number = forms.CharField(required=False)
-    cc_exp_yr = forms.CharField(required=False)
-    cc_exp_mo = forms.CharField(required=False)
-    cc_cvv = forms.CharField(required=False)
-    cc_phone = PhoneNumberField(required=False)
+    # cc_number = forms.CharField(required=False)
+    # cc_exp_yr = forms.CharField(required=False)
+    # cc_exp_mo = forms.CharField(required=False)
+    # cc_cvv = forms.CharField(required=False)
+    # cc_phone = PhoneNumberField(required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
