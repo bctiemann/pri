@@ -19,6 +19,7 @@ TRUE_FALSE_CHOICES = (
 )
 current_year = timezone.now().year
 birth_years = range(current_year - 18, current_year - 100, -1)
+operational_years = range(settings.COMPANY_FOUNDING_YEAR, current_year + 10)
 
 
 # TODO: Add slug to the visible form fields and set on both models
@@ -109,9 +110,9 @@ class ReservationForm(forms.ModelForm):
     home_phone = PhoneNumberField(required=False)
     work_phone = PhoneNumberField(required=False)
     mobile_phone = PhoneNumberField(required=False)
-    out_at_date = forms.DateField(widget=forms.SelectDateWidget(attrs={'class': 'check-conflict'}))
+    out_at_date = forms.DateField(widget=forms.SelectDateWidget(attrs={'class': 'check-conflict'}, years=operational_years))
     out_at_time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time', 'class': 'check-conflict'}))
-    back_at_date = forms.DateField(widget=forms.SelectDateWidget(attrs={'class': 'check-conflict'}))
+    back_at_date = forms.DateField(widget=forms.SelectDateWidget(attrs={'class': 'check-conflict'}, years=operational_years))
     back_at_time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time', 'class': 'check-conflict'}))
     delivery_required = forms.ChoiceField(choices=DELIVERY_REQUIRED_CHOICES)
     extra_miles = forms.ChoiceField()

@@ -202,6 +202,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 COMPANY_NAME = 'Performance Rentals'
+COMPANY_FOUNDING_YEAR = 2008
 SUPPORT_EMAIL = 'support@performance.rentals'
 SITE_EMAIL = 'info@performancerentals.us'
 DEBUG_EMAIL = 'btman@mac.com'
