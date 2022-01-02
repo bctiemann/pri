@@ -574,7 +574,14 @@
                 {% if reservation %}
                 <cfif reservationid>
                     <button class="btn" type="submit" name="convert">Convert to Rental</button>
-                    <button class="btn delete" type="submit" name="delete" onclick="return confirmDelete(this.form, 'reservation')">Delete Reservation</button>
+                    <button
+                        class="btn delete"
+                        type="submit"
+                        name="delete"
+                        onclick="return confirmDelete(this.form, '{% url "backoffice:reservation-delete" pk=reservation.id %}', 'reservation')"
+                    >
+                        Delete Reservation
+                    </button>
                 </cfif>
                 {% endif %}
             </td>
