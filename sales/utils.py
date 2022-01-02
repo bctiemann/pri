@@ -181,6 +181,7 @@ class RentalPriceCalculator(PriceCalculator):
     - Subtract multi-day discount
     - Subtract largest of (coupon discount, customer discount, promotional discount, military discount)
     - Add extra miles surcharge
+    - If subtotal override is provided, it takes the place of the subtotal here
     - Add sales tax
 
     Interim subtotals (e.g. post_multi_day_discount_subtotal) are for forensics and to return
