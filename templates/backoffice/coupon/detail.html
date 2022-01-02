@@ -1,0 +1,63 @@
+{% extends "backoffice/coupon/base.html" %}
+
+{% block content %}
+
+    {% if employee %}
+        <h2>Edit Discount Code</h2>
+    {% else %}
+        <h2>Add Discount Code</h2>
+    {% endif %}
+
+    {{ form.errors }}
+    {% if coupon %}
+        <form method="POST" action="{% url "backoffice:coupon-detail" pk=coupon.id %}">
+    {% else %}
+        <form method="POST" action="{% url "backoffice:coupon-create" %}">
+    {% endif %}
+
+    <table class="inputform coupons">
+        <tr>
+            <td>Code</td>
+            <td>
+                {{ form.code }}
+                <cfinput name="code" value="#Discount.code#" required="yes" message="Enter a discount code." maxlength="50" />
+            </td>
+        </tr>
+        <tr>
+            <td class="align-top">Discount Percentage</td>
+            <td>
+                {{ form.percent }}
+                <cfinput name="amount" value="#Discount.amount#" required="yes" validate="regex" pattern="^\d{0,2}(\.\d{1,2})?$" class="short" /> %<br />
+                <small>Discount percentage must be a decimal format. E.g. 5.00</small>
+            </td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>
+                <button class="btn" type="submit" name="submit">
+                    {% if coupon %}
+                        Edit
+                    {% else %}
+                        Add
+                    {% endif %}
+                </button>
+                {% if coupon %}
+                <cfif discountid>
+                    <button
+                        class="btn delete"
+                        type="submit"
+                        name="delete"
+                        onclick="return confirmDelete(this.form, '{% url "backoffice:coupon-delete" pk=coupon.id %}', 'discount code')"
+                    >
+                        Delete Code
+                    </button>
+                </cfif>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+    {% csrf_token %}
+    </form>
+
+{% endblock %}

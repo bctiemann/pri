@@ -121,11 +121,13 @@
 	<a class="tnav <CFIF scrpt IS "gift.cfm">selected</CFIF>" href="gift.cfm">Gift Certificates</a>
 	</li>
 </CFIF>
+{% if user.employee.admin_access %}
 <CFIF YourID.acclev IS 1>
 	<li>
-	<a class="tnav <CFIF scrpt IS "discounts.cfm">selected</CFIF>" href="discounts.cfm">Discount Codes</a>
+	<a class="tnav {% if page_group == 'coupons' %}selected{% endif %}" href="{% url "backoffice:coupon-list" %}">Discount Codes</a>
 	</li>
 </CFIF>
+{% endif %}
 <CFIF YourID.acclev IS 1>
 	<li>
 	<a class="tnav <CFIF scrpt IS "subpay.cfm">selected</CFIF>" href="subpay.cfm">Substitute Payments</a>

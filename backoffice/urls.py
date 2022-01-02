@@ -8,6 +8,7 @@ from backoffice import views
 from backoffice.views import vehicles
 from backoffice.views import reservations
 from backoffice.views import employees
+from backoffice.views import coupons
 
 
 urlpatterns = [
@@ -41,4 +42,9 @@ urlpatterns = [
     path('employees/create/', employees.EmployeeCreateView.as_view(is_create_view=True), name='employee-create'),
     path('employees/<int:pk>/', employees.EmployeeDetailView.as_view(), name='employee-detail'),
     path('employees/<int:pk>/delete/', employees.EmployeeDeleteView.as_view(), name='employee-delete'),
+
+    path('coupons/', coupons.CouponListView.as_view(), name='coupon-list'),
+    path('coupons/create/', coupons.CouponCreateView.as_view(is_create_view=True), name='coupon-create'),
+    path('coupons/<int:pk>/', coupons.CouponDetailView.as_view(), name='coupon-detail'),
+    path('coupons/<int:pk>/delete/', coupons.CouponDeleteView.as_view(), name='coupon-delete'),
 ]

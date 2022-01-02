@@ -11,7 +11,7 @@ from phonenumber_field.formfields import PhoneNumberField
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, VehicleType
 from consignment.models import Consigner
 from users.models import User, Employee, Customer
-from sales.models import Reservation
+from sales.models import Reservation, Coupon
 
 TRUE_FALSE_CHOICES = (
     (True, 'Yes'),
@@ -187,3 +187,10 @@ class EmployeeForm(forms.ModelForm):
         model = Employee
         # fields = '__all__'
         exclude = ('user',)
+
+
+class CouponForm(forms.ModelForm):
+
+    class Meta:
+        model = Coupon
+        fields = '__all__'
