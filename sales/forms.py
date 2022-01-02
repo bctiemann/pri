@@ -15,6 +15,8 @@ from sales.models import Reservation, Coupon
 from users.models import Customer
 from sales.utils import RentalPriceCalculator
 
+current_year = timezone.now().year
+
 
 # Rental forms
 
@@ -303,7 +305,7 @@ class ReservationRentalDetailsForm(forms.ModelForm):
     class Meta:
         model = Reservation
         # fields = '__all__'
-        exclude = ('confirmation_code',)
+        exclude = ('confirmation_code', 'status',)
 
 
 # 2nd-phase form; extends ReservationRentalDetailsForm with Customer fields so it inherits all the first form's validations
@@ -326,6 +328,7 @@ class ReservationRentalPaymentForm(ReservationRentalDetailsForm):
         ('11', 'November (11)'),
         ('12', 'December (12)'),
     )
+    EXP_YEAR_CHOICES = ((year, year) for year in range(current_year, current_year + 11))
 
     # first_name = forms.CharField()
     # last_name = forms.CharField()
@@ -333,17 +336,17 @@ class ReservationRentalPaymentForm(ReservationRentalDetailsForm):
     # home_phone = PhoneNumberField()
     # work_phone = PhoneNumberField()
     # fax = PhoneNumberField()
-    # cc_number = forms.CharField()
-    cc_exp_yr = forms.ChoiceField()
+    cc_number = forms.CharField()
+    cc_exp_yr = forms.ChoiceField(choices=EXP_YEAR_CHOICES)
     cc_exp_mo = forms.ChoiceField(choices=EXP_MONTH_CHOICES)
-    # cc_cvv = forms.CharField()
-    # cc_phone = PhoneNumberField()
+    cc_cvv = forms.CharField()
+    cc_phone = PhoneNumberField()
     # password = forms.CharField(widget=forms.PasswordInput(), required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        current_year = timezone.now().year
-        self.fields['cc_exp_yr'].choices = ((year, year) for year in range(current_year, current_year + 11))
+        # current_year = timezone.now().year
+        # self.fields['cc_exp_yr'].choices = ((year, year) for year in range(current_year, current_year + 11))
         # self.fields['extra_miles'].choices = ((k, v['label']) for k, v in settings.EXTRA_MILES_PRICES.items())
 
     class Meta:

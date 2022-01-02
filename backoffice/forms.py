@@ -204,6 +204,7 @@ class CustomerForm(forms.ModelForm):
     # cc_exp_mo = forms.CharField(required=False)
     # cc_cvv = forms.CharField(required=False)
     # cc_phone = PhoneNumberField(required=False)
+    date_of_birth = forms.DateField(widget=forms.SelectDateWidget(years=birth_years))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
