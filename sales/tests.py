@@ -178,3 +178,31 @@ class RentalPriceCalculatorTestCase(TestCase):
         self.assertEqual(price_data['military_discount'], Decimal('90.00'))
         self.assertEqual(price_data['total_with_tax'], Decimal('1215.53'))
 
+    def test_get_rental_price_data_with_override_subtotal(self):
+        """
+        2-day rental, 200 extra miles, discounts, subtotal overridden to 1400.00
+        """
+        vehicle_marketing = self.vehicle_1
+        num_days = 2
+        coupon_code = None
+        email = None
+        extra_miles = 200
+        tax_zip = '07430'
+        effective_date = None
+        rental_price_calculator = RentalPriceCalculator(
+            vehicle_marketing,
+            num_days,
+            extra_miles,
+            coupon_code=coupon_code,
+            email=email,
+            tax_zip=tax_zip,
+            effective_date=effective_date,
+            is_military=True,
+            override_subtotal=1400.00,
+        )
+        price_data = rental_price_calculator.get_price_data()
+
+        self.assertEqual(price_data['computed_subtotal'], Decimal('1140.00'))
+        self.assertEqual(price_data['subtotal'], Decimal('1400.00'))
+        self.assertEqual(price_data['total_with_tax'], Decimal('1492.75'))
+

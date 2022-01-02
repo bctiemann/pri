@@ -42,15 +42,18 @@ class PriceCalculator(ABC):
     post_specific_discount = None
 
     subtotal = 0.0
+    override_subtotal = None
     cents = decimal.Decimal('0.01')
 
-    def __init__(self, coupon_code, email, tax_zip, effective_date, is_military=False):
+    def __init__(self, coupon_code, email, tax_zip, effective_date, is_military=False, override_subtotal=None):
         self.effective_date = effective_date
         self.promotion = self.get_effective_promotion()
         self.coupon = self.get_coupon(coupon_code)
         self.customer = self.get_customer(email)
         self.tax_rate = self.get_tax_rate(tax_zip)
         self.is_military = is_military
+        if override_subtotal:
+            self.override_subtotal = float(override_subtotal)
 
     def get_effective_promotion(self):
         if not self.effective_date:
@@ -144,9 +147,13 @@ class PriceCalculator(ABC):
         raise NotImplementedError
 
     @property
+    def computed_subtotal(self):
+        return self.subtotal
+
+    @property
     def pre_tax_subtotal(self):
         # subtotal should be incrementally calculated in __init__() and returned as its final value
-        return self.subtotal
+        return self.override_subtotal or self.computed_subtotal
 
     @property
     def total_with_tax(self):
@@ -255,6 +262,7 @@ class RentalPriceCalculator(PriceCalculator):
         return dict(
             num_days=self.num_days,
             tax_rate=self.tax_rate.total_rate,
+            tax_rate_as_percent=self.tax_rate.total_rate * 100,
             customer_id=self.customer.id if self.customer else None,
             base_price=self.quantize_currency(self.base_price),
             multi_day_discount=self.quantize_currency(self.multi_day_discount),
@@ -268,6 +276,7 @@ class RentalPriceCalculator(PriceCalculator):
             extra_miles=self.extra_miles,
             extra_miles_cost=self.quantize_currency(self.extra_miles_surcharge),
             subtotal=self.quantize_currency(self.pre_tax_subtotal),
+            computed_subtotal=self.quantize_currency(self.computed_subtotal),
             total_with_tax=self.quantize_currency(self.total_with_tax),
             reservation_deposit=self.quantize_currency(self.reservation_deposit),
             tax_amount=self.quantize_currency(self.get_tax_amount()),

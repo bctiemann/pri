@@ -684,6 +684,10 @@ table.inputform .divider .subtext {
 	display: inline-block;
 }
 
+.specific-discount {
+	background-color: #d1dde0;
+}
+
 /* Form field override styles */
 
 #id_specs {

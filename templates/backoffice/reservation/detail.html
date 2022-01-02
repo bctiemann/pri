@@ -1,4 +1,5 @@
 {% extends "backoffice/reservation/base.html" %}
+{% load humanize %}
 
 {% block content %}
 
@@ -355,6 +356,12 @@
             </td>
         </tr>
         <tr>
+            <td>Military ID</td>
+            <td>
+                {{ form.is_military }}
+            </td>
+        </tr>
+        <tr>
             <td class="align-top">Notes<br /><small>Customer Requests</small></td>
             <td>
                 {{ form.customer_notes }}
@@ -365,6 +372,7 @@
         {% if reservation %}
         <cfif reservationid>
 
+        {% comment %}
         <cfquery name="VFront" datasource="#FDSN#">
             SELECT price,disc2day,disc3day,disc7day,deposit,milesinc
             FROM VehiclesFront
@@ -418,6 +426,7 @@
                 <CFSET rateval = Reservation.rate>
             </CFIF>
         </CFIF>
+        {% endcomment %}
 
         <tr>
             <td>Deposit Amount</td>
@@ -438,70 +447,97 @@
             <td>
                 <table class="price-breakdown">
                     <tr>
-                        <td>Rental Total (#Reservation.numdays# day<cfif Reservation.numdays IS NOT 1>s</cfif>):</td>
-                        <td><b>#NumberFormat(tcostRaw,"$___,___.__")#</b></td>
+                        <td>Rental Total ({{ reservation.num_days }} day{{ reservation.num_days|pluralize }}):</td>
+                        <td><b>${{ price_data.base_price|intcomma }}</b></td>
+                        <td></td>
                     </tr>
                     <cfif dMultiDay>
                     <tr>
-                        <td>Multi-Day Discount (#dMultiDay#%):</td>
-                        <td>- #NumberFormat(tcostRaw - tcost,"$___,___.__")#</td>
+                        <td>Multi-Day Discount ({{ price_data.multi_day_discount_pct }}%):</td>
+                        <td>- ${{ price_data.multi_day_discount|intcomma }}</td>
+                        <td></td>
                     </tr>
                     </cfif>
 
                     <tr>
-                        <CFIF len(Reservation.coupon) GT 0>
-                            <CFIF codecheck.recordcount IS 1>
-                                <td>Coupon Discount: </td>
-                                <td>- #NumberFormat(ds1,"$___,___.__")#</td>
-                            <CFELSE>
-                                <td>Car Discount: </td>
-                                <td>- #NumberFormat(ds1,"$___,___.__")#</td>
-                            </CFIF>
-                        <CFELSE>
-                            <td>Car Discount: </td>
-                            <td>- #NumberFormat(ds1,"$___,___.__")#</td>
-                        </CFIF>
+                        <td colspan="2">Specific Discount (greatest of following):</td>
+                        <td></td>
                     </tr>
 
-                    <tr>
+                    <tr class="specific-discount">
+                        <td>Coupon Discount: </td>
+                        <td>- ${{ price_data.coupon_discount|intcomma }}</td>
+                        <td></td>
+                    </tr>
+                    <tr class="specific-discount">
+                        <td>Promotion Discount: </td>
+                        <td>- ${{ price_data.promotion_discount|intcomma }}</td>
+                        <td></td>
+                    </tr>
+                    <tr class="specific-discount">
                         <td>Customer Discount: </td>
-                        <td>- #NumberFormat(ds2,"$___,___.__")#</td>
+                        <td>- ${{ price_data.customer_discount|intcomma }}</td>
+                        <td></td>
+                    </tr>
+                    <tr class="specific-discount">
+                        <td>Military Discount: </td>
+                        <td>- ${{ price_data.military_discount|intcomma }}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Specific Discount: </td>
+                        <td>- ${{ price_data.specific_discount|intcomma }}</td>
+                        <td>{{ price_data.specific_discount_label }}</td>
                     </tr>
 
+                    {% if reservation.extra_miles %}
                     <CFIF Reservation.xtramiles GT 0>
                     <tr>
-                        <td>Extra Miles (#Reservation.xtramiles#):</td>
-                        <td>#NumberFormat(xmi,"$___,___.__")#</td>
+                        <td>Extra Miles ({{ reservation.extra_miles }}):</td>
+                        <td>${{ price_data.extra_miles_cost|intcomma }}</td>
+                        <td></td>
                     </tr>
                     </CFIF>
+                    {% endif %}
 
                     <tr>
                         <td>&nbsp;</td>
-                        <td>SubTotal: <strong>#NumberFormat(s2,"$___,___.__")#</strong></td>
+                        <td>
+                            SubTotal: <strong>{{ price_data.computed_subtotal|intcomma }}</strong>
+                        </td>
+                        <td>
+                            {{ form.override_subtotal }}
+                        </td>
                     </tr>
 
+                    {% comment %}
                     <CFSET taxtot = s2 * (1 + (taxpct/100))>
                     <CFSET taxmt = taxtot - s2>
+                    {% endcomment %}
 
                     <tr>
                         <td>&nbsp;</td>
-                        <td>Tax: <small>(#taxpct#%)</small> #NumberFormat(taxmt,"$___,___.__")# </td>
+                        <td>Tax: <small>({{ price_data.tax_rate_as_percent }}%)</small> ${{ price_data.tax_amount|intcomma }} </td>
+                        <td></td>
                     </tr>
 
                     <tr>
                         <td>&nbsp;</td>
-                        <td>Invoice Total: <strong>#NumberFormat(taxtot,"$___,___.__")#</strong></td>
+                        <td>Invoice Total: <strong>${{ price_data.total_with_tax|intcomma }}</strong></td>
+                        <td></td>
                     </tr>
                 </table>
 
-
+                {% comment %}
                 <input type="hidden" name="total" value="#s2#">
                 <CFIF ratediff IS 1>
                 <br><br>
                 <b><big>Rate Override:</big></b> Rate set to: #NumberFormat(Reservation.rate,"$___,___.__")#
                 </CFIF>
+                {% endcomment %}
             </td>
         </tr>
+        {% comment %}
         <tr>
             <td>Computed Cost<br><small>Not including tax</small></td>
             <CFIF ratediff IS 0>
@@ -517,6 +553,7 @@
                 </CFIF>
             </td>
         </tr>
+        {% endcomment %}
 
         {% else %}
         <cfelse>

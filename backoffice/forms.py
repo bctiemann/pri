@@ -116,6 +116,7 @@ class ReservationForm(forms.ModelForm):
     delivery_required = forms.ChoiceField(choices=DELIVERY_REQUIRED_CHOICES)
     extra_miles = forms.ChoiceField()
     send_email = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, required=False)
+    is_military = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, required=False)
     customer_notes = forms.CharField(widget=forms.Textarea(attrs={'class': 'customer-notes'}), required=False)
 
     def __init__(self, *args, **kwargs):
@@ -152,6 +153,7 @@ class ReservationForm(forms.ModelForm):
 
         self.fields['tax_percent'].initial = decimal.Decimal(settings.DEFAULT_TAX_RATE) * 100
         self.fields['extra_miles'].choices = ((k, v['label']) for k, v in settings.EXTRA_MILES_PRICES.items())
+        self.fields['override_subtotal'].widget.attrs['placeholder'] = 'Override'
 
     def clean(self):
         self.cleaned_data['out_at'] = datetime.datetime.combine(

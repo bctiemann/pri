@@ -49,14 +49,14 @@ class Command(BaseCommand):
         # 'do_vehicle_pics': True,
         # 'do_vehicle_vids': True,
         # 'do_customers': True,
-        # 'do_reservations': True,
+        'do_reservations': True,
         # 'do_consigners': True,
         # 'do_consignmentvehicles': True,
         # 'do_admins': True,
         # 'do_newsitems': True
         # 'do_sitecontent': True,
         # 'do_newslettersubscriptions': True,
-        'do_coupons': True,
+        # 'do_coupons': True,
     }
 
     def add_arguments(self, parser):

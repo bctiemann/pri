@@ -8,7 +8,9 @@ from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from . import ListViewMixin
+from fleet.models import VehicleMarketing
 from sales.models import Reservation
+from sales.utils import RentalPriceCalculator
 from backoffice.forms import ReservationForm
 
 
@@ -30,6 +32,23 @@ class ReservationListView(PermissionRequiredMixin, ReservationViewMixin, ListVie
 class ReservationDetailView(ReservationViewMixin, ListViewMixin, UpdateView):
     template_name = 'backoffice/reservation/detail.html'
     form_class = ReservationForm
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        vehicle_marketing = VehicleMarketing.objects.get(vehicle_id=self.object.vehicle.id)
+        price_calculator = RentalPriceCalculator(
+            coupon_code=self.object.coupon_code,
+            email=self.object.customer.user.email,
+            tax_zip=self.object.delivery_zip,
+            effective_date=self.object.out_date,
+            is_military=self.object.is_military,
+            vehicle_marketing=vehicle_marketing,
+            num_days=self.object.num_days,
+            extra_miles=self.object.extra_miles,
+            override_subtotal=self.object.override_subtotal,
+        )
+        context['price_data'] = price_calculator.get_price_data()
+        return context
 
     def get_success_url(self):
         return reverse('backoffice:reservation-detail', kwargs={'pk': self.object.id})
