@@ -209,7 +209,7 @@ class CustomerForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if self.instance.user:
             self.fields['email'].initial = self.instance.user.email
-        phone_fields = ['home_phone', 'work_phone', 'mobile_phone']
+        phone_fields = ['home_phone', 'work_phone', 'mobile_phone', 'fax',]
         for field in phone_fields:
             self.fields[field].widget.attrs['class'] = 'phone'
 

@@ -774,8 +774,11 @@ $(document).ready(function() {
     });
 
     // Enforce formatting for phone numbers
-    $('.phone').on('keyup change', function() {
-        $(this).val(formatPhone($(this).val()));
+    $('.phone').on('keyup change', function(e) {
+        let input = String.fromCharCode(event.keyCode);
+        if (/[a-zA-Z0-9-_ ]/.test(input)) {
+            $(this).val(formatPhone($(this).val()));
+        }
     });
 
     // Enforce formatting for SSN (on subpay)

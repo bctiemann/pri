@@ -13,13 +13,13 @@
 {#    <div id="map"></div>#}
 
     {% if customer and customer.has_mappable_address %}
-    <iframe
-        id="map"
-        loading="lazy"
-        allowfullscreen
-        src="https://www.google.com/maps/embed/v1/place?key={{ google_maps_api_key }}
-        &q={{ customer.mappable_address|urlencode }}">
-    </iframe>
+        <iframe
+            id="map"
+            loading="lazy"
+            allowfullscreen
+            src="https://www.google.com/maps/embed/v1/place?key={{ google_maps_api_key }}
+            &q={{ customer.mappable_address|urlencode }}">
+        </iframe>
     {% endif %}
 
     {{ form.errors }}
@@ -151,7 +151,10 @@
         </tr>
         <tr>
             <td>Fax</td>
-            <td><cfinput name="fax" class="phone short" value="#Customer.fax#" maxlength="20" /></td>
+            <td>
+                {{ form.fax }}
+                <cfinput name="fax" class="phone short" value="#Customer.fax#" maxlength="20" />
+            </td>
         </tr>
         <tr>
             <td>Date of Birth</td>
