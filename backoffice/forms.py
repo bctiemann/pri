@@ -131,14 +131,20 @@ class ReservationForm(forms.ModelForm):
         self.fields['vehicle'].choices = self.VEHICLE_CHOICES
 
         # Populate conditionally non-editable fields from linked customer
-        field_classes = ['newuserfield']
-        if self.instance.id:
-            field_classes.append('dont-edit')
-        field_classes_str = ' '.join(field_classes)
+        phone_fields = ['home_phone', 'work_phone', 'mobile_phone']
         for field in ['first_name', 'last_name', 'email', 'home_phone', 'work_phone', 'mobile_phone']:
+            field_classes = ['newuserfield']
+            if self.instance.id:
+                field_classes.append('dont-edit')
+            if field in phone_fields:
+                field_classes.append('phone')
+            field_classes_str = ' '.join(field_classes)
             self.fields[field].widget.attrs['class'] = field_classes_str
             if self.instance.customer:
-                self.fields[field].initial = getattr(self.instance.customer, field, None) or getattr(self.instance.customer.user, field, None)
+                if field in phone_fields:
+                    self.fields[field].initial = getattr(self.instance.customer, field).as_national
+                else:
+                    self.fields[field].initial = getattr(self.instance.customer, field, None) or getattr(self.instance.customer.user, field, None)
 
         if self.instance.out_at:
             out_at_localized = self.instance.out_at.astimezone(pytz.timezone(settings.TIME_ZONE))
@@ -180,13 +186,42 @@ class EmployeeForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data['email']
-        if User.objects.filter(email=email).exists():
+        if User.objects.filter(email=email).exclude(pk=self.instance.user.id).exists():
             raise forms.ValidationError(f'A user with email {email} already exists.')
 
     class Meta:
         model = Employee
         # fields = '__all__'
         exclude = ('user',)
+
+
+class CustomerForm(forms.ModelForm):
+    email = forms.EmailField(required=True)
+    # password = forms.CharField(widget=forms.PasswordInput(), required=True)
+    # date_of_birth = forms.DateField(widget=forms.SelectDateWidget(years=birth_years))
+    cc_number = forms.CharField(required=False)
+    cc_exp_yr = forms.CharField(required=False)
+    cc_exp_mo = forms.CharField(required=False)
+    cc_cvv = forms.CharField(required=False)
+    cc_phone = PhoneNumberField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.user:
+            self.fields['email'].initial = self.instance.user.email
+        phone_fields = ['home_phone', 'work_phone', 'mobile_phone']
+        for field in phone_fields:
+            self.fields[field].widget.attrs['class'] = 'phone'
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if User.objects.filter(email=email).exclude(pk=self.instance.user.id).exists():
+            raise forms.ValidationError(f'A user with email {email} already exists.')
+
+    class Meta:
+        model = Customer
+        # fields = '__all__'
+        exclude = ('user', 'rentals_count',)
 
 
 class CouponForm(forms.ModelForm):

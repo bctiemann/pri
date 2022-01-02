@@ -103,7 +103,7 @@
 {% if user.employee.reservations_access %}
 <CFIF YourID.acclev IS 1 OR YourID.acclev IS 2>
 	<li>
-	<a class="tnav <CFIF scrpt IS "customers.cfm">selected</CFIF>" href="customers.cfm">Customers</a></li>
+	<a class="tnav {% if page_group == 'customers' %}selected{% endif %}" href="{% url "backoffice:customer-list" %}">Customers</a></li>
 </CFIF>
 {% endif %}
 <CFIF YourID.acclev IS 1 OR YourID.acclev IS 3>

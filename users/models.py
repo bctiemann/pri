@@ -1,4 +1,5 @@
 import random
+import requests
 from localflavor.us.models import USStateField, USZipCodeField, USSocialSecurityNumberField
 from phonenumber_field.modelfields import PhoneNumberField
 from encrypted_fields import fields
@@ -239,6 +240,13 @@ class Employee(models.Model):
 
 # Customer contains all business data for a customer, and optionally is linked to a login user
 class Customer(models.Model):
+
+    class DriversClubLevel(models.IntegerChoices):
+        NO = (0, 'No')
+        SILVER = (1, 'Silver')
+        GOLD = (2, 'Gold')
+        PLATINUM = (3, 'Platinum')
+
     user = models.OneToOneField('users.User', null=True, blank=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -269,11 +277,11 @@ class Customer(models.Model):
     insurance_company_phone = PhoneNumberField(blank=True)
     coverage_verified = models.BooleanField(default=False)
 
-    cc_number = fields.EncryptedCharField(max_length=255, verbose_name='CC1 number')
-    cc_exp_yr = models.CharField(max_length=4, verbose_name='CC1 exp year')
-    cc_exp_mo = models.CharField(max_length=2, verbose_name='CC1 exp month')
-    cc_cvv = models.CharField(max_length=6, verbose_name='CC1 CVV')
-    cc_phone = PhoneNumberField(verbose_name='CC1 contact phone')
+    cc_number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC1 number')
+    cc_exp_yr = models.CharField(max_length=4, blank=True, verbose_name='CC1 exp year')
+    cc_exp_mo = models.CharField(max_length=2, blank=True, verbose_name='CC1 exp month')
+    cc_cvv = models.CharField(max_length=6, blank=True, verbose_name='CC1 CVV')
+    cc_phone = PhoneNumberField(blank=True, verbose_name='CC1 contact phone')
 
     cc2_number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC2 number')
     cc2_exp_yr = models.CharField(max_length=4, blank=True, verbose_name='CC2 exp year')
@@ -283,13 +291,14 @@ class Customer(models.Model):
 
     rentals_count = models.IntegerField(null=True, blank=True)
     remarks = fields.EncryptedTextField(blank=True)
+    rating = models.IntegerField(null=True, blank=True)
     driver_skill = models.IntegerField(null=True, blank=True)
     discount_pct = models.IntegerField(null=True, blank=True)
     music_genre = models.ForeignKey('users.MusicGenre', null=True, blank=True, on_delete=models.SET_NULL)
 
     first_time = models.BooleanField(default=True)
-    drivers_club = models.BooleanField(default=False)
-    no_email = models.BooleanField(default=False)
+    drivers_club = models.IntegerField(choices=DriversClubLevel.choices, null=True, blank=True)
+    receive_email = models.BooleanField(default=True)
     ban = models.BooleanField(default=False)
     survey_done = models.BooleanField(default=False)
 
@@ -300,6 +309,21 @@ class Customer(models.Model):
     @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
+
+    @property
+    def ip_country(self):
+        url = f'http://ip-api.com/json/{self.registration_ip}'
+        response = requests.get(url)
+        result = response.json()
+        return result.get('country')
+
+    @property
+    def has_mappable_address(self):
+        return bool(self.address_line_1 and self.zip)
+
+    @property
+    def mappable_address(self):
+        return f'{self.address_line_1}, {self.zip}'
 
     def __str__(self):
         return f'[{self.id}] {self.first_name} {self.last_name}'

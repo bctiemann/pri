@@ -712,7 +712,7 @@ $(document).ready(function() {
     });
 
     // Geolocation map
-    if ($('#map').length) {
+    if ($('div#map').length) {
         // Google (iffy because site is not publicly visible; geocoding requires an accompanying map)
         geocoder = new google.maps.Geocoder();
         var address = $('#addr').val() + ", " + $('#zip').val();

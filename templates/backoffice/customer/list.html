@@ -1,0 +1,105 @@
+{% extends "backoffice/customer/base.html" %}
+
+{% block content %}
+
+    {% comment %}
+    <cfif IsDefined("URL.deleted")>
+        <p>Vehicle deleted successfully.</p>
+    </cfif>
+
+    <cfset sortCols = "vehicleid,make,model,year,status">
+
+    <cfif NOT IsDefined("URL.sortby") OR NOT ListContains(sortCols, URL.sortby)>
+        <cfset URL.sortby = "vehicleid">
+    </cfif>
+    <cfif NOT IsDefined("URL.sortdir") OR NOT ListContains("ASC,DESC", URL.sortdir)>
+        <cfset URL.sortdir = "ASC">
+    </cfif>
+    <cfif NOT IsDefined("URL.page") OR NOT IsNumeric(URL.page) OR URL.page LT 1>
+        <cfset URL.page = 1>
+    </cfif>
+
+    <CFQUERY NAME="allRecords" DATASOURCE="#DSN#">
+        SELECT vehicleid FROM Vehicles
+        WHERE 1
+        <cfif IsDefined("Form.query")>
+            AND (
+                make LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR"> OR
+                model LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR"> OR
+                year LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR">
+            )
+        </cfif>
+        <cfif IsDefined("URL.type") AND IsValid("integer",URL.type)>
+            AND type = <CFQUERYPARAM value="#URL.type#" CFSQLType="CF_SQL_INTEGER">
+        </cfif>
+        <cfif NOT (IsDefined("URL.showall") AND URL.showall IS 1)>
+            AND status != 3
+        </cfif>
+    </CFQUERY>
+
+    <cfset pageViewLink = getPageViewLink(allRecords.recordCount)>
+    <CFSET Pages = pagesLink(#allRecords.recordCount#,#rowsperpage#,int(#URL.page#),#CGI.SCRIPT_NAME#,#URL#)>
+
+    <CFQUERY NAME="Vehicles" DATASOURCE="#DSN#" result="result">
+        SELECT Vehicles.vehicleid,make,model,year,type,plate,vin,mileage,damage,Vehicles.notes,policyno,policyco,policytel,
+        status,weighting,tagnumber FROM Vehicles
+        LEFT JOIN TollTags ON TollTags.vehicleid=Vehicles.vehicleid
+        WHERE 1
+        <cfif IsDefined("Form.query")>
+            AND (
+                make LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR"> OR
+                model LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR"> OR
+                year LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR">
+            )
+        </cfif>
+        <cfif IsDefined("URL.type") AND IsValid("integer",URL.type)>
+            AND type = <CFQUERYPARAM value="#URL.type#" CFSQLType="CF_SQL_INTEGER">
+        </cfif>
+        <cfif NOT (IsDefined("URL.showall") AND URL.showall IS 1)>
+            AND status != 3
+        </cfif>
+        ORDER BY #URL.sortby# #URL.sortdir#
+        LIMIT #Pages.offset#,#Pages.thispage#
+    </CFQUERY>
+
+    <CFOUTPUT>
+    <div class="pager">
+    #pageViewLink#
+    #Pages.pages#
+    </div>
+    </CFOUTPUT>
+    {% endcomment %}
+
+    {% include "backoffice/includes/paginator.html" %}
+
+    {% include "backoffice/includes/search_form.html" %}
+
+    <table class="data alternating" sortedby="{{ sortby }}">
+     <tr>
+        <th col="id" default-sort="desc">ID</th>
+        <th col="lname" colspan="2">Name</th>
+        <th></th>
+        <th col="email">Email</th>
+        <th col="rentednum" default-sort="desc">Num. Rentals</th>
+        <th col="rating" default-sort="desc">Rating</th>
+        <th>Drivers' Club</th>
+        <th col="createdon" default-sort="desc">Created</th>
+    </tr>
+    {% for customer in customer_list %}
+        <tr class="clickable click-to-edit" destination="{% url "backoffice:customer-detail" pk=customer.id %}">
+        <td><a href="{% url "backoffice:customer-detail" pk=customer.id %}">{{ customer.id }}</a></td>
+        <td>{{ customer.first_name }}</td>
+        <td>{{ customer.last_name}}</td>
+        <td><a href="reservations.cfm?edit=1&customerid=#customerid#"><span class="ui-icon ui-icon-clipboard" /></a></td>
+        <td><a href="mailto:{{ customer.user.email }}">{{ customer.user.email }}</a></td>
+        <td>{{ customer.rentals_count }}</td>
+        <td>{{ customer.rating|default_if_none:"" }}</td>
+        <td>
+            {{ customer.get_drivers_club_display }}
+        </td>
+        <td>{{ customer.created_at|date:"m/d/Y" }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+
+{% endblock %}

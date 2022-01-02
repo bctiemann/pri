@@ -9,6 +9,7 @@ def settings_constants(request):
         'title_bar_line_2': settings.TITLE_BAR_LINE_2,
         'vehicle_type': VehicleType,
         'vehicle_status': VehicleStatus,
+        'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
     }
     return context
 

@@ -59,7 +59,7 @@ class CustomerAdmin(admin.ModelAdmin):
             'fields': ('rentals_count', 'remarks', 'driver_skill', 'discount_pct', 'music_genre',)
         }),
         ('Options', {
-            'fields': ('first_time', 'drivers_club', 'no_email', 'ban', 'survey_done',)
+            'fields': ('first_time', 'drivers_club', 'receive_email', 'ban', 'survey_done',)
         }),
         ('Registration', {
             'fields': ('registration_ip', 'registration_lat', 'registration_long',)

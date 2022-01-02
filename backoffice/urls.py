@@ -5,10 +5,7 @@ from django.conf import settings
 
 from fleet import views as fleet_views
 from backoffice import views
-from backoffice.views import vehicles
-from backoffice.views import reservations
-from backoffice.views import employees
-from backoffice.views import coupons
+from backoffice.views import vehicles, reservations, employees, customers, coupons
 
 
 urlpatterns = [
@@ -42,6 +39,11 @@ urlpatterns = [
     path('employees/create/', employees.EmployeeCreateView.as_view(is_create_view=True), name='employee-create'),
     path('employees/<int:pk>/', employees.EmployeeDetailView.as_view(), name='employee-detail'),
     path('employees/<int:pk>/delete/', employees.EmployeeDeleteView.as_view(), name='employee-delete'),
+
+    path('customers/', customers.CustomerListView.as_view(), name='customer-list'),
+    path('customers/create/', customers.CustomerCreateView.as_view(is_create_view=True), name='customer-create'),
+    path('customers/<int:pk>/', customers.CustomerDetailView.as_view(), name='customer-detail'),
+    path('customers/<int:pk>/delete/', customers.CustomerDeleteView.as_view(), name='customer-delete'),
 
     path('coupons/', coupons.CouponListView.as_view(), name='coupon-list'),
     path('coupons/create/', coupons.CouponCreateView.as_view(is_create_view=True), name='coupon-create'),

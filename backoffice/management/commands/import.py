@@ -20,7 +20,7 @@ from fleet.models import (
     get_vehicle_picture_path, get_vehicle_video_path
 )
 from users.models import Customer, Employee, User, MusicGenre
-from sales.models import Promotion, Coupon, Reservation
+from sales.models import Promotion, Coupon, BaseReservation, Reservation, Rental
 from consignment.models import Consigner
 from pri.cipher import AESCipher
 
@@ -48,7 +48,7 @@ class Command(BaseCommand):
         # 'do_vehicles': True,
         # 'do_vehicle_pics': True,
         # 'do_vehicle_vids': True,
-        # 'do_customers': True,
+        'do_customers': True,
         'do_reservations': True,
         # 'do_consigners': True,
         # 'do_consignmentvehicles': True,
@@ -309,18 +309,21 @@ class Command(BaseCommand):
                         cc2_cvv=old['cc2cvv'] or '',
                         rentals_count=old['rentednum'],
                         remarks=self.decrypt(old['remarks']),
+                        rating=old['rating'],
                         driver_skill=old['driverskill'],
                         discount_pct=int(old['discount']) if old['discount'].isdigit() else None,
                         music_genre=music_genre,
                         first_time=bool(old['firsttime']),
                         drivers_club=bool(old['DriversClub']),
-                        no_email=bool(old['nomail']),
+                        receive_email=not bool(old['nomail']),
                         ban=bool(old['ban']),
                         survey_done=bool(old['surveydone']),
                         registration_ip=old['regip'],
                         registration_lat=old['reglat'],
                         registration_long=old['reglong'],
                     )
+                    new.created_at = old['createdon']
+                    new.save()
                     try:
                         new.home_phone = old['hphone']
                         new.save()
@@ -359,7 +362,7 @@ class Command(BaseCommand):
 
         if 'do_reservations' in self.enabled:
             if clear_existing:
-                Reservation.objects.all().delete()
+                BaseReservation.objects.all().delete()
             back_cursor.execute("""SELECT * FROM Reservations""")
             for old in back_cursor.fetchall():
                 print(old['reservationid'])
@@ -381,7 +384,7 @@ class Command(BaseCommand):
                     deposit_amount=old['depamount'],
                     confirmation_code=old['confcode'],
                     delivery_required=bool(old['delivery']),
-                    app_channel=Reservation.AppChannelChoices.MOBILE if old['iphone'] else Reservation.AppChannelChoices.WEB,
+                    app_channel=Reservation.AppChannel.MOBILE if old['iphone'] else Reservation.AppChannel.WEB,
                     tax_percent=old['taxpct'],
                     delivery_zip=old['deliveryzip'],
                 )

@@ -258,6 +258,9 @@ AVALARA_ENVIRONMENT = None
 DEFAULT_TAX_ZIP = '07456'
 DEFAULT_TAX_RATE = '0.07'
 
+# Google Maps embed API
+GOOGLE_MAPS_API_KEY = None
+
 TITLE_BAR_LINE_1 = 'Sports car rentals for the automotive enthusiast'
 TITLE_BAR_LINE_2 = 'Serving the NYC area and beyond'
 
