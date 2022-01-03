@@ -102,7 +102,7 @@
         <tr>
             <td>Date Out</td>
             <td>
-                {{ form.out_date }}
+                {{ form.out_at_date }}
                 {% comment %}
                 <cftry>
                     <cfset dateout = DateFormat(Rental.dateout,"MM/DD/YYYY")>
@@ -122,7 +122,7 @@
                 </cfif>
                 {% endcomment %}
                 <cfinput name="dateout" value="#dateout#" maxlength="20" class="check-conflict short" /> @
-                {{ form.out_time }}
+                {{ form.out_at_time }}
                 {% comment %}
                 <cfselect name="dateouttime" class="check-conflict">
                     <option value="07:00" <CFIF DateOutTime IS "07:00">selected</CFIF>>07:00</option>
@@ -166,7 +166,7 @@
         <tr>
             <td>Date Returned</td>
             <td>
-                {{ form.back_date }}
+                {{ form.back_at_date }}
                 {% comment %}
                 <cftry>
                     <cfset dateback = DateFormat(Rental.dateback,"MM/DD/YYYY")>
@@ -186,7 +186,7 @@
                 </cfif>
                 {% endcomment %}
                 <cfinput name="dateback" value="#dateback#" maxlength="20" class="check-conflict short" /> @
-                {{ form.back_time }}
+                {{ form.back_at_time }}
                 {% comment %}
                 <cfselect name="datebacktime" class="check-conflict">
                     <option value="07:00" <CFIF DateBackTime IS "07:00">selected</CFIF>>07:00</option>
@@ -456,6 +456,7 @@
             </td>
         </tr>
 
+        {% comment %}
         <cfquery name="VFront" datasource="#FDSN#">
             SELECT price,disc2day,disc3day,disc7day,deposit,milesinc
             FROM VehiclesFront
@@ -513,6 +514,7 @@
                 <CFSET rateval = Rental.rate>
             </CFIF>
         </CFIF>
+        {% endcomment %}
 
         <tr class="divider">
             <td colspan="2">
@@ -562,8 +564,8 @@
                         <td></td>
                     </tr>
                     <tr class="specific-discount">
-                        <td>This Rental Discount: </td>
-                        <td>- ${{ price_data.rental_discount|intcomma }}</td>
+                        <td>One-Time Discount: </td>
+                        <td>- ${{ price_data.one_time_discount|intcomma }}</td>
                         <td></td>
                     </tr>
                     <tr>

@@ -48,6 +48,7 @@ class RentalDetailView(RentalViewMixin, ListViewMixin, UpdateView):
             num_days=self.object.num_days,
             extra_miles=self.object.extra_miles,
             override_subtotal=self.object.override_subtotal,
+            one_time_discount_pct=self.object.rental_discount_pct,
         )
         context['price_data'] = price_calculator.get_price_data()
         return context

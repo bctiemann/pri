@@ -92,6 +92,7 @@ class RentalPriceCalculatorTestCase(TestCase):
         price_data = rental_price_calculator.get_price_data()
 
         self.assertEqual(price_data['coupon_discount'], Decimal('15.00'))
+        self.assertEqual(price_data['specific_discount_label'], 'Coupon discount')
         self.assertEqual(price_data['total_with_tax'], Decimal('1295.49'))
 
     def test_get_rental_price_data_with_expired_coupon(self):
@@ -111,6 +112,7 @@ class RentalPriceCalculatorTestCase(TestCase):
         price_data = rental_price_calculator.get_price_data()
 
         self.assertEqual(price_data['coupon_discount'], Decimal('0.00'))
+        self.assertEqual(price_data['specific_discount_label'], 'Promotional discount')
         self.assertEqual(price_data['total_with_tax'], Decimal('1311.49'))
 
     def test_get_rental_price_data_with_customer_discount(self):
@@ -131,6 +133,7 @@ class RentalPriceCalculatorTestCase(TestCase):
 
         self.assertEqual(price_data['customer_id'], 1)
         self.assertEqual(price_data['customer_discount'], Decimal('90.00'))
+        self.assertEqual(price_data['specific_discount_label'], 'Customer discount')
         self.assertEqual(price_data['total_with_tax'], Decimal('1215.53'))
 
     def test_get_rental_price_data_with_promotional_discount(self):
@@ -150,6 +153,7 @@ class RentalPriceCalculatorTestCase(TestCase):
         price_data = rental_price_calculator.get_price_data()
 
         self.assertEqual(price_data['promotion_discount'], Decimal('180.00'))
+        self.assertEqual(price_data['specific_discount_label'], 'Promotional discount')
         self.assertEqual(price_data['total_with_tax'], Decimal('1119.56'))
 
     def test_get_rental_price_data_with_military_discount(self):
@@ -176,7 +180,37 @@ class RentalPriceCalculatorTestCase(TestCase):
         price_data = rental_price_calculator.get_price_data()
 
         self.assertEqual(price_data['military_discount'], Decimal('90.00'))
+        self.assertEqual(price_data['specific_discount_label'], 'Military discount')
         self.assertEqual(price_data['total_with_tax'], Decimal('1215.53'))
+
+    def test_get_rental_price_data_with_one_time_discount(self):
+        """
+        2-day rental, 200 extra miles, no coupon, no promotional discount, 20% one-time discount
+        """
+        vehicle_marketing = self.vehicle_1
+        num_days = 2
+        coupon_code = None
+        email = None
+        extra_miles = 200
+        tax_zip = '07430'
+        effective_date = None
+        rental_price_calculator = RentalPriceCalculator(
+            vehicle_marketing,
+            num_days,
+            extra_miles,
+            coupon_code=coupon_code,
+            email=email,
+            tax_zip=tax_zip,
+            effective_date=effective_date,
+            is_military=False,
+            one_time_discount_pct=20,
+        )
+        price_data = rental_price_calculator.get_price_data()
+
+        self.assertEqual(price_data['one_time_discount'], Decimal('180.00'))
+        self.assertEqual(price_data['specific_discount_label'], 'One-time discount')
+        self.assertEqual(price_data['total_with_tax'], Decimal('1119.56'))
+
 
     def test_get_rental_price_data_with_override_subtotal(self):
         """

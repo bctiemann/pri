@@ -37,6 +37,9 @@ class PriceCalculator(ABC):
     military_discount = None
     post_military_discount_subtotal = None
 
+    one_time_discount_pct = None
+    post_one_time_discount_subtotal = None
+
     specific_discount = None
     specific_discount_label = ''
     post_specific_discount = None
@@ -45,7 +48,7 @@ class PriceCalculator(ABC):
     override_subtotal = None
     cents = decimal.Decimal('0.01')
 
-    def __init__(self, coupon_code, email, tax_zip, effective_date, is_military=False, override_subtotal=None):
+    def __init__(self, coupon_code, email, tax_zip, effective_date, is_military=False, override_subtotal=None, one_time_discount_pct=None):
         self.effective_date = effective_date
         self.promotion = self.get_effective_promotion()
         self.coupon = self.get_coupon(coupon_code)
@@ -54,6 +57,7 @@ class PriceCalculator(ABC):
         self.is_military = is_military
         if override_subtotal:
             self.override_subtotal = float(override_subtotal)
+        self.one_time_discount_pct = one_time_discount_pct
 
     def get_effective_promotion(self):
         if not self.effective_date:
@@ -114,17 +118,26 @@ class PriceCalculator(ABC):
             return value * settings.MILITARY_DISCOUNT_PCT / 100
         return 0
 
+    def get_one_time_discount(self, value=None):
+        if value is None:
+            raise ValueError('No base value provided.')
+        if self.one_time_discount_pct:
+            return value * self.one_time_discount_pct / 100
+        return 0
+
     def calculate_specific_discount(self, value):
         self.promotion_discount = self.get_promotion_discount(value=value)
         self.coupon_discount = self.get_coupon_discount(value=value)
         self.customer_discount = self.get_customer_discount(value=value)
         self.military_discount = self.get_military_discount(value=value)
+        self.one_time_discount = self.get_one_time_discount(value=value)
 
         specific_discounts = [
             dict(discount=self.promotion_discount, label='Promotional discount'),
             dict(discount=self.coupon_discount, label='Coupon discount'),
             dict(discount=self.customer_discount, label='Customer discount'),
             dict(discount=self.military_discount, label='Military discount'),
+            dict(discount=self.one_time_discount, label='One-time discount'),
         ]
 
         specific_discounts = sorted(specific_discounts, key=lambda x: x['discount'], reverse=True)
@@ -177,9 +190,10 @@ class RentalPriceCalculator(PriceCalculator):
         - effective date
         - military status
         - Subtotal override
+        - one-time discount
     - Base price is daily rate * number of days
     - Subtract multi-day discount
-    - Subtract largest of (coupon discount, customer discount, promotional discount, military discount)
+    - Subtract largest of (coupon discount, customer discount, promotional discount, military discount, one-time discount)
     - Add extra miles surcharge
     - If subtotal override is provided, it takes the place of the subtotal here
     - Add sales tax
@@ -273,6 +287,7 @@ class RentalPriceCalculator(PriceCalculator):
             coupon_discount=self.quantize_currency(self.coupon_discount),
             customer_discount=self.quantize_currency(self.customer_discount),
             military_discount=self.quantize_currency(self.military_discount),
+            one_time_discount=self.quantize_currency(self.one_time_discount),
             specific_discount=self.quantize_currency(self.specific_discount),
             specific_discount_label=self.specific_discount_label,
             extra_miles=self.extra_miles,

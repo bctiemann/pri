@@ -185,10 +185,10 @@ class ReservationForm(forms.ModelForm):
 
 class RentalForm(forms.ModelForm):
 
-    out_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short'}))
-    out_time = forms.ChoiceField(choices=service_hours)
-    back_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short'}))
-    back_time = forms.ChoiceField(choices=service_hours)
+    out_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short'}))
+    out_at_time = forms.ChoiceField(choices=service_hours)
+    back_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short'}))
+    back_at_time = forms.ChoiceField(choices=service_hours)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -199,20 +199,33 @@ class RentalForm(forms.ModelForm):
         vehicle_choices.append(('Motorcycles', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.BIKE))))
         self.fields['vehicle'].choices = vehicle_choices
 
-        for field in ['out_date', 'back_date']:
+        for field in ['out_at_date', 'back_at_date']:
             if self.instance.status == Rental.Status.COMPLETE:
                 self.fields[field].widget.attrs['class'] += ' dont-edit'
 
-        out_at_localized = self.instance.out_at.astimezone(pytz.timezone(settings.TIME_ZONE))
-        back_at_localized = self.instance.back_at.astimezone(pytz.timezone(settings.TIME_ZONE))
-        self.fields['out_date'].initial = out_at_localized.strftime('%m/%d/%Y')
-        self.fields['back_date'].initial = back_at_localized.strftime('%m/%d/%Y')
-        self.fields['out_time'].initial = out_at_localized.strftime('%H:%M')
-        self.fields['back_time'].initial = back_at_localized.strftime('%H:%M')
+        if self.instance.out_at and self.instance.back_at:
+            out_at_localized = self.instance.out_at.astimezone(pytz.timezone(settings.TIME_ZONE))
+            back_at_localized = self.instance.back_at.astimezone(pytz.timezone(settings.TIME_ZONE))
+            self.fields['out_at_date'].initial = out_at_localized.strftime('%m/%d/%Y')
+            self.fields['back_at_date'].initial = back_at_localized.strftime('%m/%d/%Y')
+            self.fields['out_at_time'].initial = out_at_localized.strftime('%H:%M')
+            self.fields['back_at_time'].initial = back_at_localized.strftime('%H:%M')
+
+    def clean(self):
+        out_at_time = datetime.datetime.strptime(self.cleaned_data['out_at_time'], '%H:%M').time()
+        back_at_time = datetime.datetime.strptime(self.cleaned_data['back_at_time'], '%H:%M').time()
+        self.cleaned_data['out_at'] = datetime.datetime.combine(
+            self.cleaned_data['out_at_date'],
+            out_at_time,
+        )
+        self.cleaned_data['back_at'] = datetime.datetime.combine(
+            self.cleaned_data['back_at_date'],
+            back_at_time,
+        )
 
     class Meta:
         model = Rental
-        exclude = ('confirmation_code',)
+        exclude = ('confirmation_code', 'customer',)
 
 
 class EmployeeForm(forms.ModelForm):
