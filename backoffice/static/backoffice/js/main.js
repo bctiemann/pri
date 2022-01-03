@@ -813,12 +813,12 @@ $(document).ready(function() {
     });
 
     // Credit card field processing
-    $('input#ccnum').payment('formatCardNumber');
-    $('input#cc2num').payment('formatCardNumber');
-    $('input#cccvv').payment('formatCardCVC');
-    $('input#cc2cvv').payment('formatCardCVC');
-    $('input#ccnum').trigger($.Event( 'keyup', {which:$.ui.keyCode.SPACE, keyCode:$.ui.keyCode.SPACE}));
-    $('input#cc2num').trigger($.Event( 'keyup', {which:$.ui.keyCode.SPACE, keyCode:$.ui.keyCode.SPACE}));
+    $('input#id_cc_number').payment('formatCardNumber');
+    $('input#id_cc2_number').payment('formatCardNumber');
+    $('input#id_cc_cvv').payment('formatCardCVC');
+    $('input#id_cc2_cvv').payment('formatCardCVC');
+    $('input#id_cc_number').trigger($.Event( 'keyup', {which:$.ui.keyCode.SPACE, keyCode:$.ui.keyCode.SPACE}));
+    $('input#id_cc2_number').trigger($.Event( 'keyup', {which:$.ui.keyCode.SPACE, keyCode:$.ui.keyCode.SPACE}));
 
     // Add CC classes to credit card field upon load
     $('div.card-number').each(function() {

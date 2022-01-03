@@ -321,6 +321,7 @@ class Command(BaseCommand):
                         registration_ip=old['regip'],
                         registration_lat=old['reglat'],
                         registration_long=old['reglong'],
+                        music_favorite=old['musicfav'] or '',
                     )
                     new.created_at = old['createdon']
                     new.save()

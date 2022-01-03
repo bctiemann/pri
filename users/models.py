@@ -295,6 +295,7 @@ class Customer(models.Model):
     driver_skill = models.IntegerField(null=True, blank=True)
     discount_pct = models.IntegerField(null=True, blank=True)
     music_genre = models.ForeignKey('users.MusicGenre', null=True, blank=True, on_delete=models.SET_NULL)
+    music_favorite = models.CharField(max_length=255, blank=True)
 
     first_time = models.BooleanField(default=True)
     drivers_club = models.IntegerField(choices=DriversClubLevel.choices, null=True, blank=True)
@@ -324,6 +325,18 @@ class Customer(models.Model):
     @property
     def mappable_address(self):
         return f'{self.address_line_1}, {self.zip}'
+
+    def format_cc_number(self, cc_number):
+        if len(cc_number) == 16:
+            cc_number = cc_number[0:4] + ' ' + cc_number[4:8] + ' ' + cc_number[8:12] + ' ' + cc_number[12:16]
+        elif len(cc_number) == 15:
+            cc_number = cc_number[0:4] + ' ' + cc_number[4:10] + ' ' + cc_number[10:15]
+        return cc_number
+
+    def save(self, *args, **kwargs):
+        self.cc_number = self.format_cc_number((self.cc_number))
+        self.cc2_number = self.format_cc_number((self.cc2_number))
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f'[{self.id}] {self.first_name} {self.last_name}'

@@ -158,12 +158,14 @@
         </tr>
         <tr>
             <td>Date of Birth</td>
+            {% comment %}
             <cftry>
                 <cfset dob = DateFormat(Customer.dob,"MM/DD/YYYY")>
                 <cfcatch type="Any">
                     <cfset dob = "">
                 </cfcatch>
             </cftry>
+            {% endcomment %}
             <td>
                 {{ form.date_of_birth }}
                 <cfinput name="dob" class="dob short" value="#dob#" maxlength="20" />
@@ -171,38 +173,57 @@
         </tr>
         <tr>
             <td>License Number</td>
-            <td><cfinput name="licenseno" value="#Customer.licenseno#" maxlength="30" /></td>
+            <td>
+                {{ form.license_number }}
+                <cfinput name="licenseno" value="#Customer.licenseno#" maxlength="30" />
+            </td>
         </tr>
         <tr>
             <td>License State</td>
             <td>
+                {{ form.license_state }}
+                {% comment %}
                 <cfselect name="licensestate">
                     <option value="">(Select state)</option>
                     <cfloop array="#states#" index="state">
                         <option value="#state.abbr#" <CFIF Customer.licensestate IS state.abbr>selected</CFIF>>#state.name#</option>
                     </cfloop>
                 </cfselect>
+                {% endcomment %}
             </td>
         </tr>
         <tr>
             <td class="align-top">License History</td>
-            <td><cftextarea name="licensehist" style="height: 40px;">#Customer.licensehist#</cftextarea></td>
+            <td>
+                {{ form.license_history }}
+{#                <cftextarea name="licensehist" style="height: 40px;">#Customer.licensehist#</cftextarea>#}
+            </td>
         </tr>
         <tr>
             <td>Insurance Company</td>
-            <td><cfinput name="insco" value="#Customer.insco#" maxlength="255" /></td>
+            <td>
+                {{ form.insurance_company }}
+                <cfinput name="insco" value="#Customer.insco#" maxlength="255" />
+            </td>
         </tr>
         <tr>
             <td>Insurance Policy Number</td>
-            <td><cfinput name="inspolnum" value="#Customer.inspolnum#" maxlength="255" /></td>
+            <td>
+                {{ form.insurance_policy_number }}
+                <cfinput name="inspolnum" value="#Customer.inspolnum#" maxlength="255" />
+            </td>
         </tr>
         <tr>
             <td>Insurance Policy Telephone</td>
-            <td><cfinput name="inscotel" class="phone short" value="#Customer.inscotel#" maxlength="20" /></td>
+            <td>
+                {{ form.insurance_company_phone }}
+                <cfinput name="inscotel" class="phone short" value="#Customer.inscotel#" maxlength="20" />
+            </td>
         </tr>
         <tr>
             <td>Insurance Coverage</td>
             <td>
+                {{ form.coverage_verified }}
                 <cfselect name="coverage">
                     <option value="0" <cfif Customer.coverage IS 0>selected</cfif>>Unverified</option>
                     <option value="1" <cfif Customer.coverage IS 1>selected</cfif>>Verified</option>
@@ -211,11 +232,15 @@
         </tr>
         <tr>
             <td class="align-top">Remarks</td>
-            <td><cftextarea name="remarks">#remarks_dec#</cftextarea></td>
+            <td>
+                {{ form.remarks }}
+{#                <cftextarea name="remarks">#remarks_dec#</cftextarea>#}
+            </td>
         </tr>
         <tr>
             <td>Drivers' Club</td>
             <td>
+                {{ form.drivers_club }}
                 <cfselect name="DriversClub">
                     <option value="0" <cfif Customer.DriversClub IS 0>selected</cfif>>No</option>
                     <option value="1" <cfif Customer.DriversClub IS 1>selected</cfif>>Silver</option>
@@ -227,6 +252,7 @@
         <tr>
             <td>Driver Skill</td>
             <td>
+                {{ form.driver_skill }}
                 <cfselect name="driverskill">
                     <option value="0" <cfif Customer.driverskill IS 0>selected</cfif>>1 - Good lord.</option>
                     <option value="1" <cfif Customer.driverskill IS 1>selected</cfif>>2</option>
@@ -244,6 +270,7 @@
         <tr>
             <td>Customer Rating</td>
             <td>
+                {{ form.rating }}
                 <cfselect name="rating">
                     <option value="0" <cfif Customer.rating IS 0>selected</cfif>>1 - Horrible</option>
                     <option value="1" <cfif Customer.rating IS 1>selected</cfif>>2</option>
@@ -261,6 +288,7 @@
         <tr>
             <td>Discount</td>
             <td>
+                {{ form.discount_pct }}
                 <cfset discount = Customer.discount IS "" ? 0 : Customer.discount>
                 <cfinput name="discount" value="#discount#" maxlength="2" class="short" />
                 <small>(Percentage, deducted from all rentals for customer)</small>
@@ -277,6 +305,7 @@
         <tr>
             <td>Credit Card (1) Number</td>
             <td>
+                {{ form.cc_number }}
                 <cfinput name="ccnum" value="#formatCCNumber(ccnum_dec)#" class="cc-field">
                 <small><a href="stripepay.cfm?customerid=#customerid#&card=1">Stripe charge</a></small>
             </td>
@@ -284,6 +313,8 @@
         <tr>
             <td>Credit Card (1) Expiration</td>
             <td>
+                {{ form.cc_exp_mo }} / {{ form.cc_exp_yr }}
+                {% comment %}
                 <cfselect name="ccexpmo">
                     <option value="01" <cfif Customer.ccexpmo IS "01">selected</cfif>>January (01)</option>
                     <option value="02" <cfif Customer.ccexpmo IS "02">selected</cfif>>February (02)</option>
@@ -313,15 +344,22 @@
                     </cfloop>
                     </cfoutput>
                 </cfselect>
+                {% endcomment %}
             </td>
         </tr>
         <tr>
             <td>Credit Card (1) CVV</td>
-            <td><cfinput name="cccvv" value="#Customer.cccvv#" maxlength="6" class="short" /></td>
+            <td>
+                {{ form.cc_cvv }}
+                <cfinput name="cccvv" value="#Customer.cccvv#" maxlength="6" class="short" />
+            </td>
         </tr>
         <tr>
             <td>Credit Card (1) Bank Telephone</td>
-            <td><cfinput name="cctel" class="phone short" value="#Customer.cctel#" maxlength="20" /></td>
+            <td>
+                {{ form.cc_phone }}
+                <cfinput name="cctel" class="phone short" value="#Customer.cctel#" maxlength="20" />
+            </td>
         </tr>
 
         <tr class="divider">
@@ -334,6 +372,7 @@
         <tr>
             <td>Credit Card (2) Number</td>
             <td>
+                {{ form.cc2_number }}
                 <cfinput name="cc2num" value="#formatCCNumber(cc2num_dec)#" class="cc-field">
                 <small><a href="stripepay.cfm?customerid=#customerid#&card=2">Stripe charge</a></small>
             </td>
@@ -341,6 +380,8 @@
         <tr>
             <td>Credit Card (2) Expiration</td>
             <td>
+                {{ form.cc2_exp_mo }} / {{ form.cc2_exp_yr }}
+                {% comment %}
                 <cfselect name="cc2expmo">
                     <option value="01" <cfif Customer.cc2expmo IS "01">selected</cfif>>January (01)</option>
                     <option value="02" <cfif Customer.cc2expmo IS "02">selected</cfif>>February (02)</option>
@@ -370,15 +411,22 @@
                     </cfloop>
                     </cfoutput>
                 </cfselect>
+                {% endcomment %}
             </td>
         </tr>
         <tr>
             <td>Credit Card (2) CVV</td>
-            <td><cfinput name="cc2cvv" value="#Customer.cc2cvv#" maxlength="6" class="short" /></td>
+            <td>
+                {{ form.cc2_cvv }}
+                <cfinput name="cc2cvv" value="#Customer.cc2cvv#" maxlength="6" class="short" />
+            </td>
         </tr>
         <tr>
             <td>Credit Card (2) Bank Telephone</td>
-            <td><cfinput name="cc2tel" class="phone short" value="#Customer.cc2tel#" maxlength="20" /></td>
+            <td>
+                {{ form.cc2_phone }}
+                <cfinput name="cc2tel" class="phone short" value="#Customer.cc2tel#" maxlength="20" />
+            </td>
         </tr>
 
         <tr class="divider">
@@ -391,6 +439,8 @@
         <tr>
             <td>Favorite Genre</td>
             <td>
+                {{ form.music_genre }}
+                {% comment %}
                 <cfselect name="musicgenre">
                     <option value="0" <cfif Customer.musicgenre IS 0>selected</cfif>>None</option>
                     <option value="1" <cfif Customer.musicgenre IS 1>selected</cfif>>50's</option>
@@ -421,11 +471,15 @@
                     <option value="26" <cfif Customer.musicgenre IS 26>selected</cfif>>Top 40</option>
                     <option value="27" <cfif Customer.musicgenre IS 27>selected</cfif>>World</option>
                 </cfselect>
+                {% endcomment %}
             </td>
         </tr>
         <tr>
             <td>Favorite Artist / Composer</td>
-            <td><cfinput name="musicfav" value="#Customer.musicfav#" maxlength="255"></td>
+            <td>
+                {{ form.music_favorite }}
+                <cfinput name="musicfav" value="#Customer.musicfav#" maxlength="255">
+            </td>
         </tr>
 
         <tr class="divider">

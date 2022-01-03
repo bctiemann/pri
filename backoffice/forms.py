@@ -1,5 +1,4 @@
 import datetime
-
 import pytz
 import decimal
 
@@ -196,23 +195,54 @@ class EmployeeForm(forms.ModelForm):
 
 
 class CustomerForm(forms.ModelForm):
+
+    EXP_MONTH_CHOICES = (
+        ('01', 'January (01)'),
+        ('02', 'February (02)'),
+        ('03', 'March (03)'),
+        ('04', 'April (04)'),
+        ('05', 'May (05)'),
+        ('06', 'June (06)'),
+        ('07', 'July (07)'),
+        ('08', 'August (08)'),
+        ('09', 'September (09)'),
+        ('10', 'October (10)'),
+        ('11', 'November (11)'),
+        ('12', 'December (12)'),
+    )
+    # EXP_YEAR_CHOICES = ((year, year) for year in range(settings.COMPANY_FOUNDING_YEAR, current_year + 11))
+    # EXP_YEAR_CHOICES_2 = ((year, year) for year in range(settings.COMPANY_FOUNDING_YEAR, current_year + 11))
+    # EXP_YEAR_CHOICES_2 = tuple(deepcopy(list(EXP_YEAR_CHOICES)))
+
     email = forms.EmailField(required=True)
     # password = forms.CharField(widget=forms.PasswordInput(), required=True)
     # date_of_birth = forms.DateField(widget=forms.SelectDateWidget(years=birth_years))
     # cc_number = forms.CharField(required=False)
-    # cc_exp_yr = forms.CharField(required=False)
-    # cc_exp_mo = forms.CharField(required=False)
+    cc_exp_yr = forms.ChoiceField()
+    cc_exp_mo = forms.ChoiceField(choices=EXP_MONTH_CHOICES)
+    cc2_exp_yr = forms.ChoiceField()
+    cc2_exp_mo = forms.ChoiceField(choices=EXP_MONTH_CHOICES)
     # cc_cvv = forms.CharField(required=False)
     # cc_phone = PhoneNumberField(required=False)
     date_of_birth = forms.DateField(widget=forms.SelectDateWidget(years=birth_years))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.fields['cc_exp_yr'].choices = self.get_exp_year_choices()
+        self.fields['cc2_exp_yr'].choices = self.get_exp_year_choices()
+
         if self.instance.user:
             self.fields['email'].initial = self.instance.user.email
-        phone_fields = ['home_phone', 'work_phone', 'mobile_phone', 'fax',]
+        phone_fields = ['home_phone', 'work_phone', 'mobile_phone', 'fax', 'insurance_company_phone', 'cc_phone', 'cc2_phone']
         for field in phone_fields:
             self.fields[field].widget.attrs['class'] = 'phone'
+        cc_fields = ['cc_number', 'cc2_number']
+        for field in cc_fields:
+            self.fields[field].widget.attrs['class'] = 'cc-field'
+
+    def get_exp_year_choices(self):
+        return ((year, year) for year in range(settings.COMPANY_FOUNDING_YEAR, current_year + 11))
 
     def clean_email(self):
         email = self.cleaned_data['email']
