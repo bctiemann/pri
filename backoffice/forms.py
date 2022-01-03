@@ -225,6 +225,8 @@ class CustomerForm(forms.ModelForm):
     # cc_cvv = forms.CharField(required=False)
     # cc_phone = PhoneNumberField(required=False)
     date_of_birth = forms.DateField(widget=forms.SelectDateWidget(years=birth_years))
+    ban = forms.BooleanField(required=False)
+    password = forms.CharField(widget=forms.PasswordInput(), required=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

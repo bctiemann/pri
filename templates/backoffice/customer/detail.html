@@ -490,11 +490,21 @@
 
         <tr>
             <td>Ban</td>
-            <td><cfinput type="checkbox" name="ban" checked="#YesNoFormat(Customer.ban)#"></td>
+            <td>
+                {{ form.ban }}
+                <cfinput type="checkbox" name="ban" checked="#YesNoFormat(Customer.ban)#">
+            </td>
         </tr>
         <tr>
             <td>Password</td>
-            <td><cfinput name="password" value="#password_dec#" maxlength="255" required="yes"></td>
+            {% if customer %}
+                <td>
+                    <a href="{% url "admin:auth_user_password_change" id=customer.user.id %}">Change password</a>
+                    <input type="hidden" id="id_password" name="password" value="{{ customer.user.password }}" />
+                </td>
+            {% else %}
+                <td>{{ form.password }}</td>
+            {% endif %}
         </tr>
 
         <tr>
@@ -507,10 +517,19 @@
                         Add
                     {% endif %}
                 </button>
+                {% if customer %}
                 <cfif customerid>
                     <button class="btn" type="button" name="clone" onclick="promptCloneCustomer();">Clone</button>
-                    <button class="btn delete" type="submit" name="delete" onclick="return confirmDelete(this.form, 'customer')">Delete Customer</button>
+                    <button
+                        class="btn delete"
+                        type="submit"
+                        name="delete"
+                        onclick="return confirmDelete(this.form, '{% url "backoffice:customer-delete" pk=customer.id %}', 'customer')"
+                    >
+                        Delete Customer
+                    </button>
                 </cfif>
+                {% endif %}
             </td>
         </tr>
     </table>
