@@ -568,9 +568,10 @@
 
     <div class="dialog" id="dialog_past_rentals" title="Past Rentals">
         <p>
-        These are all prior rentals for #Customer.fname# #Customer.lname#.
+        These are all prior rentals for {{ customer.full_name }}.
         </p>
 
+        {% comment %}
         <cfquery name="PastRentals" datasource="#DSN#">
             SELECT rentalid,dateout,numdays,make,model FROM Rentals
             INNER JOIN Vehicles ON Vehicles.vehicleid = Rentals.vehicleid
@@ -578,6 +579,7 @@
             AND Rentals.status = 3
             ORDER BY dateout DESC
         </cfquery>
+        {% endcomment %}
 
         <table class="data">
             <tr>
@@ -586,14 +588,16 @@
                 <th>Vehicle</td>
                 <th>Num. Days</td>
             </tr>
+            {% for rental in customer.past_rentals %}
             <cfloop query="PastRentals">
             <tr>
-                <td><a href="rentals.cfm?edit=1&rentalid=#rentalid#">#rentalid#</a></td>
-                <td>#DateFormat(dateout,"MM/DD/YYYY")#</td>
-                <td>#make# #model#</td>
-                <td>#numdays#</td>
+                <td><a href="rentals.cfm?edit=1&rentalid=#rentalid#">{{ rental.id }}</a></td>
+                <td>{{ rental.out_date|date:"m/d/Y" }}</td>
+                <td>{{ rental.vehicle.vehicle_name }}</td>
+                <td>{{ rental.num_days }}</td>
             </tr>
             </cfloop>
+            {% endfor %}
         </table>
     </div>
 

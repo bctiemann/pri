@@ -1,0 +1,603 @@
+{% extends "backoffice/rental/base.html" %}
+{% load humanize %}
+
+{% block content %}
+
+    {% if rental %}
+        <h2>Edit Rental</h2>
+    {% else %}
+        <h2>Add Rental</h2>
+    {% endif %}
+
+    {% if rental and rental.customer.has_mappable_address %}
+        <iframe
+            id="map"
+            loading="lazy"
+            allowfullscreen
+            src="https://www.google.com/maps/embed/v1/place?key={{ google_maps_api_key }}
+            &q={{ rental.customer.mappable_address|urlencode }}">
+        </iframe>
+    {% endif %}
+
+    {{ form.errors }}
+    {% if rental %}
+        <form method="POST" action="{% url "backoffice:rental-detail" pk=rental.id %}">
+    {% else %}
+        <form method="POST" action="{% url "backoffice:rental-create" %}">
+    {% endif %}
+
+    <table class="inputform rentals">
+        <tr>
+            <td>Conf Code</td>
+            <td>
+                <cfinput type="hidden" name="confcode" value="#Rental.confcode#" />
+                {{ rental.confirmation_code }}
+                <a class="btn" href="gencontract.cfm?rentalid=#rentalid#" target="_blank" style="margin-left: 50px;">Generate Contract</a>
+            </td>
+        </tr>
+        <tr>
+            <td>Customer</td>
+            <td><a href="{% url "backoffice:customer-detail" pk=rental.customer.id %}">{{ rental.customer.full_name }}</a></td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td><a href="mailto:{{ rental.customer.email }}">{{ rental.customer.email }}</a></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <button class="btn" type="button" name="send_insurance" onclick="sendInsuranceAuthForm({{ rental.customer.id }})">Send Insurance Auth</button>
+                <button class="btn" type="button" name="send_welcome" onclick="sendWelcomeEmail(null, {{ rental.id }})">Send Welcome Email</button>
+            </td>
+        </tr>
+        <tr>
+            <td>Status</td>
+            <td>
+                {{ form.status }}
+            <cfselect name="status">
+                <option value="0" <CFIF Rental.status IS 0>selected</CFIF>>Incomplete</option>
+                <option value="1" <CFIF Rental.status IS 1>selected</CFIF>>Confirmed/Billed</option>
+                <option value="2" <CFIF Rental.status IS 2>selected</CFIF>>In Progress</option>
+                <option value="3" <CFIF Rental.status IS 3>selected</CFIF>>Complete</option>
+                <option value="4" <CFIF Rental.status IS 4>selected</CFIF>>Cancelled</option>
+            </cfselect>
+            </td>
+        </tr>
+        <tr>
+            <td>Vehicle</td>
+            <td>
+                {{ form.vehicle }}
+                {% comment %}
+                <cfquery name="Cars" datasource="#DSN#">
+                    SELECT vehicleid,make,model,year,status FROM Vehicles
+                    WHERE type = 1
+                    ORDER BY make
+                </cfquery>
+                <cfquery name="Motorcycles" datasource="#DSN#">
+                    SELECT vehicleid,make,model,year,status FROM Vehicles
+                    WHERE type = 2
+                    ORDER BY make
+                </cfquery>
+                <cfselect name="vehicleid" onchange="changeCar();" class="check-conflict">
+                    <optgroup label="Cars">
+                        <cfloop query="Cars">
+                            <option value="#vehicleid#" <cfif Cars.vehicleid IS Rental.vehicleid>selected</cfif>>#year# #make# #model#</option>
+                        </cfloop>
+                    </optgroup>
+                    <optgroup label="Motorcycles">
+                        <cfloop query="Motorcycles">
+                            <option value="#vehicleid#" <cfif Motorcycles.vehicleid IS Rental.vehicleid>selected</cfif>>#year# #make# #model#</option>
+                        </cfloop>
+                    </optgroup>
+                </cfselect>
+                {% endcomment %}
+            </td>
+        </tr>
+        <tr>
+            <td>Reservation Date</td>
+            <td>
+                <b>{{ rental.reserved_at|date:"m/d/Y" }} <small>{{ rental.reserved_at|date:"l" }}</small> @ {{ rental.reserved_at|date:"H:i" }} </b>
+            </td>
+        </tr>
+        <tr>
+            <td>Date Out</td>
+            <td>
+                <cftry>
+                    <cfset dateout = DateFormat(Rental.dateout,"MM/DD/YYYY")>
+                    <cfcatch type="Any">
+                        <cfset dateout = "">
+                    </cfcatch>
+                </cftry>
+                <cfif IsDefined("Form.dateouttime")>
+                    <cfset DateOutTime = Form.dateouttime>
+                <cfelse>
+                    <cftry>
+                        <cfset DateOutTime = TimeFormat(Rental.dateout,"HH:MM")>
+                        <cfcatch type="Any">
+                            <cfset DateOutTime = "07:00">
+                        </cfcatch>
+                    </cftry>
+                </cfif>
+                <cfinput name="dateout" value="#dateout#" maxlength="20" class="check-conflict short" /> @
+                <cfselect name="dateouttime" class="check-conflict">
+                    <option value="07:00" <CFIF DateOutTime IS "07:00">selected</CFIF>>07:00</option>
+                    <option value="07:30" <CFIF DateOutTime IS "07:30">selected</CFIF>>07:30</option>
+                    <option value="08:00" <CFIF DateOutTime IS "08:00">selected</CFIF>>08:00</option>
+                    <option value="08:30" <CFIF DateOutTime IS "08:30">selected</CFIF>>08:30</option>
+                    <option value="09:00" <CFIF DateOutTime IS "09:00">selected</CFIF>>09:00</option>
+                    <option value="09:30" <CFIF DateOutTime IS "09:30">selected</CFIF>>09:30</option>
+                    <option value="10:00" <CFIF DateOutTime IS "10:00">selected</CFIF>>10:00</option>
+                    <option value="10:30" <CFIF DateOutTime IS "10:30">selected</CFIF>>10:30</option>
+                    <option value="11:00" <CFIF DateOutTime IS "11:00">selected</CFIF>>11:00</option>
+                    <option value="11:30" <CFIF DateOutTime IS "11:30">selected</CFIF>>11:30</option>
+                    <option value="12:00" <CFIF DateOutTime IS "12:00">selected</CFIF>>12:00</option>
+                    <option value="12:30" <CFIF DateOutTime IS "12:30">selected</CFIF>>12:30</option>
+                    <option value="13:00" <CFIF DateOutTime IS "13:00">selected</CFIF>>13:00</option>
+                    <option value="13:30" <CFIF DateOutTime IS "13:30">selected</CFIF>>13:30</option>
+                    <option value="14:00" <CFIF DateOutTime IS "14:00">selected</CFIF>>14:00</option>
+                    <option value="14:30" <CFIF DateOutTime IS "14:30">selected</CFIF>>14:30</option>
+                    <option value="15:00" <CFIF DateOutTime IS "15:00">selected</CFIF>>15:00</option>
+                    <option value="15:30" <CFIF DateOutTime IS "15:30">selected</CFIF>>15:30</option>
+                    <option value="16:00" <CFIF DateOutTime IS "16:00">selected</CFIF>>16:00</option>
+                    <option value="16:30" <CFIF DateOutTime IS "16:30">selected</CFIF>>16:30</option>
+                    <option value="17:00" <CFIF DateOutTime IS "17:00">selected</CFIF>>17:00</option>
+                    <option value="17:30" <CFIF DateOutTime IS "17:30">selected</CFIF>>17:30</option>
+                    <option value="18:00" <CFIF DateOutTime IS "18:00">selected</CFIF>>18:00</option>
+                    <option value="18:30" <CFIF DateOutTime IS "18:30">selected</CFIF>>18:30</option>
+                    <option value="19:00" <CFIF DateOutTime IS "19:00">selected</CFIF>>19:00</option>
+                    <option value="19:30" <CFIF DateOutTime IS "19:30">selected</CFIF>>19:30</option>
+                    <option value="20:00" <CFIF DateOutTime IS "20:00">selected</CFIF>>20:00</option>
+                    <option value="00:00" <CFIF DateOutTime IS "00:00">selected</CFIF>>Other (special)</option>
+                </cfselect>
+                <cfinput type="hidden" name="dateout_orig" value="#dateout#" />
+                <cfinput type="hidden" name="dateouttime_orig" value="#DateOutTime#" />
+                <div class="schedule-conflict-warning ui-state-error hidden" onclick="showScheduleConflicts();">
+                    <p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>
+                    <strong>Schedule conflict.</strong> Click to view.</p>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Date Returned</td>
+            <td>
+                <cftry>
+                    <cfset dateback = DateFormat(Rental.dateback,"MM/DD/YYYY")>
+                    <cfcatch type="Any">
+                        <cfset dateback = "">
+                    </cfcatch>
+                </cftry>
+                <cfif IsDefined("Form.datebacktime")>
+                    <cfset DateBackTime = Form.datebacktime>
+                <cfelse>
+                    <cftry>
+                        <cfset DateBackTime = TimeFormat(Rental.dateback,"HH:MM")>
+                        <cfcatch type="Any">
+                            <cfset DateBackTime = "07:00">
+                        </cfcatch>
+                    </cftry>
+                </cfif>
+                <cfinput name="dateback" value="#dateback#" maxlength="20" class="check-conflict short" /> @
+                <cfselect name="datebacktime" class="check-conflict">
+                    <option value="07:00" <CFIF DateBackTime IS "07:00">selected</CFIF>>07:00</option>
+                    <option value="07:30" <CFIF DateBackTime IS "07:30">selected</CFIF>>07:30</option>
+                    <option value="08:00" <CFIF DateBackTime IS "08:00">selected</CFIF>>08:00</option>
+                    <option value="08:30" <CFIF DateBackTime IS "08:30">selected</CFIF>>08:30</option>
+                    <option value="09:00" <CFIF DateBackTime IS "09:00">selected</CFIF>>09:00</option>
+                    <option value="09:30" <CFIF DateBackTime IS "09:30">selected</CFIF>>09:30</option>
+                    <option value="10:00" <CFIF DateBackTime IS "10:00">selected</CFIF>>10:00</option>
+                    <option value="10:30" <CFIF DateBackTime IS "10:30">selected</CFIF>>10:30</option>
+                    <option value="11:00" <CFIF DateBackTime IS "11:00">selected</CFIF>>11:00</option>
+                    <option value="11:30" <CFIF DateBackTime IS "11:30">selected</CFIF>>11:30</option>
+                    <option value="12:00" <CFIF DateBackTime IS "12:00">selected</CFIF>>12:00</option>
+                    <option value="12:30" <CFIF DateBackTime IS "12:30">selected</CFIF>>12:30</option>
+                    <option value="13:00" <CFIF DateBackTime IS "13:00">selected</CFIF>>13:00</option>
+                    <option value="13:30" <CFIF DateBackTime IS "13:30">selected</CFIF>>13:30</option>
+                    <option value="14:00" <CFIF DateBackTime IS "14:00">selected</CFIF>>14:00</option>
+                    <option value="14:30" <CFIF DateBackTime IS "14:30">selected</CFIF>>14:30</option>
+                    <option value="15:00" <CFIF DateBackTime IS "15:00">selected</CFIF>>15:00</option>
+                    <option value="15:30" <CFIF DateBackTime IS "15:30">selected</CFIF>>15:30</option>
+                    <option value="16:00" <CFIF DateBackTime IS "16:00">selected</CFIF>>16:00</option>
+                    <option value="16:30" <CFIF DateBackTime IS "16:30">selected</CFIF>>16:30</option>
+                    <option value="17:00" <CFIF DateBackTime IS "17:00">selected</CFIF>>17:00</option>
+                    <option value="17:30" <CFIF DateBackTime IS "17:30">selected</CFIF>>17:30</option>
+                    <option value="18:00" <CFIF DateBackTime IS "18:00">selected</CFIF>>18:00</option>
+                    <option value="18:30" <CFIF DateBackTime IS "18:30">selected</CFIF>>18:30</option>
+                    <option value="19:00" <CFIF DateBackTime IS "19:00">selected</CFIF>>19:00</option>
+                    <option value="19:30" <CFIF DateBackTime IS "19:30">selected</CFIF>>19:30</option>
+                    <option value="20:00" <CFIF DateBackTime IS "20:00">selected</CFIF>>20:00</option>
+                    <option value="00:00" <CFIF DateBackTime IS "00:00">selected</CFIF>>Other (special)</option>
+                </cfselect>
+                <cfinput type="hidden" name="dateback_orig" value="#dateback#" />
+                <cfinput type="hidden" name="datebacktime_orig" value="#DateBackTime#" />
+                <cfif Rental.status IS 2>
+                    <small>&plusmn; &##x2264; #extendThresholdHours# hours free</small>
+                </cfif>
+            </td>
+        </tr>
+        <tr>
+            <td>Number of Days</td>
+            <td><b>#Rental.numdays#</b> <CFIF Rental.extenddays GT 0>(Extended #Rental.extenddays# day<cfif Rental.extenddays IS NOT 1>s</cfif>)</CFIF></td>
+        </tr>
+        <tr>
+            <td>Delivery</td>
+            <td>
+                <cfselect name="delivery">
+                    <option value="0" <CFIF Rental.delivery IS 0>selected</CFIF>>Pickup at PRI</option>
+                    <option value="1" <CFIF Rental.delivery IS 1>selected</CFIF>>Delivery</option>
+                </cfselect>
+            </td>
+        </tr>
+        <tr>
+            <td class="align-top">Drivers</td>
+            <td id="drivers"></td>
+        </tr>
+        <tr>
+            <td>Miles Included</td>
+            <td><cfinput name="milesinc" value="#Rental.milesinc#" maxlength="10" class="short" /></td>
+        </tr>
+        <tr>
+            <td>Extra Miles</td>
+            <td>
+                <cfselect name="xtramiles">
+                    <cfloop from="1" to="#arrayLen(extraMilesPrices)#" index="i">
+                        <cfset milesChoice = extraMilesPrices[i]>
+                        <option value="#milesChoice.value#" <cfif Rental.xtramiles IS milesChoice.value>selected</cfif>>#milesChoice.label#</option>
+                    </cfloop>
+                </cfselect>
+            </td>
+        </tr>
+        <tr>
+            <td>Mileage Out</td>
+            <td>
+                <cfset milesout = Rental.milesout GT 0 ? Rental.milesout : Rental.mileage>
+                <cfinput name="milesout" id="milesout" value="#milesout#" class="short" />
+                <small><b>CONFIRM AT DELIVERY</b></small>
+            </td>
+        </tr>
+        <tr>
+            <td>Mileage Back</td>
+            <td>
+                <cfset milesback = Rental.milesback GT 0 ? Rental.milesback : Rental.mileage>
+                <cfinput name="milesback" id="milesback" value="#milesback#" class="short" />
+            </td>
+        </tr>
+        <tr>
+            <td class="align-top">Abuse Incidents</td>
+            <td><cftextarea name="abuse">#Rental.abuse#</cftextarea></td>
+        </tr>
+        <tr>
+            <td class="align-top">Damage Out</td>
+            <td><cftextarea name="damageout">#Rental.damageout#</cftextarea></td>
+        </tr>
+        <tr>
+            <td class="align-top">Damage In (return)</td>
+            <td><cftextarea name="damagein">#Rental.damagein#</cftextarea></td>
+        </tr>
+        <tr>
+            <td>Discount/Coupon Code</td>
+            <td>
+                <CFIF len(Rental.coupon) GT 0>
+                    <CFQUERY NAME="codecheck" DATASOURCE="#DSN#">
+                        SELECT * FROM discounts
+                        WHERE LOWER(code) = '#lcase(trim(Rental.coupon))#'
+                    </CFQUERY>
+                </CFIF>
+                <cfinput name="coupon" value="#Rental.coupon#" maxlength="30" />
+                <CFIF len(Rental.coupon) GT 0>
+                    (<CFIF codecheck.recordcount IS 1>
+                         <span style="color:green">VALID</span> #codecheck.amount# %
+                     <CFELSE>
+                         <span style="color:red">INVALID</span>
+                     </CFIF>)
+                </CFIF>
+            </td>
+        </tr>
+        <tr>
+            <td class="align-top">Notes<br /><small>Customer Requests<br />Visible to Customer</small></td>
+            <td><cftextarea name="notes" class="customer-notes">#Rental.notes#</cftextarea></td>
+        </tr>
+        <tr>
+            <td class="align-top">Our Notes<br /><small>Not Public</small></td>
+            <td><cftextarea name="ournotes" class="our-notes">#ournotes_dec#</cftextarea></td>
+        </tr>
+
+        <!--- Billing info --->
+        <tr>
+            <td></td>
+            <td>
+            <CFQUERY NAME="eCustomer" DATASOURCE="#DSN#">
+                SELECT customerid,fname,lname,addr,city,state,zip,email,discount,ccnum,ccexpyr,ccexpmo,cccvv,cctel,cc2num,cc2expyr,cc2expmo,cc2cvv,cc2tel FROM Customers
+                WHERE customerid = #Rental.customerid#
+            </CFQUERY>
+
+            <cftry>
+                <cfset addr_dec = Decrypt(eCustomer.addr,globalkey,"AES","hex")>
+                <cfcatch type="Any">
+                    <cfset addr_dec = "">
+                </cfcatch>
+            </cftry>
+
+            <div id="billinginfo">
+                <p>#eCustomer.fname# #eCustomer.lname#</p>
+                <p>#addr_dec#</p>
+                <p>#eCustomer.city#, #eCustomer.state# #eCustomer.zip#</p>
+
+                <cftry>
+                    <cfset ccnum_dec = decrypt('#eCustomer.ccnum#','#globalkey#','AES','hex')>
+                    <cfcatch type="Any">
+                        <cfset ccnum_dec = "">
+                    </cfcatch>
+                </cftry>
+                <cftry>
+                    <cfset cc2num_dec = decrypt('#eCustomer.cc2num#','#globalkey#','AES','hex')>
+                    <cfcatch type="Any">
+                        <cfset cc2num_dec = "">
+                    </cfcatch>
+                </cftry>
+
+                <div class="card-mockup <cfif Len(eCustomer.ccnum) IS 0>inactive</cfif>">
+                    <div class="card-label">1</div>
+                    <cfif Len(eCustomer.ccnum) GT 0>
+                        <div class="card-number">#formatCCNumber(ccnum_dec)#</div>
+                        <div class="card-exp">#eCustomer.ccexpmo# / #eCustomer.ccexpyr#</div>
+                        <div class="card-cvv">#eCustomer.cccvv#</div>
+                        <div class="card-phone">#eCustomer.cctel#</div>
+                    </cfif>
+                </div>
+                <div class="card-mockup <cfif Len(eCustomer.cc2num) IS 0>inactive</cfif>">
+                    <div class="card-label">2</div>
+                    <cfif Len(eCustomer.cc2num) GT 0>
+                        <div class="card-number">#formatCCNumber(cc2num_dec)#</div>
+                        <div class="card-exp">#eCustomer.cc2expmo# / #eCustomer.cc2expyr#</div>
+                        <div class="card-cvv">#eCustomer.cc2cvv#</div>
+                        <div class="card-phone">#eCustomer.cc2tel#</div>
+                    </cfif>
+                </div>
+
+            </div>
+            </td>
+        </tr>
+
+        <tr>
+            <cfset depamount = Rental.depamount GT 0 ? Rental.depamount : 0.00>
+            <td>Deposit Amount</td>
+            <td class="currency"><span class="currency-prefix">$</span><cfinput name="depamount" value="#depamount#" maxlength="10" class="short" /></td>
+        </tr>
+        <tr>
+            <td>Deposit Charged On</td>
+            <td>
+                <cfinput name="depchargedon" value="#DateFormat(Rental.depchargedon,"mm/dd/yyyy")#" class="short" />
+            </td>
+        </tr>
+        <tr>
+            <cfset deprefundamount = Rental.deprefundamount GT 0 ? Rental.deprefundamount : 0.00>
+            <td>Deposit Refund Amount</td>
+            <td class="currency"><span class="currency-prefix">$</span><cfinput name="deprefundamount" value="#deprefundamount#" maxlength="10" class="short" /></td>
+        </tr>
+        <tr>
+            <td>Deposit Refunded On</td>
+            <td>
+                <cfinput name="deprefundon" value="#DateFormat(Rental.deprefundon,"mm/dd/yyyy")#" class="short" />
+            </td>
+        </tr>
+        <tr>
+            <td>Discount</td>
+            <td>
+                <cfinput name="discount" value="#Rental.discount#" class="short" /> % (This rental only)
+            </td>
+        </tr>
+        <tr>
+            <td>Delivery ZIP</td>
+            <td>
+                <cfinput name="deliveryzip" value="#Rental.deliveryzip#" class="short" />
+                <button class="btn" type="button" onclick="getTaxRate()">Get Tax Rate</button>
+            </td>
+        </tr>
+        <tr>
+            <td>Tax Rate</td>
+            <td>
+                <cfset taxpct = IsNumeric(Rental.taxpct) ? Rental.taxpct : salesTaxDefault>
+                <cfinput name="taxpct" value="#taxpct#" class="short" /> %
+            </td>
+        </tr>
+
+        <cfquery name="VFront" datasource="#FDSN#">
+            SELECT price,disc2day,disc3day,disc7day,deposit,milesinc
+            FROM VehiclesFront
+            WHERE vehicleid = <CFQUERYPARAM value="#Rental.vehicleid#" CFSQLType="CF_SQL_NUMERIC">
+        </cfquery>
+
+        <cfset tcostRaw = VFront.price * Rental.numdays>
+
+        <cfset dMultiDay = 0>
+        <cfif Rental.numdays GTE 7>
+            <cfset dMultiDay = VFront.disc7day>
+        <cfelseif Rental.numdays GTE 3>
+            <cfset dMultiDay = VFront.disc3day>
+        <cfelseif Rental.numdays IS 2>
+            <cfset dMultiDay = VFront.disc2day>
+        </cfif>
+        <cfset tcost = tcostRaw * (100 - dMultiDay) / 100>
+
+        <CFIF len(Rental.coupon) GT 0>
+            <CFIF codecheck.recordcount IS 1>
+                <CFSET d1 = codecheck.amount>
+            <CFELSE>
+                <CFSET d1 = 0>
+            </CFIF>
+        <CFELSE>
+            <CFSET d1 = 0>
+        </CFIF>
+        <CFSET d2 = Rental.customer_discount>
+        <cfset d3 = IsValid("integer",Rental.discount) ? Rental.discount : 0>
+
+        <CFSET s1 = #evaluate(tcost - (tcost * (d1/100)))#>
+        <CFSET s2 = #evaluate(s1 - (s1 * (d2/100)))#>
+
+        <cfloop from="1" to="#arrayLen(extraMilesPrices)#" index="i">
+            <cfset milesChoice = extraMilesPrices[i]>
+            <cfif Rental.xtramiles IS milesChoice.value>
+                <cfset xmi = milesChoice.cost>
+            </cfif>
+        </cfloop>
+        <cfif Rental.xtramiles GT 0>
+            <CFSET s3 = #evaluate(s2 - (s2 * (d3/100)))#>
+            <CFSET s3 = s3 + xmi>
+        <cfelse>
+            <CFSET s3 = #evaluate(s2 - (s2 * (d3/100)))#>
+        </cfif>
+
+        <CFSET ds1 = #evaluate(tcost * (d1/100))#>
+        <CFSET ds2 = #evaluate(s1 * (d2/100))#>
+        <CFSET ds3 = #evaluate(s2 * (d3/100))#>
+
+        <CFSET ratediff = 0>
+        <CFIF IsDefined("Rental.rate") AND Rental.rate IS not "0.00" AND Len(Rental.rate) GT 0>
+            <CFIF Rental.rate IS NOT #NumberFormat(s3,"______.__")#>
+                <CFSET ratediff = 1>
+                <CFSET rateval = Rental.rate>
+            </CFIF>
+        </CFIF>
+
+        <tr class="divider">
+            <td colspan="2">
+                <h3>Price Breakdown</h3>
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <table class="price-breakdown">
+                    <tr>
+                        <td>Rental Total (#Rental.numdays# day<cfif Rental.numdays IS NOT 1>s</cfif>):</td>
+                        <td><b>#NumberFormat(tcostRaw,"$___,___.__")#</b></td>
+                    </tr>
+                    <cfif dMultiDay>
+                    <tr>
+                        <td>Multi-Day Discount (#dMultiDay#%):</td>
+                        <td>- #NumberFormat(tcostRaw - tcost,"$___,___.__")#</td>
+                    </tr>
+                    </cfif>
+
+                    <tr>
+                        <CFIF len(Rental.coupon) GT 0>
+                            <CFIF codecheck.recordcount IS 1>
+                                <td>Coupon Discount: </td>
+                                <td>- #NumberFormat(ds1,"$___,___.__")#</td>
+                            <CFELSE>
+                                <td>Car Discount: </td>
+                                <td>- #NumberFormat(ds1,"$___,___.__")#</td>
+                            </CFIF>
+                        <CFELSE>
+                            <td>Car Discount: </td>
+                            <td>- #NumberFormat(ds1,"$___,___.__")#</td>
+                        </CFIF>
+                    </tr>
+
+                    <tr>
+                        <td>Customer Discount: </td>
+                        <td>- #NumberFormat(ds2,"$___,___.__")#</td>
+                    </tr>
+
+                    <tr>
+                        <td>This Rental Discount: </td>
+                        <td><b>- #NumberFormat(ds3,"$___,___.__")#</b></td>
+                    </tr>
+
+                    <CFIF Rental.xtramiles GT 0>
+                    <tr>
+                        <td>Extra Miles (#Rental.xtramiles#):</td>
+                        <td>#NumberFormat(xmi,"$___,___.__")#</td>
+                    </tr>
+                    </CFIF>
+
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>SubTotal: <strong>#NumberFormat(s3,"$___,___.__")#</strong></td>
+                    </tr>
+
+                    <CFSET taxtot = s3 * (1 + (taxpct/100))>
+                    <CFSET taxmt = taxtot - s3>
+
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>Tax: <small>(#taxpct#%)</small> #NumberFormat(taxmt,"$___,___.__")# </td>
+                    </tr>
+
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>Invoice Total: <strong>#NumberFormat(taxtot,"$___,___.__")#</strong></td>
+                    </tr>
+
+                    <tr class="bill-total">
+                        <td>&nbsp;</td>
+                        <td>50% deposit: <strong>#NumberFormat(taxtot/2,"$___,___.__")#</strong></td>
+                    </tr>
+                </table>
+
+
+                <input type="hidden" name="total" value="#s3#">
+                <CFIF ratediff IS 1>
+                    <b><big>Rate Override:</big></b> Rate set to: #NumberFormat(Rental.rate,"$___,___.__")#
+                </CFIF>
+
+                <CFIF Rental.extenddays GT 0>
+                    <CFSET extendamount =  VFront.price * Rental.extenddays>
+                    <p><strong>Extended Days:</strong> #Rental.extenddays# @ $#DecimalFormat(VFront.price)#</p>
+                    <p><strong><u>Extension Total:</u></strong> <strong>$#DecimalFormat(extendamount)#</strong></p>
+                </CFIF>
+            </td>
+        </tr>
+
+        <tr>
+            <td>Computed Cost<br><small>Not including tax</small></td>
+            <CFIF ratediff IS 0>
+                <cfset computedCost = NumberFormat(s3,".__")>
+            <CFELSEIF ratediff IS 1>
+                <cfset computedCost = NumberFormat(Rental.rate,".__")>
+            </CFIF>
+            <td class="currency">
+                <span class="currency-prefix">$</span>
+                <cfinput type="text" name="rate" size="15" value="#computedCost#" class="short" />
+                <CFIF ratediff IS 1>
+                    <b>Rate Override</b> <cfinput type="checkbox" name="delover" /><small>Clear</small>
+                </CFIF>
+            </td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>
+                <button class="btn" type="submit" name="submit"><cfif rentalid>Edit<cfelse>Add</cfif></button>
+                <button class="btn delete" type="submit" name="delete" onclick="return confirmDelete(this.form, 'rental')">Delete Rental</button>
+            </td>
+        </tr>
+    </table>
+    <input type="hidden" id="reservation_id" value="{{ reservation.id }}" />
+    <cfinput type="hidden" name="fnc" value="edit" />
+    <cfinput type="hidden" name="numdays" value="#Reservation.numdays#" />
+    {% csrf_token %}
+    </form>
+    </cfoutput>
+
+    <div class="dialog" id="dialog_conflicts" title="Schedule Conflict">
+        <p>
+        The <span id="conflict_vehicle"></span> is reserved for the following dates/times that conflict with your selection:
+        </p>
+
+        <table class="data" id="conflict_data">
+            <thead>
+            <tr>
+                <th>Customer</td>
+                <th>Type</td>
+                <th>Date Out</td>
+                <th>Date Back</td>
+                <th>Num. Days</td>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

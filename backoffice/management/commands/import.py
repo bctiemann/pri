@@ -20,8 +20,9 @@ from fleet.models import (
     get_vehicle_picture_path, get_vehicle_video_path
 )
 from users.models import Customer, Employee, User, MusicGenre
-from sales.models import Promotion, Coupon, BaseReservation, Reservation, Rental
+from sales.models import Promotion, Coupon, BaseReservation, Reservation, Rental, generate_code
 from consignment.models import Consigner
+from sales.enums import ReservationType
 from pri.cipher import AESCipher
 
 logger = logging.getLogger(__name__)
@@ -48,8 +49,9 @@ class Command(BaseCommand):
         # 'do_vehicles': True,
         # 'do_vehicle_pics': True,
         # 'do_vehicle_vids': True,
-        'do_customers': True,
-        'do_reservations': True,
+        # 'do_customers': True,
+        # 'do_reservations': True,
+        'do_rentals': True,
         # 'do_consigners': True,
         # 'do_consignmentvehicles': True,
         # 'do_admins': True,
@@ -363,7 +365,7 @@ class Command(BaseCommand):
 
         if 'do_reservations' in self.enabled:
             if clear_existing:
-                BaseReservation.objects.all().delete()
+                Reservation.objects.all().delete()
             back_cursor.execute("""SELECT * FROM Reservations""")
             for old in back_cursor.fetchall():
                 print(old['reservationid'])
@@ -388,6 +390,49 @@ class Command(BaseCommand):
                     app_channel=Reservation.AppChannel.MOBILE if old['iphone'] else Reservation.AppChannel.WEB,
                     tax_percent=old['taxpct'],
                     delivery_zip=old['deliveryzip'],
+                )
+                new.reserved_at = old['reservdate']
+                new.save()
+
+        if 'do_rentals' in self.enabled:
+            if clear_existing:
+                Rental.objects.all().delete()
+            back_cursor.execute("""SELECT * FROM Rentals""")
+            for old in back_cursor.fetchall():
+                print(old)
+                customer = Customer.objects.filter(id=old['customerid']).first()
+                vehicle = Vehicle.objects.filter(id=old['vehicleid']).first()
+                new = Rental.objects.create(
+                    id=old['rentalid'],
+                    customer=customer,
+                    vehicle=vehicle,
+                    out_at=old['dateout'],
+                    back_at=old['dateback'],
+                    rate=old['rate'],
+                    drivers=old['drivers'],
+                    miles_included=old['milesinc'],
+                    extra_miles=old['xtramiles'],
+                    customer_notes=old['notes'],
+                    coupon_code=old['coupon'],
+                    status=old['status'],
+                    deposit_amount=old['depamount'],
+                    confirmation_code=old['confcode'] or generate_code(ReservationType.RENTAL.value),
+                    delivery_required=bool(old['delivery']),
+                    app_channel=Reservation.AppChannel.MOBILE if old['iphone'] else Reservation.AppChannel.WEB,
+                    tax_percent=old['taxpct'],
+                    delivery_zip=old['deliveryzip'] or '',
+
+                    mileage_out=old['milesout'],
+                    mileage_back=old['milesback'],
+                    abuse=old['abuse'],
+                    damage_out=old['damageout'],
+                    damage_in=old['damagein'],
+                    internal_notes=old['notes'],
+                    deposit_charged_at=old['depchargedon'],
+                    deposit_refunded_at=old['deprefundon'],
+                    deposit_refund_amount=old['deprefundamount'],
+                    rental_discount_pct=old['discount'],
+                    extended_days=old['extenddays'],
                 )
                 new.reserved_at = old['reservdate']
                 new.save()

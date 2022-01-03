@@ -215,6 +215,10 @@ class Employee(models.Model):
         return f'{self.first_name} {self.last_name}'
 
     @property
+    def email(self):
+        return self.user.email
+
+    @property
     def reservations_access(self):
         return self.access_level in (self.AccessLevel.ADMIN, self.AccessLevel.RESERVATIONS)
 
@@ -312,6 +316,10 @@ class Customer(models.Model):
         return f'{self.first_name} {self.last_name}'
 
     @property
+    def email(self):
+        return self.user.email
+
+    @property
     def ip_country(self):
         url = f'http://ip-api.com/json/{self.registration_ip}'
         response = requests.get(url)
@@ -325,6 +333,10 @@ class Customer(models.Model):
     @property
     def mappable_address(self):
         return f'{self.address_line_1}, {self.zip}'
+
+    @property
+    def past_rentals(self):
+        return self.basereservation_set.filter(rental__isnull=False)
 
     def format_cc_number(self, cc_number):
         if len(cc_number) == 16:

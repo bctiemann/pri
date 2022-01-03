@@ -179,6 +179,7 @@ class Rental(BaseReservation):
         CANCELLED = (4, 'Cancelled')
 
     status = models.IntegerField(choices=Status.choices, default=Status.INCOMPLETE, blank=True)
+    background_check = models.BooleanField(default=False)
     mileage_out = models.IntegerField(null=True, blank=True)
     mileage_back = models.IntegerField(null=True, blank=True)
     abuse = models.TextField(blank=True)

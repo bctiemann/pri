@@ -10,7 +10,7 @@ from phonenumber_field.formfields import PhoneNumberField
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, VehicleType
 from consignment.models import Consigner
 from users.models import User, Employee, Customer
-from sales.models import Reservation, Coupon
+from sales.models import Reservation, Rental, Coupon
 
 TRUE_FALSE_CHOICES = (
     (True, 'Yes'),
@@ -178,6 +178,24 @@ class ReservationForm(forms.ModelForm):
         exclude = ('confirmation_code',)
 
 
+class RentalForm(forms.ModelForm):
+
+    VEHICLE_CHOICES = []
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Populate vehicle choices
+        self.VEHICLE_CHOICES = []
+        self.VEHICLE_CHOICES.append(('Cars', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.CAR))))
+        self.VEHICLE_CHOICES.append(('Motorcycles', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.BIKE))))
+        self.fields['vehicle'].choices = self.VEHICLE_CHOICES
+
+    class Meta:
+        model = Rental
+        exclude = ('confirmation_code',)
+
+
 class EmployeeForm(forms.ModelForm):
     email = forms.EmailField(required=True)
     password = forms.CharField(widget=forms.PasswordInput(), required=True)
@@ -215,6 +233,7 @@ class CustomerForm(forms.ModelForm):
     # EXP_YEAR_CHOICES_2 = tuple(deepcopy(list(EXP_YEAR_CHOICES)))
 
     email = forms.EmailField(required=True)
+    receive_email = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
     # password = forms.CharField(widget=forms.PasswordInput(), required=True)
     # date_of_birth = forms.DateField(widget=forms.SelectDateWidget(years=birth_years))
     # cc_number = forms.CharField(required=False)

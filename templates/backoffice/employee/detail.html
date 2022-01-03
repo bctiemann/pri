@@ -28,8 +28,8 @@
             <td>Email</td>
             {% if employee %}
                 <td>
-                    {{ employee.user.email }}
-                    <input type="hidden" id="id_email" name="email" value="{{ employee.user.email }}" />
+                    {{ employee.email }}
+                    <input type="hidden" id="id_email" name="email" value="{{ employee.email }}" />
                 </td>
             {% else %}
                 <td>{{ form.email }}</td>

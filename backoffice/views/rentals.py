@@ -9,30 +9,30 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from . import ListViewMixin
 from fleet.models import VehicleMarketing
-from sales.models import Reservation
+from sales.models import Rental
 from sales.utils import RentalPriceCalculator
-from backoffice.forms import ReservationForm
+from backoffice.forms import RentalForm
 
 
 # Template generics-based CRUD views
 
-class ReservationViewMixin:
-    model = Reservation
-    page_group = 'reservations'
+class RentalViewMixin:
+    model = Rental
+    page_group = 'rentals'
     default_sort = '-id'
     paginate_by = 25
 
 
-class ReservationListView(PermissionRequiredMixin, ReservationViewMixin, ListViewMixin, ListView):
+class RentalListView(PermissionRequiredMixin, RentalViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
-    permission_required = ('users.view_reservation',)
-    template_name = 'backoffice/reservation/list.html'
+    permission_required = ('users.view_rental',)
+    template_name = 'backoffice/rental/list.html'
     search_fields = ('customer__first_name', 'customer__last_name', 'customer__user__email', 'vehicle__make', 'confirmation_code',)
 
 
-class ReservationDetailView(ReservationViewMixin, ListViewMixin, UpdateView):
-    template_name = 'backoffice/reservation/detail.html'
-    form_class = ReservationForm
+class RentalDetailView(RentalViewMixin, ListViewMixin, UpdateView):
+    template_name = 'backoffice/rental/detail.html'
+    form_class = RentalForm
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -52,19 +52,19 @@ class ReservationDetailView(ReservationViewMixin, ListViewMixin, UpdateView):
         return context
 
     def get_success_url(self):
-        return reverse('backoffice:reservation-detail', kwargs={'pk': self.object.id})
+        return reverse('backoffice:rental-detail', kwargs={'pk': self.object.id})
 
 
-class ReservationCreateView(ReservationViewMixin, ListViewMixin, CreateView):
-    template_name = 'backoffice/reservation/detail.html'
-    form_class = ReservationForm
-
-    def get_success_url(self):
-        return reverse('backoffice:reservation-detail', kwargs={'pk': self.object.id})
-
-
-class ReservationDeleteView(DeleteView):
-    model = Reservation
+class RentalCreateView(RentalViewMixin, ListViewMixin, CreateView):
+    template_name = 'backoffice/rental/detail.html'
+    form_class = RentalForm
 
     def get_success_url(self):
-        return reverse('backoffice:reservation-list')
+        return reverse('backoffice:rental-detail', kwargs={'pk': self.object.id})
+
+
+class RentalDeleteView(DeleteView):
+    model = Rental
+
+    def get_success_url(self):
+        return reverse('backoffice:rental-list')

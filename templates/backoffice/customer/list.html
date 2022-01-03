@@ -91,7 +91,7 @@
         <td>{{ customer.first_name }}</td>
         <td>{{ customer.last_name}}</td>
         <td><a href="reservations.cfm?edit=1&customerid=#customerid#"><span class="ui-icon ui-icon-clipboard" /></a></td>
-        <td><a href="mailto:{{ customer.user.email }}">{{ customer.user.email }}</a></td>
+        <td><a href="mailto:{{ customer.email }}">{{ customer.email }}</a></td>
         <td>{{ customer.rentals_count }}</td>
         <td>{{ customer.rating|default_if_none:"" }}</td>
         <td>

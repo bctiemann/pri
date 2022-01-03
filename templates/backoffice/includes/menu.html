@@ -184,11 +184,13 @@
 	</li>
 </CFIF>
 {% endif %}
+{% if user.employee.reservations_access %}
 <CFIF YourID.acclev IS 1 OR YourID.acclev IS 2>
 	<li>
-	<a class="tnav <CFIF scrpt IS "rentals.cfm">selected</CFIF>" href="rentals.cfm">Rentals</a>
+	<a class="tnav {% if page_group == 'rentals' %}selected{% endif %}" href="{% url "backoffice:rental-list" %}">Rentals</a>
 	</li>
 </CFIF>
+{% endif %}
 <CFIF YourID.acclev IS 1 OR YourID.acclev IS 2>
 	<li>
 	<a class="tnav <CFIF scrpt IS "joyperf.cfm">selected</CFIF>" href="joyperf.cfm?type=2">Performance Experiences</a>

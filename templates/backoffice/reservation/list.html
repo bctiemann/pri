@@ -24,7 +24,7 @@
     <tr class="clickable click-to-edit" destination="{% url "backoffice:reservation-detail" pk=reservation.id %}">
         <td><a href="{% url "backoffice:reservation-detail" pk=reservation.id %}">{{ reservation.id }}</a></td>
         <td><a href="{% url "backoffice:vehicle-detail" pk=reservation.vehicle.id %}">{{ reservation.vehicle.vehicle_name }}</a></td>
-        <td><a href="customers.cfm?edit=1&customerid=#customerid#">{{ reservation.customer.full_name }}</a></td>
+        <td><a href="{% url "backoffice:customer-detail" pk=reservation.customer.id %}">{{ reservation.customer.full_name }}</a></td>
         <td>{{ reservation.out_at|date:"m/d/Y @ H:i" }} <small>{{ reservation.out_at|date:"D" }}</small></td>
         <td>{{ reservation.back_at|date:"m/d/Y @ H:i" }} <small>{{ reservation.back_at|date:"D" }}</td>
         <td>{{ reservation.num_days }}</td>

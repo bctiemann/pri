@@ -94,7 +94,7 @@ class ValidateRentalPaymentView(APIView):
     @staticmethod
     def _get_login_customer(request, form):
         if form.customer:
-            if authenticate(request, username=form.customer.user.email, password=form.cleaned_data['password']):
+            if authenticate(request, username=form.customer.email, password=form.cleaned_data['password']):
                 login(request, form.customer.user)
                 return form.customer
             # Only way to return None is if password is incorrect for an existing user's email

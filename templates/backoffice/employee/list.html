@@ -87,7 +87,7 @@
             <td><a href="{% url "backoffice:employee-detail" pk=employee.id %}">{{ employee.id }}</a></td>
             <td>{{ employee.first_name }}</td>
             <td>{{ employee.last_name }}</td>
-            <td>{{ employee.user.email }}</td>
+            <td>{{ employee.email }}</td>
             <td>{{ employee.get_status_display }}</td>
             <td>{{ employee.hired_on|default_if_none:"" }}</td>
         </tr>
