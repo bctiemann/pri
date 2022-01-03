@@ -2,13 +2,10 @@
 
 {% block nav %}
     <h1 class="pageheader">
-        Reservations
+        Rentals
         <ul class="nav_subpage">
             <a href="{% url "backoffice:rental-list" %}">
                 <li {% if is_unfiltered_list_view %}class="selected"{% endif %}>List</li>
-            </a>
-            <a href="{% url "backoffice:rental-create" %}">
-                <li {% if is_create_view %}class="selected"{% endif %}>Add</li>
             </a>
         </ul>
     </h1>
