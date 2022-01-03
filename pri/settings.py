@@ -245,6 +245,8 @@ PERFORMANCE_EXPERIENCE_PRICES = {
 
 MILITARY_DISCOUNT_PCT = 10
 
+EXTEND_THRESHOLD_HOURS = 6
+
 # Backoffice site seconds of idle until push to "sleeping" page
 ADMIN_SLEEP_TIMEOUT_SECS = 1500
 

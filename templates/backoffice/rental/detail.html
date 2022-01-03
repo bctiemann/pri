@@ -103,6 +103,7 @@
             <td>Date Out</td>
             <td>
                 {{ form.out_date }}
+                {% comment %}
                 <cftry>
                     <cfset dateout = DateFormat(Rental.dateout,"MM/DD/YYYY")>
                     <cfcatch type="Any">
@@ -119,8 +120,10 @@
                         </cfcatch>
                     </cftry>
                 </cfif>
+                {% endcomment %}
                 <cfinput name="dateout" value="#dateout#" maxlength="20" class="check-conflict short" /> @
                 {{ form.out_time }}
+                {% comment %}
                 <cfselect name="dateouttime" class="check-conflict">
                     <option value="07:00" <CFIF DateOutTime IS "07:00">selected</CFIF>>07:00</option>
                     <option value="07:30" <CFIF DateOutTime IS "07:30">selected</CFIF>>07:30</option>
@@ -151,6 +154,7 @@
                     <option value="20:00" <CFIF DateOutTime IS "20:00">selected</CFIF>>20:00</option>
                     <option value="00:00" <CFIF DateOutTime IS "00:00">selected</CFIF>>Other (special)</option>
                 </cfselect>
+                {% endcomment %}
                 <cfinput type="hidden" name="dateout_orig" value="#dateout#" />
                 <cfinput type="hidden" name="dateouttime_orig" value="#DateOutTime#" />
                 <div class="schedule-conflict-warning ui-state-error hidden" onclick="showScheduleConflicts();">
@@ -163,6 +167,7 @@
             <td>Date Returned</td>
             <td>
                 {{ form.back_date }}
+                {% comment %}
                 <cftry>
                     <cfset dateback = DateFormat(Rental.dateback,"MM/DD/YYYY")>
                     <cfcatch type="Any">
@@ -179,8 +184,10 @@
                         </cfcatch>
                     </cftry>
                 </cfif>
+                {% endcomment %}
                 <cfinput name="dateback" value="#dateback#" maxlength="20" class="check-conflict short" /> @
                 {{ form.back_time }}
+                {% comment %}
                 <cfselect name="datebacktime" class="check-conflict">
                     <option value="07:00" <CFIF DateBackTime IS "07:00">selected</CFIF>>07:00</option>
                     <option value="07:30" <CFIF DateBackTime IS "07:30">selected</CFIF>>07:30</option>
@@ -211,20 +218,29 @@
                     <option value="20:00" <CFIF DateBackTime IS "20:00">selected</CFIF>>20:00</option>
                     <option value="00:00" <CFIF DateBackTime IS "00:00">selected</CFIF>>Other (special)</option>
                 </cfselect>
+                {% endcomment %}
                 <cfinput type="hidden" name="dateback_orig" value="#dateback#" />
                 <cfinput type="hidden" name="datebacktime_orig" value="#DateBackTime#" />
+                {% if rental.status == rental.Status.IN_PROGRESS %}
                 <cfif Rental.status IS 2>
-                    <small>&plusmn; &##x2264; #extendThresholdHours# hours free</small>
+                    <small>&plusmn; &#x2264; {{ extend_threshold_hours }} hours free</small>
                 </cfif>
+                {% endif %}
             </td>
         </tr>
         <tr>
             <td>Number of Days</td>
-            <td><b>#Rental.numdays#</b> <CFIF Rental.extenddays GT 0>(Extended #Rental.extenddays# day<cfif Rental.extenddays IS NOT 1>s</cfif>)</CFIF></td>
+            <td>
+                <b>{{ rental.num_days }}</b>
+                {% if rental.extended_days %}
+                    (Extended {{ rental.extended_days }} day{{ rental.extended_days|pluralize }})
+                {% endif %}
+            </td>
         </tr>
         <tr>
             <td>Delivery</td>
             <td>
+                {{ form.delivery_required }}
                 <cfselect name="delivery">
                     <option value="0" <CFIF Rental.delivery IS 0>selected</CFIF>>Pickup at PRI</option>
                     <option value="1" <CFIF Rental.delivery IS 1>selected</CFIF>>Delivery</option>
@@ -237,11 +253,15 @@
         </tr>
         <tr>
             <td>Miles Included</td>
-            <td><cfinput name="milesinc" value="#Rental.milesinc#" maxlength="10" class="short" /></td>
+            <td>
+                {{ form.miles_included }}
+                <cfinput name="milesinc" value="#Rental.milesinc#" maxlength="10" class="short" />
+            </td>
         </tr>
         <tr>
             <td>Extra Miles</td>
             <td>
+                {{ form.extra_miles }}
                 <cfselect name="xtramiles">
                     <cfloop from="1" to="#arrayLen(extraMilesPrices)#" index="i">
                         <cfset milesChoice = extraMilesPrices[i]>
@@ -253,6 +273,7 @@
         <tr>
             <td>Mileage Out</td>
             <td>
+                {{ form.mileage_out }}
                 <cfset milesout = Rental.milesout GT 0 ? Rental.milesout : Rental.mileage>
                 <cfinput name="milesout" id="milesout" value="#milesout#" class="short" />
                 <small><b>CONFIRM AT DELIVERY</b></small>
@@ -261,21 +282,31 @@
         <tr>
             <td>Mileage Back</td>
             <td>
+                {{ form.mileage_back }}
                 <cfset milesback = Rental.milesback GT 0 ? Rental.milesback : Rental.mileage>
                 <cfinput name="milesback" id="milesback" value="#milesback#" class="short" />
             </td>
         </tr>
         <tr>
             <td class="align-top">Abuse Incidents</td>
-            <td><cftextarea name="abuse">#Rental.abuse#</cftextarea></td>
+            <td>
+                {{ form.abuse }}
+                <cftextarea name="abuse">#Rental.abuse#</cftextarea>
+            </td>
         </tr>
         <tr>
             <td class="align-top">Damage Out</td>
-            <td><cftextarea name="damageout">#Rental.damageout#</cftextarea></td>
+            <td>
+                {{ form.damage_out }}
+                <cftextarea name="damageout">#Rental.damageout#</cftextarea>
+            </td>
         </tr>
         <tr>
             <td class="align-top">Damage In (return)</td>
-            <td><cftextarea name="damagein">#Rental.damagein#</cftextarea></td>
+            <td>
+                {{ form.damage_in }}
+                <cftextarea name="damagein">#Rental.damagein#</cftextarea>
+            </td>
         </tr>
         <tr>
             <td>Discount/Coupon Code</td>
@@ -298,17 +329,24 @@
         </tr>
         <tr>
             <td class="align-top">Notes<br /><small>Customer Requests<br />Visible to Customer</small></td>
-            <td><cftextarea name="notes" class="customer-notes">#Rental.notes#</cftextarea></td>
+            <td>
+                {{ form.customer_notes }}
+                <cftextarea name="notes" class="customer-notes">#Rental.notes#</cftextarea>
+            </td>
         </tr>
         <tr>
             <td class="align-top">Our Notes<br /><small>Not Public</small></td>
-            <td><cftextarea name="ournotes" class="our-notes">#ournotes_dec#</cftextarea></td>
+            <td>
+                {{ form.internal_notes }}
+                <cftextarea name="ournotes" class="our-notes">#ournotes_dec#</cftextarea>
+            </td>
         </tr>
 
         <!--- Billing info --->
         <tr>
             <td></td>
             <td>
+            {% comment %}
             <CFQUERY NAME="eCustomer" DATASOURCE="#DSN#">
                 SELECT customerid,fname,lname,addr,city,state,zip,email,discount,ccnum,ccexpyr,ccexpmo,cccvv,cctel,cc2num,cc2expyr,cc2expmo,cc2cvv,cc2tel FROM Customers
                 WHERE customerid = #Rental.customerid#
@@ -320,11 +358,15 @@
                     <cfset addr_dec = "">
                 </cfcatch>
             </cftry>
+            {% endcomment %}
 
             <div id="billinginfo">
-                <p>#eCustomer.fname# #eCustomer.lname#</p>
-                <p>#addr_dec#</p>
-                <p>#eCustomer.city#, #eCustomer.state# #eCustomer.zip#</p>
+                <p>{{ rental.customer.full_name }}</p>
+                <p>{{ rental.customer.address_line_1 }}</p>
+                {% if rental.customer.address_line_2 %}
+                    <p>{{ rental.customer.address_line_2 }}</p>
+                {% endif %}
+                <p>{{ rental.customer.city }}, {{ rental.customer.state }} {{ rental.customer.zip }}</p>
 
                 <cftry>
                     <cfset ccnum_dec = decrypt('#eCustomer.ccnum#','#globalkey#','AES','hex')>
@@ -339,23 +381,27 @@
                     </cfcatch>
                 </cftry>
 
-                <div class="card-mockup <cfif Len(eCustomer.ccnum) IS 0>inactive</cfif>">
+                <div class="card-mockup {% if not rental.customer.cc_number %}inactive{% endif %}">
                     <div class="card-label">1</div>
+                    {% if rental.customer.cc_number %}
                     <cfif Len(eCustomer.ccnum) GT 0>
-                        <div class="card-number">#formatCCNumber(ccnum_dec)#</div>
-                        <div class="card-exp">#eCustomer.ccexpmo# / #eCustomer.ccexpyr#</div>
-                        <div class="card-cvv">#eCustomer.cccvv#</div>
-                        <div class="card-phone">#eCustomer.cctel#</div>
+                        <div class="card-number">{{ rental.customer.cc_number }}</div>
+                        <div class="card-exp">{{ rental.customer.cc_exp_mo }} / {{ rental.customer.cc_exp_yr }}</div>
+                        <div class="card-cvv">{{ rental.customer.cc_cvv }}</div>
+                        <div class="card-phone">{{ rental.customer.cc_phone }}</div>
                     </cfif>
+                    {% endif %}
                 </div>
-                <div class="card-mockup <cfif Len(eCustomer.cc2num) IS 0>inactive</cfif>">
+                <div class="card-mockup {% if not rental.customer.cc2_number %}inactive{% endif %}">
                     <div class="card-label">2</div>
+                    {% if rental.customer.cc2_number %}
                     <cfif Len(eCustomer.cc2num) GT 0>
-                        <div class="card-number">#formatCCNumber(cc2num_dec)#</div>
-                        <div class="card-exp">#eCustomer.cc2expmo# / #eCustomer.cc2expyr#</div>
-                        <div class="card-cvv">#eCustomer.cc2cvv#</div>
-                        <div class="card-phone">#eCustomer.cc2tel#</div>
+                        <div class="card-number">{{ rental.customer.cc2_number }}</div>
+                        <div class="card-exp">{{ rental.customer.cc2_exp_mo }} / {{ rental.customer.cc2_exp_yr }}</div>
+                        <div class="card-cvv">{{ rental.customer.cc2_cvv }}</div>
+                        <div class="card-phone">{{ rental.customer.cc2_phone }}</div>
                     </cfif>
+                    {% endif %}
                 </div>
 
             </div>
@@ -365,34 +411,38 @@
         <tr>
             <cfset depamount = Rental.depamount GT 0 ? Rental.depamount : 0.00>
             <td>Deposit Amount</td>
-            <td class="currency"><span class="currency-prefix">$</span><cfinput name="depamount" value="#depamount#" maxlength="10" class="short" /></td>
+            <td class="currency"><span class="currency-prefix">$</span>{{ form.deposit_amount }}<cfinput name="depamount" value="#depamount#" maxlength="10" class="short" /></td>
         </tr>
         <tr>
             <td>Deposit Charged On</td>
             <td>
+                {{ form.deposit_charged_at }}
                 <cfinput name="depchargedon" value="#DateFormat(Rental.depchargedon,"mm/dd/yyyy")#" class="short" />
             </td>
         </tr>
         <tr>
             <cfset deprefundamount = Rental.deprefundamount GT 0 ? Rental.deprefundamount : 0.00>
             <td>Deposit Refund Amount</td>
-            <td class="currency"><span class="currency-prefix">$</span><cfinput name="deprefundamount" value="#deprefundamount#" maxlength="10" class="short" /></td>
+            <td class="currency"><span class="currency-prefix">$</span>{{ form.deposit_refund_amount }}<cfinput name="deprefundamount" value="#deprefundamount#" maxlength="10" class="short" /></td>
         </tr>
         <tr>
             <td>Deposit Refunded On</td>
             <td>
+                {{ form.deposit_refunded_at }}
                 <cfinput name="deprefundon" value="#DateFormat(Rental.deprefundon,"mm/dd/yyyy")#" class="short" />
             </td>
         </tr>
         <tr>
             <td>Discount</td>
             <td>
+                {{ form.rental_discount_pct }}
                 <cfinput name="discount" value="#Rental.discount#" class="short" /> % (This rental only)
             </td>
         </tr>
         <tr>
             <td>Delivery ZIP</td>
             <td>
+                {{ form.delivery_zip }}
                 <cfinput name="deliveryzip" value="#Rental.deliveryzip#" class="short" />
                 <button class="btn" type="button" onclick="getTaxRate()">Get Tax Rate</button>
             </td>
@@ -400,6 +450,7 @@
         <tr>
             <td>Tax Rate</td>
             <td>
+                {{ form.tax_percent }}
                 <cfset taxpct = IsNumeric(Rental.taxpct) ? Rental.taxpct : salesTaxDefault>
                 <cfinput name="taxpct" value="#taxpct#" class="short" /> %
             </td>
