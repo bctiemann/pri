@@ -674,12 +674,41 @@
             </td>
         </tr>
     </table>
-    <input type="hidden" id="reservation_id" value="{{ reservation.id }}" />
+    <input type="hidden" id="rental_id" value="{{ rental.id }}" />
+    <cfinput type="hidden" name="addr" value="#addr_dec#" />
+    <cfinput type="hidden" name="zip" value="#Rental.zip#" />
     <cfinput type="hidden" name="fnc" value="edit" />
-    <cfinput type="hidden" name="numdays" value="#Reservation.numdays#" />
     {% csrf_token %}
     </form>
     </cfoutput>
+
+    <div class="dialog" id="dialog_clone_driver" title="Clone Driver">
+        <p>
+        Creating a clone of <strong>#Rental.fname# #Rental.lname#</strong> to add to this rental.
+        </p>
+
+        <cfform>
+        <table class="inputform">
+            <tr>
+                <td>First Name</td>
+                <td><cfinput name="clone_fname" value="" /></td>
+            </tr>
+            <tr>
+                <td>Last Name</td>
+                <td><cfinput name="clone_lname" value="" /></td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td><cfinput name="clone_email" value="#nextEmail#" /></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><cfinput type="checkbox" name="clone_license" /> <label for="clone_license">Clone driver's license</label></td>
+            </tr>
+        </table>
+        <cfinput type="hidden" name="clone_customerid" value="#Rental.customerid#" />
+        </cfform>
+    </div>
 
     <div class="dialog" id="dialog_conflicts" title="Schedule Conflict">
         <p>

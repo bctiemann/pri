@@ -20,7 +20,7 @@ from fleet.models import (
     get_vehicle_picture_path, get_vehicle_video_path
 )
 from users.models import Customer, Employee, User, MusicGenre
-from sales.models import Promotion, Coupon, BaseReservation, Reservation, Rental, generate_code
+from sales.models import Promotion, Coupon, BaseReservation, Reservation, Rental, Driver, generate_code
 from consignment.models import Consigner
 from sales.enums import ReservationType
 from pri.cipher import AESCipher
@@ -51,7 +51,8 @@ class Command(BaseCommand):
         # 'do_vehicle_vids': True,
         # 'do_customers': True,
         # 'do_reservations': True,
-        'do_rentals': True,
+        # 'do_rentals': True,
+        'do_drivers': True,
         # 'do_consigners': True,
         # 'do_consignmentvehicles': True,
         # 'do_admins': True,
@@ -436,6 +437,26 @@ class Command(BaseCommand):
                 )
                 new.reserved_at = old['reservdate']
                 new.save()
+
+        if 'do_drivers' in self.enabled:
+            if clear_existing:
+                Driver.objects.all().delete()
+            back_cursor.execute("""SELECT * FROM Drivers""")
+            for old in back_cursor.fetchall():
+                print(old)
+                try:
+                    rental = Rental.objects.get(pk=old['rentalid'])
+                except Rental.DoesNotExist:
+                    continue
+                try:
+                    customer = Customer.objects.get(pk=old['customerid'])
+                except Customer.DoesNotExist:
+                    continue
+                new = Driver.objects.create(
+                    rental=rental,
+                    customer=customer,
+                    is_primary=bool(old['primarydrv']),
+                )
 
         if 'do_consigners' in self.enabled:
             if clear_existing:

@@ -204,7 +204,9 @@ class GuidedDrive(models.Model):
 
 
 class Driver(models.Model):
-    pass
+    rental = models.ForeignKey('sales.Rental', on_delete=models.CASCADE)
+    customer = models.ForeignKey('users.Customer', on_delete=models.CASCADE)
+    is_primary = models.BooleanField(default=False)
 
 
 class GiftCertificate(models.Model):

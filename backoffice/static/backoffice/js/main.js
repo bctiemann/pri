@@ -119,14 +119,16 @@ var refreshSalesTaxDetail = function() {
 };
 
 var refreshDrivers = function() {
-    $('#drivers').load('ajax_drivers.cfm?rentalid=' + $('#rentalid').val(), function(html) {
+    let rentalId = $('#rental_id').val();
+    let url = `/backoffice/rentals/${rentalId}/drivers/`;
+    $('#drivers').load(url, function(html) {
         $('#do_driver_add').button({
             icons: {
                 primary: 'ui-icon-plusthick',
             },
             text: false,
         }).click(function(event) {
-            editDriver('addDriver', null, $('#driver_add_id').val(), $('#rentalid').val());
+            editDriver('add', null, $('#driver_add_id').val(), $('#rental_id').val());
             event.preventDefault();
         });
         $('button.remove-driver').each(function() {
@@ -136,7 +138,7 @@ var refreshDrivers = function() {
                 },
                 text: false,
             }).click(function(event) {
-                editDriver('removeDriver', $(this).attr('driverid'));
+                editDriver('remove', $(this).attr('driver_id'), null, $('#rental_id').val());
                 event.preventDefault();
             });
         });
@@ -148,15 +150,16 @@ var refreshDrivers = function() {
                 },
                 text: false,
             }).click(function(event) {
-                editDriver('makePrimaryDriver', $(this).attr('driverid'));
+                editDriver('promote', $(this).attr('driver_id'), null, $('#rental_id').val());
                 event.preventDefault();
             });
         });
 
         $('input#driver_add').autocomplete({
-            source: 'cfc/customers.cfc?method=getCustomers',
+            // source: 'cfc/customers.cfc?method=getCustomers',
+            source: '/api/customers/search/',
             select: function(event, ui) {
-                $('input#driver_add_id').val(ui.item.customerid);
+                $('input#driver_add_id').val(ui.item.id);
                 $('input#driver_add').val(ui.item.label);
                 return false;
             },
@@ -172,11 +175,12 @@ var editDriver = function(method, driverid, customerid, rentalid) {
     var params = {
         component: 'drivers',
         method: method,
-        customerid: customerid || null,
-        rentalid: rentalid || null,
-        driverid: driverid || null,
+        customer_id: customerid || null,
+        rental_id: rentalid || null,
+        driver_id: driverid || null,
     };
-    $.post('ajax_post.cfm',params,function(data) {
+    let url = `/backoffice/rentals/${rentalid}/drivers/${method}/`;
+    $.post(url, params, function(data) {
 console.log(data);
         if (data.success) {
             refreshDrivers();

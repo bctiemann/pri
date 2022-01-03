@@ -39,6 +39,10 @@ urlpatterns = [
     path('rentals/create/', rentals.RentalCreateView.as_view(is_create_view=True), name='rental-create'),
     path('rentals/<int:pk>/', rentals.RentalDetailView.as_view(), name='rental-detail'),
     path('rentals/<int:pk>/delete/', rentals.RentalDeleteView.as_view(), name='rental-delete'),
+    path('rentals/<int:pk>/drivers/', rentals.RentalDriversView.as_view(), name='rental-drivers'),
+    path('rentals/<int:pk>/drivers/add/', rentals.RentalDriverAddView.as_view(), name='rental-drivers-add'),
+    path('rentals/<int:pk>/drivers/remove/', rentals.RentalDriverRemoveView.as_view(), name='rental-drivers-remove'),
+    path('rentals/<int:pk>/drivers/promote/', rentals.RentalDriverPromoteView.as_view(), name='rental-drivers-promote'),
 
     path('employees/', employees.EmployeeListView.as_view(), name='employee-list'),
     path('employees/create/', employees.EmployeeCreateView.as_view(is_create_view=True), name='employee-create'),

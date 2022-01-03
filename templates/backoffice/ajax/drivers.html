@@ -1,0 +1,25 @@
+<table class="drivers">
+    {% for driver in rental.driver_set.all %}
+        <tr {% if driver.is_primary %}class="primary"{% endif %}>
+            <td><a href="{% url "backoffice:customer-detail" pk=driver.customer.id %}">{{ driver.customer.full_name }}</a></td>
+            <td>{{ driver.customer.license_number }}</td>
+            {% if driver.is_primary %}
+            <cfif primarydrv IS 1>
+                <td colspan="2"><span class="ui-icon ui-icon-star"></span> Primary</td>
+            {% else %}
+            <cfelse>
+                <td><button class="remove-driver" driver_id="{{ driver.id }}">Remove</button></td>
+                <td><button class="make-primary-driver" driver_id="{{ driver.id }}">Make Primary</button></td>
+            </cfif>
+            {% endif %}
+        </tr>
+    {% endfor %}
+    <tr>
+        <td colspan="3"><input id="driver_add" class="search" /></td>
+        <td><button id="do_driver_add">Add</button></td>
+        <td></td>
+    </tr>
+</table>
+<input id="driver_add_id" type="hidden" value="" />
+
+<button type="button" class="btn clone-driver" onclick="promptCloneCustomer();">Clone Driver</button>
