@@ -199,10 +199,6 @@ class Rental(BaseReservation):
         return self.extended_days * vehicle_marketing.price_per_day
 
 
-class GuidedDrive(models.Model):
-    pass
-
-
 class Driver(models.Model):
     rental = models.ForeignKey('sales.Rental', on_delete=models.CASCADE)
     customer = models.ForeignKey('users.Customer', on_delete=models.CASCADE)
@@ -210,6 +206,11 @@ class Driver(models.Model):
 
     class Meta:
         ordering = ('-is_primary',)
+
+
+class GuidedDrive(models.Model):
+    pass
+
 
 class GiftCertificate(models.Model):
     pass
