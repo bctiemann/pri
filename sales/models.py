@@ -192,6 +192,12 @@ class Rental(BaseReservation):
     rental_discount_pct = models.IntegerField(null=True, blank=True)
     extended_days = models.IntegerField(null=True, blank=True)
 
+    @property
+    def extended_days_amount(self):
+        from fleet.models import VehicleMarketing
+        vehicle_marketing = VehicleMarketing.objects.get(vehicle_id=self.vehicle.id)
+        return self.extended_days * vehicle_marketing.price_per_day
+
 
 class GuidedDrive(models.Model):
     pass

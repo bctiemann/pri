@@ -524,86 +524,116 @@
             <td>
                 <table class="price-breakdown">
                     <tr>
-                        <td>Rental Total (#Rental.numdays# day<cfif Rental.numdays IS NOT 1>s</cfif>):</td>
-                        <td><b>#NumberFormat(tcostRaw,"$___,___.__")#</b></td>
+                        <td>Rental Total ({{ rental.num_days }} day{{ rental.num_days|pluralize }}):</td>
+                        <td><b>${{ price_data.base_price|intcomma }}</b></td>
                     </tr>
+                    {% if price_data.multi_day_discount %}
                     <cfif dMultiDay>
                     <tr>
-                        <td>Multi-Day Discount (#dMultiDay#%):</td>
-                        <td>- #NumberFormat(tcostRaw - tcost,"$___,___.__")#</td>
+                        <td>Multi-Day Discount ({{ price_data.multi_day_discount_pct }}%):</td>
+                        <td>- ${{ price_data.multi_day_discount|intcomma }}</td>
                     </tr>
                     </cfif>
+                    {% endif %}
 
                     <tr>
-                        <CFIF len(Rental.coupon) GT 0>
-                            <CFIF codecheck.recordcount IS 1>
-                                <td>Coupon Discount: </td>
-                                <td>- #NumberFormat(ds1,"$___,___.__")#</td>
-                            <CFELSE>
-                                <td>Car Discount: </td>
-                                <td>- #NumberFormat(ds1,"$___,___.__")#</td>
-                            </CFIF>
-                        <CFELSE>
-                            <td>Car Discount: </td>
-                            <td>- #NumberFormat(ds1,"$___,___.__")#</td>
-                        </CFIF>
+                        <td colspan="2">Specific Discount (greatest of following):</td>
+                        <td></td>
                     </tr>
 
-                    <tr>
+                    <tr class="specific-discount">
+                        <td>Coupon Discount: </td>
+                        <td>- ${{ price_data.coupon_discount|intcomma }}</td>
+                        <td></td>
+                    </tr>
+                    <tr class="specific-discount">
+                        <td>Promotion Discount: </td>
+                        <td>- ${{ price_data.promotion_discount|intcomma }}</td>
+                        <td></td>
+                    </tr>
+                    <tr class="specific-discount">
                         <td>Customer Discount: </td>
-                        <td>- #NumberFormat(ds2,"$___,___.__")#</td>
+                        <td>- ${{ price_data.customer_discount|intcomma }}</td>
+                        <td></td>
                     </tr>
-
-                    <tr>
+                    <tr class="specific-discount">
+                        <td>Military Discount: </td>
+                        <td>- ${{ price_data.military_discount|intcomma }}</td>
+                        <td></td>
+                    </tr>
+                    <tr class="specific-discount">
                         <td>This Rental Discount: </td>
-                        <td><b>- #NumberFormat(ds3,"$___,___.__")#</b></td>
+                        <td>- ${{ price_data.rental_discount|intcomma }}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Specific Discount: </td>
+                        <td>- ${{ price_data.specific_discount|intcomma }}</td>
+                        <td>{{ price_data.specific_discount_label }}</td>
                     </tr>
 
+                    {% if rental.extra_miles %}
                     <CFIF Rental.xtramiles GT 0>
                     <tr>
-                        <td>Extra Miles (#Rental.xtramiles#):</td>
-                        <td>#NumberFormat(xmi,"$___,___.__")#</td>
+                        <td>Extra Miles ({{ rental.extra_miles }}):</td>
+                        <td>${{ price_data.extra_miles_cost|intcomma }}</td>
                     </tr>
                     </CFIF>
+                    {% endif %}
 
                     <tr>
                         <td>&nbsp;</td>
-                        <td>SubTotal: <strong>#NumberFormat(s3,"$___,___.__")#</strong></td>
+                        <td>
+                            SubTotal: <strong>{{ price_data.computed_subtotal|intcomma }}</strong>
+                        </td>
+                        <td>
+                            {{ form.override_subtotal }}
+                        </td>
                     </tr>
 
+                    {% comment %}
                     <CFSET taxtot = s3 * (1 + (taxpct/100))>
                     <CFSET taxmt = taxtot - s3>
+                    {% endcomment %}
 
                     <tr>
                         <td>&nbsp;</td>
-                        <td>Tax: <small>(#taxpct#%)</small> #NumberFormat(taxmt,"$___,___.__")# </td>
+                        <td>Tax: <small>({{ price_data.tax_rate_as_percent }}%)</small> ${{ price_data.tax_amount|intcomma }} </td>
+                        <td></td>
                     </tr>
 
                     <tr>
                         <td>&nbsp;</td>
-                        <td>Invoice Total: <strong>#NumberFormat(taxtot,"$___,___.__")#</strong></td>
+                        <td>Invoice Total: <strong>${{ price_data.total_with_tax|intcomma }}</strong></td>
+                        <td></td>
                     </tr>
 
                     <tr class="bill-total">
                         <td>&nbsp;</td>
-                        <td>50% deposit: <strong>#NumberFormat(taxtot/2,"$___,___.__")#</strong></td>
+                        <td>50% deposit: <strong>${{ price_data.reservation_deposit|intcomma }}</strong></td>
+                        <td></td>
                     </tr>
                 </table>
 
 
+                {% comment %}
                 <input type="hidden" name="total" value="#s3#">
                 <CFIF ratediff IS 1>
                     <b><big>Rate Override:</big></b> Rate set to: #NumberFormat(Rental.rate,"$___,___.__")#
                 </CFIF>
+                {% endcomment %}
 
+                {% if rental.extended_days %}
                 <CFIF Rental.extenddays GT 0>
                     <CFSET extendamount =  VFront.price * Rental.extenddays>
-                    <p><strong>Extended Days:</strong> #Rental.extenddays# @ $#DecimalFormat(VFront.price)#</p>
-                    <p><strong><u>Extension Total:</u></strong> <strong>$#DecimalFormat(extendamount)#</strong></p>
+                    <p><strong>Extended Days:</strong> {{ rental.extended_days }} @ ${{ vehicle_marketing.price_per_day|intcomma }}</p>
+                    <p><strong><u>Extension Total:</u></strong> <strong>${{ rental.extended_days_amount|intcomma }}</strong></p>
                 </CFIF>
+                {% endif %}
             </td>
         </tr>
 
+        {% comment %}
         <tr>
             <td>Computed Cost<br><small>Not including tax</small></td>
             <CFIF ratediff IS 0>
@@ -619,12 +649,26 @@
                 </CFIF>
             </td>
         </tr>
+        {% endcomment %}
 
         <tr>
             <td></td>
             <td>
-                <button class="btn" type="submit" name="submit"><cfif rentalid>Edit<cfelse>Add</cfif></button>
-                <button class="btn delete" type="submit" name="delete" onclick="return confirmDelete(this.form, 'rental')">Delete Rental</button>
+                <button class="btn" type="submit" name="submit">
+                    {% if rental %}
+                        Edit
+                    {% else %}
+                        Add
+                    {% endif %}
+                </button>
+                <button
+                    class="btn delete"
+                    type="submit"
+                    name="delete"
+                    onclick="return confirmDelete(this.form, '{% url "backoffice:rental-delete" pk=rental.id %}', 'rental')"
+                >
+                    Delete Rental
+                </button>
             </td>
         </tr>
     </table>

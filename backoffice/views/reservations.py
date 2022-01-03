@@ -37,6 +37,7 @@ class ReservationDetailView(ReservationViewMixin, ListViewMixin, UpdateView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         vehicle_marketing = VehicleMarketing.objects.get(vehicle_id=self.object.vehicle.id)
+        context['vehicle_marketing'] = vehicle_marketing
         price_calculator = RentalPriceCalculator(
             coupon_code=self.object.coupon_code,
             email=self.object.customer.email,

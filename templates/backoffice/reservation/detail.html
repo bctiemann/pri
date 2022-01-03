@@ -455,6 +455,7 @@
                         <td><b>${{ price_data.base_price|intcomma }}</b></td>
                         <td></td>
                     </tr>
+                    {% if price_data.multi_day_discount %}
                     <cfif dMultiDay>
                     <tr>
                         <td>Multi-Day Discount ({{ price_data.multi_day_discount_pct }}%):</td>
@@ -462,6 +463,7 @@
                         <td></td>
                     </tr>
                     </cfif>
+                    {% endif %}
 
                     <tr>
                         <td colspan="2">Specific Discount (greatest of following):</td>
