@@ -208,6 +208,8 @@ class Driver(models.Model):
     customer = models.ForeignKey('users.Customer', on_delete=models.CASCADE)
     is_primary = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ('-is_primary',)
 
 class GiftCertificate(models.Model):
     pass
