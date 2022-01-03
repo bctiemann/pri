@@ -20,6 +20,13 @@ current_year = timezone.now().year
 birth_years = range(current_year - 18, current_year - 100, -1)
 operational_years = range(settings.COMPANY_FOUNDING_YEAR, current_year + 10)
 
+service_hours = []
+for hour in range(7, 20):
+    service_hours.append((f'{str(hour).zfill(2)}:00', f'{hour}:00'))
+    service_hours.append((f'{str(hour).zfill(2)}:30', f'{hour}:30'))
+service_hours.append(('20:00', '20:00'))
+service_hours.append(('23:00', 'Other (Special)'))
+
 
 # TODO: Add slug to the visible form fields and set on both models
 
@@ -95,8 +102,6 @@ class VehicleVideoForm(forms.ModelForm):
 
 class ReservationForm(forms.ModelForm):
 
-    VEHICLE_CHOICES = []
-
     DELIVERY_REQUIRED_CHOICES = (
         (False, 'Pickup at PRI'),
         (True, 'Delivery'),
@@ -124,10 +129,10 @@ class ReservationForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         # Populate vehicle choices
-        self.VEHICLE_CHOICES = []
-        self.VEHICLE_CHOICES.append(('Cars', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.CAR))))
-        self.VEHICLE_CHOICES.append(('Motorcycles', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.BIKE))))
-        self.fields['vehicle'].choices = self.VEHICLE_CHOICES
+        vehicle_choices = []
+        vehicle_choices.append(('Cars', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.CAR))))
+        vehicle_choices.append(('Motorcycles', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.BIKE))))
+        self.fields['vehicle'].choices = vehicle_choices
 
         # Populate conditionally non-editable fields from linked customer
         phone_fields = ['home_phone', 'work_phone', 'mobile_phone']
@@ -180,16 +185,30 @@ class ReservationForm(forms.ModelForm):
 
 class RentalForm(forms.ModelForm):
 
-    VEHICLE_CHOICES = []
+    out_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short'}))
+    out_time = forms.ChoiceField(choices=service_hours)
+    back_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short'}))
+    back_time = forms.ChoiceField(choices=service_hours)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # Populate vehicle choices
-        self.VEHICLE_CHOICES = []
-        self.VEHICLE_CHOICES.append(('Cars', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.CAR))))
-        self.VEHICLE_CHOICES.append(('Motorcycles', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.BIKE))))
-        self.fields['vehicle'].choices = self.VEHICLE_CHOICES
+        vehicle_choices = []
+        vehicle_choices.append(('Cars', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.CAR))))
+        vehicle_choices.append(('Motorcycles', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.BIKE))))
+        self.fields['vehicle'].choices = vehicle_choices
+
+        for field in ['out_date', 'back_date']:
+            if self.instance.status == Rental.Status.COMPLETE:
+                self.fields[field].widget.attrs['class'] += ' dont-edit'
+
+        out_at_localized = self.instance.out_at.astimezone(pytz.timezone(settings.TIME_ZONE))
+        back_at_localized = self.instance.back_at.astimezone(pytz.timezone(settings.TIME_ZONE))
+        self.fields['out_date'].initial = out_at_localized.strftime('%m/%d/%Y')
+        self.fields['back_date'].initial = back_at_localized.strftime('%m/%d/%Y')
+        self.fields['out_time'].initial = out_at_localized.strftime('%H:%M')
+        self.fields['back_time'].initial = back_at_localized.strftime('%H:%M')
 
     class Meta:
         model = Rental

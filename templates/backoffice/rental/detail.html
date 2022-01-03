@@ -102,6 +102,7 @@
         <tr>
             <td>Date Out</td>
             <td>
+                {{ form.out_date }}
                 <cftry>
                     <cfset dateout = DateFormat(Rental.dateout,"MM/DD/YYYY")>
                     <cfcatch type="Any">
@@ -119,6 +120,7 @@
                     </cftry>
                 </cfif>
                 <cfinput name="dateout" value="#dateout#" maxlength="20" class="check-conflict short" /> @
+                {{ form.out_time }}
                 <cfselect name="dateouttime" class="check-conflict">
                     <option value="07:00" <CFIF DateOutTime IS "07:00">selected</CFIF>>07:00</option>
                     <option value="07:30" <CFIF DateOutTime IS "07:30">selected</CFIF>>07:30</option>
@@ -160,6 +162,7 @@
         <tr>
             <td>Date Returned</td>
             <td>
+                {{ form.back_date }}
                 <cftry>
                     <cfset dateback = DateFormat(Rental.dateback,"MM/DD/YYYY")>
                     <cfcatch type="Any">
@@ -177,6 +180,7 @@
                     </cftry>
                 </cfif>
                 <cfinput name="dateback" value="#dateback#" maxlength="20" class="check-conflict short" /> @
+                {{ form.back_time }}
                 <cfselect name="datebacktime" class="check-conflict">
                     <option value="07:00" <CFIF DateBackTime IS "07:00">selected</CFIF>>07:00</option>
                     <option value="07:30" <CFIF DateBackTime IS "07:30">selected</CFIF>>07:30</option>

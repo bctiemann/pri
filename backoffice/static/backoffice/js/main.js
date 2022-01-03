@@ -792,8 +792,8 @@ $(document).ready(function() {
         yearRange: '1940:2000',
         defaultDate: '01/01/1970',
     });
-    $('#dateout').datepicker({});
-    $('#dateback').datepicker({});
+    $('#id_out_date').datepicker({});
+    $('#id_back_date').datepicker({});
     $('#depchargedon').datepicker({});
     $('#deprefundon').datepicker({});
     $('#reqdate').datepicker({});
