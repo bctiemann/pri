@@ -201,7 +201,6 @@ class Employee(models.Model):
     license_state = USStateField(blank=True)
 
     # Employment details
-    hired_on = models.DateField(null=True, blank=True)
     status = models.IntegerField(choices=Status.choices, blank=True, default=Status.EMPLOYED)
     position = models.CharField(max_length=100, blank=True)
     employment_type = models.IntegerField(choices=EmploymentType.choices, default=EmploymentType.FULLTIME)
@@ -216,7 +215,9 @@ class Employee(models.Model):
 
     @property
     def email(self):
-        return self.user.email
+        if self.user:
+            return self.user.email
+        return None
 
     @property
     def reservations_access(self):

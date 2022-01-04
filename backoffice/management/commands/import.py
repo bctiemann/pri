@@ -52,10 +52,10 @@ class Command(BaseCommand):
         # 'do_customers': True,
         # 'do_reservations': True,
         # 'do_rentals': True,
-        'do_drivers': True,
+        # 'do_drivers': True,
         # 'do_consigners': True,
         # 'do_consignmentvehicles': True,
-        # 'do_admins': True,
+        'do_admins': True,
         # 'do_newsitems': True
         # 'do_sitecontent': True,
         # 'do_newslettersubscriptions': True,

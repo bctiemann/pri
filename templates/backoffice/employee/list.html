@@ -89,7 +89,7 @@
             <td>{{ employee.last_name }}</td>
             <td>{{ employee.email }}</td>
             <td>{{ employee.get_status_display }}</td>
-            <td>{{ employee.hired_on|default_if_none:"" }}</td>
+            <td>{{ employee.created_at|date:"m/d/Y" }}</td>
         </tr>
     {% endfor %}
     </table>
