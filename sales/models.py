@@ -9,8 +9,9 @@ from requests import HTTPError
 from django.conf import settings
 from django.db import models
 from django.utils.timezone import now
+from django.core.serializers.json import DjangoJSONEncoder
 
-from sales.enums import RESERVATION_TYPE_CODE_MAP
+from sales.enums import RESERVATION_TYPE_CODE_MAP, ServiceType
 
 
 def generate_code(reservation_type):
@@ -19,11 +20,11 @@ def generate_code(reservation_type):
     return f'{RESERVATION_TYPE_CODE_MAP.get(reservation_type)}{alpha_str}{numeric_str}'
 
 
-class ServiceType(models.TextChoices):
-    RENTAL = ('rental', 'Rental')
-    PERFORMANCE_EXPERIENCE = ('perfexp', 'Performance Experience')
-    JOY_RIDE = ('joyride', 'Joy Ride')
-    GIFT_CERTIFICATE = ('giftcert', 'Gift Certificate')
+# class ServiceType(models.TextChoices):
+#     RENTAL = ('rental', 'Rental')
+#     PERFORMANCE_EXPERIENCE = ('perfexp', 'Performance Experience')
+#     JOY_RIDE = ('joyride', 'Joy Ride')
+#     GIFT_CERTIFICATE = ('giftcert', 'Gift Certificate')
 
 
 # Promotions are time-bound discounts that apply to all customers, such as a holiday special. They may or may not
@@ -113,6 +114,7 @@ class BaseReservation(models.Model):
     tax_percent = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
     delivery_zip = USZipCodeField(blank=True)
     override_subtotal = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    final_price_data = models.JSONField(null=True, blank=True)
 
     @property
     def is_reservation(self):
@@ -152,8 +154,27 @@ class BaseReservation(models.Model):
             return Coupon.objects.filter(models.Q(end_date__isnull=True) | models.Q(end_date__gte=self.out_date), code=self.coupon_code).first()
         return None
 
+    def get_price_data(self):
+        from fleet.models import VehicleMarketing
+        from sales.utils import RentalPriceCalculator
+        vehicle_marketing = VehicleMarketing.objects.get(vehicle_id=self.vehicle.id)
+        price_calculator = RentalPriceCalculator(
+            coupon_code=self.coupon_code,
+            email=self.customer.email,
+            tax_zip=self.delivery_zip,
+            effective_date=self.out_date,
+            is_military=self.is_military,
+            vehicle_marketing=vehicle_marketing,
+            num_days=self.num_days,
+            extra_miles=self.extra_miles,
+            override_subtotal=self.override_subtotal,
+            one_time_discount_pct=getattr(self, 'rental_discount_pct', None),
+        )
+        return price_calculator.get_price_data()
+
     def save(self, *args, **kwargs):
         self.coupon_code = self.coupon_code.upper()
+        self.final_price_data = json.loads(json.dumps(self.get_price_data(), cls=DjangoJSONEncoder))
         super().save(*args, **kwargs)
 
     class Meta:

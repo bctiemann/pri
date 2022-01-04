@@ -8,10 +8,12 @@ from sales.models import Reservation, Rental, Promotion, Coupon, TaxRate
 
 class ReservationAdmin(admin.ModelAdmin):
     list_display = ('id', 'vehicle', 'customer',)
+    autocomplete_fields = ('customer',)
 
 
 class RentalAdmin(admin.ModelAdmin):
     list_display = ('id', 'vehicle', 'customer',)
+    autocomplete_fields = ('customer',)
 
 
 class PromotionAdmin(admin.ModelAdmin):

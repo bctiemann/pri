@@ -3,6 +3,7 @@ from datetime import datetime, time, timedelta
 
 from django.conf import settings
 from django.utils import timezone
+from django.db import models
 
 from fleet.models import VehicleMarketing, VehicleType
 
@@ -75,6 +76,13 @@ class ReservationType(Enum):
     RENTAL = 'rental'
     PERFORMANCE_EXPERIENCE = 'perfexp'
     JOY_RIDE = 'joyride'
+
+
+class ServiceType(models.TextChoices):
+    RENTAL = ('rental', 'Rental')
+    PERFORMANCE_EXPERIENCE = ('perfexp', 'Performance Experience')
+    JOY_RIDE = ('joyride', 'Joy Ride')
+    GIFT_CERTIFICATE = ('giftcert', 'Gift Certificate')
 
 
 RESERVATION_TYPE_CODE_MAP = {

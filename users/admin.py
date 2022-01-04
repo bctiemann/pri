@@ -56,7 +56,7 @@ class CustomerAdmin(admin.ModelAdmin):
             'fields': ('cc2_number', 'cc2_exp_yr', 'cc2_exp_mo', 'cc2_cvv', 'cc2_phone',)
         }),
         ('Details', {
-            'fields': ('rentals_count', 'remarks', 'driver_skill', 'discount_pct', 'music_genre',)
+            'fields': ('rentals_count', 'remarks', 'driver_skill', 'rating', 'discount_pct', 'music_genre',)
         }),
         ('Options', {
             'fields': ('first_time', 'drivers_club', 'receive_email', 'ban', 'survey_done',)

@@ -4,7 +4,8 @@ from abc import ABC
 from django.conf import settings
 from django.db.models import Q
 
-from sales.models import ServiceType, Reservation, Promotion, Coupon, TaxRate
+from sales.models import Promotion, Coupon, TaxRate
+from sales.enums import ServiceType
 from users.models import Customer
 
 
@@ -276,6 +277,7 @@ class RentalPriceCalculator(PriceCalculator):
 
     def get_price_data(self):
         return dict(
+            vehicle_price_per_day=self.quantize_currency(self.vehicle_marketing.price_per_day),
             num_days=self.num_days,
             tax_rate=self.tax_rate.total_rate,
             tax_rate_as_percent=self.tax_rate.total_rate * 100,

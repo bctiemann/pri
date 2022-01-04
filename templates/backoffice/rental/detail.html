@@ -643,7 +643,7 @@
                 {% if rental.extended_days %}
                 <CFIF Rental.extenddays GT 0>
                     <CFSET extendamount =  VFront.price * Rental.extenddays>
-                    <p><strong>Extended Days:</strong> {{ rental.extended_days }} @ ${{ vehicle_marketing.price_per_day|intcomma }}</p>
+                    <p><strong>Extended Days:</strong> {{ rental.extended_days }} @ ${{ price_data.vehicle_price_per_day|intcomma }}</p>
                     <p><strong><u>Extension Total:</u></strong> <strong>${{ rental.extended_days_amount|intcomma }}</strong></p>
                 </CFIF>
                 {% endif %}

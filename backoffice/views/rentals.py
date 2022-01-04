@@ -39,21 +39,7 @@ class RentalDetailView(PermissionRequiredMixin, RentalViewMixin, ListViewMixin, 
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        vehicle_marketing = VehicleMarketing.objects.get(vehicle_id=self.object.vehicle.id)
-        context['vehicle_marketing'] = vehicle_marketing
-        price_calculator = RentalPriceCalculator(
-            coupon_code=self.object.coupon_code,
-            email=self.object.customer.email,
-            tax_zip=self.object.delivery_zip,
-            effective_date=self.object.out_date,
-            is_military=self.object.is_military,
-            vehicle_marketing=vehicle_marketing,
-            num_days=self.object.num_days,
-            extra_miles=self.object.extra_miles,
-            override_subtotal=self.object.override_subtotal,
-            one_time_discount_pct=self.object.rental_discount_pct,
-        )
-        context['price_data'] = price_calculator.get_price_data()
+        context['price_data'] = self.object.get_price_data()
         return context
 
     def get_success_url(self):
