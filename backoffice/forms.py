@@ -88,7 +88,32 @@ class VehicleVideoForm(forms.ModelForm):
         fields = ('video_mp4', 'video_webm', 'poster', 'thumbnail', 'length', 'title', 'blurb',)
 
 
-class ReservationForm(forms.ModelForm):
+class ReservationDateTimeMixin:
+
+    def init_reservation_date_time(self):
+        if self.instance.out_at and self.instance.back_at:
+            out_at_localized = self.instance.out_at.astimezone(pytz.timezone(settings.TIME_ZONE))
+            back_at_localized = self.instance.back_at.astimezone(pytz.timezone(settings.TIME_ZONE))
+            self.fields['out_at_date'].initial = out_at_localized.strftime('%m/%d/%Y')
+            self.fields['back_at_date'].initial = back_at_localized.strftime('%m/%d/%Y')
+            self.fields['out_at_time'].initial = out_at_localized.strftime('%H:%M')
+            self.fields['back_at_time'].initial = back_at_localized.strftime('%H:%M')
+
+    def clean(self):
+        super().clean()
+        out_at_time = datetime.datetime.strptime(self.cleaned_data['out_at_time'], '%H:%M').time()
+        back_at_time = datetime.datetime.strptime(self.cleaned_data['back_at_time'], '%H:%M').time()
+        self.cleaned_data['out_at'] = datetime.datetime.combine(
+            self.cleaned_data['out_at_date'],
+            out_at_time,
+        )
+        self.cleaned_data['back_at'] = datetime.datetime.combine(
+            self.cleaned_data['back_at_date'],
+            back_at_time,
+        )
+
+
+class ReservationForm(ReservationDateTimeMixin, forms.ModelForm):
 
     DELIVERY_REQUIRED_CHOICES = (
         (False, 'Pickup at PRI'),
@@ -103,10 +128,12 @@ class ReservationForm(forms.ModelForm):
     home_phone = PhoneNumberField(required=False)
     work_phone = PhoneNumberField(required=False)
     mobile_phone = PhoneNumberField(required=False)
-    out_at_date = forms.DateField(widget=forms.SelectDateWidget(attrs={'class': 'check-conflict'}, years=operational_years))
-    out_at_time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time', 'class': 'check-conflict'}))
-    back_at_date = forms.DateField(widget=forms.SelectDateWidget(attrs={'class': 'check-conflict'}, years=operational_years))
-    back_at_time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time', 'class': 'check-conflict'}))
+
+    out_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short'}))
+    out_at_time = forms.ChoiceField(choices=get_service_hours())
+    back_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short'}))
+    back_at_time = forms.ChoiceField(choices=get_service_hours())
+
     delivery_required = forms.ChoiceField(choices=DELIVERY_REQUIRED_CHOICES)
     extra_miles = forms.ChoiceField()
     send_email = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, required=False)
@@ -138,15 +165,7 @@ class ReservationForm(forms.ModelForm):
                 else:
                     self.fields[field].initial = getattr(self.instance.customer, field, None) or getattr(self.instance.customer.user, field, None)
 
-        if self.instance.out_at:
-            out_at_localized = self.instance.out_at.astimezone(pytz.timezone(settings.TIME_ZONE))
-            self.fields['out_at_date'].initial = out_at_localized
-            self.fields['out_at_time'].initial = out_at_localized
-
-        if self.instance.back_at:
-            back_at_localized = self.instance.back_at.astimezone(pytz.timezone(settings.TIME_ZONE))
-            self.fields['back_at_date'].initial = back_at_localized
-            self.fields['back_at_time'].initial = back_at_localized
+        self.init_reservation_date_time()
 
         for field in ['drivers', 'delivery_zip', 'tax_percent', 'miles_included', 'coupon_code']:
             self.fields[field].widget.attrs['class'] = 'short'
@@ -155,23 +174,13 @@ class ReservationForm(forms.ModelForm):
         self.fields['extra_miles'].choices = ((k, v['label']) for k, v in settings.EXTRA_MILES_PRICES.items())
         self.fields['override_subtotal'].widget.attrs['placeholder'] = 'Override'
 
-    def clean(self):
-        self.cleaned_data['out_at'] = datetime.datetime.combine(
-            self.cleaned_data['out_at_date'],
-            self.cleaned_data['out_at_time'],
-        )
-        self.cleaned_data['back_at'] = datetime.datetime.combine(
-            self.cleaned_data['back_at_date'],
-            self.cleaned_data['back_at_time'],
-        )
-
     class Meta:
         model = Reservation
         # fields = '__all__'
         exclude = ('confirmation_code',)
 
 
-class RentalForm(forms.ModelForm):
+class RentalForm(ReservationDateTimeMixin, forms.ModelForm):
 
     out_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short'}))
     out_at_time = forms.ChoiceField(choices=get_service_hours())
@@ -191,25 +200,7 @@ class RentalForm(forms.ModelForm):
             if self.instance.status == Rental.Status.COMPLETE:
                 self.fields[field].widget.attrs['class'] += ' dont-edit'
 
-        if self.instance.out_at and self.instance.back_at:
-            out_at_localized = self.instance.out_at.astimezone(pytz.timezone(settings.TIME_ZONE))
-            back_at_localized = self.instance.back_at.astimezone(pytz.timezone(settings.TIME_ZONE))
-            self.fields['out_at_date'].initial = out_at_localized.strftime('%m/%d/%Y')
-            self.fields['back_at_date'].initial = back_at_localized.strftime('%m/%d/%Y')
-            self.fields['out_at_time'].initial = out_at_localized.strftime('%H:%M')
-            self.fields['back_at_time'].initial = back_at_localized.strftime('%H:%M')
-
-    def clean(self):
-        out_at_time = datetime.datetime.strptime(self.cleaned_data['out_at_time'], '%H:%M').time()
-        back_at_time = datetime.datetime.strptime(self.cleaned_data['back_at_time'], '%H:%M').time()
-        self.cleaned_data['out_at'] = datetime.datetime.combine(
-            self.cleaned_data['out_at_date'],
-            out_at_time,
-        )
-        self.cleaned_data['back_at'] = datetime.datetime.combine(
-            self.cleaned_data['back_at_date'],
-            back_at_time,
-        )
+        self.init_reservation_date_time()
 
     class Meta:
         model = Rental
