@@ -120,7 +120,6 @@ class ReservationForm(ReservationDateTimeMixin, forms.ModelForm):
         (True, 'Delivery'),
     )
 
-    vehicle = forms.ChoiceField(choices=get_vehicle_choices(), widget=forms.Select(attrs={'class': 'check-conflict'}))
     customer = forms.ModelChoiceField(queryset=Customer.objects.all(), widget=forms.HiddenInput())
     reservation = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     first_name = forms.CharField(required=False)
@@ -143,6 +142,9 @@ class ReservationForm(ReservationDateTimeMixin, forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.fields['vehicle'].choices = get_vehicle_choices()
+        self.fields['vehicle'].widget.attrs['class'] = 'check-conflict'
 
         # Populate conditionally non-editable fields from linked customer
         phone_fields = ['home_phone', 'work_phone', 'mobile_phone']
@@ -177,7 +179,6 @@ class ReservationForm(ReservationDateTimeMixin, forms.ModelForm):
 
 class RentalForm(ReservationDateTimeMixin, forms.ModelForm):
 
-    vehicle = forms.ChoiceField(choices=get_vehicle_choices(), widget=forms.Select(attrs={'class': 'check-conflict'}))
     out_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
     out_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
     back_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
@@ -185,6 +186,9 @@ class RentalForm(ReservationDateTimeMixin, forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.fields['vehicle'].choices = get_vehicle_choices()
+        self.fields['vehicle'].widget.attrs['class'] = 'check-conflict'
 
         for field in ['out_at_date', 'back_at_date']:
             if self.instance.status == Rental.Status.COMPLETE:
