@@ -30,7 +30,7 @@ class ReservationRentalDetailsForm(forms.ModelForm):
         (2, '2'),
         (3, _('More than 2')),
     )
-    DELIVERY_CHOICES = (
+    DELIVERY_REQUIRED_CHOICES = (
         (0, _('I will be picking up the vehicle at PRI in Ringwood, NJ')),
         (1, _('I would like the vehicle to be delivered to me')),
     )
@@ -51,7 +51,7 @@ class ReservationRentalDetailsForm(forms.ModelForm):
     back_time = forms.TimeField(widget=forms.Select(choices=get_service_hours()))
     back_at = forms.DateTimeField(required=False)
     drivers = forms.ChoiceField(choices=DRIVERS_CHOICES)
-    delivery_required = forms.ChoiceField(choices=DELIVERY_CHOICES)
+    delivery_required = forms.ChoiceField(choices=DELIVERY_REQUIRED_CHOICES)
     delivery_zip = USZipCodeField(required=False)
     extra_miles = forms.ChoiceField()
     email = forms.EmailField()

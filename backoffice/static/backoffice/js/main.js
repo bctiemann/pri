@@ -800,8 +800,8 @@ $(document).ready(function() {
     });
     $('#id_out_at_date').datepicker({});
     $('#id_back_at_date').datepicker({});
-    $('#depchargedon').datepicker({});
-    $('#deprefundon').datepicker({});
+    $('#id_deposit_charged_on').datepicker({});
+    $('#id_deposit_refunded_on').datepicker({});
     $('#reqdate').datepicker({});
     $('#bupdate').datepicker({});
     $('#donestamp').datepicker({});

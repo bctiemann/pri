@@ -12,6 +12,11 @@ TRUE_FALSE_CHOICES = (
     (False, 'No')
 )
 
+DELIVERY_REQUIRED_CHOICES = (
+    (False, 'Pickup at PRI'),
+    (True, 'Delivery'),
+)
+
 current_year = timezone.now().year
 birth_years = range(current_year - 18, current_year - 100, -1)
 operational_years = range(settings.COMPANY_FOUNDING_YEAR, current_year + 10)
@@ -60,6 +65,10 @@ def get_vehicle_choices():
     vehicle_choices.append(('Cars', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.CAR))))
     vehicle_choices.append(('Motorcycles', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.BIKE))))
     return vehicle_choices
+
+
+def get_extra_miles_choices():
+    return ((k, v['label']) for k, v in settings.EXTRA_MILES_PRICES.items())
 
 
 class ReservationType(Enum):

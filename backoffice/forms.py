@@ -11,9 +11,19 @@ from consignment.models import Consigner
 from users.models import User, Employee, Customer
 from sales.models import Reservation, Rental, Coupon
 from sales.enums import (
-    TRUE_FALSE_CHOICES, birth_years, operational_years, get_service_hours,
-    current_year, get_exp_year_choices, get_exp_month_choices, get_vehicle_choices
+    TRUE_FALSE_CHOICES, DELIVERY_REQUIRED_CHOICES, birth_years, operational_years, get_service_hours,
+    current_year, get_exp_year_choices, get_exp_month_choices, get_vehicle_choices, get_extra_miles_choices
 )
+
+
+class CSSClassMixin:
+
+    def add_widget_css_class(self, field, css_class_name):
+        widget_css_class = self.fields[field].widget.attrs.get('class')
+        widget_css_classes = widget_css_class.split(' ') if widget_css_class else []
+        widget_css_classes.append(css_class_name)
+        css_class_string = ' '.join(list(set(widget_css_classes)))
+        self.fields[field].widget.attrs['class'] = css_class_string
 
 
 # TODO: Add slug to the visible form fields and set on both models
@@ -113,12 +123,7 @@ class ReservationDateTimeMixin:
         )
 
 
-class ReservationForm(ReservationDateTimeMixin, forms.ModelForm):
-
-    DELIVERY_REQUIRED_CHOICES = (
-        (False, 'Pickup at PRI'),
-        (True, 'Delivery'),
-    )
+class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):
 
     customer = forms.ModelChoiceField(queryset=Customer.objects.all(), widget=forms.HiddenInput())
     reservation = forms.IntegerField(widget=forms.HiddenInput(), required=False)
@@ -135,7 +140,7 @@ class ReservationForm(ReservationDateTimeMixin, forms.ModelForm):
     back_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
 
     delivery_required = forms.ChoiceField(choices=DELIVERY_REQUIRED_CHOICES)
-    extra_miles = forms.ChoiceField()
+    extra_miles = forms.ChoiceField(choices=get_extra_miles_choices())
     send_email = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, required=False)
     is_military = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, required=False)
     customer_notes = forms.CharField(widget=forms.Textarea(attrs={'class': 'customer-notes'}), required=False)
@@ -165,10 +170,9 @@ class ReservationForm(ReservationDateTimeMixin, forms.ModelForm):
         self.init_reservation_date_time()
 
         for field in ['drivers', 'delivery_zip', 'tax_percent', 'miles_included', 'coupon_code']:
-            self.fields[field].widget.attrs['class'] = 'short'
+            self.add_widget_css_class(field, 'short')
 
         self.fields['tax_percent'].initial = decimal.Decimal(settings.DEFAULT_TAX_RATE) * 100
-        self.fields['extra_miles'].choices = ((k, v['label']) for k, v in settings.EXTRA_MILES_PRICES.items())
         self.fields['override_subtotal'].widget.attrs['placeholder'] = 'Override'
 
     class Meta:
@@ -177,12 +181,17 @@ class ReservationForm(ReservationDateTimeMixin, forms.ModelForm):
         exclude = ('confirmation_code',)
 
 
-class RentalForm(ReservationDateTimeMixin, forms.ModelForm):
+class RentalForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):
 
     out_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
     out_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
     back_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
     back_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
+
+    delivery_required = forms.ChoiceField(choices=DELIVERY_REQUIRED_CHOICES)
+    extra_miles = forms.ChoiceField(choices=get_extra_miles_choices())
+    deposit_charged_on = forms.DateField()
+    deposit_refunded_on = forms.DateField()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -192,9 +201,22 @@ class RentalForm(ReservationDateTimeMixin, forms.ModelForm):
 
         for field in ['out_at_date', 'back_at_date']:
             if self.instance.status == Rental.Status.COMPLETE:
-                self.fields[field].widget.attrs['class'] += ' dont-edit'
+                self.add_widget_css_class(field, 'dont-edit')
+
+        for field in [
+            'delivery_zip', 'miles_included', 'mileage_out', 'mileage_back', 'coupon_code',
+            'deposit_amount', 'deposit_charged_on', 'deposit_refund_amount', 'deposit_refunded_on',
+            'rental_discount_pct', 'tax_percent'
+        ]:
+            self.add_widget_css_class(field, 'short')
 
         self.init_reservation_date_time()
+        if self.instance.deposit_charged_at:
+            deposit_charged_at_localized = self.instance.deposit_charged_at.astimezone(pytz.timezone(settings.TIME_ZONE))
+            self.fields['deposit_charged_on'].initial = deposit_charged_at_localized.strftime('%m/%d/%Y')
+        if self.instance.deposit_refunded_at:
+            deposit_refunded_at_localized = self.instance.deposit_refunded_at.astimezone(pytz.timezone(settings.TIME_ZONE))
+            self.fields['deposit_refunded_on'].initial = deposit_refunded_at_localized.strftime('%m/%d/%Y')
 
     class Meta:
         model = Rental
