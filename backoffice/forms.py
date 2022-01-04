@@ -4,28 +4,16 @@ import decimal
 
 from django.conf import settings
 from django import forms
-from django.utils import timezone
 from phonenumber_field.formfields import PhoneNumberField
 
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, VehicleType
 from consignment.models import Consigner
 from users.models import User, Employee, Customer
 from sales.models import Reservation, Rental, Coupon
-
-TRUE_FALSE_CHOICES = (
-    (True, 'Yes'),
-    (False, 'No')
+from sales.enums import (
+    TRUE_FALSE_CHOICES, birth_years, operational_years, get_service_hours,
+    current_year, get_exp_year_choices, get_exp_month_choices
 )
-current_year = timezone.now().year
-birth_years = range(current_year - 18, current_year - 100, -1)
-operational_years = range(settings.COMPANY_FOUNDING_YEAR, current_year + 10)
-
-service_hours = []
-for hour in range(7, 20):
-    service_hours.append((f'{str(hour).zfill(2)}:00', f'{hour}:00'))
-    service_hours.append((f'{str(hour).zfill(2)}:30', f'{hour}:30'))
-service_hours.append(('20:00', '20:00'))
-service_hours.append(('23:00', 'Other (Special)'))
 
 
 # TODO: Add slug to the visible form fields and set on both models
@@ -186,9 +174,9 @@ class ReservationForm(forms.ModelForm):
 class RentalForm(forms.ModelForm):
 
     out_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short'}))
-    out_at_time = forms.ChoiceField(choices=service_hours)
+    out_at_time = forms.ChoiceField(choices=get_service_hours())
     back_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short'}))
-    back_at_time = forms.ChoiceField(choices=service_hours)
+    back_at_time = forms.ChoiceField(choices=get_service_hours())
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -246,35 +234,12 @@ class EmployeeForm(forms.ModelForm):
 
 class CustomerForm(forms.ModelForm):
 
-    EXP_MONTH_CHOICES = (
-        ('01', 'January (01)'),
-        ('02', 'February (02)'),
-        ('03', 'March (03)'),
-        ('04', 'April (04)'),
-        ('05', 'May (05)'),
-        ('06', 'June (06)'),
-        ('07', 'July (07)'),
-        ('08', 'August (08)'),
-        ('09', 'September (09)'),
-        ('10', 'October (10)'),
-        ('11', 'November (11)'),
-        ('12', 'December (12)'),
-    )
-    # EXP_YEAR_CHOICES = ((year, year) for year in range(settings.COMPANY_FOUNDING_YEAR, current_year + 11))
-    # EXP_YEAR_CHOICES_2 = ((year, year) for year in range(settings.COMPANY_FOUNDING_YEAR, current_year + 11))
-    # EXP_YEAR_CHOICES_2 = tuple(deepcopy(list(EXP_YEAR_CHOICES)))
-
     email = forms.EmailField(required=True)
     receive_email = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
-    # password = forms.CharField(widget=forms.PasswordInput(), required=True)
-    # date_of_birth = forms.DateField(widget=forms.SelectDateWidget(years=birth_years))
-    # cc_number = forms.CharField(required=False)
-    cc_exp_yr = forms.ChoiceField()
-    cc_exp_mo = forms.ChoiceField(choices=EXP_MONTH_CHOICES)
-    cc2_exp_yr = forms.ChoiceField()
-    cc2_exp_mo = forms.ChoiceField(choices=EXP_MONTH_CHOICES)
-    # cc_cvv = forms.CharField(required=False)
-    # cc_phone = PhoneNumberField(required=False)
+    cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices(since_founding=True, allow_null=True))
+    cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(allow_null=True))
+    cc2_exp_yr = forms.ChoiceField(choices=get_exp_year_choices(since_founding=True, allow_null=True))
+    cc2_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(allow_null=True))
     date_of_birth = forms.DateField(widget=forms.SelectDateWidget(years=birth_years))
     ban = forms.BooleanField(required=False)
     password = forms.CharField(widget=forms.PasswordInput(), required=True)
@@ -282,8 +247,8 @@ class CustomerForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['cc_exp_yr'].choices = self.get_exp_year_choices()
-        self.fields['cc2_exp_yr'].choices = self.get_exp_year_choices()
+        # self.fields['cc_exp_yr'].choices = get_exp_year_choices(since_founding=True, allow_null=True)
+        # self.fields['cc2_exp_yr'].choices = get_exp_year_choices(since_founding=True, allow_null=True)
 
         if self.instance.user:
             self.fields['email'].initial = self.instance.user.email
@@ -294,8 +259,8 @@ class CustomerForm(forms.ModelForm):
         for field in cc_fields:
             self.fields[field].widget.attrs['class'] = 'cc-field'
 
-    def get_exp_year_choices(self):
-        return ((year, year) for year in range(settings.COMPANY_FOUNDING_YEAR, current_year + 11))
+    # def get_exp_year_choices(self):
+    #     return ((year, year) for year in range(settings.COMPANY_FOUNDING_YEAR, current_year + 11))
 
     def clean_email(self):
         email = self.cleaned_data['email']

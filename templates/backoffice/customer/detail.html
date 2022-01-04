@@ -497,7 +497,7 @@
         </tr>
         <tr>
             <td>Password</td>
-            {% if customer %}
+            {% if customer.user %}
                 <td>
                     <a href="{% url "admin:auth_user_password_change" id=customer.user.id %}">Change password</a>
                     <input type="hidden" id="id_password" name="password" value="{{ customer.user.password }}" />

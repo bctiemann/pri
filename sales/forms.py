@@ -14,6 +14,7 @@ from fleet.models import Vehicle, VehicleMarketing, VehicleStatus
 from sales.models import Reservation, Coupon
 from users.models import Customer
 from sales.utils import RentalPriceCalculator
+from sales.enums import get_service_hours, TRUE_FALSE_CHOICES, get_exp_year_choices, get_exp_month_choices
 
 current_year = timezone.now().year
 
@@ -24,36 +25,6 @@ current_year = timezone.now().year
 
 class ReservationRentalDetailsForm(forms.ModelForm):
     error_css_class = 'field-error'
-    TIME_CHOICES = (
-        ('07:00', '7:00 am'),
-        ('07:30', '7:30 am'),
-        ('08:00', '8:00 am'),
-        ('08:30', '8:30 am'),
-        ('09:00', '9:00 am'),
-        ('09:30', '9:30 am'),
-        ('10:00', '10:00 am'),
-        ('10:30', '10:30 am'),
-        ('11:00', '11:00 am'),
-        ('11:30', '11:30 am'),
-        ('12:00', '12:00 pm'),
-        ('12:30', '12:30 pm'),
-        ('13:00', '1:00 pm'),
-        ('13:30', '1:30 pm'),
-        ('14:00', '2:00 pm'),
-        ('14:30', '2:30 pm'),
-        ('15:00', '3:00 pm'),
-        ('15:30', '3:30 pm'),
-        ('16:00', '4:00 pm'),
-        ('16:30', '4:30 pm'),
-        ('17:00', '5:00 pm'),
-        ('17:30', '5:30 pm'),
-        ('18:00', '6:00 pm'),
-        ('18:30', '6:30 pm'),
-        ('19:00', '7:00 pm'),
-        ('19:30', '7:30 pm'),
-        ('20:00', '8:00 pm'),
-        ('23:00', 'Other (special)'),
-    )
     DRIVERS_CHOICES = (
         (1, '1'),
         (2, '2'),
@@ -62,10 +33,6 @@ class ReservationRentalDetailsForm(forms.ModelForm):
     DELIVERY_CHOICES = (
         (0, _('I will be picking up the vehicle at PRI in Ringwood, NJ')),
         (1, _('I would like the vehicle to be delivered to me')),
-    )
-    TRUE_FALSE_CHOICES = (
-        (True, 'Yes'),
-        (False, 'No')
     )
     DATETIME_FORMAT = '%m/%d/%Y %H:%M'
     discount = None
@@ -78,10 +45,10 @@ class ReservationRentalDetailsForm(forms.ModelForm):
 
     vehicle_marketing = forms.ModelChoiceField(widget=forms.HiddenInput(), queryset=VehicleMarketing.objects.filter(status=VehicleStatus.READY))
     out_date = forms.DateField(widget=forms.DateInput(attrs={'placeholder': 'MM/DD/YYYY'}))
-    out_time = forms.TimeField(widget=forms.Select(choices=TIME_CHOICES))
+    out_time = forms.TimeField(widget=forms.Select(choices=get_service_hours()))
     out_at = forms.DateTimeField(required=False)
     back_date = forms.DateField(widget=forms.DateInput(attrs={'placeholder': 'MM/DD/YYYY'}))
-    back_time = forms.TimeField(widget=forms.Select(choices=TIME_CHOICES))
+    back_time = forms.TimeField(widget=forms.Select(choices=get_service_hours()))
     back_at = forms.DateTimeField(required=False)
     drivers = forms.ChoiceField(choices=DRIVERS_CHOICES)
     delivery_required = forms.ChoiceField(choices=DELIVERY_CHOICES)
@@ -314,21 +281,21 @@ class ReservationRentalPaymentForm(ReservationRentalDetailsForm):
         'first_name', 'last_name', 'mobile_phone', 'home_phone', 'work_phone', 'fax', 'cc_number', 'cc_exp_yr',
         'cc_exp_mo', 'cc_cvv', 'cc_phone', 'address_line_1', 'address_line_2', 'city', 'state', 'zip'
     )
-    EXP_MONTH_CHOICES = (
-        ('01', 'January (01)'),
-        ('02', 'February (02)'),
-        ('03', 'March (03)'),
-        ('04', 'April (04)'),
-        ('05', 'May (05)'),
-        ('06', 'June (06)'),
-        ('07', 'July (07)'),
-        ('08', 'August (08)'),
-        ('09', 'September (09)'),
-        ('10', 'October (10)'),
-        ('11', 'November (11)'),
-        ('12', 'December (12)'),
-    )
-    EXP_YEAR_CHOICES = ((year, year) for year in range(current_year, current_year + 11))
+    # EXP_MONTH_CHOICES = (
+    #     ('01', 'January (01)'),
+    #     ('02', 'February (02)'),
+    #     ('03', 'March (03)'),
+    #     ('04', 'April (04)'),
+    #     ('05', 'May (05)'),
+    #     ('06', 'June (06)'),
+    #     ('07', 'July (07)'),
+    #     ('08', 'August (08)'),
+    #     ('09', 'September (09)'),
+    #     ('10', 'October (10)'),
+    #     ('11', 'November (11)'),
+    #     ('12', 'December (12)'),
+    # )
+    # EXP_YEAR_CHOICES = ((year, year) for year in range(current_year, current_year + 11))
 
     # first_name = forms.CharField()
     # last_name = forms.CharField()
@@ -337,8 +304,8 @@ class ReservationRentalPaymentForm(ReservationRentalDetailsForm):
     # work_phone = PhoneNumberField()
     # fax = PhoneNumberField()
     cc_number = forms.CharField()
-    cc_exp_yr = forms.ChoiceField(choices=EXP_YEAR_CHOICES)
-    cc_exp_mo = forms.ChoiceField(choices=EXP_MONTH_CHOICES)
+    cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices())
+    cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices())
     cc_cvv = forms.CharField()
     cc_phone = PhoneNumberField()
     # password = forms.CharField(widget=forms.PasswordInput(), required=False)
@@ -346,7 +313,7 @@ class ReservationRentalPaymentForm(ReservationRentalDetailsForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # current_year = timezone.now().year
-        # self.fields['cc_exp_yr'].choices = ((year, year) for year in range(current_year, current_year + 11))
+        # self.fields['cc_exp_yr'].choices = get_exp_year_choices()
         # self.fields['extra_miles'].choices = ((k, v['label']) for k, v in settings.EXTRA_MILES_PRICES.items())
 
     class Meta:

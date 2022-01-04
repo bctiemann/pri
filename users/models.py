@@ -317,7 +317,9 @@ class Customer(models.Model):
 
     @property
     def email(self):
-        return self.user.email
+        if self.user:
+            return self.user.email
+        return None
 
     @property
     def ip_country(self):
