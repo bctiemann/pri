@@ -245,7 +245,7 @@ class EmployeeForm(forms.ModelForm):
         exclude = ('user',)
 
 
-class CustomerForm(forms.ModelForm):
+class CustomerForm(CSSClassMixin, forms.ModelForm):
 
     email = forms.EmailField(required=True)
     receive_email = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
@@ -260,9 +260,6 @@ class CustomerForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # self.fields['cc_exp_yr'].choices = get_exp_year_choices(since_founding=True, allow_null=True)
-        # self.fields['cc2_exp_yr'].choices = get_exp_year_choices(since_founding=True, allow_null=True)
-
         if self.instance.user:
             self.fields['email'].initial = self.instance.user.email
         phone_fields = ['home_phone', 'work_phone', 'mobile_phone', 'fax', 'insurance_company_phone', 'cc_phone', 'cc2_phone']
@@ -271,6 +268,12 @@ class CustomerForm(forms.ModelForm):
         cc_fields = ['cc_number', 'cc2_number']
         for field in cc_fields:
             self.fields[field].widget.attrs['class'] = 'cc-field'
+        short_fields = [
+            'zip', 'home_phone', 'mobile_phone', 'work_phone', 'fax', 'insurance_company_phone', 'discount_pct',
+            'cc_cvv', 'cc_phone', 'cc2_cvv', 'cc2_phone',
+        ]
+        for field in short_fields:
+            self.add_widget_css_class(field, 'short')
 
     # def get_exp_year_choices(self):
     #     return ((year, year) for year in range(settings.COMPANY_FOUNDING_YEAR, current_year + 11))

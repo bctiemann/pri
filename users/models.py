@@ -252,6 +252,30 @@ class Customer(models.Model):
         GOLD = (2, 'Gold')
         PLATINUM = (3, 'Platinum')
 
+    class DriverSkill(models.IntegerChoices):
+        SKILL_1 = (0, '1 - Good lord.')
+        SKILL_2 = (1, '2')
+        SKILL_3 = (2, '3')
+        SKILL_4 = (3, '4')
+        SKILL_5 = (4, '5')
+        SKILL_6 = (5, '6')
+        SKILL_7 = (6, '7')
+        SKILL_8 = (7, '8')
+        SKILL_9 = (8, '9')
+        SKILL_10 = (9, '10 - Schumi')
+
+    class Rating(models.IntegerChoices):
+        RATING_1 = (0, '1 - Horrible')
+        RATING_2 = (1, '2')
+        RATING_3 = (2, '3')
+        RATING_4 = (3, '4')
+        RATING_5 = (4, '5')
+        RATING_6 = (5, '6')
+        RATING_7 = (6, '7')
+        RATING_8 = (7, '8')
+        RATING_9 = (8, '9')
+        RATING_10 = (9, '10 - Awesome')
+
     user = models.OneToOneField('users.User', null=True, blank=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -296,8 +320,8 @@ class Customer(models.Model):
 
     rentals_count = models.IntegerField(null=True, blank=True)
     remarks = fields.EncryptedTextField(blank=True)
-    rating = models.IntegerField(null=True, blank=True)
-    driver_skill = models.IntegerField(null=True, blank=True)
+    rating = models.IntegerField(choices=Rating.choices, null=True, blank=True)
+    driver_skill = models.IntegerField(choices=DriverSkill.choices, null=True, blank=True)
     discount_pct = models.IntegerField(null=True, blank=True)
     music_genre = models.ForeignKey('users.MusicGenre', null=True, blank=True, on_delete=models.SET_NULL)
     music_favorite = models.CharField(max_length=255, blank=True)
