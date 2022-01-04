@@ -4,6 +4,8 @@ from datetime import datetime, time, timedelta
 from django.conf import settings
 from django.utils import timezone
 
+from fleet.models import VehicleMarketing, VehicleType
+
 
 TRUE_FALSE_CHOICES = (
     (True, 'Yes'),
@@ -51,6 +53,13 @@ def get_exp_year_choices(since_founding=False, allow_null=False):
     if allow_null:
         choices = [(None, '----')] + choices
     return choices
+
+
+def get_vehicle_choices():
+    vehicle_choices = []
+    vehicle_choices.append(('Cars', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.CAR))))
+    vehicle_choices.append(('Motorcycles', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.BIKE))))
+    return vehicle_choices
 
 
 class ReservationType(Enum):

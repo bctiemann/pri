@@ -12,7 +12,7 @@ from users.models import User, Employee, Customer
 from sales.models import Reservation, Rental, Coupon
 from sales.enums import (
     TRUE_FALSE_CHOICES, birth_years, operational_years, get_service_hours,
-    current_year, get_exp_year_choices, get_exp_month_choices
+    current_year, get_exp_year_choices, get_exp_month_choices, get_vehicle_choices
 )
 
 
@@ -120,7 +120,7 @@ class ReservationForm(ReservationDateTimeMixin, forms.ModelForm):
         (True, 'Delivery'),
     )
 
-    vehicle = forms.ChoiceField(widget=forms.Select(attrs={'class': 'check-conflict'}))
+    vehicle = forms.ChoiceField(choices=get_vehicle_choices(), widget=forms.Select(attrs={'class': 'check-conflict'}))
     customer = forms.ModelChoiceField(queryset=Customer.objects.all(), widget=forms.HiddenInput())
     reservation = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     first_name = forms.CharField(required=False)
@@ -143,12 +143,6 @@ class ReservationForm(ReservationDateTimeMixin, forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        # Populate vehicle choices
-        vehicle_choices = []
-        vehicle_choices.append(('Cars', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.CAR))))
-        vehicle_choices.append(('Motorcycles', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.BIKE))))
-        self.fields['vehicle'].choices = vehicle_choices
 
         # Populate conditionally non-editable fields from linked customer
         phone_fields = ['home_phone', 'work_phone', 'mobile_phone']
@@ -183,7 +177,7 @@ class ReservationForm(ReservationDateTimeMixin, forms.ModelForm):
 
 class RentalForm(ReservationDateTimeMixin, forms.ModelForm):
 
-    vehicle = forms.ChoiceField(widget=forms.Select(attrs={'class': 'check-conflict'}))
+    vehicle = forms.ChoiceField(choices=get_vehicle_choices(), widget=forms.Select(attrs={'class': 'check-conflict'}))
     out_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
     out_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
     back_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
@@ -191,12 +185,6 @@ class RentalForm(ReservationDateTimeMixin, forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        # Populate vehicle choices
-        vehicle_choices = []
-        vehicle_choices.append(('Cars', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.CAR))))
-        vehicle_choices.append(('Motorcycles', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.BIKE))))
-        self.fields['vehicle'].choices = vehicle_choices
 
         for field in ['out_at_date', 'back_at_date']:
             if self.instance.status == Rental.Status.COMPLETE:
