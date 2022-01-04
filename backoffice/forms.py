@@ -120,6 +120,7 @@ class ReservationForm(ReservationDateTimeMixin, forms.ModelForm):
         (True, 'Delivery'),
     )
 
+    vehicle = forms.ChoiceField(widget=forms.Select(attrs={'class': 'check-conflict'}))
     customer = forms.ModelChoiceField(queryset=Customer.objects.all(), widget=forms.HiddenInput())
     reservation = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     first_name = forms.CharField(required=False)
@@ -129,10 +130,10 @@ class ReservationForm(ReservationDateTimeMixin, forms.ModelForm):
     work_phone = PhoneNumberField(required=False)
     mobile_phone = PhoneNumberField(required=False)
 
-    out_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short'}))
-    out_at_time = forms.ChoiceField(choices=get_service_hours())
-    back_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short'}))
-    back_at_time = forms.ChoiceField(choices=get_service_hours())
+    out_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
+    out_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
+    back_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
+    back_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
 
     delivery_required = forms.ChoiceField(choices=DELIVERY_REQUIRED_CHOICES)
     extra_miles = forms.ChoiceField()
@@ -182,10 +183,11 @@ class ReservationForm(ReservationDateTimeMixin, forms.ModelForm):
 
 class RentalForm(ReservationDateTimeMixin, forms.ModelForm):
 
-    out_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short'}))
-    out_at_time = forms.ChoiceField(choices=get_service_hours())
-    back_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short'}))
-    back_at_time = forms.ChoiceField(choices=get_service_hours())
+    vehicle = forms.ChoiceField(widget=forms.Select(attrs={'class': 'check-conflict'}))
+    out_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
+    out_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
+    back_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
+    back_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

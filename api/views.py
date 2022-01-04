@@ -306,20 +306,12 @@ class CheckScheduleConflictView(APIView):
 
     def post(self, request):
         try:
-            out_at_date = datetime.datetime(
-                day=int(request.POST.get('out_at_date_day')),
-                month=int(request.POST.get('out_at_date_month')),
-                year=int(request.POST.get('out_at_date_year')),
-            )
-            out_at_time = datetime.datetime.strptime(request.POST.get('out_at_time'), '%H:%M:%S').time()
+            out_at_date = datetime.datetime.strptime(request.POST.get('out_at_date'), '%m/%d/%Y').date()
+            out_at_time = datetime.datetime.strptime(request.POST.get('out_at_time'), '%H:%M').time()
             out_at = datetime.datetime.combine(out_at_date, out_at_time)
 
-            back_at_date = datetime.datetime(
-                day=int(request.POST.get('back_at_date_day')),
-                month=int(request.POST.get('back_at_date_month')),
-                year=int(request.POST.get('back_at_date_year')),
-            )
-            back_at_time = datetime.datetime.strptime(request.POST.get('back_at_time'), '%H:%M:%S').time()
+            back_at_date = datetime.datetime.strptime(request.POST.get('back_at_date'), '%m/%d/%Y').date()
+            back_at_time = datetime.datetime.strptime(request.POST.get('back_at_time'), '%H:%M').time()
             back_at = datetime.datetime.combine(back_at_date, back_at_time)
         except ValueError:
             return Response({'success': False, 'error': 'Out/back dates not set'})
@@ -327,7 +319,8 @@ class CheckScheduleConflictView(APIView):
         vehicle = Vehicle.objects.get(pk=request.POST.get('vehicle_id'))
 
         conflicts = BaseReservation.objects.filter(vehicle=vehicle, back_at__gte=out_at, out_at__lte=back_at)
-        conflicts = conflicts.exclude(pk=request.POST.get('reservation_id'))
+        exclude_id = request.POST.get('reservation_id') or request.POST.get('rental_id')
+        conflicts = conflicts.exclude(pk=exclude_id)
 
         serializer = ScheduleConflictSerializer(conflicts, many=True)
 

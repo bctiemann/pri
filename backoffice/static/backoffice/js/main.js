@@ -609,10 +609,12 @@ var checkScheduleConflict = function() {
     var params = {
         // component: 'reservations',
         // method: 'checkConflict',
+        out_at_date: $('#id_out_at_date').val(),
         out_at_date_day: $('#id_out_at_date_day').val(),
         out_at_date_month: $('#id_out_at_date_month').val(),
         out_at_date_year: $('#id_out_at_date_year').val(),
         out_at_time: $('#id_out_at_time').val(),
+        back_at_date: $('#id_back_at_date').val(),
         back_at_date_day: $('#id_back_at_date_day').val(),
         back_at_date_month: $('#id_back_at_date_month').val(),
         back_at_date_year: $('#id_back_at_date_year').val(),
