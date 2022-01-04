@@ -106,7 +106,7 @@ class BaseReservation(models.Model):
     customer_notes = models.TextField(blank=True)
     coupon_code = models.CharField(max_length=30, blank=True)
     is_military = models.BooleanField(default=False)
-    deposit_amount = models.IntegerField(null=True, blank=True)
+    deposit_amount = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
     confirmation_code = models.CharField(max_length=10, blank=True, unique=True)
     app_channel = models.CharField(max_length=20, choices=AppChannel.choices, blank=True, default=AppChannel.WEB)
     delivery_required = models.BooleanField(default=False)
