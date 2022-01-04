@@ -190,8 +190,8 @@ class RentalForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):
 
     delivery_required = forms.ChoiceField(choices=DELIVERY_REQUIRED_CHOICES)
     extra_miles = forms.ChoiceField(choices=get_extra_miles_choices())
-    deposit_charged_on = forms.DateField()
-    deposit_refunded_on = forms.DateField()
+    deposit_charged_on = forms.DateField(required=False)
+    deposit_refunded_on = forms.DateField(required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -217,6 +217,11 @@ class RentalForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):
         if self.instance.deposit_refunded_at:
             deposit_refunded_at_localized = self.instance.deposit_refunded_at.astimezone(pytz.timezone(settings.TIME_ZONE))
             self.fields['deposit_refunded_on'].initial = deposit_refunded_at_localized.strftime('%m/%d/%Y')
+
+    def clean(self):
+        super().clean()
+        self.cleaned_data['deposit_charged_at'] = self.cleaned_data['deposit_charged_on']
+        self.cleaned_data['deposit_refunded_at'] = self.cleaned_data['deposit_refunded_on']
 
     class Meta:
         model = Rental
