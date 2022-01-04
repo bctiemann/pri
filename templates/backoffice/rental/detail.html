@@ -291,26 +291,28 @@
             <td class="align-top">Abuse Incidents</td>
             <td>
                 {{ form.abuse }}
-                <cftextarea name="abuse">#Rental.abuse#</cftextarea>
+{#                <cftextarea name="abuse">#Rental.abuse#</cftextarea>#}
             </td>
         </tr>
         <tr>
             <td class="align-top">Damage Out</td>
             <td>
                 {{ form.damage_out }}
-                <cftextarea name="damageout">#Rental.damageout#</cftextarea>
+{#                <cftextarea name="damageout">#Rental.damageout#</cftextarea>#}
             </td>
         </tr>
         <tr>
             <td class="align-top">Damage In (return)</td>
             <td>
                 {{ form.damage_in }}
-                <cftextarea name="damagein">#Rental.damagein#</cftextarea>
+{#                <cftextarea name="damagein">#Rental.damagein#</cftextarea>#}
             </td>
         </tr>
         <tr>
             <td>Discount/Coupon Code</td>
             <td>
+                {{ form.coupon_code }}
+                {% comment %}
                 <CFIF len(Rental.coupon) GT 0>
                     <CFQUERY NAME="codecheck" DATASOURCE="#DSN#">
                         SELECT * FROM discounts
@@ -325,20 +327,33 @@
                          <span style="color:red">INVALID</span>
                      </CFIF>)
                 </CFIF>
+                {% endcomment %}
+                {% if rental.coupon_code %}
+                <CFIF len(Reservation.coupon) GT 0>
+                    ({% if rental.coupon %}
+                    <CFIF codecheck.recordcount IS 1>
+                         <span style="color:green">VALID</span> {{ rental.coupon.value_str }}
+                    {% else %}
+                     <CFELSE>
+                         <span style="color:red">INVALID</span>
+                     </CFIF>
+                    {% endif %})
+                </CFIF>
+                {% endif %}
             </td>
         </tr>
         <tr>
             <td class="align-top">Notes<br /><small>Customer Requests<br />Visible to Customer</small></td>
             <td>
                 {{ form.customer_notes }}
-                <cftextarea name="notes" class="customer-notes">#Rental.notes#</cftextarea>
+{#                <cftextarea name="notes" class="customer-notes">#Rental.notes#</cftextarea>#}
             </td>
         </tr>
         <tr>
             <td class="align-top">Our Notes<br /><small>Not Public</small></td>
             <td>
                 {{ form.internal_notes }}
-                <cftextarea name="ournotes" class="our-notes">#ournotes_dec#</cftextarea>
+{#                <cftextarea name="ournotes" class="our-notes">#ournotes_dec#</cftextarea>#}
             </td>
         </tr>
 
