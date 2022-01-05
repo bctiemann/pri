@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.db import models
 
 
@@ -11,6 +12,18 @@ class BBSPost(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
     body = models.TextField(blank=True)
+
+    @property
+    def css_class(self):
+        age_days = (timezone.now() - self.created_at).seconds / 86400
+        if age_days < 0.25:
+            return 'bbbsnew'
+        elif age_days < 2:
+            return 'bbsrecent'
+        elif self.deleted_at:
+            return 'bbsdeleted'
+        return 'bbs'
+
 
     class Meta:
         ordering = ('-reply_to_id', 'id',)

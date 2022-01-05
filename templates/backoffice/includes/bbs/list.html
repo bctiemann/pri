@@ -1,62 +1,29 @@
 {% load bbcode_tags %}
 
-<!-- LIST -->
-<CFIF ListBBS IS True>
-        <CFIF IsDefined("ShortBBS")>
-                <CFQUERY NAME="Notes" DATASOURCE="#DSN#">
-                        SELECT * FROM notes
-                        WHERE Stamp > #Dateadd("d",-3,Now())# AND Deleted = 0
-                        ORDER BY ReplyTonotesid DESC, notesid
-                </CFQUERY>
-        <CFELSE>
-                <CFQUERY NAME="Notes" DATASOURCE="#DSN#">
-                        SELECT * FROM notes
-                        ORDER BY ReplyTonotesid DESC, notesid
-                </CFQUERY>
-        </CFIF>
-        <CFSET RepID = 0>
-
-        {% for post in bbs_posts %}
-        <CFOUTPUT QUERY="Notes">
-                <cfset notes_dec = Decrypt(notes,globalkey,"AES","hex")>
-		<div class="bbsnote
-		        {% if post.reply_to != post %}
-                <CFIF ReplyTonotesid IS NOT notesid> reply
-                        <CFSET RepID = #ReplyTonotesid#>
-                </CFIF>
-                {% endif %}
-                <CFSET x = Now() - Stamp>
-                <CFIF x LT 0.25>
-                        <CFSET msg = 'bbsnew'><CFELSEIF x LT 1><CFSET msg = 'bbsrecent'><CFELSE><CFSET msg = 'bbs'></CFIF><CFIF Deleted><CFSET msg='bbsdeleted'>
-                </CFIF>
-#msg#">
-
-			<div class="bbsinfo">
+{% for post in bbs_posts %}
+    <div class="bbsnote {{ post.css_class }} {% if post.reply_to != post %}reply{% endif %}">
+        <div class="bbsinfo">
 			<b>{{ post.author.employee.full_name }}</b> {{ post.created_at|date:"n/j g:iA" }}
-			<CFIF NOT Deleted>
+            {% if not post.deleted_at %}
 				<a class="submenu" href="{% url "backoffice:home-reply-post" pk=post.id %}">Reply</a>
-				<CFIF YourID.AdminID IS AdminID>
+                {% if user == post.author %}
 					<a class="submenu" href="{% url "backoffice:home-edit-post" pk=post.id %}">Edit</a>
 					<a class="submenu" href="{% url "backoffice:home-delete-post" pk=post.id %}">Delete</a>
-				</CFIF>
-			</CFIF>
-			</div>
-			<div class="bbsnotetext">
-                {{ post.body|bbcode|safe }}
-			</div>
-		</div>
-        </CFOUTPUT>
-        {% endfor %}
+                {% endif %}
+            {% endif %}
+        </div>
+        <div class="bbsnotetext">
+            {{ post.body|bbcode|safe }}
+        </div>
+    </div>
+{% endfor %}
 
-        <small>
-        <font color="#202020">
-        <b><font color="#ff0000">Red</font></b>, less than 6hrs<Br>
-        <b><font color="#ff8080">Pink</font></b>, less than 2days<br>
-        <b><font color="#000">White</font></b>, All other<br>
-        <CFIF IsDefined("ShortBBS")>Shows messages from the last three (3)
-days.
-<br></CFIF>
-        </font>
-        </small>
-</CFIF>
+<small>
+    <font color="#202020">
+    <b><font color="#ff0000">Red</font></b>, less than 6hrs<Br>
+    <b><font color="#ff8080">Pink</font></b>, less than 2days<br>
+    <b><font color="#000">White</font></b>, All other<br>
+    {% if short_bbs %}Shows messages from the last three (3) days.<br>{% endif %}
+    </font>
+</small>
 

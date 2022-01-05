@@ -1,9 +1,12 @@
+from datetime import timedelta
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 
 from django.urls import reverse_lazy, reverse
 from django.utils.dateparse import parse_datetime
+from django.utils import timezone
 from django.views.generic import TemplateView, DetailView, UpdateView, CreateView, DeleteView
 from django.contrib.auth.views import LogoutView
 from django.db.models import Q
@@ -33,12 +36,14 @@ class HomeView(AdminViewMixin, TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['bbs_posts'] = BBSPost.objects.all()
+        three_days_ago = timezone.now() - timedelta(days=3)
+        context['bbs_posts'] = BBSPost.objects.filter(created_at__gte=three_days_ago, deleted_at__isnull=True)
+        context['short_bbs'] = True
         return context
 
 
 class HomeAddPostView(AdminViewMixin, CreateView):
-    template_name = 'backoffice/home_add_post.html'
+    template_name = 'backoffice/home/add_post.html'
     model = BBSPost
     fields = ('body',)
 
@@ -55,13 +60,13 @@ class HomeAddPostView(AdminViewMixin, CreateView):
 
 
 class HomeEditPostView(AdminViewMixin, UpdateView):
-    template_name = 'backoffice/home_edit_post.html'
+    template_name = 'backoffice/home/edit_post.html'
     model = BBSPost
     fields = ('body',)
 
 
 class HomeReplyPostView(AdminViewMixin, CreateView):
-    template_name = 'backoffice/home_reply_post.html'
+    template_name = 'backoffice/home/reply_post.html'
     model = BBSPost
     fields = ('body',)
 
@@ -88,7 +93,7 @@ class HomeReplyPostView(AdminViewMixin, CreateView):
 
 
 class HomeDeletePostView(AdminViewMixin, DeleteView):
-    template_name = 'backoffice/home_delete_post.html'
+    template_name = 'backoffice/home/delete_post.html'
     model = BBSPost
 
     def get_success_url(self):
