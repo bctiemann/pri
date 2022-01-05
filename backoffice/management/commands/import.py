@@ -14,6 +14,7 @@ from django.utils import timezone
 from django.core.files.temp import NamedTemporaryFile
 from django.core.files import File
 
+from backoffice.models import BBSPost
 from marketing.models import NewsItem, SiteContent, NewsletterSubscription
 from fleet.models import (
     Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, TransmissionType, Location,
@@ -55,8 +56,9 @@ class Command(BaseCommand):
         # 'do_drivers': True,
         # 'do_consigners': True,
         # 'do_consignmentvehicles': True,
-        'do_admins': True,
-        # 'do_newsitems': True
+        # 'do_admins': True,
+        'do_newsitems': True,
+        # 'do_bbsposts': True,
         # 'do_sitecontent': True,
         # 'do_newslettersubscriptions': True,
         # 'do_coupons': True,
@@ -559,6 +561,13 @@ class Command(BaseCommand):
                     pass
                 news_item.created_at = old['stamp'].replace(tzinfo=pytz.utc)
                 news_item.save()
+
+        if 'do_bbsposts' in self.enabled:
+            # if clear_existing:
+            #     BBSPost.objects.all().delete()
+            back_cursor.execute("""SELECT * FROM notes""")
+            for old in back_cursor.fetchall():
+                print(old)
 
         if 'do_sitecontent' in self.enabled:
             if clear_existing:

@@ -10,6 +10,7 @@ from django.db.models import Q
 
 from users.views import LoginView
 from users.models import User
+from backoffice.models import BBSPost
 
 
 # Home and login/logout views
@@ -28,6 +29,11 @@ class LandingView(AdminViewMixin, TemplateView):
 
 class HomeView(AdminViewMixin, TemplateView):
     template_name = 'backoffice/home.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['bbs_posts'] = BBSPost.objects.all()
+        return context
 
 
 class LoginView(LoginView):

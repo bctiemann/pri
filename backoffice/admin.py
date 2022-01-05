@@ -1,10 +1,10 @@
 from django.contrib import admin
 
-# from backoffice.models import Vehicle
+from backoffice.models import BBSPost
 
 
-# class VehicleAdmin(admin.ModelAdmin):
-#     list_display = ('make', 'model', 'year',)
+class BBSPostAdmin(admin.ModelAdmin):
+    list_display = ('author', 'created_at',)
 
 
-# admin.site.register(Vehicle, VehicleAdmin)
+admin.site.register(BBSPost, BBSPostAdmin)

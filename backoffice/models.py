@@ -6,7 +6,14 @@ from django.db import models
 #
 
 class BBSPost(models.Model):
-    pass
+    reply_to = models.ForeignKey('backoffice.BBSPost', null=True, blank=True, on_delete=models.SET_NULL)
+    author = models.ForeignKey('users.User', null=True, blank=True, on_delete=models.SET_NULL)
+    created_at = models.DateTimeField(auto_now_add=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    body = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ('-created_at',)
 
 
 # vehicles
