@@ -13,7 +13,7 @@ class BBSPost(models.Model):
     body = models.TextField(blank=True)
 
     class Meta:
-        ordering = ('-created_at',)
+        ordering = ('-reply_to_id', 'id',)
 
 
 # vehicles

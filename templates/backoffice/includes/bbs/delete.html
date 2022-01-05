@@ -1,0 +1,57 @@
+<!-- edit -->
+<CFIF IsDefined("URL.EditNotes")>
+        <CFQUERY NAME="Notes" DATASOURCE="#DSN#">
+                SELECT * FROM notes
+                WHERE notesid = #URL.notesid#
+                ORDER BY ReplyTonotesid, notesid
+        </CFQUERY>
+        <p>
+        Edit a post.
+        </p>
+        <table class="inputform">
+        <CFOUTPUT QUERY="Notes">
+        <cfset notes_dec = Decrypt(notes,globalkey,"AES","hex")>
+        <form method="post" action="{% url "backoffice:home-delete-post" pk=bbspost.id %}">
+        <input type="hidden" name="notesid" value="#notesid#">
+        <input type="hidden" name="ReplyTonotesid" value="#ReplyTonotesid#">
+        <tr>
+            <td>
+            <textarea wrap=virtual cols=75 rows=16 name="Notes">{{ bbspost.body }}</textarea>
+            </td>
+        </tr>
+        <tr>
+            <td valign=top align=right> &mdash; <b>#Administrator#</b> #DateFormat(Stamp,"m/d")# #TimeFormat(Stamp,"h:mmTT")#</td>
+        </tr>
+        <tr>
+            <td><button type="submit" class="btn" name="EDITNOTES2">Post Change</button></td>
+        </tr>
+        {% csrf_token %}
+        </form>
+        </CFOUTPUT>
+        </table>
+        <CFSET ListBBS = False>
+</CFIF>
+<CFIF IsDefined("Form.EditNotes2")>
+        <CFSET CR = Chr(13)>
+        <CFSET CRLF = Chr(13) & Chr(10)>
+        <CFSET TheNote=Form.Notes>
+        <!---
+        <CFSET TheNote = Replace(TheNote, "<", "&lt;", "ALL")>
+        <CFSET TheNote = Replace(TheNote, ">", "&gt;", "ALL")>
+        --->
+        <CFSET TheNote = Replace(TheNote, CRLF, "<br>", "ALL")>
+
+        <CFSET TheNote = Replace(TheNote, CR, "<br>", "ALL")>
+        <cftry>
+            <cfset thenote_enc = Encrypt(TheNote,globalkey,"AES","hex")>
+            <cfcatch type="Any">
+                <cfset thenote_enc = "">
+            </cfcatch>
+        </cftry>
+        <CFQUERY DATASOURCE="#DSN#">
+                UPDATE notes
+                SET notes = '#thenote_enc#', Stamp = Now()
+                WHERE notesid = #Form.notesid#
+        </CFQUERY>
+<CFLOCATION URL="#CGI.SCRIPT_NAME#">
+</CFIF>

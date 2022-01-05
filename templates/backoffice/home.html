@@ -5,8 +5,8 @@
     <h1 class="pageheader">Status (Waiting Room)
         <ul class="nav_subpage" style="left: 340px;">
             <cfoutput>
-            <a href="status.cfm?AddNotes="><li>Post to BBS</li></a>
-            <a href="status.cfm?Option=0"><li>BBS (Recent)</li></a>
+            <a href="{% url "backoffice:home-add-post" %}"><li>Post to BBS</li></a>
+            <a href="{% url "backoffice:home" %}"><li>BBS (Recent)</li></a>
             </cfoutput>
         </ul>
     </h1>
@@ -19,7 +19,9 @@
     <tr>
 
             <td valign=top class="clear" rowspan=3>
-                {% include "backoffice/includes/bbs/list.html" %}
+                {% block bbs %}
+                    {% include "backoffice/includes/bbs/list.html" %}
+                {% endblock %}
             <CFINCLUDE TEMPLATE="inc_bbs.cfm">
             </td>
 

@@ -2,11 +2,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.utils.dateparse import parse_datetime
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, DetailView, UpdateView, CreateView, DeleteView
 from django.contrib.auth.views import LogoutView
 from django.db.models import Q
+from django.http import Http404, HttpResponseRedirect
 
 from users.views import LoginView
 from users.models import User
@@ -34,6 +35,64 @@ class HomeView(AdminViewMixin, TemplateView):
         context = super().get_context_data(*args, **kwargs)
         context['bbs_posts'] = BBSPost.objects.all()
         return context
+
+
+class HomeAddPostView(AdminViewMixin, CreateView):
+    template_name = 'backoffice/home_add_post.html'
+    model = BBSPost
+    fields = ('body',)
+
+    def form_valid(self, form):
+        post = form.save(commit=False)
+        post.author = self.request.user
+        post.save()
+        post.reply_to = post
+        post.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('backoffice:home')
+
+
+class HomeEditPostView(AdminViewMixin, UpdateView):
+    template_name = 'backoffice/home_edit_post.html'
+    model = BBSPost
+    fields = ('body',)
+
+
+class HomeReplyPostView(AdminViewMixin, CreateView):
+    template_name = 'backoffice/home_reply_post.html'
+    model = BBSPost
+    fields = ('body',)
+
+    def form_valid(self, form):
+        post = form.save(commit=False)
+        post.author = self.request.user
+        post.reply_to = self.get_reply_post()
+        post.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_reply_post(self):
+        try:
+            return BBSPost.objects.get(pk=self.kwargs['pk'])
+        except:
+            raise Http404
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['bbspost'] = self.get_reply_post()
+        return context
+
+    def get_success_url(self):
+        return reverse('backoffice:home')
+
+
+class HomeDeletePostView(AdminViewMixin, DeleteView):
+    template_name = 'backoffice/home_delete_post.html'
+    model = BBSPost
+
+    def get_success_url(self):
+        return reverse('backoffice:home')
 
 
 class LoginView(LoginView):

@@ -20,7 +20,7 @@
         <CFOUTPUT QUERY="Notes">
                 <cfset notes_dec = Decrypt(notes,globalkey,"AES","hex")>
 		<div class="bbsnote
-		        {% if reply_to %}
+		        {% if post.reply_to != post %}
                 <CFIF ReplyTonotesid IS NOT notesid> reply
                         <CFSET RepID = #ReplyTonotesid#>
                 </CFIF>
@@ -34,10 +34,10 @@
 			<div class="bbsinfo">
 			<b>{{ post.author.employee.full_name }}</b> {{ post.created_at|date:"n/j g:iA" }}
 			<CFIF NOT Deleted>
-				<a class="submenu" href="#script#?notesid=#notesid#&ReplyTonotesid=#ReplyTonotesid#&ReplyNotes=">Reply</a>
+				<a class="submenu" href="{% url "backoffice:home-reply-post" pk=post.id %}">Reply</a>
 				<CFIF YourID.AdminID IS AdminID>
-					<a class="submenu" href="#script#?notesid=#notesid#&ReplyTonotesid=#ReplyTonotesid#&EditNotes=">Edit</a>
-					<a class="submenu" href="#script#?notesid=#notesid#&DeleteNotes=">Delete</a>
+					<a class="submenu" href="{% url "backoffice:home-edit-post" pk=post.id %}">Edit</a>
+					<a class="submenu" href="{% url "backoffice:home-delete-post" pk=post.id %}">Delete</a>
 				</CFIF>
 			</CFIF>
 			</div>

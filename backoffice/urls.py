@@ -10,6 +10,11 @@ from backoffice.views import vehicles, reservations, rentals, employees, custome
 
 urlpatterns = [
     path('', views.HomeView.as_view(), name='home'),
+    path('post/', views.HomeAddPostView.as_view(), name='home-add-post'),
+    path('post/<int:pk>/reply/', views.HomeReplyPostView.as_view(), name='home-reply-post'),
+    path('post/<int:pk>/edit/', views.HomeEditPostView.as_view(), name='home-edit-post'),
+    path('post/<int:pk>/delete/', views.HomeDeletePostView.as_view(), name='home-delete-post'),
+
     path('landing/', views.LandingView.as_view(), name='landing'),
     path('login/', views.LoginView.as_view(), name='login'),
     path('logout/', views.LogoutView.as_view(), name='logout'),
