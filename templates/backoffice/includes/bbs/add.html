@@ -1,56 +1,17 @@
-<!-- add -->
-<CFIF IsDefined("URL.AddNotes")>
-        <p>
-        Add a post to the BBS.
-        </p>
-        <table class="inputform">
-        <form method="post" action="{% url "backoffice:home-add-post" %}">
+<p>
+    Add a post to the BBS.
+</p>
+<table class="inputform">
+    <form method="post" action="{% url "backoffice:home-add-post" %}">
         <tr>
             <td>{{ form.body }}</td>
         </tr>
         <tr>
-            <td align=right><CFOUTPUT>&mdash; <b>#YourID.user#</b> #DateFormat(Now(),"m/d")# #TimeFormat(Now(),"h:mmTT")#</CFOUTPUT></td>
+            <td align=right>&mdash; <b>{{ user.employee.full_name }}</b> {{ now|date:"n/j g:iA" }}</td>
         </tr>
         <tr>
             <td><button type="submit" class="btn" name="ADDNOTES2">Post</button></td>
         </tr>
         {% csrf_token %}
-        </form>
-        </table>
-        <CFSET ListBBS = False>
-</CFIF>
-<!-- ADD -->
-<CFIF IsDefined("Form.AddNotes2")>
-        <CFQUERY DATASOURCE="#DSN#">
-                UPDATE vars
-                SET notesid = notesid + 1
-        </CFQUERY>
-        <CFQUERY NAME="Notes" DATASOURCE="#DSN#">
-                SELECT notesid FROM vars
-        </CFQUERY>
-        <CFQUERY NAME="Admin" DATASOURCE="#DSN#">
-                SELECT user FROM admin
-                WHERE AdminID = #YourID.AdminID#
-        </CFQUERY>
-
-        <CFSET CR = Chr(13)>
-        <CFSET CRLF = Chr(13) & Chr(10)>
-        <CFSET TheNote=Form.Notes>
-        <!---
-        <CFSET TheNote = Replace(TheNote, "<", "&lt;", "ALL")>
-        <CFSET TheNote = Replace(TheNote, ">", "&gt;", "ALL")>
-        --->
-        <CFSET TheNote = Replace(TheNote, CRLF, "<br>", "ALL")>
-        <CFSET TheNote = Replace(TheNote, CR, "<br>", "ALL")>
-        <cftry>
-            <cfset thenote_enc = Encrypt(TheNote,globalkey,"AES","hex")>
-            <cfcatch type="Any">
-                <cfset thenote_enc = "">
-            </cfcatch>
-        </cftry>
-        <CFQUERY DATASOURCE="#DSN#">
-        INSERT INTO notes (notesid, replytonotesid, notes, stamp, adminid, administrator,deleted)
-VALUES (#Notes.notesid#, #Notes.notesid#, '#thenote_enc#', #Now()#, #YourID.AdminID#, '#Admin.user#',0)
-        </CFQUERY>
-<CFLOCATION URL="#CGI.SCRIPT_NAME#">
-</CFIF>
+    </form>
+</table>

@@ -5,7 +5,7 @@
         <div class="bbsinfo">
 			<b>{{ post.author.employee.full_name }}</b> {{ post.created_at|date:"n/j g:iA" }}
             {% if not post.deleted_at %}
-				<a class="submenu" href="{% url "backoffice:home-reply-post" pk=post.id %}">Reply</a>
+				<a class="submenu" href="{% url "backoffice:home-reply-post" pk=post.reply_to.id %}">Reply</a>
                 {% if user == post.author %}
 					<a class="submenu" href="{% url "backoffice:home-edit-post" pk=post.id %}">Edit</a>
 					<a class="submenu" href="{% url "backoffice:home-delete-post" pk=post.id %}">Delete</a>
@@ -20,10 +20,10 @@
 
 <small>
     <font color="#202020">
-    <b><font color="#ff0000">Red</font></b>, less than 6hrs<Br>
-    <b><font color="#ff8080">Pink</font></b>, less than 2days<br>
-    <b><font color="#000">White</font></b>, All other<br>
-    {% if short_bbs %}Shows messages from the last three (3) days.<br>{% endif %}
+        <b><font color="#ff0000">Red</font></b>, less than 6hrs<Br>
+        <b><font color="#ff8080">Pink</font></b>, less than 2days<br>
+        <b><font color="#000">White</font></b>, All other<br>
+        {% if short_bbs %}Shows messages from the last three (3) days.<br>{% endif %}
     </font>
 </small>
 

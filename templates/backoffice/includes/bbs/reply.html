@@ -1,81 +1,26 @@
-<!-- reply -->
-<CFIF IsDefined("URL.ReplyNotes")>
+{% load bbcode_tags %}
 
-        <h3>Reply to a post.</h3>
+<h3>Reply to a post.</h3>
 
-        <!-- show message replying to -->
-        <CFQUERY NAME="Notes" DATASOURCE="#DSN#">
-                SELECT * FROM notes
-                WHERE ReplyTonotesid = #URL.ReplyTonotesid#
-                ORDER BY ReplyTonotesid DESC, notesid
-        </CFQUERY>
-        <CFSET RepID = 0>
-        <table class="inputform">
-        <CFOUTPUT QUERY="Notes">
-                <cfset notes_dec = Decrypt(notes,globalkey,"AES","hex")>
-                <CFSET x = Now() - Stamp>
-                <CFIF x LT 0.25>
-                        <CFSET msg = 'bbsnew'><CFELSEIF x LT 1><CFSET msg = 'bbsrecent'><CFELSE><CFSET msg = 'bbs'></CFIF><CFIF Deleted><CFSET msg='bbsdeleted'>
-                </CFIF>
-                <tr>
-                        <td class=#msg#><p class=bbs>#notes_dec# -- <b>#Administrator#</b> #DateFormat(Stamp,"m/d")# #TimeFormat(Stamp,"h:mmTT")#</p></td>
-                </tr>
-        </CFOUTPUT>
-        </table>
+<table class="inputform">
+    {% for post in thread_posts %}
+        <tr>
+            <td class={{ post.css_class }}><p class=bbs>{{ post.body|bbcode|safe }} -- <b>{{ post.author.employee.full_name }}</b> {{ post.created_at|date:"n/j g:iA" }}</p></td>
+        </tr>
+    {% endfor %}
+</table>
 
-        <CFOUTPUT>
-        <table class="inputform">
-        <form method="post" action="{% url "backoffice:home-reply-post" pk=bbspost.id %}">
-        <input type="hidden" name="ReplyTonotesid" value="#URL.ReplyTonotesid#">
+<table class="inputform">
+    <form method="post" action="{% url "backoffice:home-reply-post" pk=bbspost.id %}">
         <tr>
             <td valign=top>{{ form.body }}</td>
         </tr>
         <tr>
-            <td valign=top align=right> &mdash; <b>#YourID.user#</b> #DateFormat(Now(),"m/d")# #TimeFormat(Now(),"h:mmTT")#</td>
+            <td valign=top align=right> &mdash; <b>{{ user.employee.full_name }}</b> {{ now|date:"n/j g:iA" }}</td>
         </tr>
         <tr>
             <td><button type="submit" class="btn" name="REPLYNOTES2">Post</button></td>
         </tr>
         {% csrf_token %}
-        </form>
-        </table>
-        </CFOUTPUT>
-        <CFSET ListBBS = False>
-</CFIF>
-<!-- reply -->
-<CFIF IsDefined("Form.ReplyNotes2")>
-
-        <!-- reply -->
-        <CFQUERY DATASOURCE="#DSN#">
-                UPDATE vars
-                SET notesid = notesid + 1
-        </CFQUERY>
-        <CFQUERY NAME="Notes" DATASOURCE="#DSN#">
-                SELECT notesid FROM vars
-        </CFQUERY>
-        <CFQUERY NAME="Admin" DATASOURCE="#DSN#">
-                SELECT user FROM admin
-                WHERE AdminID = #YourID.AdminID#
-        </CFQUERY>
-
-        <CFSET CR = Chr(13)>
-       <CFSET CRLF = Chr(13) & Chr(10)>
-        <CFSET TheNote=Form.Notes>
-        <!---
-        <CFSET TheNote = Replace(TheNote, "<", "&lt;", "ALL")>
-        <CFSET TheNote = Replace(TheNote, ">", "&gt;", "ALL")>
-        --->
-        <CFSET TheNote = Replace(TheNote, CRLF, "<br>", "ALL")>
-        <CFSET TheNote = Replace(TheNote, CR, "<br>", "ALL")>
-        <cftry>
-            <cfset thenote_enc = Encrypt(TheNote,globalkey,"AES","hex")>
-            <cfcatch type="Any">
-                <cfset thenote_enc = "">
-            </cfcatch>
-        </cftry>
-        <CFQUERY DATASOURCE="#DSN#">
-                INSERT INTO notes (notesid, ReplyTonotesid, Notes, Stamp, AdminID, Administrator,deleted)
-                VALUES (#Notes.notesid#, #Form.ReplyTonotesid#, '#thenote_enc#', Now(), #YourID.AdminID#, '#Admin.user#',0 )
-        </CFQUERY>
-<CFLOCATION URL="#CGI.SCRIPT_NAME#">
-</CFIF>
+    </form>
+</table>

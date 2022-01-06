@@ -24,6 +24,7 @@ class AdminViewMixin:
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['admin_users'] = User.objects.filter(is_backoffice=True)
+        context['now'] = timezone.now()
         return context
 
 
@@ -64,6 +65,13 @@ class HomeEditPostView(AdminViewMixin, UpdateView):
     model = BBSPost
     fields = ('body',)
 
+    def get_object(self, queryset=None):
+        queryset = self.get_queryset().filter(author=self.request.user)
+        return super().get_object(queryset)
+
+    def get_success_url(self):
+        return reverse('backoffice:home')
+
 
 class HomeReplyPostView(AdminViewMixin, CreateView):
     template_name = 'backoffice/home/reply_post.html'
@@ -79,13 +87,15 @@ class HomeReplyPostView(AdminViewMixin, CreateView):
 
     def get_reply_post(self):
         try:
-            return BBSPost.objects.get(pk=self.kwargs['pk'])
+            return BBSPost.objects.filter(reply_to=self.kwargs['pk']).first()
         except:
             raise Http404
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['bbspost'] = self.get_reply_post()
+        parent_post = self.get_reply_post()
+        context['bbspost'] = parent_post
+        context['thread_posts'] = BBSPost.objects.filter(reply_to=parent_post)
         return context
 
     def get_success_url(self):
