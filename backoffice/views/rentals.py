@@ -1,11 +1,16 @@
+import logging
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from django_pdfkit import PDFView
+
+from django.conf import settings
 from django.shortcuts import render, reverse
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponseNotFound
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from . import ListViewMixin
@@ -14,6 +19,8 @@ from sales.models import Rental, Driver
 from users.models import Customer
 from sales.utils import RentalPriceCalculator
 from backoffice.forms import RentalForm
+
+logger = logging.getLogger(__name__)
 
 
 # Template generics-based CRUD views
@@ -124,3 +131,34 @@ class RentalDriverPromoteView(PermissionRequiredMixin, RentalViewMixin, APIView)
         driver.save()
 
         return Response({'success': True})
+
+
+class RentalGenerateContractView(PermissionRequiredMixin, PDFView):
+    permission_required = ('users.view_rental',)
+    template_name = 'backoffice/pdf/contract.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.rental = Rental.objects.get(pk=self.kwargs['pk'])
+        except Rental.DoesNotExist:
+            raise Http404
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_pdfkit_options(self):
+        options = {
+            'quiet': '',
+            'page-size': 'Letter',
+            'margin-top': '0.52in',
+            'margin-right': '0.25in',
+            'margin-bottom': '0.0in',
+            'margin-left': '0.25in',
+            'encoding': "UTF-8",
+            'no-outline': None,
+        }
+        return options
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['rental'] = self.rental
+        context['site_url'] = settings.SERVER_BASE_URL
+        return context

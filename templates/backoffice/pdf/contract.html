@@ -1,0 +1,328 @@
+{% load static %}
+
+<!DOCTYPE html
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+    <title>PRI Rental Contract</title>
+    <style type="text/css">
+        @import url("{% static "backoffice/css/contract.css" %}"");
+
+body {
+	font-size: 14px;
+	font-family: sans-serif;
+	background-image: url('{% static "backoffice/images/contractbg.png" %}');
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-position: bottom;
+}
+
+#contbox {
+	width: 100%;
+}
+
+#header {
+	width: 100%;
+	margin-bottom: 5px;
+}
+
+table.header {
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	border-bottom: 1px solid #000;
+}
+
+td.headleft {
+	width: 80%;
+	text-align: left;
+	vertical-align: bottom;
+	font-size: 12px;
+}
+
+td.headright {
+	width: 20%;
+	text-align: left;
+	vertical-align: bottom;
+	font-size: 12px;
+}
+
+table.info {
+	padding: 1px;
+	margin: 1px;
+	font-size: 10px;
+}
+
+td.label {
+	text-align:right;
+	padding: 0;
+}
+
+td.data {
+	text-align:left;
+	padding: 0;
+}
+
+table.checkout {
+	font-size: 10px;
+	line-height: 14px;
+	margin: 0;
+	padding: 0;
+}
+
+#contleft {
+	width: 225px;
+	float: left;
+	font-size: 11px;
+	line-height: 13px;
+}
+
+#contright {
+	width: 350px;
+	float: right;
+	font-size: 11px;
+	line-height: 13px;
+	text-align: right;
+}
+
+#contmain {
+	width: 100%;
+	font-size: 12px;
+}
+
+
+img.logoimg {
+	width: 160px;
+	padding: 2px;
+}
+
+span.ul {
+	text-decoration: underline;
+}
+    </style>
+</head>
+
+<body>
+
+    <div id="contbox">
+
+    <div id="header">
+        <br />
+        <table class="header">
+            <tr>
+                <td class="headleft"><img class="logoimg" src="{{ server_base_url }}{% static "backoffice/images/contractlogo.png" %}"><br />Performance Rentals, Inc. (866) 607-0084<br />Rental Contract</td>
+                <td class="headright">Date: <CFOUTPUT>#DateFormat(tRent.dateout,"mm/dd/yyyy")#</CFOUTPUT></td>
+            </tr>
+        </table>
+    </div>
+
+    <br clear="all" /><br />
+
+    <div id="contleft">
+        <span class="ul">Primary Driver:</span><br />
+        <CFOUTPUT QUERY="tPri">
+            <b>Customer No.:</b> #customerid#<br />
+            <b>Name:</b> #fname# #lname#<br />
+            <b>License No.:</b> #licenseno#<br />
+            <b>License State:</b> #licensestate#<br />
+            <CFIF len(hphone) GT 0><b>Tel:</b> #hphone#<br /></CFIF>
+            <CFIF len(mphone) GT 0><b>Cel:</b> #mphone#<br /></CFIF>
+        </CFOUTPUT>
+        <br />
+        <span class="ul">Secondary Driver(s):</span><br />
+        <CFIF tRent.drivers GT 1>
+            <CFLOOP QUERY="nDrv">
+                <CFQUERY NAME="tSec" DATASOURCE="#DSN#">
+                    SELECT customerid,fname,lname,licenseno,licensestate,hphone,mphone FROM Customers
+                    WHERE customerid = <CFQUERYPARAM value="#nDrv.customerid#" CFSQLType="CF_SQL_NUMERIC">
+                </CFQUERY>
+                <CFOUTPUT>
+                    <p class="secondary-driver">#tSec.fname# #tSec.lname# -
+                    <CFIF len(tSec.hphone) GT 0>#tSec.hphone#<CFELSEIF len(tSec.mphone) GT 0>#tSec.mphone#</CFIF>
+                    </p>
+                    <p class="secondary-subtext">#tSec.licensestate# #tSec.licenseno#</p>
+                </CFOUTPUT>
+            </CFLOOP>
+        <CFELSE>
+            <big>None.</big><br /><br />
+        </CFIF>
+        <br />
+        <span class="ul">Vehicle:</span><br />
+        <CFOUTPUT QUERY="tVehicle">
+            <b>Year:</b> #year#<br />
+            <b>Make:</b> #make#<br />
+            <b>Model:</b> #model#<br />
+            <b>Plate:</b> #plate#<br />
+            <b>VIN:</b> #vin#<br />
+        </CFOUTPUT>
+        <CFOUTPUT QUERY="tRent">
+            <b>Rental Begins On:</b> <CFOUTPUT>#DateFormat(dateout,"mm/dd/yyyy")#</CFOUTPUT> @ <CFOUTPUT>#TimeFormat(dateout,"hh:mm tt")#</CFOUTPUT><br />
+            <b>Rental Due Back:</b> <CFOUTPUT>#DateFormat(dateback,"mm/dd/yyyy")#</CFOUTPUT> @ <CFOUTPUT>#TimeFormat(dateback,"hh:mm tt")#</CFOUTPUT><br />
+        </CFOUTPUT>
+    </div>
+
+    <div id="contright">
+
+        <div class="inspection">
+            <img width="350" src="{{ rental.vehicle.vehicle_marketing.inspection_image.url }}"><br /><br />
+        </div>
+
+        <table class="checkout">
+            <tr>
+                <td></td>
+                <td>
+                    Pre-Rental Checklist [ &nbsp; ]<br />
+                    Post-Rental Checklist [ &nbsp; ]<br />
+                    Mileage Out: _______________<br />
+                    Mileage Return: _______________ <br />
+                    Check Out By: _________________<br />
+                </td>
+            </tr>
+        </table>
+
+    </div>
+
+    <br clear="all" /><br />
+
+    <div id="contmain">
+<p>
+I, ______________________________, hereby understand and agree that, in addition to myself, only the additional drivers listed on this contract are authorized by Performance Rentals, Inc. to drive the Vehicle specified, and that I will be responsible for the acts of and any damage caused by all additional drivers, regardless of fault.
+<p>
+
+<p>
+I understand and agree that the vehicle may not be driven out of the states of New York, New Jersey, Connecticut, Pennsylvania, Rhode Island, New Hampshire, Vermont, Massachusetts, Delaware, Maryland, or Washington, D.C. without prior written approval from Performance Rentals, Inc. Under NO CIRCUMSTANCES may the vehicle be driven on or on the grounds of a race track, drag strip, road course, autocross course, or any other venue in which motor vehicles are understood to compete in any manner of performance competition or measurement. The vehicle is equipped with a GPS security device which allows us to remotely disable the vehicle while stopped. I understand and agree that we have the right to disable the vehicle if it is driven outside of these geographic locations, in violation of our terms and conditions specified in the attached outline, or is not returned when due.
+</p>
+
+<p>
+YOU MUST PROMPTLY REPORT ANY ACCIDENT, DAMAGE OR THEFT OF THE VEHICLE TO PERFORMANCE RENTALS, INC. YOU MUST FILE BOTH A POLICE REPORT AND A PERFORMANCE RENTALS, INC DAMAGE REPORT. FAILURE TO FILE OR SIGN EITHER OF THESE REPORTS DOES NOT ABSOLVE YOU FROM YOUR RESPONSIBILITY FOR DAMAGES UNDER THIS AGREEMENT.
+</p>
+
+<p>
+You have the right to inspect the vehicle before you are charged for any damage to the vehicle.
+</p>
+
+    <cfif tVehicle.type IS 1>
+<p>
+SMOKING IS NOT PERMITTED IN THE VEHICLE. YOU WILL BE CHARGED A $350 DETAILING FEE IF THE VEHICLE IS RETURNED SMELLING OF SMOKE, ANIMAL HAIR, OR ANY OTHER OFFENSIVE OR OBJECTIONABLE ODOR, OR IF IT IS NOT RETURNED IN SIMILAR CONDITION AS WAS RECEIVED.
+</p>
+    </cfif>
+
+<p>
+We will not refund any of the rental charges if the vehicle is returned earlier than the return date.
+</p>
+
+<p>
+By signing below, you agree to all the terms and conditions of this agreement. Your signature below is considered made on the appropriate credit card voucher for all rental charges arising out of this transaction, and you agree to pay those charges, including, if necessary, the full damage deposit listed above and any additional fees that may apply. All charges are subject to final audit.
+</p>
+
+<br />
+<p>
+Signed: ______________________________ Date: <CFOUTPUT>#DateFormat(tRent.dateout,"mm/dd/yyyy")#</CFOUTPUT>
+</p>
+
+    </div>
+
+
+    </div>
+
+
+<cfdocumentitem type="pagebreak" />
+
+    <h3>Damage Responsibility Statement Addendum</h3>
+
+    <div class="fineprint">
+<p>
+I understand that I am responsible for all damage to, or loss or theft of, the vehicle, including parts, labor, and towing, loss of use of the vehicle while it is being repaired, diminished value of the vehicle caused by damage to it or repair of it, missing equipment, and a reasonable charge to cover administrative expenses connected with any damage claim, whether or not I am at fault.
+</p>
+
+<p>
+I hereby decree that I have read and understand all parts of this agreement. I specifically authorize Performance Rentals, Inc. to charge my credit card for these charges.
+</p>
+
+<br />
+<p>
+X__________________________________________________________<span style="margin-left: 20px; font-weight: bold;"><cfoutput>#tPri.fname# #tPri.lname#</cfoutput></span><span style="margin-left:50px;">Date: <CFOUTPUT>#DateFormat(tRent.dateout,"mm/dd/yyyy")#</CFOUTPUT></span><br />
+</p>
+
+<br />
+<h4>
+Performance Rentals, Inc. Exotic Vehicle Rental Agreement Terms and Conditions
+</h4>
+
+<p>
+1. Definitions. "Agreement" means all terms and conditions found on both sides of this form. "You", "your", "I" or "my" means the person identified as the renter on the reverse, any person signing this Agreement, any Authorized Driver and any person or organization to whom charges are billed by us at its or the renter's direction. All persons referred to as "you", "your", "I" or "my" are jointly and severally bound by this Agreement. "We", "our" or "us" means Performance Rentals, Inc. "Authorized Driver" means the renter and any additional driver listed by us on this Agreement, provided that each such person has a valid driver's license and is at least age 21. "Vehicle" means the automobile identified in this Agreement and any vehicle we substitute for it, and its tires, wheels, tools, accessories, equipment, keys and vehicle documents. "Loss of use" means the amount calculated by multiplying the number of days from the date the Vehicle is damaged until it is repaired, times the daily weekday rental rate.
+<span style="margin-left: 50px;">X________</span>
+</p>
+
+<p>
+2. Rental, Indemnity and Warranties. This is a contract for rental of the Vehicle. We may repossess the Vehicle at your expense without notice to you if the Vehicle is abandoned or used in violation of law or this Agreement. You agree to indemnify us, defend us and hold us harmless from all claims, liability, costs and attorney fees we incur resulting from, or arising out of, this rental and your use of the Vehicle. &nbsp;<b>We make no warranties, express, implied or apparent, regarding the vehicle, no warranty of merchantability and no warranty that the Vehicle is fit for a particular purpose.</b>
+<span style="margin-left: 510px;">X________</span>
+</p>
+
+<p>
+3. Condition and Return of Vehicle. You must return the Vehicle to our rental office or other location we specify, on the date and time specified in this Agreement, or if no date and time is specified, at the mutually agreed upon date and time, and in the same condition that you received it, except for ordinary wear. If the Vehicle is returned after closing hours, you remain responsible for the safety of, and any damage to, the Vehicle until we inspect it upon our next opening for business. &nbsp;<b>At our sole discretion, we may elect to have a mechanic inspect the Vehicle upon its initial return. Return of the Vehicle is not complete until our mechanic has inspected the Vehicle; this inspection may not occur on the same day you physically deliver the Vehicle to us.</b> Service to the Vehicle or replacement of parts or accessories during the rental must have our prior approval. You must check and maintain all fluid levels and heed all warning lights and gauges.
+<span style="margin-left: 180px;">X________</span>
+</p>
+
+<p>
+4. Responsibility for Damage or Loss; Reporting to Police. You are responsible for all damage to, or loss or theft of, the Vehicle, loss of use of the Vehicle while it is being repaired, diminished value of the Vehicle caused by damage to it or repair of it, missing equipment, and a reasonable charge to cover our administrative expenses connected with any damage claim, whether or not you are at fault. You must report all accidents or incidents of theft and vandalism to us and the police as soon as you discover them.
+<span style="margin-left: 270px;">X________</span>
+</p>
+
+    <cfif tVehicle.type IS 1>
+<p>
+5. Prohibited Use. <b>The following uses of the Vehicle are prohibited and are considered breaches of this Agreement. You may not: a) allow any person who is not an Authorized Driver to operate the Vehicle; b) operate the Vehicle while intoxicated or under the influence of any drug whether prescribed or over the counter that could impair your driving ability; c) attend any car or truck racing event, or drive the vehicle onto the grounds of any vehicle race course or race track; d) drive the Vehicle outside the states of New York, New Jersey, Connecticut, Pennsylvania, Rhode Island, New Hampshire, Vermont, Massachusetts, Delaware, Maryland, or Washington, D.C.; e) use the Vehicle to participate in any race, rally, organized long-distance driving event, speed test or contest; f) disassemble, modify, inspect, or test the vehicle in a performance-tuning facility (e.g. dynamometer); g) use the Vehicle for driver training activity; h) push or tow anything or use the Vehicle for commercial hire; i) use the Vehicle at all for any purpose if you supply us false, fraudulent or misleading information at the time of rental; j) drive the Vehicle on unpaved or otherwise unsuitable surfaces; k) transport more persons than the Vehicle has seat belts, or carry persons outside the passenger compartment, or transport children without approved child safety seats as required by law; l) tamper with or disconnect the odometer, GPS device or data-logging device; m) operate the Vehicle when its fluid levels are low, or it is otherwise reasonable to expect you to know that further operation would damage the vehicle; n) operate the Vehicle, where applicable, if you lack experience operating a manual transmission; o) use the Vehicle at all for any purpose if your Driver's License has been suspended or is otherwise invalid; p) use the Vehicle at all for any purpose if during the rental period you are arrested, incarcerated, or if the Vehicle has been impounded or towed by the police; q) use the Vehicle in any manner that is deemed abusive or in any manner that attempts to damage or severely disrupt the operation of the Vehicle, including causing excessive tire wear ("burnouts") or repeatedly operating the engine at or near its maximum RPM ("redline") for extended periods.</b>
+<span style="margin-left: 298px;">X________</span>
+</p>
+    <cfelseif tVehicle.type IS 2>
+<p>
+5. Prohibited Use. <b>The following uses of the Vehicle are prohibited and are considered breaches of this Agreement. You may not: a) allow any person who is not an Authorized Driver to operate the Vehicle; b) operate the Vehicle while intoxicated or under the influence of any drug whether prescribed or over the counter that could impair your driving ability; c) attend any car or truck racing event, or drive the vehicle onto the grounds of any vehicle race course or race track; d) drive the Vehicle outside the states of New York, New Jersey, Connecticut, Pennsylvania, Rhode Island, New Hampshire, Vermont, Massachusetts, Delaware, Maryland, or Washington, D.C.; e) use the Vehicle to participate in any race, rally, organized long-distance driving event, speed test or contest; f) disassemble, modify, inspect, modify or test the vehicle in a performance-tuning facility (e.g. dynamometer);any way; g) use the Vehicle for driver training activity; h) push or tow anything or use the Vehicle for commercial hire; i) use the Vehicle at all for any purpose if you supply us false, fraudulent or misleading information at the time of rental; j) drive the Vehicle on unpaved or otherwise unsuitable surfaces; k) transport more persons than the Vehicle has seat belts, or carry persons outside the passenger compartment, or transport children without approved child safety seats as required by law; unless it is specifically designed to do so (e.g. dirt bikes); k) carry any passengers on or in a Vehicle without the proper facilities to do so (pegs, etc); l) tamper with or disconnect the odometer, GPS device or data-logging device; m) operate the Vehicle when its fluid levels are low, or it is otherwise reasonable to expect you to know that further operation would damage the vehicle; n) operate the Vehicle, where applicable, if you lack experience operating a manual transmission; o) use the Vehicle at all for any purpose if your Driver's License has been suspended or is otherwise invalid, or if you do not have a motorcycle endorsement; p) use the Vehicle at all for any purpose if during the rental period you are arrested, incarcerated, or if the Vehicle has been impounded or towed by the police; q) use the Vehicle in any manner that is deemed abusive or in any manner that attempts to damage or severely disrupt the operation of the Vehicle, including causing excessive tire wear ("burnouts") or repeatedly operating the engine at or near its maximum RPM ("redline") for extended periods. ; r) perform any stunts or exhibitions with the Vehicle (wheelies, stoppies, etc.); s) affix any camera or recording device to the Vehicle without our prior authorization.</b>
+<span style="margin-left: 290px;">X________</span>
+</p>
+    </cfif>
+
+<p>
+6. Insurance. You agree to provide auto liability, collision and comprehensive insurance covering you, us, and the Vehicle. You are responsible for all damage or loss you cause to others. Where state law requires us to provide auto liability insurance, we provide auto liability insurance (the "Policy") that is secondary to any other valid and collectible insurance whether primary, secondary, excess or contingent. The Policy provides bodily injury and property damage liability coverage with limits no higher than minimum levels prescribed by the vehicular financial responsibility laws of the state where the damage or loss occurs. You and we reject PIP, medical payments, no-fault and uninsured and under-insured motorist coverage, where permitted by law. Coverage is void if you violate the terms of this Agreement or if you fail to cooperate in any loss investigation conducted by us, or our insurer. Giving the Vehicle to an unauthorized driver terminates our liability insurance coverage, if any.
+<span style="margin-left: 130px;">X________</span>
+</p>
+
+<p>
+7. Charges. You will pay us, or the appropriate government authorities, on demand all charges due us under this Agreement, including: (a) time and mileage from the time the Vehicle is rented until the Return Date indicated on the reverse, even if you return the Vehicle earlier than the Return Date; (b) time and mileage for the period you keep the vehicle if it is returned later than the Return Date; (c) a mileage charge based on our experience or the GPS or data-logger reading if the odometer is tampered with or disconnected; (d) charges for additional drivers; (e) applicable taxes; (f) loss or theft of, or damage to, the Vehicle, which includes the cost of repair, or the actual cash retail value of the Vehicle on the date of the loss or theft if the Vehicle is not repairable or if we elect not to repair the Vehicle, plus loss of use, diminished value of the Vehicle caused by damage to it or repair of it, and our charges and other expenses incurred processing the claim; (g)all parking, traffic and toll violations, fines, penalties, forfeitures, court costs, towing and storage charges and other expenses involving the Vehicle assessed against us or the Vehicle, unless these expenses are our fault; (h) all expenses we incur in locating and recovering the Vehicle if you fail to return it or if we elect to repossess the Vehicle under the terms of this Agreement; (i) all costs, including pre- and post-judgement attorney fees, we incur collecting payment from you or otherwise enforcing or defending our rights under this Agreement. If you fail to pay the charging authority, you will pay us the full amount(s) owed to the charging authority plus our administrative charge of $100 for each such unpaid violation; (j) a 2% per month late payment fee, or the maximum amount allowed by law, on all amounts past due; (k) $150, plus $5/mile for every mile between the renting location and the place where the Vehicle is returned or abandoned, plus any additional recovery expenses we incur; (l) $25 or the maximum amount permitted by law, whichever is greater, if you pay us with a check returned unpaid for any reason; (m) a reasonable fee not to exceed $300 to clean the Vehicle if returned substantially less clean than when rented; (n) a $10,000 abuse fee if you intentionally operate the vehicle in an unsafe or abusive manner (see section 5 above) or if you tamper with or disconnect the data-logging device with the intention of operating the vehicle in an unsafe or abusive manner.
+<span style="margin-left: 50px;">X________</span>
+</p>
+
+<p>
+8. Deposit. We may use your deposit to pay any amounts owed to us under this Agreement. <b>If we elect for a mechanical inspection, your deposit will not be released until our mechanic has completed the inspection of the Vehicle.</b>
+<span style="margin-left: 145px;">X________</span>
+</p>
+
+<p>
+9. Your Property. You release us, our agents and employees from all claims for loss of, or damage to, your personal property or that of any other person that we received, handled or stored, or that was left or carried in or on the Vehicle or in our offices, whether or not the loss or damage was caused by our negligence or was otherwise our responsibility.
+<span style="margin-left: 309px;">X________</span>
+</p>
+
+<p>
+10. Breach of Agreement. If you breach this Agreement, in addition to all legal recourse we may have against you for the breach, <b>we may also remotely disable the Vehicle during the rental term and reserve the right to recover the Vehicle immediately.</b> You waive all recourse against us for any criminal reports or prosecutions that we take against you that arise out of your breach of this Agreement. You also forfeit any claim to rental charges paid if this Agreement is breached prior to the end of the rental period.
+<span style="margin-left: 203px;">X________</span>
+</p>
+
+<p>
+11. Modifications. No term of this Agreement can be waived or modified except by a written amendment that we have signed. If you wish to extend the rental period, you must return the Vehicle to our rental office for inspection and written amendment by us of the due-in date. This Agreement constitutes the entire agreement between you and us. All prior representations and agreements between you and us regarding this rental are void.
+<span style="margin-left: 555px;">X________</span>
+</p>
+
+<p>
+12. Miscellaneous. A waiver by us of any breach of this Agreement is not a waiver of any additional breach or waiver of the performance of your obligations under this Agreement. Our acceptance of payment from you or our failure, refusal or neglect to exercise any of our rights under this Agreement does not constitute a waiver of any other provision of this Agreement. Unless prohibited by law, you release us from any liability for consequential, special or punitive damages in connection with this rental or the reservation of a vehicle. If any provision of this Agreement is deemed void or unenforceable, the remaining provisions are valid and enforceable. This agreement and all associated Vehicle rentals are governed by the laws of the State of Nevada.
+<span style="margin-left: 468px;">X________</span>
+</p>
+
+<p>
+<b>By initialing above, you acknowledge that you have read and that you understand the provisions of each paragraph you initialed. This addendum will be kept on file and shall be applicable for all future Rental Agreements you enter into.</b>
+</p>
+
+    </div>
+
+</body>
+</html>

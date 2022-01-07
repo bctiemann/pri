@@ -201,6 +201,8 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
+SERVER_BASE_URL = 'https://performance.rentals'
+
 COMPANY_NAME = 'Performance Rentals'
 COMPANY_FOUNDING_YEAR = 2008
 SUPPORT_EMAIL = 'support@performance.rentals'

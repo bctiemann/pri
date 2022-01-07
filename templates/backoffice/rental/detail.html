@@ -32,7 +32,7 @@
             <td>
                 <cfinput type="hidden" name="confcode" value="#Rental.confcode#" />
                 {{ rental.confirmation_code }}
-                <a class="btn" href="gencontract.cfm?rentalid=#rentalid#" target="_blank" style="margin-left: 50px;">Generate Contract</a>
+                <a class="btn" href="{% url "backoffice:rental-generate-contract" pk=rental.id %}?inline" target="_blank" style="margin-left: 50px;">Generate Contract</a>
             </td>
         </tr>
         <tr>
@@ -340,6 +340,12 @@
                     {% endif %})
                 </CFIF>
                 {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td>Military ID</td>
+            <td>
+                {{ form.is_military }}
             </td>
         </tr>
         <tr>

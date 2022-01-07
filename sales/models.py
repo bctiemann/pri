@@ -155,16 +155,15 @@ class BaseReservation(models.Model):
         return None
 
     def get_price_data(self):
-        from fleet.models import VehicleMarketing
+        # TODO: Refactor sales.models classes to avoid this nested import
         from sales.utils import RentalPriceCalculator
-        vehicle_marketing = VehicleMarketing.objects.get(vehicle_id=self.vehicle.id)
         price_calculator = RentalPriceCalculator(
             coupon_code=self.coupon_code,
             email=self.customer.email,
             tax_zip=self.delivery_zip,
             effective_date=self.out_date,
             is_military=self.is_military,
-            vehicle_marketing=vehicle_marketing,
+            vehicle_marketing=self.vehicle.vehicle_marketing,
             num_days=self.num_days,
             extra_miles=self.extra_miles,
             override_subtotal=self.override_subtotal,
@@ -215,9 +214,7 @@ class Rental(BaseReservation):
 
     @property
     def extended_days_amount(self):
-        from fleet.models import VehicleMarketing
-        vehicle_marketing = VehicleMarketing.objects.get(vehicle_id=self.vehicle.id)
-        return self.extended_days * vehicle_marketing.price_per_day
+        return self.extended_days * self.vehicle.vehicle_marketing.price_per_day
 
 
 class Driver(models.Model):

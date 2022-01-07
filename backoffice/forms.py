@@ -190,6 +190,7 @@ class RentalForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):
 
     delivery_required = forms.ChoiceField(choices=DELIVERY_REQUIRED_CHOICES)
     extra_miles = forms.ChoiceField(choices=get_extra_miles_choices())
+    is_military = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, required=False)
     customer_notes = forms.CharField(widget=forms.Textarea(attrs={'class': 'customer-notes'}), required=False)
     deposit_charged_on = forms.DateField(required=False)
     deposit_refunded_on = forms.DateField(required=False)
