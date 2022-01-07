@@ -5,10 +5,10 @@
         <div class="bbsinfo">
 			<b>{{ post.author.employee.full_name }}</b> {{ post.created_at|date:"n/j g:iA" }}
             {% if not post.deleted_at %}
-				<a class="submenu" href="{% url "backoffice:home-reply-post" pk=post.reply_to.id %}">Reply</a>
+				<a class="submenu" href="{% block reply_url %}{% url "backoffice:bbs-reply" pk=post.reply_to.id %}{% endblock %}">Reply</a>
                 {% if user == post.author %}
-					<a class="submenu" href="{% url "backoffice:home-edit-post" pk=post.id %}">Edit</a>
-					<a class="submenu" href="{% url "backoffice:home-delete-post" pk=post.id %}">Delete</a>
+					<a class="submenu" href="{% block edit_url %}{% url "backoffice:bbs-edit" pk=post.id %}{% endblock %}">Edit</a>
+					<a class="submenu" href="{% block delete_url %}{% url "backoffice:bbs-delete" pk=post.id %}{% endblock %}">Delete</a>
                 {% endif %}
             {% endif %}
         </div>

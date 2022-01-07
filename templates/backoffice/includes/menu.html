@@ -264,7 +264,7 @@
         <a class="tnav <CFIF scrpt IS "salestax.cfm">selected</CFIF>" href="salestax.cfm">Sales Tax</a>
     </li>
     <li>
-        <a class="tnav <CFIF scrpt IS "bbs.cfm">selected</CFIF>" href="bbs.cfm">BBS</a>
+        <a class="tnav {% if page_group == 'bbs' %}>selected{% endif %}" href="{% url "backoffice:bbs-list" %}">BBS</a>
     </li>
     <CFIF YourID.acclev IS 1>
     <li>

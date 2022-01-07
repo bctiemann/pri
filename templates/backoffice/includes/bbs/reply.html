@@ -11,7 +11,7 @@
 </table>
 
 <table class="inputform">
-    <form method="post" action="{% url "backoffice:home-reply-post" pk=bbspost.id %}">
+    <form method="post" action="{% block form_action_url %}{% url "backoffice:bbs-reply" pk=bbspost.id %}{% endblock %}">
         <tr>
             <td valign=top>{{ form.body }}</td>
         </tr>

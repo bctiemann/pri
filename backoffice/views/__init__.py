@@ -102,9 +102,15 @@ class HomeReplyPostView(AdminViewMixin, CreateView):
         return reverse('backoffice:home')
 
 
-class HomeDeletePostView(AdminViewMixin, DeleteView):
+class HomeDeletePostView(AdminViewMixin, UpdateView):
     template_name = 'backoffice/home/delete_post.html'
     model = BBSPost
+    fields = ()
+
+    def form_valid(self, form):
+        self.object.deleted_at = timezone.now()
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
         return reverse('backoffice:home')

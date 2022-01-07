@@ -1,0 +1,17 @@
+{% extends "backoffice/bbs/base.html" %}
+
+{% block content %}
+
+    <p>
+        This is a complete log of all dialog on the status board BBS since the beginning.
+    </p>
+
+    {% if bbs_posts_new %}
+        <p>There are {{ bbs_posts_new.count }} new messages.</p>
+    {% endif %}
+
+    {% block bbs %}
+        {% include "backoffice/includes/bbs/list.html" %}
+    {% endblock %}
+
+{% endblock %}

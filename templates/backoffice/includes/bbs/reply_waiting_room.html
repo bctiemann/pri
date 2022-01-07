@@ -1,0 +1,3 @@
+{% extends "backoffice/includes/bbs/reply.html" %}
+
+{% block form_action_url %}{% url "backoffice:home-reply-post" pk=bbspost.id %}{% endblock %}

@@ -2,7 +2,7 @@
     Edit a post.
 </p>
 <table class="inputform">
-    <form method="post" action="{% url "backoffice:home-edit-post" pk=bbspost.id %}">
+    <form method="post" action="{% block form_action_url %}{% url "backoffice:bbs-edit" pk=bbspost.id %}{% endblock %}">
         <tr>
             <td>{{ form.body }}</td>
         </tr>
@@ -15,4 +15,3 @@
         {% csrf_token %}
     </form>
 </table>
-}

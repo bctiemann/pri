@@ -1,0 +1,7 @@
+{% extends "backoffice/includes/bbs/list.html" %}
+
+{% block reply_url %}{% url "backoffice:home-reply-post" pk=post.reply_to.id %}{% endblock %}
+
+{% block edit_url %}{% url "backoffice:home-edit-post" pk=post.id %}{% endblock %}
+
+{% block delete_url %}{% url "backoffice:home-delete-post" pk=post.id %}{% endblock %}

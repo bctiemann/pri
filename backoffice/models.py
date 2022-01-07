@@ -15,7 +15,8 @@ class BBSPost(models.Model):
 
     @property
     def css_class(self):
-        age_days = (timezone.now() - self.created_at).seconds / 86400
+        age = timezone.now() - self.created_at
+        age_days = age.days + (age.seconds / 86400)
         if age_days < 0.25:
             return 'bbsnew'
         elif age_days < 2:
@@ -23,7 +24,6 @@ class BBSPost(models.Model):
         elif self.deleted_at:
             return 'bbsdeleted'
         return 'bbs'
-
 
     class Meta:
         ordering = ('-reply_to__id', 'id',)

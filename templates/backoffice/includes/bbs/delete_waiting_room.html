@@ -1,0 +1,3 @@
+{% extends "backoffice/includes/bbs/delete.html" %}
+
+{% block form_action_url %}{% url "backoffice:home-delete-post" pk=bbspost.id %}{% endblock %}
