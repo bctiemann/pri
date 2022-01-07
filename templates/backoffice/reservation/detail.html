@@ -33,7 +33,7 @@
             <td></td>
             <td>
                 <button class="btn" type="button" name="send_insurance" onclick="sendInsuranceAuthForm({{ reservation.customer.id }})">Send Insurance Auth</button>
-                <button class="btn" type="button" name="send_welcome" onclick="sendWelcomeEmail({{ reservation.id }}, null)">Send Welcome Email</button>
+                <button class="btn" type="button" name="send_welcome" onclick="sendWelcomeEmail({{ reservation.id }})">Send Welcome Email</button>
             </td>
         </tr>
         </cfif>

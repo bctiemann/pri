@@ -47,7 +47,7 @@
             <td></td>
             <td>
                 <button class="btn" type="button" name="send_insurance" onclick="sendInsuranceAuthForm({{ rental.customer.id }})">Send Insurance Auth</button>
-                <button class="btn" type="button" name="send_welcome" onclick="sendWelcomeEmail(null, {{ rental.id }})">Send Welcome Email</button>
+                <button class="btn" type="button" name="send_welcome" onclick="sendWelcomeEmail({{ rental.id }})">Send Welcome Email</button>
             </td>
         </tr>
         <tr>

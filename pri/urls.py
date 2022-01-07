@@ -105,6 +105,8 @@ urlpatterns = [
     path('api/customers/search/', api_views.SearchCustomersView.as_view(), name='search-customers'),
     path('api/tax_rate/', api_views.TaxRateByZipView.as_view(), name='tax-rate-by-zip'),
     path('api/check_schedule_conflict/', api_views.CheckScheduleConflictView.as_view(), name='check-schedule-conflict'),
+    path('api/send_insurance_auth/', api_views.SendInsuranceAuthView.as_view(), name='send-insurance-auth'),
+    path('api/send_welcome_email/', api_views.SendWelcomeEmailView.as_view(), name='send-welcome-email'),
 
     # Handle legacy calls from mobile app
     path('ajax_post.cfm', api_views.LegacyPostView.as_view(), name='legacy-post'),

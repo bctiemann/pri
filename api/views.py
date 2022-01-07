@@ -330,3 +330,42 @@ class CheckScheduleConflictView(APIView):
             'model': vehicle.model,
             'conflicts': serializer.data
         })
+
+
+class SendInsuranceAuthView(APIView):
+
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (HasReservationsAccess,)
+
+    def post(self, request):
+        customer_id = request.POST.get('customer_id')
+        try:
+            customer = Customer.objects.get(pk=customer_id)
+        except Customer.DoesNotExist:
+            raise Http404
+
+        # TODO: Send templated email
+
+        return Response({
+            'success': True,
+        })
+
+
+class SendWelcomeEmailView(APIView):
+
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (HasReservationsAccess,)
+
+    def post(self, request):
+        reservation_id = request.POST.get('reservation_id')
+        try:
+            reservation = BaseReservation.objects.get(pk=reservation_id)
+        except Reservation.DoesNotExist:
+            raise Http404
+
+        # TODO: Send templated email
+
+        return Response({
+            'success': True,
+            'confirmation_code': reservation.confirmation_code,
+        })

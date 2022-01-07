@@ -446,10 +446,11 @@ console.log(surveyid);
 
 var sendInsuranceAuthForm = function(customerid) {
     if (confirm('An insurance authorization form will be emailed to the customer. Continue?')) {
-        $.post('ajax_post.cfm', {
+        let url = '/api/send_insurance_auth/';
+        $.post(url, {
             component: 'reservations',
             method: 'sendInsuranceAuthForm',
-            customerid: customerid,
+            customer_id: customerid,
         },
         function(data) {
             if (data.success) {
@@ -461,13 +462,13 @@ var sendInsuranceAuthForm = function(customerid) {
     }
 };
 
-var sendWelcomeEmail = function(reservationid, rentalid) {
+var sendWelcomeEmail = function(reservationid) {
     if (confirm('The welcome email (with a link to the customer portal/password retrieval page) will be emailed to the customer. Proceed?')) {
-        $.post('ajax_post.cfm', {
+        let url = '/api/send_welcome_email/';
+        $.post(url, {
             component: 'reservations',
             method: 'sendWelcomeEmail',
-            reservationid: reservationid,
-            rentalid: rentalid,
+            reservation_id: reservationid,
         },
         function(data) {
             if (data.success) {
