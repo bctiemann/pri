@@ -365,6 +365,10 @@ class Customer(models.Model):
     def past_rentals(self):
         return self.basereservation_set.filter(rental__isnull=False)
 
+    @property
+    def primary_phone(self):
+        return self.home_phone or self.mobile_phone or self.work_phone
+
     def format_cc_number(self, cc_number):
         if len(cc_number) == 16:
             cc_number = cc_number[0:4] + ' ' + cc_number[4:8] + ' ' + cc_number[8:12] + ' ' + cc_number[12:16]

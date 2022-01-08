@@ -14,7 +14,7 @@ from django.http import Http404, HttpResponseRedirect, HttpResponseNotFound
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from . import ListViewMixin
-from fleet.models import VehicleMarketing
+from fleet.models import VehicleMarketing, VehicleType
 from sales.models import Rental, Driver
 from users.models import Customer
 from sales.utils import RentalPriceCalculator
@@ -148,10 +148,10 @@ class RentalGenerateContractView(PermissionRequiredMixin, PDFView):
         options = {
             'quiet': '',
             'page-size': 'Letter',
-            'margin-top': '0.52in',
-            'margin-right': '0.25in',
+            'margin-top': '0.75in',
+            'margin-right': '1.0in',
             'margin-bottom': '0.0in',
-            'margin-left': '0.25in',
+            'margin-left': '1.0in',
             'encoding': "UTF-8",
             'no-outline': None,
         }
@@ -161,4 +161,7 @@ class RentalGenerateContractView(PermissionRequiredMixin, PDFView):
         context = super().get_context_data(**kwargs)
         context['rental'] = self.rental
         context['site_url'] = settings.SERVER_BASE_URL
+        context['company_name'] = settings.COMPANY_NAME
+        context['company_phone'] = settings.COMPANY_PHONE
+        context['vehicle_type'] = VehicleType
         return context

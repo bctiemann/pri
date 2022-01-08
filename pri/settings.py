@@ -204,6 +204,7 @@ MEDIA_URL = '/media/'
 SERVER_BASE_URL = 'https://performance.rentals'
 
 COMPANY_NAME = 'Performance Rentals'
+COMPANY_PHONE = '(866) 607-0084'
 COMPANY_FOUNDING_YEAR = 2008
 SUPPORT_EMAIL = 'support@performance.rentals'
 SITE_EMAIL = 'info@performancerentals.us'

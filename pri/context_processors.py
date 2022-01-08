@@ -11,6 +11,8 @@ def settings_constants(request):
         'vehicle_status': VehicleStatus,
         'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
         'extend_threshold_hours': settings.EXTEND_THRESHOLD_HOURS,
+        'company_name': settings.COMPANY_NAME,
+        'company_phone': settings.COMPANY_PHONE,
     }
     return context
 
