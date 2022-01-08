@@ -17,7 +17,7 @@ class VehicleVideoInline(admin.TabularInline):
 
 
 class VehicleAdmin(admin.ModelAdmin):
-    list_display = ('make', 'model', 'year',)
+    list_display = ('id', 'make', 'model', 'year',)
 
 
 class VehicleMarketingAdmin(admin.ModelAdmin):
@@ -28,9 +28,9 @@ class VehicleMarketingAdmin(admin.ModelAdmin):
     inlines = (VehiclePictureInline, VehicleVideoInline,)
     prepopulated_fields = {"slug": ("model",)}
     fieldsets = (
-        (None, {
-            'fields': ('vehicle_id',)
-        }),
+        # (None, {
+        #     'fields': ('vehicle_id',)
+        # }),
         ('Redundant with Vehicle - update corresponding record manually', {
             'fields': ('make', 'model', 'year', 'slug', 'vehicle_type', 'status', 'weighting',)
         }),

@@ -60,7 +60,12 @@ def get_vehicle_video_path(instance, filename):
 
 # Model classes
 
+# Vehicle is the "back-end" representation of a physical vehicle, with potentially sensitive information attached.
 class Vehicle(models.Model):
+
+    # Multiple Vehicles can link to the same VehicleMarketing.
+    # Cannot be a ForeignKey because the databases are kept segregated. See pri/db_routers.py
+    vehicle_marketing_id = models.IntegerField(null=True, blank=True, help_text='ID of VehicleMarketing object this corresponds to')
 
     # Fields defined on the model correspond to database columns and fully define their behavior both in DB and in code.
     # Model field names should be verbose, specific, and expressive; i.e. "vehicle_type" rather than "vtype"
@@ -96,7 +101,7 @@ class Vehicle(models.Model):
 
     @property
     def vehicle_marketing(self):
-        return VehicleMarketing.objects.filter(vehicle_id=self.id).first()
+        return VehicleMarketing.objects.get(pk=self.vehicle_marketing_id)
 
     # TODO: Either expose the slug in the backoffice vehicle form and make it controllable, or add collision
     # checking to this method for creating new records
@@ -112,17 +117,15 @@ class Vehicle(models.Model):
         ordering = ('year',)
 
 
+# VehicleMarketing is the "front-end" representation of a vehicle, which contains no sensitive information.
 class VehicleMarketing(models.Model):
 
+    # Used for textual representations in ad copy
     VEHICLE_TYPE_MAP = {
         VehicleType.CAR: 'car',
         VehicleType.BIKE: 'bike',
         VehicleType.TRACK: 'track car',
     }
-
-    # This links the record to the Vehicle object, which is where potentially sensitive business data
-    # is stored. Cannot be a ForeignKey because the databases are kept segregated. See pri/db_routers.py
-    vehicle_id = models.IntegerField(null=True, blank=True, help_text='ID of Vehicle object this corresponds to')
 
     # These fields are redundant with the Vehicle class, and will be updated concurrently with that table when
     # edited via the backoffice form. This is to avoid any joins or queries against the Vehicle table when pulling
@@ -174,6 +177,12 @@ class VehicleMarketing(models.Model):
     discount_7_day = models.IntegerField(null=True, blank=True, verbose_name='7-day discount', help_text='Percent')
     security_deposit = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
     miles_included = models.IntegerField(null=True, blank=True, help_text='Per day')
+
+    # In the event of multiple vehicles matching this marketing representation, we pick the first one per the
+    # Meta.ordering setting
+    @property
+    def vehicle(self):
+        return Vehicle.objects.filter(vehicle_marketing_id=self.id).first()
 
     @property
     def vehicle_name(self):

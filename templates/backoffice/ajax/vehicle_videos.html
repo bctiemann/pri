@@ -30,7 +30,7 @@
     <div id="webm_status"></div>
     <div id="mp4_status"></div>
 
-    <form method="POST" action="{% url "backoffice:vehicle-videos" pk=vehicle_marketing.vehicle_id %}" enctype="multipart/form-data" id="vvid_form">
+    <form method="POST" action="{% url "backoffice:vehicle-videos" pk=vehicle_marketing.vehicle.id %}" enctype="multipart/form-data" id="vvid_form">
         <table class="inputform">
             <tr>
                 <td>Video File (.mp4)</td>

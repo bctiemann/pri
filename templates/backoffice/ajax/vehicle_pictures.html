@@ -35,7 +35,7 @@
 {% endfor %}
 
 <div class="upload-form" id="vpics_upload">
-    <form method="POST" action="{% url "backoffice:vehicle-pictures" pk=vehicle_marketing.vehicle_id %}" enctype="multipart/form-data" id="vpic_form">
+    <form method="POST" action="{% url "backoffice:vehicle-pictures" pk=vehicle_marketing.vehicle.id %}" enctype="multipart/form-data" id="vpic_form">
         {{ form.image }}
         <cfinput type="file" name="picup" />
         <cfinput type="hidden" name="vehicleid" value="#URL.vehicleid#" />

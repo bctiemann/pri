@@ -51,13 +51,13 @@ class Command(BaseCommand):
         # 'do_vehicle_pics': True,
         # 'do_vehicle_vids': True,
         # 'do_customers': True,
-        # 'do_reservations': True,
-        # 'do_rentals': True,
-        # 'do_drivers': True,
+        'do_reservations': True,
+        'do_rentals': True,
+        'do_drivers': True,
         # 'do_consigners': True,
         # 'do_consignmentvehicles': True,
         # 'do_admins': True,
-        'do_newsitems': True,
+        # 'do_newsitems': True,
         # 'do_bbsposts': True,
         # 'do_sitecontent': True,
         # 'do_newslettersubscriptions': True,
@@ -156,45 +156,26 @@ class Command(BaseCommand):
             if clear_existing:
                 Vehicle.objects.all().delete()
                 VehicleMarketing.objects.all().delete()
-            back_cursor.execute("""SELECT * FROM Vehicles""")
-            for old in back_cursor.fetchall():
+            front_cursor.execute("""SELECT * FROM VehiclesFront""")
+            for old_front in front_cursor.fetchall():
+                back_cursor.execute("""SELECT * FROM Vehicles where vehicleid=%s""", old_front['vehicleid'])
+                old = back_cursor.fetchone()
+                print(old)
+                if not old:
+                    continue
+
                 print(old['make'], old['model'])
-                slug = slugify(f'{old["make"]}-{old["model"]}')
-                new = Vehicle.objects.create(
-                    id=old['vehicleid'],
-                    make=old['make'],
-                    model=old['model'],
-                    year=old['year'],
-                    slug=slug,
-                    vehicle_type=old['type'],
-                    status=0,
-                    plate=old['plate'],
-                    vin=old['vin'],
-                    mileage=old['mileage'],
-                    damage=old['damage'],
-                    notes=old['notes'],
-                    policy_number=self.decrypt(old['policyno']),
-                    policy_company=old['policyco'],
-                    weighting=old['weighting'],
-                )
-                try:
-                    new.policy_phone = old['policytel']
-                    new.save()
-                except ValueError:
-                    new.policy_phone = ''
-                front_cursor.execute("""SELECT * FROM VehiclesFront where vehicleid=%s""", old['vehicleid'])
-                old_front = front_cursor.fetchone()
                 parsed_blurb = self.bbcode_parser.feed(old_front['blurb'])
+                slug = slugify(f'{old["make"]}-{old["model"]}')
                 new_front = VehicleMarketing.objects.create(
-                    id=new.id,
-                    vehicle_id=new.id,
+                    id=old_front['vehicleid'],
                     slug=slug,
-                    weighting=old['weighting'],
                     make=old['make'],
                     model=old['model'],
                     year=old['year'],
-                    vehicle_type=old['type'],
+                    vehicle_type=old_front['type'],
                     status=old_front['status'],
+                    weighting=old['weighting'],
                     horsepower=old_front['hp'],
                     torque=old_front['tq'],
                     top_speed=old_front['topspeed'],
@@ -212,12 +193,37 @@ class Command(BaseCommand):
                     security_deposit=old_front['deposit'],
                     miles_included=old_front['milesinc'],
                 )
-                new.status = old_front['status']
-                new.save()
-                self.import_showcase_image(new_front, old['vehicleid'])
-                self.import_thumbnail_image(new_front, old['vehicleid'])
-                self.import_inspection_image(new_front, old['vehicleid'])
-                self.import_mobile_thumb_image(new_front, old['vehicleid'])
+                self.import_showcase_image(new_front, old_front['vehicleid'])
+                self.import_thumbnail_image(new_front, old_front['vehicleid'])
+                self.import_inspection_image(new_front, old_front['vehicleid'])
+                self.import_mobile_thumb_image(new_front, old_front['vehicleid'])
+
+                new = Vehicle.objects.create(
+                    id=old['vehicleid'],
+                    vehicle_marketing_id=new_front.id,
+                    make=old['make'],
+                    model=old['model'],
+                    year=old['year'],
+                    slug=slug,
+                    vehicle_type=old['type'],
+                    status=old_front['status'],
+                    plate=old['plate'],
+                    vin=old['vin'],
+                    mileage=old['mileage'],
+                    damage=old['damage'],
+                    notes=old['notes'],
+                    policy_number=self.decrypt(old['policyno']),
+                    policy_company=old['policyco'],
+                    weighting=old['weighting'],
+                )
+                try:
+                    new.policy_phone = old['policytel']
+                    new.save()
+                except ValueError:
+                    new.policy_phone = ''
+
+                # new.status = old_front['status']
+                # new.save()
 
         if 'do_vehicle_pics' in self.enabled:
             if clear_existing:
@@ -230,7 +236,7 @@ class Command(BaseCommand):
                 except Vehicle.DoesNotExist:
                     continue
                 try:
-                    vehicle_marketing = VehicleMarketing.objects.get(vehicle_id=vehicle.id)
+                    vehicle_marketing = VehicleMarketing.objects.get(id=vehicle.vehicle_marketing_id)
                 except VehicleMarketing.DoesNotExist:
                     continue
                 print(vehicle_marketing)
