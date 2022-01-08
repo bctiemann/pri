@@ -9,7 +9,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from . import ListViewMixin
 from users.models import User, Customer
-from backoffice.forms import CustomerForm
+from backoffice.forms import CustomerForm, CloneCustomerForm
 
 
 # Template generics-based CRUD views
@@ -60,3 +60,30 @@ class CustomerDeleteView(DeleteView):
 
     def get_success_url(self):
         return reverse('backoffice:customer-list')
+
+
+class CustomerCloneView(PermissionRequiredMixin, APIView):
+    permission_required = ('users.edit_customer',)
+
+    def post(self, request, pk=None):
+        form = CloneCustomerForm(request.POST)
+
+        try:
+            customer = Customer.objects.get(pk=pk)
+        except Customer.DoesNotExist:
+            raise Http404
+
+        new_customer = customer
+
+        # TODO: Create User, then create customer
+
+        new_customer.id = None
+        new_customer.first_name = form.cleaned_data['clone_first_name']
+        new_customer.last_name = form.cleaned_data['clone_last_name']
+        new_customer.save()
+
+        return Response({
+            'success': True,
+            'customer_id': new_customer.id,
+        })
+

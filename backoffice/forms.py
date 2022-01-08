@@ -290,6 +290,18 @@ class CustomerForm(CSSClassMixin, forms.ModelForm):
         exclude = ('user', 'rentals_count',)
 
 
+class CloneCustomerForm(forms.ModelForm):
+
+    clone_first_name = forms.CharField()
+    clone_last_name = forms.CharField()
+    clone_email = forms.EmailField()
+    clone_duplicate_license = forms.BooleanField(required=False)
+
+    class Meta:
+        model = Customer
+        fields = ('clone_first_name', 'clone_last_name', 'clone_email', 'clone_duplicate_license',)
+
+
 class CouponForm(forms.ModelForm):
 
     class Meta:

@@ -59,6 +59,7 @@ urlpatterns = [
     path('customers/create/', customers.CustomerCreateView.as_view(is_create_view=True), name='customer-create'),
     path('customers/<int:pk>/', customers.CustomerDetailView.as_view(), name='customer-detail'),
     path('customers/<int:pk>/delete/', customers.CustomerDeleteView.as_view(), name='customer-delete'),
+    path('customers/<int:pk>/clone/', customers.CustomerCloneView.as_view(), name='customer-delete'),
 
     path('coupons/', coupons.CouponListView.as_view(), name='coupon-list'),
     path('coupons/create/', coupons.CouponCreateView.as_view(is_create_view=True), name='coupon-create'),

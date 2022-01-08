@@ -204,22 +204,25 @@ var promptCloneCustomer = function() {
 };
 
 var cloneCustomer = function() {
-    var rentalid = $('#rentalid').val();
+    var rentalId = $('#rental_id').val();
+    var customerId = $('#clone_customer_id').val();
     var params = {
         component: 'customers',
         method: 'cloneCustomer',
-        fname: $('#clone_fname').val(),
-        lname: $('#clone_lname').val(),
-        email: $('#clone_email').val(),
-        clone_license: $('#clone_license').prop('checked'),
-        customerid: $('#clone_customerid').val(),
-        rentalid: rentalid,
+        clone_first_name: $('#id_clone_first_name').val(),
+        clone_last_name: $('#id_clone_last_name').val(),
+        clone_email: $('#id_clone_email').val(),
+        clone_duplicate_license: $('#id_clone_duplicate_license').prop('checked'),
+        customer_id: customerId,
+        rental_id: rentalId,
     };
-    $.post('ajax_post.cfm',params,function(data) {
+    console.log(params);
+    let url = `/backoffice/customers/${customerId}/clone/`;
+    $.post(url, params, function(data) {
 console.log(data);
         if (data.success) {
-            if (rentalid) {
-                editDriver('addDriver', null, data.customerid, rentalid);
+            if (rentalId) {
+                editDriver('add', null, data.customer_id, rentalId);
             } else {
                 alert('New cloned customer created successfully.');
             }
