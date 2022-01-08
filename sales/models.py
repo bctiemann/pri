@@ -34,7 +34,7 @@ def generate_code(reservation_type):
 class Promotion(models.Model):
     name = models.CharField(max_length=255, blank=True)
     amount = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
-    percent = models.IntegerField(null=True, blank=True)
+    percent = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     service_type = models.CharField(max_length=50, choices=ServiceType.choices, blank=True)
@@ -50,7 +50,7 @@ class Promotion(models.Model):
         if self.amount:
             return self.amount
         elif self.percent:
-            return value * self.percent / 100
+            return value * float(self.percent) / 100
         return 0
 
     def get_discounted_value(self, value):
