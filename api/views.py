@@ -1,5 +1,7 @@
 import datetime
 import logging
+
+import pytz
 import requests
 
 from rest_framework.views import APIView
@@ -308,11 +310,11 @@ class CheckScheduleConflictView(APIView):
         try:
             out_at_date = datetime.datetime.strptime(request.POST.get('out_at_date'), '%m/%d/%Y').date()
             out_at_time = datetime.datetime.strptime(request.POST.get('out_at_time'), '%H:%M').time()
-            out_at = datetime.datetime.combine(out_at_date, out_at_time)
+            out_at = datetime.datetime.combine(out_at_date, out_at_time).astimezone(pytz.timezone(settings.TIME_ZONE))
 
             back_at_date = datetime.datetime.strptime(request.POST.get('back_at_date'), '%m/%d/%Y').date()
             back_at_time = datetime.datetime.strptime(request.POST.get('back_at_time'), '%H:%M').time()
-            back_at = datetime.datetime.combine(back_at_date, back_at_time)
+            back_at = datetime.datetime.combine(back_at_date, back_at_time).astimezone(pytz.timezone(settings.TIME_ZONE))
         except ValueError:
             return Response({'success': False, 'error': 'Out/back dates not set'})
 
