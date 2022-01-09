@@ -41,7 +41,7 @@ class VehicleForm(forms.ModelForm):
 
     class Meta:
         model = Vehicle
-        exclude = ('slug',)
+        exclude = ('slug', 'vehicle_marketing_id',)
 
 
 class VehicleMarketingForm(forms.ModelForm):

@@ -53,14 +53,12 @@ class VehicleDetailView(VehicleViewMixin, ListViewMixin, UpdateView):
     form_class = VehicleForm
     marketing_form_class = VehicleMarketingForm
 
-    def post(self, request, *args, **kwargs):
-        marketing_form = VehicleMarketingForm(request.POST)
-        print(marketing_form.data)
-        print(marketing_form.is_valid())
-        print(marketing_form.cleaned_data)
-        result = super().post(request, *args, **kwargs)
-        VehicleMarketing.objects.filter(vehicle_id=self.object.id).update(**marketing_form.cleaned_data)
-        return result
+    def form_valid(self, form):
+        vehicle = form.save()
+        marketing_form = VehicleMarketingForm(self.request.POST)
+        marketing_form.is_valid()
+        VehicleMarketing.objects.filter(id=vehicle.vehicle_marketing_id).update(**marketing_form.cleaned_data)
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_marketing_form_class(self):
         return self.marketing_form_class
