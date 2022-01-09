@@ -246,13 +246,14 @@ var showPastRentals = function() {
 };
 
 var refreshMedia = function() {
-    var vehicleid = $('#vehicleid').val();
-    var vpicsUrl = 'pictures/';
-    var vvidsUrl = 'videos/';
-    var showcaseUrl = 'showcase/';
-    var thumbnailUrl = 'thumbnail/';
-    var inspectionUrl = 'inspection/';
-    var mobilethumbUrl = 'mobile_thumb/';
+    var vehicleMarketingId = $('#vehicle_marketing_id').val();
+    var baseUrl = `/backoffice/vehicles/marketing/${vehicleMarketingId}/`;
+    var vpicsUrl = baseUrl + 'pictures/';
+    var vvidsUrl = baseUrl + 'videos/';
+    var showcaseUrl = baseUrl + 'showcase/';
+    var thumbnailUrl = baseUrl + 'thumbnail/';
+    var inspectionUrl = baseUrl + 'inspection/';
+    var mobilethumbUrl = baseUrl + 'mobile_thumb/';
     $('#vpics').load(vpicsUrl, function() {
         $('.vpic-delete').click(function() {
             var vpicsid = $(this).attr('vpicsid');
