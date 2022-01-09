@@ -17,7 +17,7 @@ from django.core.files import File
 from backoffice.models import BBSPost
 from marketing.models import NewsItem, SiteContent, NewsletterSubscription
 from fleet.models import (
-    Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, TransmissionType, Location,
+    Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, TransmissionType, Location, TollTag,
     get_vehicle_picture_path, get_vehicle_video_path
 )
 from users.models import Customer, Employee, User, MusicGenre
@@ -47,13 +47,14 @@ SITE_SEC_ROOT = 'http://172.16.0.5/prinew/secure/'
 class Command(BaseCommand):
 
     enabled = {
+        'do_tolltags': True,
         # 'do_vehicles': True,
         # 'do_vehicle_pics': True,
         # 'do_vehicle_vids': True,
         # 'do_customers': True,
         # 'do_reservations': True,
-        'do_rentals': True,
-        'do_drivers': True,
+        # 'do_rentals': True,
+        # 'do_drivers': True,
         # 'do_consigners': True,
         # 'do_consignmentvehicles': True,
         # 'do_admins': True,
@@ -622,4 +623,22 @@ class Command(BaseCommand):
                     code=old['code'],
                     name=old['code'],
                     percent=old['amount'],
+                )
+
+        if 'do_tolltags' in self.enabled:
+            if clear_existing:
+                TollTag.objects.all().delete()
+            back_cursor.execute("""SELECT * FROM TollTags""")
+            for old in back_cursor.fetchall():
+                print(old)
+                try:
+                    vehicle = Vehicle.objects.get(pk=old['vehicleid'])
+                except Vehicle.DoesNotExist:
+                    vehicle = None
+                new = TollTag.objects.create(
+                    toll_account=old['tollaccount'],
+                    tag_number=old['tagnumber'],
+                    vehicle=vehicle,
+                    alt_usage=old['altusage'] or '',
+                    notes=old['notes'],
                 )

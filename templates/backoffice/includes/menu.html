@@ -158,11 +158,13 @@
 	<a class="tnav <CFIF scrpt IS "tards.cfm">selected</CFIF>" href="tards.cfm">Tards</a>
 	</li>
 </CFIF>
+{% if user.employee.admin_access %}
 <CFIF YourID.acclev IS 1>
 	<li>
-	<a class="tnav <CFIF scrpt IS "tolltags.cfm">selected</CFIF>" href="tolltags.cfm">Toll Tags (E-ZPass)</a>
+	<a class="tnav {% if page_group == 'tolltags' %}selected{% endif %}" href="{% url "backoffice:tolltag-list" %}">Toll Tags (E-ZPass)</a>
 	</li>
 </CFIF>
+{% endif %}
 </ul>
 </div>
 

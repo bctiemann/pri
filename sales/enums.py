@@ -61,10 +61,12 @@ def get_exp_year_choices(since_founding=False, allow_null=False):
     return choices
 
 
-def get_vehicle_choices():
+def get_vehicle_choices(allow_null=False):
     vehicle_choices = []
     vehicle_choices.append(('Cars', list((v.id, v.vehicle_name) for v in Vehicle.objects.filter(vehicle_type=VehicleType.CAR))))
     vehicle_choices.append(('Motorcycles', list((v.id, v.vehicle_name) for v in Vehicle.objects.filter(vehicle_type=VehicleType.BIKE))))
+    if allow_null:
+        vehicle_choices = [(None, '----')] + vehicle_choices
     return vehicle_choices
 
 

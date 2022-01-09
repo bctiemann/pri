@@ -6,7 +6,7 @@ from django.conf import settings
 from django import forms
 from phonenumber_field.formfields import PhoneNumberField
 
-from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, VehicleType
+from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, TollTag
 from consignment.models import Consigner
 from users.models import User, Employee, Customer
 from sales.models import Reservation, Rental, Coupon
@@ -341,4 +341,16 @@ class CouponForm(forms.ModelForm):
 
     class Meta:
         model = Coupon
+        fields = '__all__'
+
+
+class TollTagForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['vehicle'].choices = get_vehicle_choices(allow_null=True)
+
+    class Meta:
+        model = TollTag
         fields = '__all__'

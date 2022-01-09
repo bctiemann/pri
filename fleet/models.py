@@ -315,4 +315,9 @@ class VehicleVideo(models.Model):
 
 
 class TollTag(models.Model):
-    pass
+    toll_account = models.CharField(max_length=32, blank=True)
+    tag_number = models.CharField(max_length=32, blank=True)
+    vehicle = models.ForeignKey('fleet.Vehicle', null=True, blank=True, on_delete=models.SET_NULL)
+    alt_usage = models.CharField(max_length=255, blank=True)
+    notes = models.TextField(blank=True)
+

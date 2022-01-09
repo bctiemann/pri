@@ -5,7 +5,9 @@ from django.conf import settings
 
 from fleet import views as fleet_views
 from backoffice import views
-from backoffice.views import vehicles, reservations, rentals, employees, customers, coupons, bbs
+from backoffice.views import (
+    vehicles, reservations, rentals, employees, customers, coupons, tolltags, bbs
+)
 
 
 urlpatterns = [
@@ -66,6 +68,11 @@ urlpatterns = [
     path('coupons/create/', coupons.CouponCreateView.as_view(is_create_view=True), name='coupon-create'),
     path('coupons/<int:pk>/', coupons.CouponDetailView.as_view(), name='coupon-detail'),
     path('coupons/<int:pk>/delete/', coupons.CouponDeleteView.as_view(), name='coupon-delete'),
+
+    path('toll_tags/', tolltags.TollTagListView.as_view(), name='tolltag-list'),
+    path('toll_tags/create/', tolltags.TollTagCreateView.as_view(is_create_view=True), name='tolltag-create'),
+    path('toll_tags/<int:pk>/', tolltags.TollTagDetailView.as_view(), name='tolltag-detail'),
+    path('toll_tags/<int:pk>/delete/', tolltags.TollTagDeleteView.as_view(), name='tolltag-delete'),
 
     path('bbs/', bbs.BBSListView.as_view(), name='bbs-list'),
     path('bbs/<int:pk>/reply/', bbs.BBSReplyPostView.as_view(), name='bbs-reply'),

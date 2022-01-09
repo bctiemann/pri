@@ -1,0 +1,107 @@
+{% extends "backoffice/tolltag/base.html" %}
+
+{% block content %}
+
+    {% if employee %}
+        <h2>Edit Toll Tag</h2>
+    {% else %}
+        <h2>Add Toll Tag</h2>
+    {% endif %}
+
+    {{ form.errors }}
+    {% if tolltag %}
+        <form method="POST" action="{% url "backoffice:tolltag-detail" pk=tolltag.id %}">
+    {% else %}
+        <form method="POST" action="{% url "backoffice:tolltag-create" %}">
+    {% endif %}
+
+    <table class="inputform tolltags">
+        <tr>
+            <td>Tag Number</td>
+            <td>
+                {{ form.tag_number }}
+                <cfinput name="tagnumber" value="#TollTag.tagnumber#" required="yes" message="Enter the toll tag number (printed on the device)." maxlength="32" />
+            </td>
+        </tr>
+        <tr>
+            <td>Toll Account</td>
+            <td>
+                {{ form.toll_account }}
+                <cfinput name="tollaccount" value="#TollTag.tollaccount#" required="yes" message="Enter the toll account number." maxlength="14" />
+            </td>
+        </tr>
+        <tr>
+            <td>Fleet Vehicle</td>
+            <td>
+                {{ form.vehicle }}
+                {% comment %}
+                <cfquery name="Cars" datasource="#DSN#">
+                    SELECT vehicleid,year,make,model FROM Vehicles
+                    WHERE type=1
+                    ORDER BY vehicleid
+                </cfquery>
+                <cfquery name="Motorcycles" datasource="#DSN#">
+                    SELECT vehicleid,year,make,model FROM Vehicles
+                    WHERE type=2
+                    ORDER BY vehicleid
+                </cfquery>
+                <cfselect name="vehicleid">
+                    <option value="">(None)</option>
+                    <optgroup label="Cars">
+                    <cfloop query="#Cars#">
+                        <option value="#vehicleid#" <cfif vehicleid IS TollTag.vehicleid>selected</cfif>>#year# #make# #model#</option>
+                    </cfloop>
+                    </optgroup>
+                    <optgroup label="Motorcycles">
+                    <cfloop query="#Motorcycles#">
+                        <option value="#vehicleid#" <cfif vehicleid IS TollTag.vehicleid>selected</cfif>>#year# #make# #model#</option>
+                    </cfloop>
+                    </optgroup>
+                </cfselect>
+                {% endcomment %}
+            </td>
+        </tr>
+        <tr>
+            <td>Other Usage</td>
+            <td>
+                {{ form.alt_usage }}
+                <cfinput name="altusage" value="#TollTag.altusage#" maxlength="255" />
+            </td>
+        </tr>
+        <tr>
+            <td class="align-top">Notes</td>
+            <td>
+                {{ form.notes }}
+{#                <cftextarea name="notes">#TollTag.notes#</cftextarea>#}
+            </td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>
+                <button class="btn" type="submit" name="edit">
+                    {% if tolltag %}
+                        Edit
+                    {% else %}
+                        Add
+                    {% endif %}
+                </button>
+                {% if tolltag %}
+                <cfif tolltagid>
+                    <button
+                        class="btn delete"
+                        type="submit"
+                        name="delete"
+                        onclick="return confirmDelete(this.form, '{% url "backoffice:tolltag-delete" pk=tolltag.id %}', 'tolltag')"
+                    >
+                        Delete Toll Tag
+                    </button>
+                </cfif>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+    {% csrf_token %}
+    </form>
+
+{% endblock %}
