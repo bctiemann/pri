@@ -29,15 +29,7 @@ class CSSClassMixin:
 # TODO: Add slug to the visible form fields and set on both models
 
 class VehicleForm(CSSClassMixin, forms.ModelForm):
-    WEIGHTING_CHOICES = (
-        (0, '0 - Normal'),
-        (1, '+1'),
-        (2, '+2'),
-        (3, '+3'),
-    )
-
     external_owner = forms.ModelChoiceField(queryset=Consigner.objects.all(), empty_label='PRI', required=False)
-    weighting = forms.ChoiceField(choices=WEIGHTING_CHOICES)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -55,7 +47,16 @@ class VehicleForm(CSSClassMixin, forms.ModelForm):
 
 
 class VehicleMarketingForm(CSSClassMixin, forms.ModelForm):
+
+    WEIGHTING_CHOICES = (
+        (0, '0 - Normal'),
+        (1, '+1'),
+        (2, '+2'),
+        (3, '+3'),
+    )
+
     tight_fit = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
+    weighting = forms.ChoiceField(choices=WEIGHTING_CHOICES)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
