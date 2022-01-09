@@ -28,7 +28,7 @@ class CSSClassMixin:
 
 # TODO: Add slug to the visible form fields and set on both models
 
-class VehicleForm(forms.ModelForm):
+class VehicleForm(CSSClassMixin, forms.ModelForm):
     WEIGHTING_CHOICES = (
         (0, '0 - Normal'),
         (1, '+1'),
@@ -39,13 +39,32 @@ class VehicleForm(forms.ModelForm):
     external_owner = forms.ModelChoiceField(queryset=Consigner.objects.all(), empty_label='PRI', required=False)
     weighting = forms.ChoiceField(choices=WEIGHTING_CHOICES)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.add_widget_css_class('policy_phone', 'phone')
+
+        for field in [
+            'year', 'plate', 'mileage',
+        ]:
+            self.add_widget_css_class(field, 'short')
+
     class Meta:
         model = Vehicle
         exclude = ('slug', 'vehicle_marketing_id',)
 
 
-class VehicleMarketingForm(forms.ModelForm):
+class VehicleMarketingForm(CSSClassMixin, forms.ModelForm):
     tight_fit = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in [
+            'horsepower', 'torque', 'top_speed', 'gears', 'price_per_day',
+            'discount_2_day', 'discount_3_day', 'discount_7_day', 'security_deposit', 'miles_included',
+        ]:
+            self.add_widget_css_class(field, 'short')
 
     class Meta:
         model = VehicleMarketing
