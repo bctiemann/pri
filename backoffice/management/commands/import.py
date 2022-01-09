@@ -382,6 +382,7 @@ class Command(BaseCommand):
                 vehicle = Vehicle.objects.filter(id=old['vehicleid']).first()
                 new = Reservation.objects.create(
                     id=old['reservationid'],
+                    type=Reservation.ReservationType.RESERVATION,
                     customer=customer,
                     vehicle=vehicle,
                     out_at=old['dateout'],
@@ -413,6 +414,7 @@ class Command(BaseCommand):
                 vehicle = Vehicle.objects.filter(id=old['vehicleid']).first()
                 new = Rental.objects.create(
                     id=old['rentalid'],
+                    type=Rental.ReservationType.RENTAL,
                     customer=customer,
                     vehicle=vehicle,
                     out_at=old['dateout'],

@@ -94,6 +94,12 @@ var confirmDelete = function(form, deleteUrl, objectName) {
     return false;
 };
 
+var convertToRental = function(form, convertUrl) {
+    console.log(form.submit);
+    form.action = convertUrl;
+    form.submit();
+};
+
 var refreshSpecs = function() {
     var specsJson = $('#id_specs').val();
     if (specsJson) {

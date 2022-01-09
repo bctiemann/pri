@@ -39,6 +39,7 @@ urlpatterns = [
     path('reservations/create/', reservations.ReservationCreateView.as_view(is_create_view=True), name='reservation-create'),
     path('reservations/<int:pk>/', reservations.ReservationDetailView.as_view(), name='reservation-detail'),
     path('reservations/<int:pk>/delete/', reservations.ReservationDeleteView.as_view(), name='reservation-delete'),
+    path('reservations/<int:pk>/convert/', reservations.ReservationConvertToRentalView.as_view(), name='reservation-convert'),
 
     path('rentals/', rentals.RentalListView.as_view(), name='rental-list'),
     path('rentals/create/', rentals.RentalCreateView.as_view(is_create_view=True), name='rental-create'),

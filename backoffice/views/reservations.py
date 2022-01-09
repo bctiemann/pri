@@ -9,7 +9,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from . import ListViewMixin
 from fleet.models import VehicleMarketing
-from sales.models import Reservation
+from sales.models import Reservation, Rental
 from sales.utils import RentalPriceCalculator
 from backoffice.forms import ReservationForm
 
@@ -56,3 +56,47 @@ class ReservationDeleteView(DeleteView):
 
     def get_success_url(self):
         return reverse('backoffice:reservation-list')
+
+
+class ReservationConvertToRentalView(UpdateView):
+    model = Reservation
+    fields = ()
+
+    def form_valid(self, form):
+        reservation = form.instance
+
+        # Populate a new Rental object with fields explicitly from the Reservation
+        rental = Rental.objects.create(
+            type=Rental.ReservationType.RENTAL,
+            vehicle=reservation.vehicle,
+            customer=reservation.customer,
+            reserved_at=reservation.reserved_at,
+            out_at=reservation.out_at,
+            back_at=reservation.back_at,
+            rate=reservation.rate,
+            drivers=reservation.drivers,
+            miles_included=reservation.miles_included,
+            extra_miles=reservation.extra_miles,
+            customer_notes=reservation.customer_notes,
+            coupon_code=reservation.coupon_code,
+            is_military=reservation.is_military,
+            deposit_amount=reservation.deposit_amount,
+            confirmation_code=reservation.confirmation_code,
+            app_channel=reservation.app_channel,
+            delivery_required=reservation.delivery_required,
+            tax_percent=reservation.tax_percent,
+            delivery_zip=reservation.delivery_zip,
+            override_subtotal=reservation.override_subtotal,
+            final_price_data=reservation.final_price_data,
+            status=Rental.Status.CONFIRMED,
+        )
+        self.rental = rental
+
+        # We delete the reservation object after converting it to a rental (no harm in this as Rental is a superset
+        # of Reservation, except for the status field)
+        reservation.delete()
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('backoffice:rental-detail', kwargs={'pk': self.rental.id})

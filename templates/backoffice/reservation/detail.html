@@ -570,7 +570,7 @@
         <tr>
             <td></td>
             <td>
-                <button class="btn" type="submit" name="submit">
+                <button class="btn" type="submit" name="edit">
                     {% if reservation %}
                         Edit
                     {% else %}
@@ -579,7 +579,14 @@
                 </button>
                 {% if reservation %}
                 <cfif reservationid>
-                    <button class="btn" type="submit" name="convert">Convert to Rental</button>
+                    <button
+                        class="btn"
+                        type="button"
+                        name="convert"
+                        onclick="convertToRental(this.form, '{% url "backoffice:reservation-convert" pk=reservation.id %}')"
+                    >
+                        Convert to Rental
+                    </button>
                     <button
                         class="btn delete"
                         type="submit"

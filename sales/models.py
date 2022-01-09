@@ -95,6 +95,7 @@ class BaseReservation(models.Model):
         RESERVATION = ('reservation', 'Unconfirmed Reservation')
         RENTAL = ('rental', 'Confirmed Rental')
 
+    type = models.CharField(max_length=20, choices=ReservationType.choices, blank=True, default=ReservationType.RESERVATION)
     vehicle = models.ForeignKey('fleet.Vehicle', null=True, blank=True, on_delete=models.SET_NULL)
     customer = models.ForeignKey('users.Customer', null=True, blank=True, on_delete=models.SET_NULL)
     reserved_at = models.DateTimeField(auto_now_add=True)
@@ -108,7 +109,7 @@ class BaseReservation(models.Model):
     coupon_code = models.CharField(max_length=30, blank=True)
     is_military = models.BooleanField(default=False)
     deposit_amount = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
-    confirmation_code = models.CharField(max_length=10, blank=True, unique=True)
+    confirmation_code = models.CharField(max_length=10, blank=True)
     app_channel = models.CharField(max_length=20, choices=AppChannel.choices, blank=True, default=AppChannel.WEB)
     delivery_required = models.BooleanField(default=False)
     tax_percent = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
@@ -178,6 +179,7 @@ class BaseReservation(models.Model):
 
     class Meta:
         abstract = False
+        unique_together = ('confirmation_code', 'type',)
 
 
 class Reservation(BaseReservation):
