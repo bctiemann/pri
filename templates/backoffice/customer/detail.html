@@ -591,7 +591,7 @@
             {% for rental in customer.past_rentals %}
             <cfloop query="PastRentals">
             <tr>
-                <td><a href="rentals.cfm?edit=1&rentalid=#rentalid#">{{ rental.id }}</a></td>
+                <td><a href="{% url "backoffice:rental-detail" pk=rental.id %}">{{ rental.id }}</a></td>
                 <td>{{ rental.out_date|date:"m/d/Y" }}</td>
                 <td>{{ rental.vehicle.vehicle_name }}</td>
                 <td>{{ rental.num_days }}</td>
