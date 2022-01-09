@@ -5,7 +5,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.db import models
 
-from fleet.models import VehicleMarketing, VehicleType
+from fleet.models import Vehicle, VehicleMarketing, VehicleType
 
 
 TRUE_FALSE_CHOICES = (
@@ -63,8 +63,8 @@ def get_exp_year_choices(since_founding=False, allow_null=False):
 
 def get_vehicle_choices():
     vehicle_choices = []
-    vehicle_choices.append(('Cars', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.CAR))))
-    vehicle_choices.append(('Motorcycles', list((v.id, v.vehicle_name) for v in VehicleMarketing.objects.filter(vehicle_type=VehicleType.BIKE))))
+    vehicle_choices.append(('Cars', list((v.id, v.vehicle_name) for v in Vehicle.objects.filter(vehicle_type=VehicleType.CAR))))
+    vehicle_choices.append(('Motorcycles', list((v.id, v.vehicle_name) for v in Vehicle.objects.filter(vehicle_type=VehicleType.BIKE))))
     return vehicle_choices
 
 
