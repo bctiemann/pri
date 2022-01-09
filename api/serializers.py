@@ -1,9 +1,19 @@
 from rest_framework import serializers
 from django.urls import reverse
+from phonenumber_field.phonenumber import PhoneNumber
+from phonenumber_field.serializerfields import PhoneNumberField
 
 from fleet.models import Vehicle, VehicleMarketing
 from users.models import Customer
 from sales.models import BaseReservation
+
+
+class NationalizedPhoneNumberField(PhoneNumberField):
+
+    def to_representation(self, value):
+        if isinstance(value, PhoneNumber):
+            return value.as_national
+        return value
 
 
 class VehicleSerializer(serializers.ModelSerializer):
@@ -47,6 +57,9 @@ class CustomerSearchSerializer(serializers.ModelSerializer):
     label = serializers.CharField(source='full_name')
     value = serializers.IntegerField(source='id')
     customer_url = serializers.SerializerMethodField()
+    home_phone = NationalizedPhoneNumberField()
+    work_phone = NationalizedPhoneNumberField()
+    mobile_phone = NationalizedPhoneNumberField()
 
     def get_customer_url(self, obj):
         return reverse('backoffice:customer-detail', kwargs={'pk': obj.id})
