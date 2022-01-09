@@ -712,19 +712,28 @@
         <table class="inputform">
             <tr>
                 <td>First Name</td>
-                <td>{{ clone_form.clone_first_name }}<cfinput name="clone_fname" value="" /></td>
+                <td>
+                    {{ clone_form.clone_first_name }}<cfinput name="clone_fname" value="" />
+                    <p class="form-error" id="error_clone_first_name"></p>
+                </td>
             </tr>
             <tr>
                 <td>Last Name</td>
-                <td>{{ clone_form.clone_last_name }}<cfinput name="clone_lname" value="" /></td>
+                <td>
+                    {{ clone_form.clone_last_name }}<cfinput name="clone_lname" value="" />
+                    <p class="form-error" id="error_clone_last_name"></p>
+                </td>
             </tr>
             <tr>
                 <td>Email</td>
-                <td>{{ clone_form.clone_email }}<cfinput name="clone_email" value="#nextEmail#" /></td>
+                <td>
+                    {{ clone_form.clone_email }}<cfinput name="clone_email" value="#nextEmail#" />
+                    <p class="form-error" id="error_clone_email"></p>
+                </td>
             </tr>
             <tr>
                 <td></td>
-                <td>{{ clone_form.clone_duplicate_license }}<cfinput type="checkbox" name="clone_license" /> <label for="id_clone_license">Clone driver's license</label></td>
+                <td>{{ clone_form.clone_duplicate_license }}<cfinput type="checkbox" name="clone_license" /> <label for="id_clone_duplicate_license">Clone driver's license</label></td>
             </tr>
         </table>
         <input type="hidden" id="clone_customer_id" value="{{ rental.customer.id }}" />

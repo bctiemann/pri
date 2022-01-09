@@ -540,30 +540,42 @@
 
     <div class="dialog" id="dialog_clone_driver" title="Clone Customer">
         <p>
-        Creating a clone of <strong>#Customer.fname# #Customer.lname#</strong>.
+        Creating a clone of <strong>{{ customer.full_name }}</strong>.
         </p>
 
-        <cfform>
+        <form>
         <table class="inputform">
             <tr>
                 <td>First Name</td>
-                <td><cfinput name="clone_fname" value="" /></td>
+                <td>
+                    {{ clone_form.clone_first_name }}<cfinput name="clone_fname" value="" />
+                    <p class="form-error" id="error_clone_first_name"></p>
+                </td>
             </tr>
             <tr>
                 <td>Last Name</td>
-                <td><cfinput name="clone_lname" value="" /></td>
+                <td>
+                    {{ clone_form.clone_last_name }}<cfinput name="clone_lname" value="" />
+                    <p class="form-error" id="error_clone_last_name"></p>
+                </td>
             </tr>
             <tr>
                 <td>Email</td>
-                <td><cfinput name="clone_email" value="#nextEmail#" /></td>
+                <td>
+                    {{ clone_form.clone_email }}<cfinput name="clone_email" value="#nextEmail#" />
+                    <p class="form-error" id="error_clone_email"></p>
+                </td>
             </tr>
             <tr>
                 <td></td>
-                <td><cfinput type="checkbox" name="clone_license" /> <label for="clone_license">Clone driver's license</label></td>
+                <td>
+                    {{ clone_form.clone_duplicate_license }}<cfinput type="checkbox" name="clone_license" /> <label for="id_clone_duplicate_license">Clone driver's license</label>
+                </td>
             </tr>
         </table>
+        <input type="hidden" id="clone_customer_id" value="{{ customer.id }}" />
         <cfinput type="hidden" name="clone_customerid" value="#customerid#" />
-        </cfform>
+        </form>
     </div>
 
     <div class="dialog" id="dialog_past_rentals" title="Past Rentals">

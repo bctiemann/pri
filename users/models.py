@@ -151,6 +151,20 @@ class User(PermissionsMixin, AbstractBaseUser):
         return AdminIdleTimeCSSClass.MORE_THAN_2_DAYS.value
 
     @property
+    def next_disambiguated_email(self):
+        username, domain_part = self.email.split('@')
+        number = 0
+        if '+' in username:
+            username, number = username.split('+')
+        try:
+            number = int(number)
+        except ValueError:
+            pass
+        next_number = number + 1
+        new_email = f'{username}+{next_number}@{domain_part}'
+        return new_email
+
+    @property
     def full_name(self):
         try:
             return f'{self.customer.first_name} {self.customer.last_name}'

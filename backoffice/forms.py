@@ -317,6 +317,21 @@ class CloneCustomerForm(forms.ModelForm):
     clone_email = forms.EmailField()
     clone_duplicate_license = forms.BooleanField(required=False)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.instance.user:
+            self.fields['clone_email'].initial = self.instance.user.next_disambiguated_email
+
+    def clean_clone_email(self):
+        email = self.cleaned_data['clone_email']
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError(f'A user with email {email} already exists.')
+        return email
+
+    def clean(self):
+        return super().clean()
+
     class Meta:
         model = Customer
         fields = ('clone_first_name', 'clone_last_name', 'clone_email', 'clone_duplicate_license',)

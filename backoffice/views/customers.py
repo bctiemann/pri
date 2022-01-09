@@ -8,7 +8,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from . import ListViewMixin
-from users.models import User, Customer
+from users.models import User, Customer, generate_password
 from backoffice.forms import CustomerForm, CloneCustomerForm
 
 
@@ -35,6 +35,11 @@ class CustomerDetailView(CustomerViewMixin, ListViewMixin, UpdateView):
     # def post(self, request, *args, **kwargs):
     #     result = super().post(request, *args, **kwargs)
     #     return result
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['clone_form'] = CloneCustomerForm(instance=self.object)
+        return context
 
     def get_success_url(self):
         return reverse('backoffice:customer-detail', kwargs={'pk': self.object.id})
@@ -67,23 +72,30 @@ class CustomerCloneView(PermissionRequiredMixin, APIView):
 
     def post(self, request, pk=None):
         form = CloneCustomerForm(request.POST)
+        if not form.is_valid():
+            return Response({'success': False, 'errors': form.errors})
 
         try:
             customer = Customer.objects.get(pk=pk)
         except Customer.DoesNotExist:
             raise Http404
 
+        password = generate_password()
+        user = User.objects.create_user(email=form.cleaned_data['clone_email'], password=password)
+
         new_customer = customer
-
-        # TODO: Create User, then create customer
-
         new_customer.id = None
         new_customer.first_name = form.cleaned_data['clone_first_name']
         new_customer.last_name = form.cleaned_data['clone_last_name']
+        if not form.cleaned_data['clone_duplicate_license']:
+            new_customer.license_number = ''
+        new_customer.user = user
         new_customer.save()
 
         return Response({
             'success': True,
             'customer_id': new_customer.id,
+            'email': user.email,
+            'password': password,
         })
 

@@ -228,7 +228,10 @@ console.log(data);
             }
             $('#dialog_clone_driver').dialog('close');
         } else {
-            alert(data.error);
+            $('.form-error').html('');
+            for (const error in data.errors) {
+                $(`#error_${error}`).html(data.errors[error]);
+            }
         }
     });
 }

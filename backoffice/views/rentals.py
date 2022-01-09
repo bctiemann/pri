@@ -47,7 +47,7 @@ class RentalDetailView(PermissionRequiredMixin, RentalViewMixin, ListViewMixin, 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['price_data'] = self.object.get_price_data()
-        context['clone_form'] = CloneCustomerForm()
+        context['clone_form'] = CloneCustomerForm(instance=self.object.customer)
         return context
 
     def get_success_url(self):

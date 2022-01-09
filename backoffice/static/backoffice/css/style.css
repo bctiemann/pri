@@ -688,6 +688,13 @@ table.inputform .divider .subtext {
 	background-color: #d1dde0;
 }
 
+.form-error {
+	font-size: 9px;
+	color: #ff0000;
+	line-height: 10px;
+	height: 10px;
+}
+
 /* Form field override styles */
 
 #id_specs {
