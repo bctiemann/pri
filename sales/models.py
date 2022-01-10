@@ -271,7 +271,7 @@ class TaxRate(models.Model):
             self.detail = result
             self.date_updated = now()
         except HTTPError:
-            self.total_rate = settings.DEFAULT_TAX_RATE
+            self.total_rate = decimal.Decimal(settings.DEFAULT_TAX_RATE)
         self.save()
 
     def save(self, *args, **kwargs):
