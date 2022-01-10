@@ -30,6 +30,7 @@ class CSSClassMixin:
 
 class VehicleForm(CSSClassMixin, forms.ModelForm):
     external_owner = forms.ModelChoiceField(queryset=Consigner.objects.all(), empty_label='PRI', required=False)
+    toll_tag = forms.ModelChoiceField(queryset=TollTag.objects.all(), required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -40,6 +41,8 @@ class VehicleForm(CSSClassMixin, forms.ModelForm):
             'year', 'plate', 'mileage',
         ]:
             self.add_widget_css_class(field, 'short')
+
+        self.fields['toll_tag'].initial = TollTag.objects.filter(vehicle=self.instance).first()
 
     class Meta:
         model = Vehicle

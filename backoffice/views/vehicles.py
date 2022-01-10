@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.http import Http404, HttpResponseRedirect
 
 from . import ListViewMixin
-from fleet.models import VehicleType, VehicleStatus, Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo
+from fleet.models import VehicleType, VehicleStatus, Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, TollTag
 from backoffice.forms import (
     VehicleForm, VehicleShowcaseForm, VehicleThumbnailForm, VehicleInspectionForm, VehicleMobileThumbForm,
     VehiclePictureForm, VehicleVideoForm, VehicleMarketingForm
@@ -55,6 +55,13 @@ class VehicleDetailView(VehicleViewMixin, ListViewMixin, UpdateView):
 
     def form_valid(self, form):
         vehicle = form.save()
+
+        TollTag.objects.filter(vehicle=vehicle).update(vehicle=None)
+        toll_tag = form.cleaned_data['toll_tag']
+        if toll_tag:
+            toll_tag.vehicle = vehicle
+            toll_tag.save()
+
         marketing_form = VehicleMarketingForm(self.request.POST)
         marketing_form.is_valid()
         VehicleMarketing.objects.filter(id=vehicle.vehicle_marketing_id).update(**marketing_form.cleaned_data)

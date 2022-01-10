@@ -321,3 +321,16 @@ class TollTag(models.Model):
     alt_usage = models.CharField(max_length=255, blank=True)
     notes = models.TextField(blank=True)
 
+    def __str__(self):
+        return f'{self.tag_number} ({self.label})'
+
+    @property
+    def label(self):
+        if self.vehicle:
+            return self.vehicle.vehicle_name
+        elif self.alt_usage:
+            return self.alt_usage
+        return 'Unassigned'
+
+    class Meta:
+        ordering = ('tag_number',)

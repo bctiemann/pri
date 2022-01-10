@@ -129,6 +129,8 @@
         <tr>
             <td>Toll tag</td>
             <td>
+                {{ form.toll_tag }}
+                {% comment %}
                 <cfquery name="TollTags" datasource="#DSN#">
                     SELECT * FROM TollTags
                     LEFT JOIN Vehicles ON Vehicles.vehicleid=TollTags.vehicleid
@@ -140,7 +142,7 @@
                         <option value="#tolltagid#" <cfif tolltagid IS TollTag.tolltagid>selected</cfif>>#tagnumber#<cfif TollTags.vehicleid GT 0> (#year# #make# #model#)<cfelseif altusage IS NOT ""> (#altusage#)</cfif></option>
                     </cfloop>
                 </cfselect>
-                {{ form.toll_tag }}
+                {% endcomment %}
             </td>
         </tr>
         <tr>
