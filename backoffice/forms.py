@@ -9,7 +9,7 @@ from phonenumber_field.formfields import PhoneNumberField
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, TollTag
 from consignment.models import Consigner
 from users.models import User, Employee, Customer
-from sales.models import Reservation, Rental, Coupon
+from sales.models import Reservation, Rental, Coupon, TaxRate
 from sales.enums import (
     TRUE_FALSE_CHOICES, DELIVERY_REQUIRED_CHOICES, birth_years, operational_years, get_service_hours,
     current_year, get_exp_year_choices, get_exp_month_choices, get_vehicle_choices, get_extra_miles_choices
@@ -354,3 +354,19 @@ class TollTagForm(forms.ModelForm):
     class Meta:
         model = TollTag
         fields = '__all__'
+
+
+class TaxRateForm(CSSClassMixin, forms.ModelForm):
+    total_rate_as_percent = forms.DecimalField()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['total_rate_as_percent'].initial = self.instance.total_rate_as_percent
+        for field in ['postal_code', 'total_rate_as_percent']:
+            self.add_widget_css_class(field, 'short')
+
+    class Meta:
+        model = TaxRate
+        # fields = '__all__'
+        exclude = ('country', 'total_rate',)

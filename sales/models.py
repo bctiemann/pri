@@ -248,6 +248,12 @@ class TaxRate(models.Model):
     def __str__(self):
         return '{0}: {1}'.format(self.postal_code, self.total_rate)
 
+    @property
+    def total_rate_as_percent(self):
+        if self.total_rate:
+            return self.total_rate * 100
+        return 0
+
     def update(self):
         client = AvataxClient(
             settings.AVALARA_APP_NAME,

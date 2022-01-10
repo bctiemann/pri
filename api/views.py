@@ -1,6 +1,5 @@
 import datetime
 import logging
-
 import pytz
 import requests
 
@@ -19,13 +18,16 @@ from django.http import Http404, HttpResponseRedirect
 
 from sales.forms import ReservationRentalDetailsForm, ReservationRentalPaymentForm, ReservationRentalLoginForm
 from marketing.forms import NewsletterSubscribeForm
-from sales.models import BaseReservation, Reservation, Rental, generate_code
+from sales.models import BaseReservation, Reservation, Rental, TaxRate, generate_code
 from sales.enums import ReservationType
 from sales.tasks import send_email
 from sales.utils import PriceCalculator
 from users.models import User, Customer, Employee, generate_password
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture
-from api.serializers import VehicleSerializer, VehicleDetailSerializer, CustomerSearchSerializer, ScheduleConflictSerializer
+from api.serializers import (
+    VehicleSerializer, VehicleDetailSerializer, CustomerSearchSerializer, ScheduleConflictSerializer,
+    TaxRateFetchSerializer
+)
 
 logger = logging.getLogger(__name__)
 
@@ -291,12 +293,22 @@ class TaxRateByZipView(APIView):
     permission_classes = (HasReservationsAccess,)
 
     def post(self, request):
-        tax_zip = request.POST.get('zip')
+        serializer = TaxRateFetchSerializer(data=request.POST)
+        if not serializer.is_valid():
+            return Response({'success': False, 'error': 'No ZIP code specified'})
+
+        tax_zip = serializer.data['zip']
+        force_refresh = serializer.data['force_refresh']
+
+        if force_refresh:
+            for tax_rate in TaxRate.objects.filter(postal_code=tax_zip):
+                tax_rate.update()
+
         price_calculator = PriceCalculator(coupon_code=None, email=None, tax_zip=tax_zip, effective_date=None)
         tax_rate = price_calculator.tax_rate
         return Response({
             'success': True,
-            'tax_rate': float(tax_rate.total_rate) * 100,
+            'tax_rate': float(tax_rate.total_rate_as_percent),
             'detail': tax_rate.detail,
         })
 

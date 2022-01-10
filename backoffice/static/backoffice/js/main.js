@@ -113,12 +113,12 @@ var refreshSpecs = function() {
 };
 
 var refreshSalesTaxDetail = function() {
-    var detailJson = $('#detail').val();
+    var detailJson = $('#id_detail').val();
     if (detailJson) {
         try {
-            $('#salestax-output').html(JSON.stringify(JSON.parse(detailJson), null, 4));
+            $('#taxrate-output').html(JSON.stringify(JSON.parse(detailJson), null, 4));
         } catch(err) {
-            $('#salestax-output').html('Invalid JSON.');
+            $('#taxrate-output').html('Invalid JSON.');
             console.log(err);
         }
     }
@@ -510,17 +510,18 @@ var sendGiftCertEmail = function(giftcertid) {
     }
 };
 
-var getTaxRate = function() {
-    var zip = $('#id_delivery_zip').val() || $('#zipcode').val() || '';
+var getTaxRate = function(forceRefresh = false) {
+    var zip = $('#id_delivery_zip').val() || $('#id_postal_code').val() || '';
     $.post('/api/tax_rate/', {
         // component: 'reservations',
         // method: 'getSalesTax',
         zip: zip,
+        force_refresh: forceRefresh,
     },
     function(data) {
 console.log(data);
         if (data.success) {
-            $('#id_tax_percent').val(data.tax_rate.toFixed(3));
+            $('#id_tax_percent, #id_total_rate_as_percent').val(data.tax_rate.toFixed(3));
             // $('#totalrate').val(data.tax_rate.toFixed(3));
             // $('#detail').val(JSON.stringify(data.detail));
             refreshSalesTaxDetail();

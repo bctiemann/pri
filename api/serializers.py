@@ -99,3 +99,8 @@ class ScheduleConflictSerializer(serializers.ModelSerializer):
             'id', 'is_reservation', 'is_rental', 'first_name', 'last_name', 'reservation_type',
             'out_date', 'back_date', 'reserved_at', 'num_days', 'url',
         )
+
+
+class TaxRateFetchSerializer(serializers.Serializer):
+    zip = serializers.CharField()
+    force_refresh = serializers.BooleanField()
