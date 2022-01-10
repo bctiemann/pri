@@ -144,6 +144,9 @@ class ValidateRentalPaymentView(APIView):
 
         # Generate a unique confirmation code.
         # Retry until successful or we run out of retries (increase retries_left if necessary)
+
+        # TODO: Vehicle should be Vehicle, but form selection is a VehicleMarketing. Resolve a Vehicle from form.vehicle
+        # before assigning it to the Reservation
         confirmation_code = None
         reservation = None
         retries_left = 5
@@ -153,7 +156,7 @@ class ValidateRentalPaymentView(APIView):
                 reservation = Reservation.objects.create(
                     confirmation_code=confirmation_code,
                     customer=customer,
-                    vehicle=form.vehicle,
+                    vehicle=form.vehicle_marketing.vehicle,
 
                 )
             except IntegrityError:

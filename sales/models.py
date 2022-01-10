@@ -5,6 +5,7 @@ import random
 from localflavor.us.models import USStateField, USZipCodeField
 from avalara import AvataxClient
 from requests import HTTPError
+from encrypted_fields import fields
 
 from django.conf import settings
 from django.db import models
@@ -208,7 +209,7 @@ class Rental(BaseReservation):
     abuse = models.TextField(blank=True)
     damage_out = models.TextField(blank=True)
     damage_in = models.TextField(blank=True)
-    internal_notes = models.TextField(blank=True)
+    internal_notes = fields.EncryptedTextField(blank=True)
     deposit_charged_at = models.DateTimeField(null=True, blank=True)
     deposit_refunded_at = models.DateTimeField(null=True, blank=True)
     deposit_refund_amount = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
@@ -230,7 +231,35 @@ class Driver(models.Model):
 
 
 class GuidedDrive(models.Model):
-    pass
+
+    class EventType(models.IntegerChoices):
+        JOY_RIDE = (1, 'Joy Ride')
+        PERFORMANCE_EXPERIENCE = (2, 'Performance Experience')
+
+    class Status(models.IntegerChoices):
+        PENDING = (0, 'Pending')
+        CONFIRMED = (1, 'Confirmed/Billed')
+        COMPLETE = (2, 'Complete')
+        CANCELLED = (3, 'Cancelled')
+
+    status = models.IntegerField(choices=Status.choices, default=Status.PENDING, blank=True)
+    customer = models.ForeignKey('users.Customer', null=True, blank=True, on_delete=models.SET_NULL)
+    created_at = models.DateTimeField(auto_now_add=True)
+    vehicle_choice_1 = models.ForeignKey('fleet.Vehicle', null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
+    vehicle_choice_2 = models.ForeignKey('fleet.Vehicle', null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
+    vehicle_choice_3 = models.ForeignKey('fleet.Vehicle', null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
+    num_drivers = models.IntegerField(null=True, blank=True)
+    num_passengers = models.IntegerField(null=True, blank=True)
+    num_minors = models.IntegerField(null=True, blank=True)
+    requested_date = models.DateField(null=True, blank=True)
+    backup_date = models.DateField(null=True, blank=True)
+    customer_notes = models.TextField(blank=True)
+    internal_notes = fields.EncryptedTextField(blank=True)
+    big_and_tall = models.BooleanField(default=False)
+    coupon_code = models.CharField(max_length=30, blank=True)
+    rate = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
+    event_type = models.IntegerField(choices=EventType.choices, default=EventType.JOY_RIDE, blank=True)
+    confirmation_code = models.CharField(max_length=10, blank=True, unique=True)
 
 
 class GiftCertificate(models.Model):
