@@ -248,7 +248,6 @@ class GuidedDrive(models.Model):
     vehicle_choice_1 = models.ForeignKey('fleet.Vehicle', null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
     vehicle_choice_2 = models.ForeignKey('fleet.Vehicle', null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
     vehicle_choice_3 = models.ForeignKey('fleet.Vehicle', null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
-    num_drivers = models.IntegerField(null=True, blank=True)
     num_passengers = models.IntegerField(null=True, blank=True)
     num_minors = models.IntegerField(null=True, blank=True)
     requested_date = models.DateField(null=True, blank=True)
@@ -260,6 +259,17 @@ class GuidedDrive(models.Model):
     rate = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
     event_type = models.IntegerField(choices=EventType.choices, default=EventType.JOY_RIDE, blank=True)
     confirmation_code = models.CharField(max_length=10, blank=True, unique=True)
+
+    class Meta:
+        abstract = True
+
+
+class JoyRide(GuidedDrive):
+    pass
+
+
+class PerformanceExperience(GuidedDrive):
+    num_drivers = models.IntegerField(null=True, blank=True)
 
 
 class GiftCertificate(models.Model):

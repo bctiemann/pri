@@ -21,7 +21,9 @@ from fleet.models import (
     get_vehicle_picture_path, get_vehicle_video_path
 )
 from users.models import Customer, Employee, User, MusicGenre
-from sales.models import Promotion, Coupon, BaseReservation, Reservation, Rental, Driver, GuidedDrive, generate_code
+from sales.models import (
+    Promotion, Coupon, BaseReservation, Reservation, Rental, Driver, JoyRide, PerformanceExperience, generate_code
+)
 from consignment.models import Consigner
 from sales.enums import ReservationType
 from pri.cipher import AESCipher
@@ -43,6 +45,11 @@ LOCATION_MAP = {
 GUIDED_DRIVE_TYPE_MAP = {
     1: ReservationType.JOY_RIDE.value,
     2: ReservationType.PERFORMANCE_EXPERIENCE.value,
+}
+
+GUIDED_DRIVE_MODEL_MAP = {
+    1: JoyRide,
+    2: PerformanceExperience,
 }
 
 SITE_ROOT = 'http://172.16.0.5/prinew/root/'
@@ -651,7 +658,8 @@ class Command(BaseCommand):
 
         if 'do_guideddrives' in self.enabled:
             if clear_existing:
-                GuidedDrive.objects.all().delete()
+                JoyRide.objects.all().delete()
+                PerformanceExperience.objects.all().delete()
             back_cursor.execute("""SELECT * FROM joyperf""")
             for old in back_cursor.fetchall():
                 print(old)
@@ -671,7 +679,8 @@ class Command(BaseCommand):
                     vehicle_choice_3 = Vehicle.objects.get(pk=old['choice3'])
                 except Vehicle.DoesNotExist:
                     vehicle_choice_3 = None
-                new = GuidedDrive.objects.create(
+                model = GUIDED_DRIVE_MODEL_MAP.get(old['type'])
+                new = model.objects.create(
                     customer=customer,
                     vehicle_choice_1=vehicle_choice_1,
                     vehicle_choice_2=vehicle_choice_2,
@@ -683,10 +692,12 @@ class Command(BaseCommand):
                     status=old['status'],
                     customer_notes=old['notes'],
                     internal_notes=self.decrypt(old['ournotes']),
-                    num_drivers=old['nodrv'],
                     num_passengers=old['nopax'],
                     num_minors=old['nominors'],
                     big_and_tall=old['bigtall'],
                     coupon_code=old['coupon'],
                     rate=old['rate'],
                 )
+                if model == PerformanceExperience:
+                    new.num_drivers = old['nodrv']
+                    new.save()
