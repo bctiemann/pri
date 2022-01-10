@@ -11,6 +11,7 @@ from django.views.generic import TemplateView, DetailView, UpdateView, CreateVie
 from django.contrib.auth.views import LogoutView
 from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect
+from django.core.exceptions import FieldError
 
 from users.views import LoginView
 from users.models import User
@@ -162,7 +163,11 @@ class ListViewMixin:
             for field in self.search_fields:
                 or_condition.add(Q(**{f'{field}__icontains': self.search_term}), Q.OR)
             queryset = queryset.filter(or_condition)
-        queryset = queryset.order_by(self.request.GET.get('sortby', self.default_sort))
+        sort_field = self.request.GET.get('sortby', self.default_sort)
+        try:
+            queryset = queryset.order_by(sort_field)
+        except FieldError:
+            pass
         return queryset
 
     def get_context_data(self, *args, **kwargs):

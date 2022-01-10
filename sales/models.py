@@ -112,6 +112,7 @@ class BaseReservation(models.Model):
     confirmation_code = models.CharField(max_length=10, blank=True)
     app_channel = models.CharField(max_length=20, choices=AppChannel.choices, blank=True, default=AppChannel.WEB)
     delivery_required = models.BooleanField(default=False)
+    # TODO: remove tax_percent; derive tax from delivery zip or default (HQ) tax rate
     tax_percent = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
     delivery_zip = USZipCodeField(blank=True)
     override_subtotal = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
@@ -161,7 +162,7 @@ class BaseReservation(models.Model):
         price_calculator = RentalPriceCalculator(
             coupon_code=self.coupon_code,
             email=self.customer.email,
-            tax_zip=self.delivery_zip,
+            tax_zip=self.delivery_zip or None,
             effective_date=self.out_date,
             is_military=self.is_military,
             vehicle_marketing=self.vehicle.vehicle_marketing,
@@ -267,7 +268,7 @@ class TaxRate(models.Model):
             response.raise_for_status()
             result = response.json()
             self.total_rate = result['totalRate']
-            self.detail = result['rates']
+            self.detail = result
             self.date_updated = now()
         except HTTPError:
             self.total_rate = settings.DEFAULT_TAX_RATE

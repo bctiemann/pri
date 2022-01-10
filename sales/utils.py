@@ -82,8 +82,16 @@ class PriceCalculator(ABC):
         return Customer.objects.filter(user__email=email).first()
 
     def get_tax_rate(self, tax_zip):
-        tax_rate, tax_rate_created = TaxRate.objects.get_or_create(postal_code=tax_zip)
-        return tax_rate
+        if tax_zip:
+            tax_rate, tax_rate_created = TaxRate.objects.get_or_create(postal_code=tax_zip)
+            return tax_rate
+        return None
+
+    @property
+    def tax_total_rate(self):
+        if self.tax_rate:
+            return self.tax_rate.total_rate
+        return decimal.Decimal(settings.DEFAULT_TAX_RATE)
 
     def quantize_currency(self, value):
         # return f'{decimal.Decimal(value).quantize(self.cents, decimal.ROUND_HALF_UP)}'
@@ -148,7 +156,7 @@ class PriceCalculator(ABC):
     def get_tax_amount(self, value=None):
         if value is None:
             value = self.pre_tax_subtotal
-        return float(self.tax_rate.total_rate) * value
+        return float(self.tax_total_rate) * value
 
     def apply_discount(self, value=None):
         return self.subtotal - float(value)
@@ -279,8 +287,8 @@ class RentalPriceCalculator(PriceCalculator):
         return dict(
             vehicle_price_per_day=self.quantize_currency(self.vehicle_marketing.price_per_day),
             num_days=self.num_days,
-            tax_rate=self.tax_rate.total_rate,
-            tax_rate_as_percent=self.tax_rate.total_rate * 100,
+            tax_rate=self.tax_total_rate,
+            tax_rate_as_percent=self.tax_total_rate * 100,
             customer_id=self.customer.id if self.customer else None,
             base_price=self.quantize_currency(self.base_price),
             multi_day_discount=self.quantize_currency(self.multi_day_discount),
