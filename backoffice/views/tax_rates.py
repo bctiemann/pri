@@ -23,12 +23,12 @@ class TaxRateViewMixin:
 class TaxRateListView(PermissionRequiredMixin, TaxRateViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_taxrate',)
-    template_name = 'backoffice/taxrate/list.html'
+    template_name = 'backoffice/tax_rate/list.html'
     search_fields = ('postal_code',)
 
 
 class TaxRateDetailView(TaxRateViewMixin, ListViewMixin, UpdateView):
-    template_name = 'backoffice/taxrate/detail.html'
+    template_name = 'backoffice/tax_rate/detail.html'
     form_class = TaxRateForm
 
     def form_valid(self, form):
@@ -42,7 +42,7 @@ class TaxRateDetailView(TaxRateViewMixin, ListViewMixin, UpdateView):
 
 
 class TaxRateCreateView(TaxRateViewMixin, ListViewMixin, CreateView):
-    template_name = 'backoffice/taxrate/detail.html'
+    template_name = 'backoffice/tax_rate/detail.html'
     form_class = TaxRateForm
 
     def get_success_url(self):

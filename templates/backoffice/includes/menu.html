@@ -193,16 +193,20 @@
 	</li>
 </CFIF>
 {% endif %}
+{% if user.employee.reservations_access %}
 <CFIF YourID.acclev IS 1 OR YourID.acclev IS 2>
 	<li>
-	<a class="tnav <CFIF scrpt IS "joyperf.cfm">selected</CFIF>" href="joyperf.cfm?type=2">Performance Experiences</a>
+	<a class="tnav {% if page_group == 'performance_experiences' %}selected{% endif %}" href="{% url "backoffice:perfexp-list" %}">Performance Experiences</a>
 	</li>
 </CFIF>
+{% endif %}
+{% if user.employee.reservations_access %}
 <CFIF YourID.acclev IS 1 OR YourID.acclev IS 2>
 	<li>
-	<a class="tnav <CFIF scrpt IS "joyperf.cfm">selected</CFIF>" href="joyperf.cfm?type=1">Joy Rides</a>
+	<a class="tnav {% if page_group == 'joy_rides' %}selected{% endif %}" href="{% url "backoffice:joyride-list" %}">Joy Rides</a>
 	</li>
 </CFIF>
+{% endif %}
 </ul>
 </div>
 

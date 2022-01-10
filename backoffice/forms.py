@@ -9,7 +9,7 @@ from phonenumber_field.formfields import PhoneNumberField
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, TollTag
 from consignment.models import Consigner
 from users.models import User, Employee, Customer
-from sales.models import Reservation, Rental, Coupon, TaxRate
+from sales.models import Reservation, Rental, GuidedDrive, JoyRide, PerformanceExperience, Coupon, TaxRate
 from sales.enums import (
     TRUE_FALSE_CHOICES, DELIVERY_REQUIRED_CHOICES, birth_years, operational_years, get_service_hours,
     current_year, get_exp_year_choices, get_exp_month_choices, get_vehicle_choices, get_extra_miles_choices
@@ -373,3 +373,23 @@ class TaxRateForm(CSSClassMixin, forms.ModelForm):
         model = TaxRate
         # fields = '__all__'
         exclude = ('country', 'total_rate',)
+
+
+# class GuidedDriveForm(forms.ModelForm):
+#     class Meta:
+#         model = GuidedDrive
+#         fields = '__all__'
+
+
+class JoyRideForm(forms.ModelForm):
+
+    class Meta:
+        model = JoyRide
+        fields = '__all__'
+
+
+class PerformanceExperienceForm(forms.ModelForm):
+
+    class Meta:
+        model = PerformanceExperience
+        fields = '__all__'

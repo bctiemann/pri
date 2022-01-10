@@ -1,0 +1,24 @@
+{% extends "backoffice/base.html" %}
+
+{% block nav %}
+    <h1 class="pageheader">
+        {{ event_type.label }}s
+        <ul class="nav_subpage">
+            {% if event_type == event_types.JOY_RIDE %}
+                <a href="{% url "backoffice:joyride-list" %}">
+                    <li {% if is_unfiltered_list_view %}class="selected"{% endif %}>List</li>
+                </a>
+                <a href="{% url "backoffice:joyride-create" %}">
+                    <li {% if is_create_view %}class="selected"{% endif %}>Add</li>
+                </a>
+            {% elif event_type == event_types.PERFORMANCE_EXPERIENCE %}
+                <a href="{% url "backoffice:perfexp-list" %}">
+                    <li {% if is_unfiltered_list_view %}class="selected"{% endif %}>List</li>
+                </a>
+                <a href="{% url "backoffice:perfexp-create" %}">
+                    <li {% if is_create_view %}class="selected"{% endif %}>Add</li>
+                </a>
+            {% endif %}
+        </ul>
+    </h1>
+{% endblock %}

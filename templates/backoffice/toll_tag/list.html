@@ -1,4 +1,4 @@
-{% extends "backoffice/taxrate/base.html" %}
+{% extends "backoffice/toll_tag/base.html" %}
 
 {% block content %}
 
@@ -78,17 +78,23 @@
     <tr>
         <cfoutput>
         <th col="id" default-sort="desc">ID</th>
-        <th col="postal_code">Zipcode</th>
-        <th col="date_updated" default-sort="desc">Refreshed</th>
-        <th col="total_rate">Rate</th>
+        <th col="toll_account">Toll Account</th>
+        <th col="tag_number">Tag Number</th>
+        <th>Vehicle</th>
         </cfoutput>
     </tr>
-    {% for taxrate in taxrate_list %}
-        <tr class="clickable click-to-edit" destination="{% url "backoffice:taxrate-detail" pk=taxrate.id %}">
-            <td><a href="{% url "backoffice:taxrate-detail" pk=taxrate.id %}">{{ taxrate.id }}</a></td>
-            <td>{{ taxrate.postal_code }}</td>
-            <td>{{ taxrate.date_updated|date:"m/d/Y" }}</td>
-            <td>{{ taxrate.total_rate_as_percent }}</td>
+    {% for tolltag in tolltag_list %}
+        <tr class="clickable click-to-edit" destination="{% url "backoffice:tolltag-detail" pk=tolltag.id %}">
+            <td><a href="{% url "backoffice:tolltag-detail" pk=tolltag.id %}">{{ tolltag.id }}</a></td>
+            <td>{{ tolltag.toll_account }}</td>
+            <td>{{ tolltag.tag_number }}</td>
+            <td>
+                {% if tolltag.vehicle %}
+                    <a href="{% url "backoffice:vehicle-detail" pk=tolltag.vehicle.id %}">{{ tolltag.vehicle.vehicle_name }}</a>
+                {% else %}
+                    {{ tolltag.alt_usage }}
+                {% endif %}
+            </td>
         </tr>
 
     {% endfor %}

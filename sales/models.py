@@ -11,6 +11,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.timezone import now
 from django.core.serializers.json import DjangoJSONEncoder
+from django.shortcuts import reverse
 
 from sales.enums import RESERVATION_TYPE_CODE_MAP, ServiceType
 
@@ -259,6 +260,22 @@ class GuidedDrive(models.Model):
     rate = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
     event_type = models.IntegerField(choices=EventType.choices, default=EventType.JOY_RIDE, blank=True)
     confirmation_code = models.CharField(max_length=10, blank=True, unique=True)
+
+    @property
+    def vehicle_list(self):
+        vehicles = []
+        for vehicle in [self.vehicle_choice_1, self.vehicle_choice_2, self.vehicle_choice_3]:
+            if vehicle:
+                vehicles.append(vehicle)
+        return vehicles
+
+    @property
+    def vehicle_names_with_links(self):
+        vehicle_links = []
+        for vehicle in self.vehicle_list:
+            url = reverse('backoffice:vehicle-detail', kwargs={'pk': vehicle.id})
+            vehicle_links.append(f'<a href="{url}">{vehicle.model}</a>')
+        return ', '.join(vehicle_links)
 
     class Meta:
         abstract = True

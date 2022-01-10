@@ -6,7 +6,7 @@ from django.conf import settings
 from fleet import views as fleet_views
 from backoffice import views
 from backoffice.views import (
-    vehicles, reservations, rentals, employees, customers, coupons, tolltags, taxrates, bbs
+    vehicles, reservations, rentals, guided_drives, employees, customers, coupons, toll_tags, tax_rates, bbs
 )
 
 
@@ -69,15 +69,24 @@ urlpatterns = [
     path('coupons/<int:pk>/', coupons.CouponDetailView.as_view(), name='coupon-detail'),
     path('coupons/<int:pk>/delete/', coupons.CouponDeleteView.as_view(), name='coupon-delete'),
 
-    path('toll_tags/', tolltags.TollTagListView.as_view(), name='tolltag-list'),
-    path('toll_tags/create/', tolltags.TollTagCreateView.as_view(is_create_view=True), name='tolltag-create'),
-    path('toll_tags/<int:pk>/', tolltags.TollTagDetailView.as_view(), name='tolltag-detail'),
-    path('toll_tags/<int:pk>/delete/', tolltags.TollTagDeleteView.as_view(), name='tolltag-delete'),
+    path('toll_tags/', toll_tags.TollTagListView.as_view(), name='tolltag-list'),
+    path('toll_tags/create/', toll_tags.TollTagCreateView.as_view(is_create_view=True), name='tolltag-create'),
+    path('toll_tags/<int:pk>/', toll_tags.TollTagDetailView.as_view(), name='tolltag-detail'),
+    path('toll_tags/<int:pk>/delete/', toll_tags.TollTagDeleteView.as_view(), name='tolltag-delete'),
 
-    path('tax_rates/', taxrates.TaxRateListView.as_view(), name='taxrate-list'),
-    path('tax_rates/create/', taxrates.TaxRateCreateView.as_view(is_create_view=True), name='taxrate-create'),
-    path('tax_rates/<int:pk>/', taxrates.TaxRateDetailView.as_view(), name='taxrate-detail'),
-    path('tax_rates/<int:pk>/delete/', taxrates.TaxRateDeleteView.as_view(), name='taxrate-delete'),
+    path('tax_rates/', tax_rates.TaxRateListView.as_view(), name='taxrate-list'),
+    path('tax_rates/create/', tax_rates.TaxRateCreateView.as_view(is_create_view=True), name='taxrate-create'),
+    path('tax_rates/<int:pk>/', tax_rates.TaxRateDetailView.as_view(), name='taxrate-detail'),
+    path('tax_rates/<int:pk>/delete/', tax_rates.TaxRateDeleteView.as_view(), name='taxrate-delete'),
+
+    path('joy_rides/', guided_drives.JoyRideListView.as_view(), name='joyride-list'),
+    path('joy_rides/create/', guided_drives.JoyRideCreateView.as_view(is_create_view=True), name='joyride-create'),
+    path('joy_rides/<int:pk>/', guided_drives.JoyRideDetailView.as_view(), name='joyride-detail'),
+    path('joy_rides/<int:pk>/delete/', guided_drives.JoyRideDeleteView.as_view(), name='joyride-delete'),
+    path('performance_experiences/', guided_drives.PerformanceExperienceListView.as_view(), name='perfexp-list'),
+    path('performance_experiences/create/', guided_drives.PerformanceExperienceCreateView.as_view(is_create_view=True), name='perfexp-create'),
+    path('performance_experiences/<int:pk>/', guided_drives.PerformanceExperienceDetailView.as_view(), name='perfexp-detail'),
+    path('performance_experiences/<int:pk>/delete/', guided_drives.PerformanceExperienceDeleteView.as_view(), name='perfexp-delete'),
 
     path('bbs/', bbs.BBSListView.as_view(), name='bbs-list'),
     path('bbs/<int:pk>/reply/', bbs.BBSReplyPostView.as_view(), name='bbs-reply'),

@@ -23,12 +23,12 @@ class TollTagViewMixin:
 class TollTagListView(PermissionRequiredMixin, TollTagViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_tolltag',)
-    template_name = 'backoffice/tolltag/list.html'
+    template_name = 'backoffice/toll_tag/list.html'
     search_fields = ('toll_account', 'tag_number', 'vehicle',)
 
 
 class TollTagDetailView(TollTagViewMixin, ListViewMixin, UpdateView):
-    template_name = 'backoffice/tolltag/detail.html'
+    template_name = 'backoffice/toll_tag/detail.html'
     form_class = TollTagForm
 
     def get_success_url(self):
@@ -36,7 +36,7 @@ class TollTagDetailView(TollTagViewMixin, ListViewMixin, UpdateView):
 
 
 class TollTagCreateView(TollTagViewMixin, ListViewMixin, CreateView):
-    template_name = 'backoffice/tolltag/detail.html'
+    template_name = 'backoffice/toll_tag/detail.html'
     form_class = TollTagForm
 
     def get_success_url(self):
