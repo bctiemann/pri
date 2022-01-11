@@ -240,7 +240,7 @@ class GuidedDrive(models.Model):
         COMPLETE = (2, 'Complete')
         CANCELLED = (3, 'Cancelled')
 
-    status = models.IntegerField(choices=Status.choices, default=Status.PENDING, blank=True)
+    status = models.IntegerField(choices=Status.choices, default=Status.PENDING)
     customer = models.ForeignKey('users.Customer', null=True, blank=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
     vehicle_choice_1 = models.ForeignKey('fleet.Vehicle', null=True, blank=True, on_delete=models.SET_NULL, related_name='+')

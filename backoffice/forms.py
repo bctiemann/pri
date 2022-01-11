@@ -406,6 +406,7 @@ class GuidedDriveForm(CSSClassMixin, forms.ModelForm):
     work_phone = PhoneNumberField(required=False)
     mobile_phone = PhoneNumberField(required=False)
     big_and_tall = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
+    customer_notes = forms.CharField(widget=forms.Textarea(attrs={'class': 'customer-notes'}), required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -413,10 +414,15 @@ class GuidedDriveForm(CSSClassMixin, forms.ModelForm):
         self.fields['vehicle_choice_1'].choices = get_vehicle_choices(allow_null=True)
         self.fields['vehicle_choice_2'].choices = get_vehicle_choices(allow_null=True)
         self.fields['vehicle_choice_3'].choices = get_vehicle_choices(allow_null=True)
-        self.add_widget_css_class('requested_date_picker', 'short')
-        self.add_widget_css_class('backup_date_picker', 'short')
         self.fields['requested_date_picker'].initial = self.instance.requested_date.strftime('%m/%d/%Y')
         self.fields['backup_date_picker'].initial = self.instance.backup_date.strftime('%m/%d/%Y')
+        self.fields['override_subtotal'].widget.attrs['placeholder'] = 'Override'
+
+        short_fields = [
+            'requested_date_picker', 'backup_date_picker', 'num_drivers', 'num_passengers', 'num_minors', 'coupon_code'
+        ]
+        for field in short_fields:
+            self.add_widget_css_class(field, 'short')
 
         self.style_customer_search_fields()
 
