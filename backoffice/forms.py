@@ -195,7 +195,7 @@ class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):
         for field in ['drivers', 'delivery_zip', 'tax_percent', 'miles_included', 'coupon_code']:
             self.add_widget_css_class(field, 'short')
 
-        self.fields['tax_percent'].initial = decimal.Decimal(settings.DEFAULT_TAX_RATE) * 100
+        # self.fields['tax_percent'].initial = decimal.Decimal(settings.DEFAULT_TAX_RATE) * 100
         self.fields['override_subtotal'].widget.attrs['placeholder'] = 'Override'
 
     class Meta:
@@ -234,6 +234,8 @@ class RentalForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):
             'rental_discount_pct', 'tax_percent'
         ]:
             self.add_widget_css_class(field, 'short')
+
+        self.fields['override_subtotal'].widget.attrs['placeholder'] = 'Override'
 
         self.init_reservation_date_time()
         if self.instance.deposit_charged_at:

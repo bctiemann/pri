@@ -164,7 +164,7 @@ class BaseReservation(models.Model):
         price_calculator = RentalPriceCalculator(
             coupon_code=self.coupon_code,
             email=self.customer.email,
-            tax_zip=self.delivery_zip or None,
+            tax_zip=self.delivery_zip or settings.DEFAULT_TAX_ZIP,
             effective_date=self.out_date,
             is_military=self.is_military,
             vehicle_marketing=self.vehicle.vehicle_marketing,
