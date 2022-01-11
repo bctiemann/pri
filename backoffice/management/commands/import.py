@@ -412,7 +412,7 @@ class Command(BaseCommand):
                     confirmation_code=old['confcode'],
                     delivery_required=bool(old['delivery']),
                     app_channel=Reservation.AppChannel.MOBILE if old['iphone'] else Reservation.AppChannel.WEB,
-                    tax_percent=old['taxpct'],
+                    # tax_percent=old['taxpct'],
                     delivery_zip=old['deliveryzip'],
                 )
                 new.reserved_at = old['reservdate']
@@ -444,7 +444,7 @@ class Command(BaseCommand):
                     confirmation_code=old['confcode'] or generate_code(ReservationType.RENTAL.value),
                     delivery_required=bool(old['delivery']),
                     app_channel=Reservation.AppChannel.MOBILE if old['iphone'] else Reservation.AppChannel.WEB,
-                    tax_percent=old['taxpct'],
+                    # tax_percent=old['taxpct'],
                     delivery_zip=old['deliveryzip'] or '',
 
                     mileage_out=old['milesout'],

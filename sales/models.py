@@ -114,8 +114,6 @@ class BaseReservation(models.Model):
     confirmation_code = models.CharField(max_length=10, blank=True)
     app_channel = models.CharField(max_length=20, choices=AppChannel.choices, blank=True, default=AppChannel.WEB)
     delivery_required = models.BooleanField(default=False)
-    # TODO: remove tax_percent; derive tax from delivery zip or default (HQ) tax rate
-    tax_percent = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
     delivery_zip = USZipCodeField(blank=True)
     override_subtotal = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
     final_price_data = models.JSONField(null=True, blank=True)

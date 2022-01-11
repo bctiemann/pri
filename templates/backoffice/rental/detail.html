@@ -471,6 +471,7 @@
         <tr>
             <td>Tax Rate</td>
             <td>
+{#                <span id="id_tax_percent"></span>#}
                 {{ form.tax_percent }}
                 <cfset taxpct = IsNumeric(Rental.taxpct) ? Rental.taxpct : salesTaxDefault>
                 <cfinput name="taxpct" value="#taxpct#" class="short" /> %

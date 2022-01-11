@@ -55,6 +55,7 @@ class PriceCalculator(ABC):
         self.coupon = self.get_coupon(coupon_code)
         self.customer = self.get_customer(email)
         self.tax_rate = self.get_tax_rate(tax_zip)
+        self.tax_zip = tax_zip
         self.is_military = is_military
         if override_subtotal:
             self.override_subtotal = float(override_subtotal)
@@ -281,6 +282,7 @@ class RentalPriceCalculator(PriceCalculator):
         return dict(
             vehicle_price_per_day=self.quantize_currency(self.vehicle_marketing.price_per_day),
             num_days=self.num_days,
+            tax_zip=self.tax_zip,
             tax_rate=self.tax_rate.total_rate,
             tax_rate_as_percent=self.tax_rate.total_rate * 100,
             customer_id=self.customer.id if self.customer else None,

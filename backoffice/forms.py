@@ -167,6 +167,7 @@ class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):
     send_email = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, required=False)
     is_military = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, required=False)
     customer_notes = forms.CharField(widget=forms.Textarea(attrs={'class': 'customer-notes'}), required=False)
+    tax_percent = forms.DecimalField(disabled=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -196,6 +197,7 @@ class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):
             self.add_widget_css_class(field, 'short')
 
         # self.fields['tax_percent'].initial = decimal.Decimal(settings.DEFAULT_TAX_RATE) * 100
+        self.fields['tax_percent'].initial = self.instance.get_price_data()['tax_rate'] * 100
         self.fields['override_subtotal'].widget.attrs['placeholder'] = 'Override'
 
     class Meta:
@@ -217,6 +219,7 @@ class RentalForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):
     customer_notes = forms.CharField(widget=forms.Textarea(attrs={'class': 'customer-notes'}), required=False)
     deposit_charged_on = forms.DateField(required=False)
     deposit_refunded_on = forms.DateField(required=False)
+    tax_percent = forms.DecimalField(disabled=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -235,6 +238,7 @@ class RentalForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):
         ]:
             self.add_widget_css_class(field, 'short')
 
+        self.fields['tax_percent'].initial = self.instance.get_price_data()['tax_rate'] * 100
         self.fields['override_subtotal'].widget.attrs['placeholder'] = 'Override'
 
         self.init_reservation_date_time()
