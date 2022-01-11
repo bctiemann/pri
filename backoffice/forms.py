@@ -39,7 +39,10 @@ class CSSClassMixin:
             self.fields[field].widget.attrs['class'] = field_classes_str
             if self.instance.customer:
                 if field in phone_fields:
-                    self.fields[field].initial = getattr(self.instance.customer, field).as_national
+                    try:
+                        self.fields[field].initial = getattr(self.instance.customer, field).as_national
+                    except AttributeError:
+                        pass
                 else:
                     self.fields[field].initial = getattr(self.instance.customer, field, None) or getattr(self.instance.customer.user, field, None)
 
