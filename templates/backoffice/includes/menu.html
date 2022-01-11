@@ -217,11 +217,13 @@
     <li>
         <a class="tnav <CFIF scrpt IS "accounts.cfm">selected</CFIF>" href="accounts.cfm">Accounts</a>
     </li>
+    {% if user.employee.admin_access %}
     <CFIF YourID.acclev IS 1>
     <li>
-        <a class="tnav <CFIF scrpt IS "owners.cfm">selected</CFIF>" href="owners.cfm">Special Use Owners</a>
+        <a class="tnav {% if page_group == 'consigners' %}selected{% endif %}" href="{% url "backoffice:consigner-list" %}">Special Use Owners</a>
     </li>
     </CFIF>
+    {% endif %}
 <!---
     <li>
         <a class="tnav <CFIF scrpt IS "timesheet.cfm">selected</CFIF>" href="timesheet.cfm">Time Sheet</a>

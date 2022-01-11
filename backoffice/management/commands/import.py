@@ -24,7 +24,7 @@ from users.models import Customer, Employee, User, MusicGenre
 from sales.models import (
     Promotion, Coupon, BaseReservation, Reservation, Rental, Driver, JoyRide, PerformanceExperience, generate_code
 )
-from consignment.models import Consigner
+from consignment.models import Consigner, ConsignmentPayment
 from sales.enums import ReservationType
 from pri.cipher import AESCipher
 
@@ -69,13 +69,14 @@ class Command(BaseCommand):
         # 'do_drivers': True,
         # 'do_consigners': True,
         # 'do_consignmentvehicles': True,
+        'do_consignmentpayments': True,
         # 'do_admins': True,
         # 'do_newsitems': True,
         # 'do_bbsposts': True,
         # 'do_sitecontent': True,
         # 'do_newslettersubscriptions': True,
         # 'do_coupons': True,
-        'do_guideddrives': True,
+        # 'do_guideddrives': True,
     }
 
     def add_arguments(self, parser):
@@ -523,6 +524,23 @@ class Command(BaseCommand):
                 if vehicle and consigner:
                     vehicle.external_owner = consigner
                     vehicle.save()
+
+        if 'do_consignmentpayments' in self.enabled:
+            if clear_existing:
+                ConsignmentPayment.objects.all().delete()
+            back_cursor.execute("""SELECT * FROM ConsignmentPayments""")
+            for old in back_cursor.fetchall():
+                print(old)
+                try:
+                    consigner = Consigner.objects.get(pk=old['consignerid'])
+                except Consigner.DoesNotExist:
+                    continue
+                new = ConsignmentPayment.objects.create(
+                    consigner=consigner,
+                    paid_at=old['stamp'],
+                    amount=old['amount'],
+                    method=old['method'],
+                )
 
         if 'do_admins' in self.enabled:
             if clear_existing:

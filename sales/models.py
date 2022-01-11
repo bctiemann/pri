@@ -1,3 +1,4 @@
+import datetime
 import json
 import pytz
 import decimal
@@ -146,7 +147,10 @@ class BaseReservation(models.Model):
     @property
     def num_days(self):
         if self.out_at and self.back_at:
-            return (self.back_at - self.out_at).days
+            # Pad the selection with 30m so the estimate comes out to 1 day if up to 24.5 hours
+            grace_period = datetime.timedelta(seconds=1801)
+            rental_length = (self.back_at - self.out_at - grace_period)
+            return int(rental_length.days) + 1
         return 0
 
     @property
@@ -154,6 +158,10 @@ class BaseReservation(models.Model):
         if self.coupon_code and self.out_date:
             return Coupon.objects.filter(models.Q(end_date__isnull=True) | models.Q(end_date__gte=self.out_date), code=self.coupon_code).first()
         return None
+
+    @property
+    def transaction_time(self):
+        return self.out_at
 
     def get_price_data(self):
         # TODO: Refactor sales.models classes to avoid this nested import

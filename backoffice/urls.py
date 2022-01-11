@@ -6,7 +6,8 @@ from django.conf import settings
 from fleet import views as fleet_views
 from backoffice import views
 from backoffice.views import (
-    vehicles, reservations, rentals, guided_drives, employees, customers, coupons, toll_tags, tax_rates, bbs
+    vehicles, reservations, rentals, guided_drives, employees, customers, coupons, toll_tags, tax_rates, bbs,
+    consigners,
 )
 
 
@@ -92,4 +93,9 @@ urlpatterns = [
     path('bbs/<int:pk>/reply/', bbs.BBSReplyPostView.as_view(), name='bbs-reply'),
     path('bbs/<int:pk>/edit/', bbs.BBSEditPostView.as_view(), name='bbs-edit'),
     path('bbs/<int:pk>/delete/', bbs.BBSDeletePostView.as_view(), name='bbs-delete'),
+
+    path('consigners/', consigners.ConsignerListView.as_view(), name='consigner-list'),
+    path('consigners/create/', consigners.ConsignerCreateView.as_view(is_create_view=True), name='consigner-create'),
+    path('consigners/<int:pk>/', consigners.ConsignerDetailView.as_view(), name='consigner-detail'),
+    path('consigners/<int:pk>/delete/', consigners.ConsignerDeleteView.as_view(), name='consigner-delete'),
 ]

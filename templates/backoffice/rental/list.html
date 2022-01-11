@@ -21,7 +21,7 @@
     </tr>
     {% for rental in rental_list %}
     <cfoutput query="Reservations">
-    <tr class="clickable click-to-edit" destination="{% url "backoffice:rental-detail" pk=rental.id %}">
+    <tr class="clickable click-to-edit {% if rental.status == rental.Status.CANCELLED %}cancelled{% endif %}" destination="{% url "backoffice:rental-detail" pk=rental.id %}">
         <td><a href="{% url "backoffice:rental-detail" pk=rental.id %}">{{ rental.id }}</a></td>
         <td><a href="{% url "backoffice:vehicle-detail" pk=rental.vehicle.id %}">{{ rental.vehicle.vehicle_name }}</a></td>
         <td><a href="{% url "backoffice:customer-detail" pk=rental.customer.id %}">{{ rental.customer.full_name }}</a></td>

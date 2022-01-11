@@ -449,3 +449,11 @@ class PerformanceExperienceForm(GuidedDriveForm):
         model = PerformanceExperience
         # fields = '__all__'
         exclude = ('confirmation_code',)
+
+
+class ConsignerForm(forms.ModelForm):
+
+    class Meta:
+        model = Consigner
+        fields = '__all__'
+        # exclude = ('confirmation_code',)

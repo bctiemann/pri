@@ -289,6 +289,7 @@ class RentalPriceCalculator(PriceCalculator):
             base_price=self.quantize_currency(self.base_price),
             multi_day_discount=self.quantize_currency(self.multi_day_discount),
             multi_day_discount_pct=self.multi_day_discount_pct,
+            post_multi_day_discount_subtotal=self.quantize_currency(self.post_multi_day_discount_subtotal),
             promotion_discount=self.quantize_currency(self.promotion_discount),
             coupon_discount=self.quantize_currency(self.coupon_discount),
             customer_discount=self.quantize_currency(self.customer_discount),
