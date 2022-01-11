@@ -103,7 +103,6 @@ class BaseReservation(models.Model):
     reserved_at = models.DateTimeField(auto_now_add=True)
     out_at = models.DateTimeField(null=True, blank=True)
     back_at = models.DateTimeField(null=True, blank=True)
-    rate = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
     drivers = models.IntegerField(null=True, blank=True)
     miles_included = models.IntegerField(null=True, blank=True)
     extra_miles = models.IntegerField(null=True, blank=True)
@@ -115,7 +114,7 @@ class BaseReservation(models.Model):
     app_channel = models.CharField(max_length=20, choices=AppChannel.choices, blank=True, default=AppChannel.WEB)
     delivery_required = models.BooleanField(default=False)
     delivery_zip = USZipCodeField(blank=True)
-    override_subtotal = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    override_subtotal = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
     final_price_data = models.JSONField(null=True, blank=True)
 
     @property
@@ -255,9 +254,10 @@ class GuidedDrive(models.Model):
     internal_notes = fields.EncryptedTextField(blank=True)
     big_and_tall = models.BooleanField(default=False)
     coupon_code = models.CharField(max_length=30, blank=True)
-    rate = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
     event_type = models.IntegerField(choices=EventType.choices, default=EventType.JOY_RIDE, blank=True)
     confirmation_code = models.CharField(max_length=10, blank=True, unique=True)
+    override_subtotal = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
+    final_price_data = models.JSONField(null=True, blank=True)
 
     @property
     def vehicle_list(self):
@@ -275,16 +275,56 @@ class GuidedDrive(models.Model):
             vehicle_links.append(f'<a href="{url}">{vehicle.model}</a>')
         return ', '.join(vehicle_links)
 
+    @property
+    def coupon(self):
+        if self.coupon_code and self.requested_date:
+            return Coupon.objects.filter(models.Q(end_date__isnull=True) | models.Q(end_date__gte=self.requested_date), code=self.coupon_code).first()
+        return None
+
+    def save(self, *args, **kwargs):
+        self.coupon_code = self.coupon_code.upper()
+        self.final_price_data = json.loads(json.dumps(self.get_price_data(), cls=DjangoJSONEncoder))
+        super().save(*args, **kwargs)
+
     class Meta:
         abstract = True
 
 
 class JoyRide(GuidedDrive):
-    pass
+
+    def get_price_data(self):
+        # TODO: Refactor sales.models classes to avoid this nested import
+        from sales.utils import JoyRidePriceCalculator
+        price_calculator = JoyRidePriceCalculator(
+            coupon_code=self.coupon_code,
+            email=self.customer.email,
+            tax_zip=settings.DEFAULT_TAX_ZIP,
+            effective_date=self.requested_date,
+            is_military=False,
+            num_passengers=self.num_passengers,
+            override_subtotal=self.override_subtotal,
+        )
+        return price_calculator.get_price_data()
+
 
 
 class PerformanceExperience(GuidedDrive):
     num_drivers = models.IntegerField(null=True, blank=True)
+
+    def get_price_data(self):
+        # TODO: Refactor sales.models classes to avoid this nested import
+        from sales.utils import PerformanceExperiencePriceCalculator
+        price_calculator = PerformanceExperiencePriceCalculator(
+            coupon_code=self.coupon_code,
+            email=self.customer.email,
+            tax_zip=settings.DEFAULT_TAX_ZIP,
+            effective_date=self.requested_date,
+            is_military=False,
+            num_drivers=self.num_drivers,
+            num_passengers=self.num_passengers,
+            override_subtotal=self.override_subtotal,
+        )
+        return price_calculator.get_price_data()
 
 
 class GiftCertificate(models.Model):

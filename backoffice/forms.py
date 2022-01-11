@@ -25,6 +25,24 @@ class CSSClassMixin:
         css_class_string = ' '.join(list(set(widget_css_classes)))
         self.fields[field].widget.attrs['class'] = css_class_string
 
+    def style_customer_search_fields(self):
+        # Populate conditionally non-editable fields from linked customer
+        phone_fields = ['home_phone', 'work_phone', 'mobile_phone']
+        for field in ['first_name', 'last_name', 'email', 'home_phone', 'work_phone', 'mobile_phone']:
+            field_classes = ['newuserfield']
+            if self.instance.id:
+                field_classes.append('dont-edit')
+            if field in phone_fields:
+                field_classes.append('phone')
+                field_classes.append('short')
+            field_classes_str = ' '.join(field_classes)
+            self.fields[field].widget.attrs['class'] = field_classes_str
+            if self.instance.customer:
+                if field in phone_fields:
+                    self.fields[field].initial = getattr(self.instance.customer, field).as_national
+                else:
+                    self.fields[field].initial = getattr(self.instance.customer, field, None) or getattr(self.instance.customer.user, field, None)
+
 
 # TODO: Add slug to the visible form fields and set on both models
 
@@ -175,21 +193,7 @@ class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):
         self.fields['vehicle'].choices = get_vehicle_choices()
         self.fields['vehicle'].widget.attrs['class'] = 'check-conflict'
 
-        # Populate conditionally non-editable fields from linked customer
-        phone_fields = ['home_phone', 'work_phone', 'mobile_phone']
-        for field in ['first_name', 'last_name', 'email', 'home_phone', 'work_phone', 'mobile_phone']:
-            field_classes = ['newuserfield']
-            if self.instance.id:
-                field_classes.append('dont-edit')
-            if field in phone_fields:
-                field_classes.append('phone')
-            field_classes_str = ' '.join(field_classes)
-            self.fields[field].widget.attrs['class'] = field_classes_str
-            if self.instance.customer:
-                if field in phone_fields:
-                    self.fields[field].initial = getattr(self.instance.customer, field).as_national
-                else:
-                    self.fields[field].initial = getattr(self.instance.customer, field, None) or getattr(self.instance.customer.user, field, None)
+        self.style_customer_search_fields()
 
         self.init_reservation_date_time()
 
@@ -387,15 +391,49 @@ class TaxRateForm(CSSClassMixin, forms.ModelForm):
 #         fields = '__all__'
 
 
-class JoyRideForm(forms.ModelForm):
+class GuidedDriveForm(CSSClassMixin, forms.ModelForm):
+
+    requested_date_picker = forms.DateField(required=False)
+    backup_date_picker = forms.DateField(required=False)
+    customer = forms.ModelChoiceField(queryset=Customer.objects.all(), widget=forms.HiddenInput())
+    first_name = forms.CharField(required=False)
+    last_name = forms.CharField(required=False)
+    email = forms.EmailField(required=False)
+    home_phone = PhoneNumberField(required=False)
+    work_phone = PhoneNumberField(required=False)
+    mobile_phone = PhoneNumberField(required=False)
+    big_and_tall = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['vehicle_choice_1'].choices = get_vehicle_choices(allow_null=True)
+        self.fields['vehicle_choice_2'].choices = get_vehicle_choices(allow_null=True)
+        self.fields['vehicle_choice_3'].choices = get_vehicle_choices(allow_null=True)
+        self.add_widget_css_class('requested_date_picker', 'short')
+        self.add_widget_css_class('backup_date_picker', 'short')
+        self.fields['requested_date_picker'].initial = self.instance.requested_date.strftime('%m/%d/%Y')
+        self.fields['backup_date_picker'].initial = self.instance.backup_date.strftime('%m/%d/%Y')
+
+        self.style_customer_search_fields()
+
+    def clean(self):
+        super().clean()
+        self.cleaned_data['requested_date'] = self.cleaned_data['requested_date_picker']
+        self.cleaned_data['backup_date'] = self.cleaned_data['backup_date_picker']
+
+
+class JoyRideForm(GuidedDriveForm):
 
     class Meta:
         model = JoyRide
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('confirmation_code',)
 
 
-class PerformanceExperienceForm(forms.ModelForm):
+class PerformanceExperienceForm(GuidedDriveForm):
 
     class Meta:
         model = PerformanceExperience
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('confirmation_code',)

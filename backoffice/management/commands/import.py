@@ -401,7 +401,7 @@ class Command(BaseCommand):
                     vehicle=vehicle,
                     out_at=old['dateout'],
                     back_at=old['dateback'],
-                    rate=old['rate'],
+                    override_subtotal=old['rate'],
                     drivers=old['drivers'],
                     miles_included=old['milesinc'],
                     extra_miles=old['xtramiles'],
@@ -433,7 +433,7 @@ class Command(BaseCommand):
                     vehicle=vehicle,
                     out_at=old['dateout'],
                     back_at=old['dateback'],
-                    rate=old['rate'],
+                    override_subtotal=old['rate'],
                     drivers=old['drivers'],
                     miles_included=old['milesinc'],
                     extra_miles=old['xtramiles'],
@@ -696,7 +696,7 @@ class Command(BaseCommand):
                     num_minors=old['nominors'],
                     big_and_tall=old['bigtall'],
                     coupon_code=old['coupon'],
-                    rate=old['rate'],
+                    override_subtotal=old['rate'],
                 )
                 if model == PerformanceExperience:
                     new.num_drivers = old['nodrv']

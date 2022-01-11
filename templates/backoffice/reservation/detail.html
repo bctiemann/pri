@@ -53,7 +53,7 @@
                 <cfinput name="fname" value="#Customer.fname#" maxlength="255" class="newuserfield #Customer.customerid GT 0 ? 'dont-edit' : ''#" />
                 {% if reservation.customer %}
                     <a class="matched-customer" href="{% url "backoffice:customer-detail" pk=reservation.customer.id %}">
-                        <span customerid="#Customer.customerid#" class=" ui-icon ui-icon-person"></span>
+                        <span class=" ui-icon ui-icon-person"></span>
                     </a>
                 {% endif %}
             </td>

@@ -1,19 +1,12 @@
 {% extends "backoffice/guided_drive/base.html" %}
+{% load humanize %}
 
 {% block content %}
 
-    {% if event_type == event_types.JOY_RIDE %}
-        {% if event %}
-            <h2>Edit Joy Ride</h2>
-        {% else %}
-            <h2>Add Joy Ride</h2>
-        {% endif %}
-    {% elif event_type == event_types.PERFORMANCE_EXPERIENCE %}
-       {% if event %}
-            <h2>Edit Performance Experience</h2>
-        {% else %}
-            <h2>Add Performance Experience</h2>
-        {% endif %}
+    {% if event %}
+        <h2>Edit {{ event_type.label }}</h2>
+    {% else %}
+        <h2>Add {{ event_type.label }}</h2>
     {% endif %}
 
     {{ form.errors }}
@@ -49,6 +42,7 @@
                 </cfselect>
             </td>
         </tr>
+        {% comment %}
         <cfquery name="Cars" datasource="#DSN#">
             SELECT vehicleid,make,model,year,status FROM Vehicles
             WHERE type = 1
@@ -59,9 +53,12 @@
             WHERE type = 2
             ORDER BY make
         </cfquery>
+        {% endcomment %}
         <tr>
             <td>Vehicle Choice 1</td>
             <td>
+                {{ form.vehicle_choice_1 }}
+                {% comment %}
                 <cfselect name="choice1">
                     <option value="0">(None)</option>
                     <optgroup label="Cars">
@@ -75,11 +72,14 @@
                         </cfloop>
                     </optgroup>
                 </cfselect>
+                {% endcomment %}
             </td>
         </tr>
         <tr>
             <td>Vehicle Choice 2</td>
             <td>
+                {{ form.vehicle_choice_2 }}
+                {% comment %}
                 <cfselect name="choice2">
                     <option value="0">(None)</option>
                     <optgroup label="Cars">
@@ -93,11 +93,14 @@
                         </cfloop>
                     </optgroup>
                 </cfselect>
+                {% endcomment %}
             </td>
         </tr>
         <tr>
             <td>Vehicle Choice 3</td>
             <td>
+                {{ form.vehicle_choice_3 }}
+                {% comment %}
                 <cfselect name="choice3">
                     <option value="0">(None)</option>
                     <optgroup label="Cars">
@@ -111,11 +114,13 @@
                         </cfloop>
                     </optgroup>
                 </cfselect>
+                {% endcomment %}
             </td>
         </tr>
         <tr>
             <td>Requested Date</td>
             <td>
+                {{ form.requested_date_picker }}
                 <cftry>
                     <cfset reqdate = DateFormat(JoyPerf.reqdate,"MM/DD/YYYY")>
                     <cfcatch type="Any">
@@ -128,6 +133,7 @@
         <tr>
             <td>Backup Date</td>
             <td>
+                {{ form.backup_date_picker }}
                 <cftry>
                     <cfset bupdate = DateFormat(JoyPerf.bupdate,"MM/DD/YYYY")>
                     <cfcatch type="Any">
@@ -140,58 +146,72 @@
         <tr>
             <td>Search Customer</td>
             <td>
-                <cfinput name="customername" value="" maxlength="255" class="search" />
+                <input name="customername" id="customername" value="" maxlength="255" class="search" />
+                {{ form.customer }}
                 <cfinput type="hidden" name="customerid" value="#Customer.customerid#" />
             </td>
         </tr>
         <tr>
             <td>First Name</td>
             <td>
+                {{ form.first_name }}
                 <cfinput name="fname" value="#Customer.fname#" maxlength="255" class="newuserfield #Customer.customerid GT 0 ? 'dont-edit' : ''#" />
-                <span customerid="#Customer.customerid#" class="matched-customer ui-icon ui-icon-person"></span>
+                {% if event.customer %}
+                    <a class="matched-customer" href="{% url "backoffice:customer-detail" pk=event.customer.id %}">
+                        <span class=" ui-icon ui-icon-person"></span>
+                    </a>
+                {% endif %}
             </td>
         </tr>
         <tr>
             <td>Last Name</td>
             <td>
+                {{ form.last_name }}
                 <cfinput name="lname" value="#Customer.lname#" maxlength="255" class="newuserfield #Customer.customerid GT 0 ? 'dont-edit' : ''#" />
             </td>
         </tr>
         <tr>
             <td>Email</td>
             <td>
+                {{ form.email }}
                 <cfinput name="email" value="#Customer.email#" maxlength="255" validate="email" class="newuserfield #Customer.customerid GT 0 ? 'dont-edit' : ''#"/>
             </td>
         </tr>
         <tr>
             <td>Home Phone</td>
             <td>
+                {{ form.home_phone }}
                 <cfinput name="hphone" class="newuserfield phone short #Customer.customerid GT 0 ? 'dont-edit' : ''#" value="#Customer.hphone#" maxlength="20" />
             </td>
         </tr>
         <tr>
             <td>Work Phone</td>
             <td>
+                {{ form.work_phone }}
                 <cfinput name="wphone" class="newuserfield phone short #Customer.customerid GT 0 ? 'dont-edit' : ''#" value="#Customer.wphone#" maxlength="20" />
             </td>
         </tr>
         <tr>
             <td>Mobile Phone</td>
             <td>
+                {{ form.mobile_phone }}
                 <cfinput name="mphone" class="newuserfield phone short #Customer.customerid GT 0 ? 'dont-edit' : ''#" value="#Customer.mphone#" maxlength="20" />
             </td>
         </tr>
-        <tr>
-            <td>Number of Drivers</td>
-            <cfset drivers = 0>
-            <cfif JoyPerf.nodrv GT 0>
-                <cfset drivers = JoyPerf.nodrv>
-            </cfif>
-            <td>
-                <cfinput name="nodrv" value="#drivers#" maxlength="2" class="short" />
-                <small>Must be at least one for Perf. Exp. Max 14</small>
-            </td>
-        </tr>
+        {% if event_type == event_types.PERFORMANCE_EXPERIENCE %}
+            <tr>
+                <td>Number of Drivers</td>
+                <cfset drivers = 0>
+                <cfif JoyPerf.nodrv GT 0>
+                    <cfset drivers = JoyPerf.nodrv>
+                </cfif>
+                <td>
+                    {{ form.num_drivers }}
+                    <cfinput name="nodrv" value="#drivers#" maxlength="2" class="short" />
+                    <small>Must be at least one for Perf. Exp. Max 14</small>
+                </td>
+            </tr>
+        {% endif %}
         <tr>
             <td>Number of Passengers</td>
             <cfset passengers = 1>
@@ -199,24 +219,31 @@
                 <cfset passengers = JoyPerf.nopax>
             </cfif>
             <td>
+                {{ form.num_passengers }}
                 <cfinput name="nopax" value="#passengers#" maxlength="2" class="short" />
-                <small>Must be at least one for Joy Ride.</small>
+                {% if event_type == event_types.JOY_RIDE %}
+                    <small>Must be at least one for Joy Ride.</small>
+                {% endif %}
             </td>
         </tr>
-        <tr>
-            <td>Number of Minors</td>
-            <cfset minors = 0>
-            <cfif JoyPerf.nominors GT 0>
-                <cfset minors = JoyPerf.nominors>
-            </cfif>
-            <td>
-                <cfinput name="nominors" value="#minors#" maxlength="2" class="short" />
-                <small><b>Joy Ride Only</b></small>
-            </td>
-        </tr>
+        {% if event_type == event_types.JOY_RIDE %}
+            <tr>
+                <td>Number of Minors</td>
+                <cfset minors = 0>
+                <cfif JoyPerf.nominors GT 0>
+                    <cfset minors = JoyPerf.nominors>
+                </cfif>
+                <td>
+                    {{ form.num_minors }}
+                    <cfinput name="nominors" value="#minors#" maxlength="2" class="short" />
+                    <small><b>Joy Ride Only</b></small>
+                </td>
+            </tr>
+        {% endif %}
         <tr>
             <td>Big and Tall</td>
             <td>
+                {{ form.big_and_tall }}
                 <cfselect name="bigtall">
                     <option value="0" <cfif JoyPerf.bigtall IS 0>selected</cfif>>No</option>
                     <option value="1" <cfif JoyPerf.bigtall IS 1>selected</cfif>>Yes</option>
@@ -227,12 +254,15 @@
         <tr>
             <td>Status</td>
             <td>
+                {{ form.status }}
+                {% comment %}
                 <select name="status">
                     <option value="0" <CFIF JoyPerf.status IS 0>selected</CFIF>>Pending</option>
                     <option value="1" <CFIF JoyPerf.status IS 1>selected</CFIF>>Confirmed</option>
                     <option value="2" <CFIF JoyPerf.status IS 2>selected</CFIF>>Complete</option>
                     <option value="3" <CFIF JoyPerf.status IS 3>selected</CFIF>>Cancelled</option>
                 </select>
+                {% endcomment %}
             </td>
         </tr>
         <tr>
@@ -246,9 +276,12 @@
             </cftry>
 
             <div id="billinginfo">
-                <p>#Customer.fname# #Customer.lname#</p>
-                <p>#addr_dec#</p>
-                <p>#Customer.city#, #Customer.state# #Customer.zip#</p>
+                <p>{{ event.customer.full_name }}</p>
+                <p>{{ event.customer.address_line_1 }}</p>
+                {% if event.customer.address_line_2 %}
+                    <p>{{ event.customer.address_line_2 }}</p>
+                {% endif %}
+                <p>{{ event.customer.city }}, {{ event.customer.state }} {{ event.customer.zip }}</p>
 
                 <cftry>
                     <cfset ccnum_dec = decrypt('#Customer.ccnum#','#globalkey#','AES','hex')>
@@ -263,37 +296,45 @@
                     </cfcatch>
                 </cftry>
 
-                <div class="card-mockup <cfif Len(Customer.ccnum) IS 0>inactive</cfif>">
+                <div class="card-mockup {% if not event.customer.cc_number %}inactive{% endif %}">
                     <div class="card-label">1</div>
-                    <cfif Len(Customer.ccnum) GT 0>
-                        <div class="card-number">#formatCCNumber(ccnum_dec)#</div>
-                        <div class="card-exp">#Customer.ccexpmo# / #Customer.ccexpyr#</div>
-                        <div class="card-cvv">#Customer.cccvv#</div>
-                        <div class="card-phone">#Customer.cctel#</div>
-                    </cfif>
+                    {% if event.customer.cc_number %}
+{#                    <cfif Len(eCustomer.ccnum) GT 0>#}
+                        <div class="card-number">{{ event.customer.cc_number }}</div>
+                        <div class="card-exp">{{ event.customer.cc_exp_mo }} / {{ event.customer.cc_exp_yr }}</div>
+                        <div class="card-cvv">{{ event.customer.cc_cvv }}</div>
+                        <div class="card-phone">{{ event.customer.cc_phone }}</div>
+{#                    </cfif>#}
+                    {% endif %}
                 </div>
-                <div class="card-mockup <cfif Len(Customer.cc2num) IS 0>inactive</cfif>">
+                <div class="card-mockup {% if not event.customer.cc2_number %}inactive{% endif %}">
                     <div class="card-label">2</div>
-                    <cfif Len(Customer.cc2num) GT 0>
-                        <div class="card-number">#formatCCNumber(cc2num_dec)#</div>
-                        <div class="card-exp">#Customer.cc2expmo# / #Customer.cc2expyr#</div>
-                        <div class="card-cvv">#Customer.cc2cvv#</div>
-                        <div class="card-phone">#Customer.cc2tel#</div>
-                    </cfif>
+                    {% if event.customer.cc2_number %}
+{#                    <cfif Len(eCustomer.cc2num) GT 0>#}
+                        <div class="card-number">{{ event.customer.cc2_number }}</div>
+                        <div class="card-exp">{{ event.customer.cc2_exp_mo }} / {{ event.customer.cc2_exp_yr }}</div>
+                        <div class="card-cvv">{{ event.customer.cc2_cvv }}</div>
+                        <div class="card-phone">{{ event.customer.cc2_phone }}</div>
+{#                    </cfif>#}
+                    {% endif %}
                 </div>
 
             </div>
             </td>
         </tr>
+        {% comment %}
         <CFIF len(JoyPerf.coupon) GT 0>
             <CFQUERY NAME="codecheck" DATASOURCE="#DSN#">
                 SELECT * FROM discounts
                 WHERE LOWER(code) = '#lcase(trim(JoyPerf.coupon))#'
             </CFQUERY>
         </CFIF>
+        {% endcomment %}
         <tr>
             <td>Discount / Coupon Code</td>
             <td>
+                {{ form.coupon_code }}
+                {% comment %}
                 <cfinput name="coupon" value="#JoyPerf.coupon#" maxlength="30" />
                 <CFIF len(JoyPerf.coupon) GT 0>
                     (<CFIF codecheck.recordcount IS 1>
@@ -302,17 +343,37 @@
                          <span style="color:red">INVALID</span>
                      </CFIF>)
                 </CFIF>
+                {% endcomment %}
+                {% if event.coupon_code %}
+                <CFIF len(Reservation.coupon) GT 0>
+                    ({% if event.coupon %}
+                    <CFIF codecheck.recordcount IS 1>
+                         <span style="color:green">VALID</span> {{ event.coupon.value_str }}
+                    {% else %}
+                     <CFELSE>
+                         <span style="color:red">INVALID</span>
+                     </CFIF>
+                    {% endif %})
+                </CFIF>
+                {% endif %}
             </td>
         </tr>
         <tr>
             <td class="align-top">Notes<br /><small>Customer Requests<br />Visible to Customer</small></td>
-            <td><cftextarea name="notes" class="customer-notes">#JoyPerf.notes#</cftextarea></td>
+            <td>
+                {{ form.customer_notes }}
+{#                <cftextarea name="notes" class="customer-notes">#JoyPerf.notes#</cftextarea>#}
+            </td>
         </tr>
         <tr>
             <td class="align-top">Notes<br /><small>Not Public</small></td>
-            <td><cftextarea name="ournotes" class="our-notes">#ournotes_dec#</cftextarea></td>
+            <td>
+                {{ form.internal_notes }}
+{#                <cftextarea name="ournotes" class="our-notes">#ournotes_dec#</cftextarea>#}
+            </td>
         </tr>
 
+        {% comment %}
         <cfif joyperfid>
 
         <CFIF JoyPerf.type IS 1>
@@ -374,6 +435,7 @@
                 <CFSET rateval = JoyPerf.rate>
             </CFIF>
         </CFIF>
+        {% endcomment %}
 
         <tr class="divider">
             <td colspan="2">
@@ -386,47 +448,79 @@
                 <table class="price-breakdown">
                     <tr>
                         <td>Event Total:</td>
-                        <td><b>#NumberFormat(trate,"$___,___.__")#</b></td>
+                        <td><b>${{ price_data.base_price|intcomma }}</b></td>
                     </tr>
 
                     <tr>
+                        <td colspan="2">Specific Discount (greatest of following):</td>
+                        <td></td>
+                    </tr>
+
+                    <tr class="specific-discount">
+                        <td>Coupon Discount: </td>
+                        <td>- ${{ price_data.coupon_discount|intcomma }}</td>
+                        <td></td>
+                    </tr>
+                    <tr class="specific-discount">
+                        <td>Promotion Discount: </td>
+                        <td>- ${{ price_data.promotion_discount|intcomma }}</td>
+                        <td></td>
+                    </tr>
+                    <tr class="specific-discount">
                         <td>Customer Discount: </td>
-                        <td><b>- #NumberFormat(ds1,"$___,___.__")#</b></td>
+                        <td>- ${{ price_data.customer_discount|intcomma }}</td>
+                        <td></td>
+                    </tr>
+                    <tr class="specific-discount">
+                        <td>Military Discount: </td>
+                        <td>- ${{ price_data.military_discount|intcomma }}</td>
+                        <td></td>
+                    </tr>
+                    <tr class="specific-discount">
+                        <td>One-Time Discount: </td>
+                        <td>- ${{ price_data.one_time_discount|intcomma }}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Specific Discount: </td>
+                        <td>- ${{ price_data.specific_discount|intcomma }}</td>
+                        <td>{{ price_data.specific_discount_label }}</td>
                     </tr>
 
-                <tr>
-                <td align="right">Coupon Discount: </td>
-                <td align="right"><b>- #NumberFormat(ds2,"$___,___.__")#</b></td>
-                </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>SubTotal: <strong>${{ price_data.computed_subtotal|intcomma }}</strong></td>
+                        <td>
+                            {{ form.override_subtotal }}
+                        </td>
+                    </tr>
 
-
-                <tr>
-                <td align="right">&nbsp;</td>
-                <td align="right">SubTotal: <strong>#NumberFormat(s2,"$___,___.__")#</strong></td>
-                </tr>
-
-                <CFSET taxtot = s2 * (1 + (salesTaxDefault/100))>
-                <CFSET taxmt = taxtot - s2>
-
-                <tr>
-                <td align="right">&nbsp;</td>
-                <td align="right">Tax: <small>(#salesTaxDefault#%)</small> #NumberFormat(taxmt,"$___,___.__")# </td>
-                </tr>
+                    <CFSET taxtot = s2 * (1 + (salesTaxDefault/100))>
+                    <CFSET taxmt = taxtot - s2>
 
                     <tr>
-                        <td align="right">&nbsp;</td>
-                        <td align="right">Invoice Total: <strong>#NumberFormat(taxtot,"$___,___.__")#</strong></td>
+                        <td>&nbsp;</td>
+                        <td>Tax: <small>({{ price_data.tax_rate_as_percent }}%)</small> ${{ price_data.tax_amount|intcomma }} </td>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>Invoice Total: <strong>${{ price_data.total_with_tax|intcomma }}</strong></td>
+                        <td></td>
                     </tr>
                 </table>
 
-
+                {% comment %}
                 <input type="hidden" name="total" value="#s2#">
                 <CFIF ratediff IS 1>
                 <br><br>
                 <b>Rate Override:</b> Rate set to: #NumberFormat(rateval,"$___,___.__")#
                 </CFIF>
+                {% endcomment %}
             </td>
         </tr>
+        {% comment %}
         <tr>
             <td>Computed Cost<br><small>Not including tax</small></td>
             <CFIF ratediff IS 0>
@@ -444,14 +538,31 @@
         </tr>
 
         </cfif>
+        {% endcomment %}
 
         <tr>
             <td></td>
             <td>
-                <button class="btn" type="submit" name="submit"><cfif joyperfid>Edit<cfelse>Add</cfif></button>
+                <button class="btn" type="submit" name="edit">
+                    {% if event %}
+                        Edit
+                    {% else %}
+                        Add
+                    {% endif %}
+                </button>
+                {% if event %}
                 <cfif joyperfid>
-                    <button class="btn delete" type="submit" name="delete" onclick="return confirmDelete(this.form, 'joyperf')">Delete Event</button>
+                    <button
+                        class="btn delete"
+                        type="submit"
+                        name="delete"
+                        {% if event_type == event_types.JOY_RIDE %}
+                            onclick="return confirmDelete(this.form, '{% url "backoffice:joyride-delete" pk=event.id %}', 'Joy Ride')">Delete Event</button>
+                        {% elif event_type == event_types.PERFORMANCE_EXPERIENCE %}
+                            onclick="return confirmDelete(this.form, '{% url "backoffice:perfexp-delete" pk=event.id %}', 'Performance Experience')">Delete Event</button>
+                        {% endif %}
                 </cfif>
+                {% endif %}
             </td>
         </tr>
     </table>

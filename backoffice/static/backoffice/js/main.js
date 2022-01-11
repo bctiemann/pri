@@ -817,8 +817,8 @@ $(document).ready(function() {
     $('#id_back_at_date').datepicker({});
     $('#id_deposit_charged_on').datepicker({});
     $('#id_deposit_refunded_on').datepicker({});
-    $('#reqdate').datepicker({});
-    $('#bupdate').datepicker({});
+    $('#id_requested_date_picker').datepicker({});
+    $('#id_backup_date_picker').datepicker({});
     $('#donestamp').datepicker({});
     $('#nextstamp').datepicker({});
     $('#stamp').datepicker({});

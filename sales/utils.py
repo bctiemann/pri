@@ -311,8 +311,7 @@ class PerformanceExperiencePriceCalculator(PriceCalculator):
     Price is calculated as follows:
     - Calculator is inited with # drivers, # passengers, coupon code, email, and tax zip
     - Base price is per-driver rate * number of drivers, + per-passenger rate * number of passengers
-    - Subtract coupon discount
-    - Subtract customer ("promotional") discount
+    - Subtract largest of (coupon discount, customer discount, promotional discount, military discount, one-time discount)
     - Add sales tax
     """
     num_drivers = None
@@ -322,3 +321,109 @@ class PerformanceExperiencePriceCalculator(PriceCalculator):
         self.num_drivers = num_drivers
         self.num_passengers = num_passengers
         super().__init__(**kwargs)
+
+        # Start by calculating the base price
+        self.subtotal = self.base_price
+
+        # Find and apply greatest specific discount available
+        self.calculate_specific_discount(value=self.subtotal)
+        self.subtotal = self.apply_discount(value=self.specific_discount)
+        self.post_specific_discount_subtotal = self.subtotal
+
+    @property
+    def base_price(self):
+        driver_cost = 0
+        if self.num_drivers == 1:
+            driver_cost = settings.PERFORMANCE_EXPERIENCE_PRICES['1_drv']
+        elif self.num_drivers == 2:
+            driver_cost = settings.PERFORMANCE_EXPERIENCE_PRICES['2_drv']
+        elif self.num_drivers == 3:
+            driver_cost = settings.PERFORMANCE_EXPERIENCE_PRICES['3_drv']
+        elif self.num_drivers == 4:
+            driver_cost = settings.PERFORMANCE_EXPERIENCE_PRICES['4_drv']
+        else:
+            driver_cost = settings.PERFORMANCE_EXPERIENCE_PRICES['cost_per_drv_gt_4'] * self.num_drivers
+
+        passenger_cost = settings.PERFORMANCE_EXPERIENCE_PRICES['cost_per_pax'] * self.num_passengers
+
+        return driver_cost + passenger_cost
+
+    def get_price_data(self):
+        return dict(
+            tax_zip=self.tax_zip,
+            tax_rate=self.tax_rate.total_rate,
+            tax_rate_as_percent=self.tax_rate.total_rate * 100,
+            customer_id=self.customer.id if self.customer else None,
+            base_price=self.quantize_currency(self.base_price),
+
+            promotion_discount=self.quantize_currency(self.promotion_discount),
+            coupon_discount=self.quantize_currency(self.coupon_discount),
+            customer_discount=self.quantize_currency(self.customer_discount),
+            military_discount=self.quantize_currency(self.military_discount),
+            one_time_discount=self.quantize_currency(self.one_time_discount),
+            specific_discount=self.quantize_currency(self.specific_discount),
+            specific_discount_label=self.specific_discount_label,
+
+            subtotal=self.quantize_currency(self.pre_tax_subtotal),
+            computed_subtotal=self.quantize_currency(self.computed_subtotal),
+            total_with_tax=self.quantize_currency(self.total_with_tax),
+            tax_amount=self.quantize_currency(self.get_tax_amount()),
+        )
+
+
+class JoyRidePriceCalculator(PriceCalculator):
+    """
+    Price is calculated as follows:
+    - Calculator is inited with # passengers, coupon code, email, and tax zip
+    - Base price is per-passenger rate * number of passengers
+    - Subtract largest of (coupon discount, customer discount, promotional discount, military discount, one-time discount)
+    - Add sales tax
+    """
+    num_passengers = None
+
+    def __init__(self, num_passengers, **kwargs):
+        self.num_passengers = num_passengers
+        super().__init__(**kwargs)
+
+        # Start by calculating the base price
+        self.subtotal = self.base_price
+
+        # Find and apply greatest specific discount available
+        self.calculate_specific_discount(value=self.subtotal)
+        self.subtotal = self.apply_discount(value=self.specific_discount)
+        self.post_specific_discount_subtotal = self.subtotal
+
+    @property
+    def base_price(self):
+        if self.num_passengers == 1:
+            return settings.JOY_RIDE_PRICES['1_pax']
+        elif self.num_passengers == 2:
+            return settings.JOY_RIDE_PRICES['2_pax']
+        elif self.num_passengers == 3:
+            return settings.JOY_RIDE_PRICES['3_pax']
+        elif self.num_passengers == 4:
+            return settings.JOY_RIDE_PRICES['4_pax']
+        else:
+            return settings.JOY_RIDE_PRICES['cost_per_pax_gt_4'] * self.num_passengers
+
+    def get_price_data(self):
+        return dict(
+            tax_zip=self.tax_zip,
+            tax_rate=self.tax_rate.total_rate,
+            tax_rate_as_percent=self.tax_rate.total_rate * 100,
+            customer_id=self.customer.id if self.customer else None,
+            base_price=self.quantize_currency(self.base_price),
+
+            promotion_discount=self.quantize_currency(self.promotion_discount),
+            coupon_discount=self.quantize_currency(self.coupon_discount),
+            customer_discount=self.quantize_currency(self.customer_discount),
+            military_discount=self.quantize_currency(self.military_discount),
+            one_time_discount=self.quantize_currency(self.one_time_discount),
+            specific_discount=self.quantize_currency(self.specific_discount),
+            specific_discount_label=self.specific_discount_label,
+
+            subtotal=self.quantize_currency(self.pre_tax_subtotal),
+            computed_subtotal=self.quantize_currency(self.computed_subtotal),
+            total_with_tax=self.quantize_currency(self.total_with_tax),
+            tax_amount=self.quantize_currency(self.get_tax_amount()),
+        )

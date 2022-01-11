@@ -405,23 +405,23 @@
                 <div class="card-mockup {% if not rental.customer.cc_number %}inactive{% endif %}">
                     <div class="card-label">1</div>
                     {% if rental.customer.cc_number %}
-                    <cfif Len(eCustomer.ccnum) GT 0>
+{#                    <cfif Len(eCustomer.ccnum) GT 0>#}
                         <div class="card-number">{{ rental.customer.cc_number }}</div>
                         <div class="card-exp">{{ rental.customer.cc_exp_mo }} / {{ rental.customer.cc_exp_yr }}</div>
                         <div class="card-cvv">{{ rental.customer.cc_cvv }}</div>
                         <div class="card-phone">{{ rental.customer.cc_phone }}</div>
-                    </cfif>
+{#                    </cfif>#}
                     {% endif %}
                 </div>
                 <div class="card-mockup {% if not rental.customer.cc2_number %}inactive{% endif %}">
                     <div class="card-label">2</div>
                     {% if rental.customer.cc2_number %}
-                    <cfif Len(eCustomer.cc2num) GT 0>
+{#                    <cfif Len(eCustomer.cc2num) GT 0>#}
                         <div class="card-number">{{ rental.customer.cc2_number }}</div>
                         <div class="card-exp">{{ rental.customer.cc2_exp_mo }} / {{ rental.customer.cc2_exp_yr }}</div>
                         <div class="card-cvv">{{ rental.customer.cc2_cvv }}</div>
                         <div class="card-phone">{{ rental.customer.cc2_phone }}</div>
-                    </cfif>
+{#                    </cfif>#}
                     {% endif %}
                 </div>
 
@@ -550,12 +550,14 @@
                     <tr>
                         <td>Rental Total ({{ rental.num_days }} day{{ rental.num_days|pluralize }}):</td>
                         <td><b>${{ price_data.base_price|intcomma }}</b></td>
+                        <td></td>
                     </tr>
                     {% if price_data.multi_day_discount %}
                     <cfif dMultiDay>
                     <tr>
                         <td>Multi-Day Discount ({{ price_data.multi_day_discount_pct }}%):</td>
                         <td>- ${{ price_data.multi_day_discount|intcomma }}</td>
+                        <td></td>
                     </tr>
                     </cfif>
                     {% endif %}
