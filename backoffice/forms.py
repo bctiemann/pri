@@ -422,7 +422,10 @@ class GuidedDriveForm(CSSClassMixin, forms.ModelForm):
             'requested_date_picker', 'backup_date_picker', 'num_drivers', 'num_passengers', 'num_minors', 'coupon_code'
         ]
         for field in short_fields:
-            self.add_widget_css_class(field, 'short')
+            try:
+                self.add_widget_css_class(field, 'short')
+            except KeyError:
+                pass
 
         self.style_customer_search_fields()
 
