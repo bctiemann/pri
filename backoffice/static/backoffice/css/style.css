@@ -626,6 +626,7 @@ table.inputform textarea {
         border-color: rgba(17, 17, 18, 0.3);
 }
 table.inputform input[type=text],
+table.inputform input[type=number],
 table.inputform input[type=email],
 table.inputform input[type=search],
 table.inputform input[type=password] {

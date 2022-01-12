@@ -1,0 +1,15 @@
+{% extends "backoffice/base.html" %}
+
+{% block nav %}
+    <h1 class="pageheader">
+        Special Use Owner Payments
+        <ul class="nav_subpage">
+            <a href="{% url "backoffice:consignmentpayment-list" %}">
+                <li {% if is_unfiltered_list_view %}class="selected"{% endif %}>List</li>
+            </a>
+            <a href="{% url "backoffice:consignmentpayment-create" %}">
+                <li {% if is_create_view %}class="selected"{% endif %}>Add</li>
+            </a>
+        </ul>
+    </h1>
+{% endblock %}

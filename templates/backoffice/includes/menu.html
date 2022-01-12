@@ -133,11 +133,13 @@
 	<a class="tnav <CFIF scrpt IS "subpay.cfm">selected</CFIF>" href="subpay.cfm">Substitute Payments</a>
 	</li>
 </CFIF>
+{% if user.employee.admin_access %}
 <CFIF YourID.acclev IS 1>
 	<li>
-	<a class="tnav <CFIF scrpt IS "ownerpay.cfm">selected</CFIF>" href="ownerpay.cfm">Special Use Owner Payments</a>
+	<a class="tnav {% if page_group == 'consigmnent_payments' %}selected{% endif %}" href="{% url "backoffice:consignmentpayment-list" %}">Special Use Owner Payments</a>
 	</li>
 </CFIF>
+{% endif %}
 <CFIF YourID.acclev IS 1>
 	<li>
 	<a class="tnav <CFIF scrpt IS "stripepay.cfm">selected</CFIF>" href="stripepay.cfm">Charge Card via Stripe</a>

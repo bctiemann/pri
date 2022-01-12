@@ -7,7 +7,7 @@ from django import forms
 from phonenumber_field.formfields import PhoneNumberField
 
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, TollTag
-from consignment.models import Consigner
+from consignment.models import Consigner, ConsignmentPayment
 from users.models import User, Employee, Customer
 from sales.models import Reservation, Rental, GuidedDrive, JoyRide, PerformanceExperience, Coupon, TaxRate
 from sales.enums import (
@@ -415,8 +415,10 @@ class GuidedDriveForm(CSSClassMixin, forms.ModelForm):
         self.fields['vehicle_choice_1'].choices = get_vehicle_choices(allow_null=True)
         self.fields['vehicle_choice_2'].choices = get_vehicle_choices(allow_null=True)
         self.fields['vehicle_choice_3'].choices = get_vehicle_choices(allow_null=True)
-        self.fields['requested_date_picker'].initial = self.instance.requested_date.strftime('%m/%d/%Y')
-        self.fields['backup_date_picker'].initial = self.instance.backup_date.strftime('%m/%d/%Y')
+        if self.instance.requested_date:
+            self.fields['requested_date_picker'].initial = self.instance.requested_date.strftime('%m/%d/%Y')
+        if self.instance.backup_date:
+            self.fields['backup_date_picker'].initial = self.instance.backup_date.strftime('%m/%d/%Y')
         self.fields['override_subtotal'].widget.attrs['placeholder'] = 'Override'
 
         short_fields = [
@@ -456,6 +458,32 @@ class ConsignerForm(forms.ModelForm):
 
     class Meta:
         model = Consigner
+        fields = '__all__'
+        # exclude = ('confirmation_code',)
+
+
+class ConsignmentPaymentForm(CSSClassMixin, forms.ModelForm):
+
+    paid_on_picker = forms.DateField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.instance.paid_at:
+            self.fields['paid_on_picker'].initial = self.instance.paid_at.strftime('%m/%d/%Y')
+
+        short_fields = [
+            'amount', 'paid_on_picker'
+        ]
+        for field in short_fields:
+            self.add_widget_css_class(field, 'short')
+
+    def clean(self):
+        super().clean()
+        self.cleaned_data['paid_at'] = self.cleaned_data['paid_on_picker']
+
+    class Meta:
+        model = ConsignmentPayment
         fields = '__all__'
         # exclude = ('confirmation_code',)
 

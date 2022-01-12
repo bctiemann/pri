@@ -1,0 +1,101 @@
+{% extends "backoffice/consignment_payment/base.html" %}
+{% load humanize %}
+
+{% block content %}
+
+    {% comment %}
+    <cfif IsDefined("URL.deleted")>
+        <p>Vehicle deleted successfully.</p>
+    </cfif>
+
+    <cfset sortCols = "vehicleid,make,model,year,status">
+
+    <cfif NOT IsDefined("URL.sortby") OR NOT ListContains(sortCols, URL.sortby)>
+        <cfset URL.sortby = "vehicleid">
+    </cfif>
+    <cfif NOT IsDefined("URL.sortdir") OR NOT ListContains("ASC,DESC", URL.sortdir)>
+        <cfset URL.sortdir = "ASC">
+    </cfif>
+    <cfif NOT IsDefined("URL.page") OR NOT IsNumeric(URL.page) OR URL.page LT 1>
+        <cfset URL.page = 1>
+    </cfif>
+
+    <CFQUERY NAME="allRecords" DATASOURCE="#DSN#">
+        SELECT vehicleid FROM Vehicles
+        WHERE 1
+        <cfif IsDefined("Form.query")>
+            AND (
+                make LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR"> OR
+                model LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR"> OR
+                year LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR">
+            )
+        </cfif>
+        <cfif IsDefined("URL.type") AND IsValid("integer",URL.type)>
+            AND type = <CFQUERYPARAM value="#URL.type#" CFSQLType="CF_SQL_INTEGER">
+        </cfif>
+        <cfif NOT (IsDefined("URL.showall") AND URL.showall IS 1)>
+            AND status != 3
+        </cfif>
+    </CFQUERY>
+
+    <cfset pageViewLink = getPageViewLink(allRecords.recordCount)>
+    <CFSET Pages = pagesLink(#allRecords.recordCount#,#rowsperpage#,int(#URL.page#),#CGI.SCRIPT_NAME#,#URL#)>
+
+    <CFQUERY NAME="Vehicles" DATASOURCE="#DSN#" result="result">
+        SELECT Vehicles.vehicleid,make,model,year,type,plate,vin,mileage,damage,Vehicles.notes,policyno,policyco,policytel,
+        status,weighting,tagnumber FROM Vehicles
+        LEFT JOIN TollTags ON TollTags.vehicleid=Vehicles.vehicleid
+        WHERE 1
+        <cfif IsDefined("Form.query")>
+            AND (
+                make LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR"> OR
+                model LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR"> OR
+                year LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR">
+            )
+        </cfif>
+        <cfif IsDefined("URL.type") AND IsValid("integer",URL.type)>
+            AND type = <CFQUERYPARAM value="#URL.type#" CFSQLType="CF_SQL_INTEGER">
+        </cfif>
+        <cfif NOT (IsDefined("URL.showall") AND URL.showall IS 1)>
+            AND status != 3
+        </cfif>
+        ORDER BY #URL.sortby# #URL.sortdir#
+        LIMIT #Pages.offset#,#Pages.thispage#
+    </CFQUERY>
+
+    <CFOUTPUT>
+    <div class="pager">
+    #pageViewLink#
+    #Pages.pages#
+    </div>
+    </CFOUTPUT>
+    {% endcomment %}
+
+    {% include "backoffice/includes/paginator.html" %}
+
+    {% include "backoffice/includes/search_form.html" %}
+
+    <table class="data alternating" sortedby="{{ sortby }}">
+    <tr>
+        <cfoutput>
+        <th col="id" default-sort="desc">ID</th>
+        <th col="consigner__last_name">Name</th>
+        <th>Email</th>
+        <th>Amount</th>
+        <th col="paid_at" default-sort="desc">Date</th>
+        <th>Method</th>
+        </cfoutput>
+    </tr>
+    {% for consignment_payment in consignmentpayment_list %}
+        <tr class="clickable click-to-edit" destination="{% url "backoffice:consignmentpayment-detail" pk=consignment_payment.id %}">
+            <td><a href="{% url "backoffice:consignmentpayment-detail" pk=consignment_payment.id %}">{{ consignment_payment.id }}</a></td>
+            <td>{{ consignment_payment.consigner.full_name }}</td>
+            <td>{{ consignment_payment.consigner.user.email }}</td>
+            <td>${{ consignment_payment.amount|intcomma }}</td>
+            <td>{{ consignment_payment.paid_at|date:"m/d/Y" }}</td>
+            <td>{{ consignment_payment.method }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+
+{% endblock %}

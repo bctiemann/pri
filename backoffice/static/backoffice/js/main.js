@@ -821,7 +821,7 @@ $(document).ready(function() {
     $('#id_backup_date_picker').datepicker({});
     $('#donestamp').datepicker({});
     $('#nextstamp').datepicker({});
-    $('#stamp').datepicker({});
+    $('#id_paid_on_picker').datepicker({});
     $('#damageon').datepicker({});
     $('#repairedon').datepicker({});
 
