@@ -1,4 +1,5 @@
 {% extends "backoffice/gift_certificate/base.html" %}
+{% load humanize %}
 
 {% block content %}
 
@@ -19,18 +20,20 @@
         <cfif giftcertid GT 0>
         <tr>
             <td>Created</td>
-            <td>#DateFormat(GiftCert.created, "MM/DD/YYYY")#</td>
+            <td>{{ giftcertificate.created_at|date:"m/d/Y" }}</td>
         </tr>
         <tr>
             <td>Tag</td>
             <td>
-                <a href="previewgiftcert.cfm?tag=#GiftCert.tag#" target="_blank">#GiftCert.tag#</a>
+                <a href="previewgiftcert.cfm?tag=#GiftCert.tag#" target="_blank">{{ giftcertificate.tag }}</a>
                 <cfinput type="hidden" name="tag" value="#GiftCert.tag#" />
             </td>
         </tr>
         <tr>
             <td>Is Paid/Issued</td>
             <td>
+                {{ form.is_paid }}
+                {% comment %}
                 <select name="ispaid">
                     <option value="0" <CFIF GiftCert.ispaid IS 0>selected</CFIF>>No</option>
                     <option value="1" <CFIF GiftCert.ispaid IS 1>selected</CFIF>>Yes</option>
@@ -38,82 +41,127 @@
                 <cfif GiftCert.ispaid IS 1>
                     <button class="btn" type="button" name="send_cert" onclick="sendGiftCertEmail(#GiftCert.giftcertid#)">Send Download Email</button>
                 </cfif>
+                {% endcomment %}
             </td>
         </tr>
         <tr>
             <td>Used</td>
             <td>
+                {{ form.is_used }}
+                {% comment %}
                 <select name="used">
                     <option value="0" <CFIF GiftCert.used IS 0>selected</CFIF>>No</option>
                     <option value="1" <CFIF GiftCert.used IS 1>selected</CFIF>>Yes</option>
                 </select>
-                <CFIF GiftCert.used IS 1>#DateFormat(GiftCert.usedon,"MM/DD/YYYY")#</CFIF>
+                {% endcomment %}
+                {% if giftcertificate.is_used %}
+                    {{ giftcertificate.used_on|date:"m/d/Y" }}
+                {% endif %}
+{#                <CFIF GiftCert.used IS 1>#DateFormat(GiftCert.usedon,"MM/DD/YYYY")#</CFIF>#}
             </td>
         </tr>
         <tr>
             <td>Issued On</td>
             <td>
+                {% if giftcertificate.issued_at %}
                 <CFIF len(GiftCert.issued) gt 0>
-                    #DateFormat(GiftCert.issued,"MM/DD/YYYY")#
-                <CFELSE>Not Paid/Issued
+                    {{ giftcertificate.issued_at|date:"m/d/Y" }}
+{#                    #DateFormat(GiftCert.issued,"MM/DD/YYYY")##}
+                {% else %}
+                <CFELSE>
+                    Not Paid/Issued
                 </CFIF>
+                {% endif %}
                 <cfinput type="hidden" name="issued" value="#GiftCert.issued#" />
             </td>
         </tr>
         <tr>
             <td>Expires On</td>
-            <td><CFIF len(GiftCert.issued) gt 0>#DateFormat(DateAdd("y",365,GiftCert.issued),"MM/DD/YYYY")#<CFELSE>Not Paid/Issued</CFIF></td>
+            <td>
+                {% if giftcertificate.issued_at %}
+                    {{ giftcertificate.expires_at|date:"m/d/Y" }}
+                {% else %}
+                    Not Paid/Issued
+                {% endif %}
+{#                <CFIF len(GiftCert.issued) gt 0>#DateFormat(DateAdd("y",365,GiftCert.issued),"MM/DD/YYYY")#<CFELSE>Not Paid/Issued</CFIF>#}
+            </td>
         </tr>
         </cfif>
 
         <tr>
             <td>Customer Name</td>
-            <td><cfinput name="ccname" value="#GiftCert.ccname#" required="yes" message="Invalid customer name." maxlength="40" /></td>
+            <td>
+                {{ form.cc_name }}
+                <cfinput name="ccname" value="#GiftCert.ccname#" required="yes" message="Invalid customer name." maxlength="40" />
+            </td>
         </tr>
         <tr>
             <td>Customer Email</td>
-            <td><cfinput name="email" value="#GiftCert.email#" required="yes" validate="email" message="Invalid email address." /></td>
+            <td>
+                {{ form.email }}
+                <cfinput name="email" value="#GiftCert.email#" required="yes" validate="email" message="Invalid email address." />
+            </td>
         </tr>
         <tr>
             <td>Contact Phone Number</td>
-            <td><cfinput name="phone" class="phone short" value="#GiftCert.phone#" maxlength="20" /></td>
+            <td>
+                {{ form.phone }}
+                <cfinput name="phone" class="phone short" value="#GiftCert.phone#" maxlength="20" />
+            </td>
         </tr>
         <tr>
             <td>Gift Certificate Value<br /><small>Decimal format. 100.00</small></td>
+            {% comment %}
             <cfset amount = 100.00>
             <cfif GiftCert.amount GT 0>
                 <cfset amount = GiftCert.amount>
             </cfif>
-            <td class="currency"><span class="currency-prefix">$</span><cfinput name="amount" class="short" value="#amount#" /></td>
+            {% endcomment %}
+            <td class="currency">
+                <span class="currency-prefix">$</span>{{ form.amount }}
+                <cfinput name="amount" class="short" value="#amount#" />
+            </td>
         </tr>
         <tr>
             <td>Beneficiary Name</td>
-            <td><cfinput name="usename" value="#GiftCert.usename#" required="yes" message="Invalid beneficiary name." maxlength="40" /></td>
+            <td>
+                {{ form.beneficiary_name }}
+                <cfinput name="usename" value="#GiftCert.usename#" required="yes" message="Invalid beneficiary name." maxlength="40" />
+            </td>
         </tr>
 
         <tr>
             <td class="align-top">
-                "This certificate entitles <b>#GiftCert.usename#</b> to"
+                "This certificate entitles <b>{{ giftcertificate.beneficiary_name }}</b> to"
             </td>
             <td>
-                Default: "<b>#NumberFormat(GiftCert.amount,"$,.__")#</b> toward
-                any vehicle rental from PRI's sports car or bike fleet, or any service including the PRI Performance Experience or Joy Ride."
+                Default: "<b>{{ giftcertificate.amount|intcomma }}</b> toward
+                any vehicle rental from PRI's sports car or bike fleet, or any service including the
+                PRI Performance Experience or Joy Ride."
 
-                <cftextarea name="valuemessage">#GiftCert.valuemessage#</cftextarea>
+                {{ form.value_message }}
+{#                <cftextarea name="valuemessage">#GiftCert.valuemessage#</cftextarea>#}
             </td>
         </tr>
 
         <tr>
             <td>Billing Address</td>
-            <td><cfinput name="ccaddr" value="#ccaddr_dec#" maxlength="150" message="Enter a billing address." /></td>
+            <td>
+                {{ form.cc_address }}
+                <cfinput name="ccaddr" value="#ccaddr_dec#" maxlength="150" message="Enter a billing address." />
+            </td>
         </tr>
         <tr>
             <td>Billing City</td>
-            <td><cfinput name="cccity" value="#GiftCert.cccity#" maxlength="150" message="Enter a city name." /></td>
+            <td>
+                {{ form.cc_city }}
+                <cfinput name="cccity" value="#GiftCert.cccity#" maxlength="150" message="Enter a city name." />
+            </td>
         </tr>
         <tr>
             <td>Billing State</td>
             <td>
+                {{ form.cc_state }}
                 <cfselect name="ccstate">
                     <option value="">(Select state)</option>
                     <cfloop array="#states#" index="state">
@@ -124,15 +172,23 @@
         </tr>
         <tr>
             <td>Billing Zip</td>
-            <td><cfinput name="cczip" value="#GiftCert.cczip#" maxlength="10" validate="zipcode" message="Enter a zip." class="short" /></td>
+            <td>
+                {{ form.cc_zip }}
+                <cfinput name="cczip" value="#GiftCert.cczip#" maxlength="10" validate="zipcode" message="Enter a zip." class="short" />
+            </td>
         </tr>
         <tr>
             <td>Credit Card Number</td>
-            <td><cfinput name="ccnum" class="cc-field" value="#formatCCNumber(ccnum_dec)#" maxlength="30" message="Enter a credit card number." validate="creditcard" /></td>
+            <td>
+                {{ form.cc_number }}
+                <cfinput name="ccnum" class="cc-field" value="#formatCCNumber(ccnum_dec)#" maxlength="30" message="Enter a credit card number." validate="creditcard" />
+            </td>
         </tr>
         <tr>
             <td>Credit Card Expiration</td>
             <td>
+                {{ form.cc_exp_mo }} / {{ form.cc_exp_yr }}
+                {% comment %}
                 <cfselect name="ccexpmo">
                     <option value="">(Select month)</option>
                     <option value="01" <cfif GiftCert.ccexpmo IS "01">selected</cfif>>January (01)</option>
@@ -164,23 +220,36 @@
                     </cfloop>
                     </cfoutput>
                 </cfselect>
+                {% endcomment %}
             </td>
         </tr>
         <tr>
             <td>Credit Card<br> Security Code (CVV)</td>
-            <td><cfinput name="cccvv" value="#GiftCert.cccvv#" maxlength="5" message="Enter a valid CVV number for your credit card." validate="numeric" class="short" /></td>
+            <td>
+                {{ form.cc_cvv }}
+                <cfinput name="cccvv" value="#GiftCert.cccvv#" maxlength="5" message="Enter a valid CVV number for your credit card." validate="numeric" class="short" />
+            </td>
         </tr>
         <tr>
             <td>Credit Card<br />Bank Telephone</td>
-            <td><cfinput name="cctel" class="phone short" value="#GiftCert.cctel#" maxlength="20" /></td>
+            <td>
+                {{ form.cc_phone }}
+                <cfinput name="cctel" class="phone short" value="#GiftCert.cctel#" maxlength="20" />
+            </td>
         </tr>
         <tr>
             <td>Special Message</td>
-            <td><cfinput name="message" value="#GiftCert.message#" maxlength="100" /></td>
+            <td>
+                {{ form.message }}
+                <cfinput name="message" value="#GiftCert.message#" maxlength="100" />
+            </td>
         </tr>
         <tr>
             <td class="align-top">Remarks<p class="subtext">Not Public</p></td>
-            <td><cftextarea name="remarks">#remarks_dec#</cftextarea></td>
+            <td>
+                {{ form.remarks }}
+{#                <cftextarea name="remarks">#remarks_dec#</cftextarea>#}
+            </td>
         </tr>
 
         <tr>

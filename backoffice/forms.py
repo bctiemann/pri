@@ -497,8 +497,17 @@ class NewsItemForm(forms.ModelForm):
 
 
 class GiftCertificateForm(forms.ModelForm):
+    is_paid = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
+    is_used = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
+    cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices(since_founding=True, allow_null=False))
+    cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(allow_null=False))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['cc_number'].widget.attrs['class'] = 'cc-field'
 
     class Meta:
         model = GiftCertificate
-        fields = '__all__'
-        # exclude = ('confirmation_code',)
+        # fields = '__all__'
+        exclude = ('tag',)

@@ -741,6 +741,7 @@ class Command(BaseCommand):
                     cc_number=self.decrypt(old['ccnum']),
                     cc_exp_yr=old['ccexpyr'],
                     cc_exp_mo=old['ccexpmo'],
+                    cc_cvv=old['cccvv'],
                     cc_phone=old['cctel'],
                     email=old['email'],
                     phone=old['phone'],

@@ -354,11 +354,11 @@ class GiftCertificate(models.Model):
     cc_state = USStateField(null=True, blank=True)
     cc_zip = USZipCodeField(null=True, blank=True)
 
-    cc_number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC1 number')
-    cc_exp_yr = models.CharField(max_length=4, blank=True, verbose_name='CC1 exp year')
-    cc_exp_mo = models.CharField(max_length=2, blank=True, verbose_name='CC1 exp month')
-    cc_cvv = models.CharField(max_length=6, blank=True, verbose_name='CC1 CVV')
-    cc_phone = PhoneNumberField(blank=True, verbose_name='CC1 contact phone')
+    cc_number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC number')
+    cc_exp_yr = models.CharField(max_length=4, blank=True, verbose_name='CC exp year')
+    cc_exp_mo = models.CharField(max_length=2, blank=True, verbose_name='CC exp month')
+    cc_cvv = models.CharField(max_length=6, blank=True, verbose_name='CC CVV')
+    cc_phone = PhoneNumberField(blank=True, verbose_name='CC contact phone')
 
     email = models.EmailField(null=True, blank=True)
     phone = PhoneNumberField(blank=True)
