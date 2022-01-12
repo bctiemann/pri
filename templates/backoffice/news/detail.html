@@ -9,7 +9,7 @@
     {% endif %}
 
     {{ form.errors }}
-    {% if tolltag %}
+    {% if newsitem %}
         <form method="POST" action="{% url "backoffice:news-detail" pk=newsitem.id %}">
     {% else %}
         <form method="POST" action="{% url "backoffice:news-create" %}">

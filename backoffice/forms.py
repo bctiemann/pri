@@ -492,8 +492,8 @@ class NewsItemForm(forms.ModelForm):
 
     class Meta:
         model = NewsItem
-        fields = '__all__'
-        # exclude = ('confirmation_code',)
+        # fields = '__all__'
+        exclude = ('slug',)
 
 
 class GiftCertificateForm(forms.ModelForm):
