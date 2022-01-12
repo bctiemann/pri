@@ -10,7 +10,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from . import ListViewMixin
 from fleet.models import VehicleMarketing
 from sales.models import Reservation, Rental
-from sales.utils import RentalPriceCalculator
+from sales.calculators import RentalPriceCalculator
 from backoffice.forms import ReservationForm
 
 

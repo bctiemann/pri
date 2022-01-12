@@ -13,7 +13,7 @@ from django.utils.translation import gettext_lazy as _, ngettext_lazy
 from fleet.models import Vehicle, VehicleMarketing, VehicleStatus
 from sales.models import Reservation, Coupon
 from users.models import Customer
-from sales.utils import RentalPriceCalculator
+from sales.calculators import RentalPriceCalculator
 from sales.enums import get_service_hours, TRUE_FALSE_CHOICES, get_exp_year_choices, get_exp_month_choices
 
 current_year = timezone.now().year

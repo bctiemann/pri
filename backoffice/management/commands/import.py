@@ -72,13 +72,13 @@ class Command(BaseCommand):
         # 'do_consignmentvehicles': True,
         # 'do_consignmentpayments': True,
         # 'do_admins': True,
-        'do_newsitems': True,
+        # 'do_newsitems': True,
         # 'do_bbsposts': True,
         # 'do_sitecontent': True,
         # 'do_newslettersubscriptions': True,
         # 'do_coupons': True,
         # 'do_guideddrives': True,
-        # 'do_giftcertificates': True,
+        'do_giftcertificates': True,
     }
 
     def add_arguments(self, parser):

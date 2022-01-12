@@ -21,7 +21,7 @@ from marketing.forms import NewsletterSubscribeForm
 from sales.models import BaseReservation, Reservation, Rental, TaxRate, generate_code
 from sales.enums import ReservationType
 from sales.tasks import send_email
-from sales.utils import PriceCalculator
+from sales.calculators import PriceCalculator
 from users.models import User, Customer, Employee, generate_password
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture
 from api.serializers import (

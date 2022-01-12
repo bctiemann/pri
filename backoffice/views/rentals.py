@@ -17,7 +17,7 @@ from . import ListViewMixin
 from fleet.models import VehicleMarketing, VehicleType
 from sales.models import Rental, Driver
 from users.models import Customer
-from sales.utils import RentalPriceCalculator
+from sales.calculators import RentalPriceCalculator
 from backoffice.forms import RentalForm, CloneCustomerForm
 
 logger = logging.getLogger(__name__)

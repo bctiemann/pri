@@ -12,6 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
 from users.enums import AdminIdleTimeCSSClass
+from sales.utils import format_cc_number
 
 
 def generate_password():
@@ -383,16 +384,9 @@ class Customer(models.Model):
     def primary_phone(self):
         return self.home_phone or self.mobile_phone or self.work_phone
 
-    def format_cc_number(self, cc_number):
-        if len(cc_number) == 16:
-            cc_number = cc_number[0:4] + ' ' + cc_number[4:8] + ' ' + cc_number[8:12] + ' ' + cc_number[12:16]
-        elif len(cc_number) == 15:
-            cc_number = cc_number[0:4] + ' ' + cc_number[4:10] + ' ' + cc_number[10:15]
-        return cc_number
-
     def save(self, *args, **kwargs):
-        self.cc_number = self.format_cc_number((self.cc_number))
-        self.cc2_number = self.format_cc_number((self.cc2_number))
+        self.cc_number = format_cc_number(self.cc_number)
+        self.cc2_number = format_cc_number(self.cc2_number)
         super().save(*args, **kwargs)
 
     def __str__(self):

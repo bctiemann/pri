@@ -16,6 +16,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import reverse
 
 from sales.enums import RESERVATION_TYPE_CODE_MAP, ReservationType, ServiceType
+from sales.utils import format_cc_number
 
 
 def generate_code(reservation_type):
@@ -166,7 +167,7 @@ class BaseReservation(models.Model):
 
     def get_price_data(self):
         # TODO: Refactor sales.models classes to avoid this nested import
-        from sales.utils import RentalPriceCalculator
+        from sales.calculators import RentalPriceCalculator
         price_calculator = RentalPriceCalculator(
             coupon_code=self.coupon_code,
             email=self.customer.email,
@@ -303,7 +304,7 @@ class JoyRide(GuidedDrive):
 
     def get_price_data(self):
         # TODO: Refactor sales.models classes to avoid this nested import
-        from sales.utils import JoyRidePriceCalculator
+        from sales.calculators import JoyRidePriceCalculator
         price_calculator = JoyRidePriceCalculator(
             coupon_code=self.coupon_code,
             email=self.customer.email,
@@ -325,7 +326,7 @@ class PerformanceExperience(GuidedDrive):
 
     def get_price_data(self):
         # TODO: Refactor sales.models classes to avoid this nested import
-        from sales.utils import PerformanceExperiencePriceCalculator
+        from sales.calculators import PerformanceExperiencePriceCalculator
         price_calculator = PerformanceExperiencePriceCalculator(
             coupon_code=self.coupon_code,
             email=self.customer.email,
@@ -369,6 +370,10 @@ class GiftCertificate(models.Model):
     is_paid = models.BooleanField(default=False)
     message = models.CharField(max_length=200, blank=True)
     value_message = models.CharField(max_length=255, blank=True)
+
+    def save(self, *args, **kwargs):
+        self.cc_number = format_cc_number(self.cc_number)
+        super().save(*args, **kwargs)
 
 
 class TaxRate(models.Model):

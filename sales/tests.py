@@ -6,7 +6,7 @@ from django.test import TestCase
 from fleet.models import VehicleMarketing
 from users.models import Customer, User
 from sales.models import TaxRate, Coupon, Promotion
-from sales.utils import RentalPriceCalculator
+from sales.calculators import RentalPriceCalculator
 
 
 class RentalPriceCalculatorTestCase(TestCase):
