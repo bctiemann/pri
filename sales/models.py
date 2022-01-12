@@ -7,6 +7,7 @@ from localflavor.us.models import USStateField, USZipCodeField
 from avalara import AvataxClient
 from requests import HTTPError
 from encrypted_fields import fields
+from phonenumber_field.modelfields import PhoneNumberField
 
 from django.conf import settings
 from django.db import models
@@ -342,7 +343,32 @@ class PerformanceExperience(GuidedDrive):
 
 
 class GiftCertificate(models.Model):
-    pass
+    tag = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    issued_at = models.DateTimeField(null=True, blank=True)
+    beneficiary_name = models.CharField(max_length=255, blank=True)
+
+    cc_name = models.CharField(max_length=255, null=True, blank=True)
+    cc_address = fields.EncryptedCharField(max_length=255, null=True, blank=True)
+    cc_city = models.CharField(max_length=255, blank=True)
+    cc_state = USStateField(null=True, blank=True)
+    cc_zip = USZipCodeField(null=True, blank=True)
+
+    cc_number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC1 number')
+    cc_exp_yr = models.CharField(max_length=4, blank=True, verbose_name='CC1 exp year')
+    cc_exp_mo = models.CharField(max_length=2, blank=True, verbose_name='CC1 exp month')
+    cc_cvv = models.CharField(max_length=6, blank=True, verbose_name='CC1 CVV')
+    cc_phone = PhoneNumberField(blank=True, verbose_name='CC1 contact phone')
+
+    email = models.EmailField(null=True, blank=True)
+    phone = PhoneNumberField(blank=True)
+    is_used = models.BooleanField(default=False)
+    used_on = models.DateField(null=True, blank=True)
+    remarks = fields.EncryptedTextField(blank=True)
+    amount = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    is_paid = models.BooleanField(default=False)
+    message = models.CharField(max_length=200, blank=True)
+    value_message = models.CharField(max_length=255, blank=True)
 
 
 class TaxRate(models.Model):

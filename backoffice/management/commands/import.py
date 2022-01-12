@@ -22,7 +22,8 @@ from fleet.models import (
 )
 from users.models import Customer, Employee, User, MusicGenre
 from sales.models import (
-    Promotion, Coupon, BaseReservation, Reservation, Rental, Driver, JoyRide, PerformanceExperience, generate_code
+    Promotion, Coupon, BaseReservation, Reservation, Rental, Driver, JoyRide, PerformanceExperience, GiftCertificate,
+    generate_code
 )
 from consignment.models import Consigner, ConsignmentPayment
 from sales.enums import ReservationType
@@ -69,7 +70,7 @@ class Command(BaseCommand):
         # 'do_drivers': True,
         # 'do_consigners': True,
         # 'do_consignmentvehicles': True,
-        'do_consignmentpayments': True,
+        # 'do_consignmentpayments': True,
         # 'do_admins': True,
         # 'do_newsitems': True,
         # 'do_bbsposts': True,
@@ -77,6 +78,7 @@ class Command(BaseCommand):
         # 'do_newslettersubscriptions': True,
         # 'do_coupons': True,
         # 'do_guideddrives': True,
+        'do_giftcertificates': True,
     }
 
     def add_arguments(self, parser):
@@ -718,4 +720,38 @@ class Command(BaseCommand):
                 )
                 if model == PerformanceExperience:
                     new.num_drivers = old['nodrv']
+                    new.save()
+
+        if 'do_giftcertificates' in self.enabled:
+            if clear_existing:
+                GiftCertificate.objects.all().delete()
+            back_cursor.execute("""SELECT * FROM GiftCerts""")
+            for old in back_cursor.fetchall():
+                print(old)
+                new = GiftCertificate.objects.create(
+                    id=old['giftcertid'],
+                    tag=old['tag'],
+                    issued_at=old['issued'],
+                    beneficiary_name=old['usename'],
+                    cc_name=old['ccname'],
+                    cc_address=self.decrypt(old['ccaddr']),
+                    cc_city=old['cccity'],
+                    cc_state=old['ccstate'],
+                    cc_zip=old['cczip'],
+                    cc_number=self.decrypt(old['ccnum']),
+                    cc_exp_yr=old['ccexpyr'],
+                    cc_exp_mo=old['ccexpmo'],
+                    cc_phone=old['cctel'],
+                    email=old['email'],
+                    phone=old['phone'],
+                    is_used=old['used'],
+                    used_on=old['usedon'],
+                    remarks=old['remarks'] or '',
+                    amount=old['amount'],
+                    is_paid=old['ispaid'],
+                    message=old['message'],
+                    value_message=old['valuemessage'] or '',
+                )
+                if old['created']:
+                    new.created_at = old['created']
                     new.save()

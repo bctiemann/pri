@@ -1,0 +1,214 @@
+{% extends "backoffice/gift_certificate/base.html" %}
+
+{% block content %}
+
+    {% if giftcertificate %}
+        <h2>Edit Gift Certificate</h2>
+    {% else %}
+        <h2>Add Gift Certificate</h2>
+    {% endif %}
+
+    {{ form.errors }}
+    {% if giftcertificate %}
+        <form method="POST" action="{% url "backoffice:giftcert-detail" pk=giftcertificate.id %}">
+    {% else %}
+        <form method="POST" action="{% url "backoffice:giftcert-create" %}">
+    {% endif %}
+
+    <table class="inputform giftcerts">
+        <cfif giftcertid GT 0>
+        <tr>
+            <td>Created</td>
+            <td>#DateFormat(GiftCert.created, "MM/DD/YYYY")#</td>
+        </tr>
+        <tr>
+            <td>Tag</td>
+            <td>
+                <a href="previewgiftcert.cfm?tag=#GiftCert.tag#" target="_blank">#GiftCert.tag#</a>
+                <cfinput type="hidden" name="tag" value="#GiftCert.tag#" />
+            </td>
+        </tr>
+        <tr>
+            <td>Is Paid/Issued</td>
+            <td>
+                <select name="ispaid">
+                    <option value="0" <CFIF GiftCert.ispaid IS 0>selected</CFIF>>No</option>
+                    <option value="1" <CFIF GiftCert.ispaid IS 1>selected</CFIF>>Yes</option>
+                </select>
+                <cfif GiftCert.ispaid IS 1>
+                    <button class="btn" type="button" name="send_cert" onclick="sendGiftCertEmail(#GiftCert.giftcertid#)">Send Download Email</button>
+                </cfif>
+            </td>
+        </tr>
+        <tr>
+            <td>Used</td>
+            <td>
+                <select name="used">
+                    <option value="0" <CFIF GiftCert.used IS 0>selected</CFIF>>No</option>
+                    <option value="1" <CFIF GiftCert.used IS 1>selected</CFIF>>Yes</option>
+                </select>
+                <CFIF GiftCert.used IS 1>#DateFormat(GiftCert.usedon,"MM/DD/YYYY")#</CFIF>
+            </td>
+        </tr>
+        <tr>
+            <td>Issued On</td>
+            <td>
+                <CFIF len(GiftCert.issued) gt 0>
+                    #DateFormat(GiftCert.issued,"MM/DD/YYYY")#
+                <CFELSE>Not Paid/Issued
+                </CFIF>
+                <cfinput type="hidden" name="issued" value="#GiftCert.issued#" />
+            </td>
+        </tr>
+        <tr>
+            <td>Expires On</td>
+            <td><CFIF len(GiftCert.issued) gt 0>#DateFormat(DateAdd("y",365,GiftCert.issued),"MM/DD/YYYY")#<CFELSE>Not Paid/Issued</CFIF></td>
+        </tr>
+        </cfif>
+
+        <tr>
+            <td>Customer Name</td>
+            <td><cfinput name="ccname" value="#GiftCert.ccname#" required="yes" message="Invalid customer name." maxlength="40" /></td>
+        </tr>
+        <tr>
+            <td>Customer Email</td>
+            <td><cfinput name="email" value="#GiftCert.email#" required="yes" validate="email" message="Invalid email address." /></td>
+        </tr>
+        <tr>
+            <td>Contact Phone Number</td>
+            <td><cfinput name="phone" class="phone short" value="#GiftCert.phone#" maxlength="20" /></td>
+        </tr>
+        <tr>
+            <td>Gift Certificate Value<br /><small>Decimal format. 100.00</small></td>
+            <cfset amount = 100.00>
+            <cfif GiftCert.amount GT 0>
+                <cfset amount = GiftCert.amount>
+            </cfif>
+            <td class="currency"><span class="currency-prefix">$</span><cfinput name="amount" class="short" value="#amount#" /></td>
+        </tr>
+        <tr>
+            <td>Beneficiary Name</td>
+            <td><cfinput name="usename" value="#GiftCert.usename#" required="yes" message="Invalid beneficiary name." maxlength="40" /></td>
+        </tr>
+
+        <tr>
+            <td class="align-top">
+                "This certificate entitles <b>#GiftCert.usename#</b> to"
+            </td>
+            <td>
+                Default: "<b>#NumberFormat(GiftCert.amount,"$,.__")#</b> toward
+                any vehicle rental from PRI's sports car or bike fleet, or any service including the PRI Performance Experience or Joy Ride."
+
+                <cftextarea name="valuemessage">#GiftCert.valuemessage#</cftextarea>
+            </td>
+        </tr>
+
+        <tr>
+            <td>Billing Address</td>
+            <td><cfinput name="ccaddr" value="#ccaddr_dec#" maxlength="150" message="Enter a billing address." /></td>
+        </tr>
+        <tr>
+            <td>Billing City</td>
+            <td><cfinput name="cccity" value="#GiftCert.cccity#" maxlength="150" message="Enter a city name." /></td>
+        </tr>
+        <tr>
+            <td>Billing State</td>
+            <td>
+                <cfselect name="ccstate">
+                    <option value="">(Select state)</option>
+                    <cfloop array="#states#" index="state">
+                        <option value="#state.abbr#" <CFIF GiftCert.ccstate IS state.abbr>selected</CFIF>>#state.name#</option>
+                    </cfloop>
+                </cfselect>
+            </td>
+        </tr>
+        <tr>
+            <td>Billing Zip</td>
+            <td><cfinput name="cczip" value="#GiftCert.cczip#" maxlength="10" validate="zipcode" message="Enter a zip." class="short" /></td>
+        </tr>
+        <tr>
+            <td>Credit Card Number</td>
+            <td><cfinput name="ccnum" class="cc-field" value="#formatCCNumber(ccnum_dec)#" maxlength="30" message="Enter a credit card number." validate="creditcard" /></td>
+        </tr>
+        <tr>
+            <td>Credit Card Expiration</td>
+            <td>
+                <cfselect name="ccexpmo">
+                    <option value="">(Select month)</option>
+                    <option value="01" <cfif GiftCert.ccexpmo IS "01">selected</cfif>>January (01)</option>
+                    <option value="02" <cfif GiftCert.ccexpmo IS "02">selected</cfif>>February (02)</option>
+                    <option value="03" <cfif GiftCert.ccexpmo IS "03">selected</cfif>>March (03)</option>
+                    <option value="04" <cfif GiftCert.ccexpmo IS "04">selected</cfif>>April (04)</option>
+                    <option value="05" <cfif GiftCert.ccexpmo IS "05">selected</cfif>>May (05)</option>
+                    <option value="06" <cfif GiftCert.ccexpmo IS "06">selected</cfif>>June (06)</option>
+                    <option value="07" <cfif GiftCert.ccexpmo IS "07">selected</cfif>>July (07)</option>
+                    <option value="08" <cfif GiftCert.ccexpmo IS "08">selected</cfif>>August (08)</option>
+                    <option value="09" <cfif GiftCert.ccexpmo IS "09">selected</cfif>>September (09)</option>
+                    <option value="10" <cfif GiftCert.ccexpmo IS "10">selected</cfif>>October (10)</option>
+                    <option value="11" <cfif GiftCert.ccexpmo IS "11">selected</cfif>>November (11)</option>
+                    <option value="12" <cfif GiftCert.ccexpmo IS "12">selected</cfif>>December (12)</option>
+                </cfselect> /
+
+                <cfset tyear = #Dateformat(Now(),"yyyy")#>
+                <cfset fyear = tyear+15>
+                <cfset ynow=#LSDateFormat(Now(),"yyyy")#>
+                <cfset ythen=(#ynow# + 11)>
+                <cfset mnow=#LSDateFormat(Now(),"mm")#>
+                <cfset dyear=ynow>
+                <cfselect name="ccexpyr">
+                    <option value="">(Select year)</option>
+                    <cfoutput>
+                    <cfloop index="year" from="#ynow#" to="#ythen#">
+                        <option value="#dyear#" <cfif GiftCert.ccexpyr IS dyear>selected</cfif>>#dyear#</option>>
+                        <cfset dyear = dyear + 1>
+                    </cfloop>
+                    </cfoutput>
+                </cfselect>
+            </td>
+        </tr>
+        <tr>
+            <td>Credit Card<br> Security Code (CVV)</td>
+            <td><cfinput name="cccvv" value="#GiftCert.cccvv#" maxlength="5" message="Enter a valid CVV number for your credit card." validate="numeric" class="short" /></td>
+        </tr>
+        <tr>
+            <td>Credit Card<br />Bank Telephone</td>
+            <td><cfinput name="cctel" class="phone short" value="#GiftCert.cctel#" maxlength="20" /></td>
+        </tr>
+        <tr>
+            <td>Special Message</td>
+            <td><cfinput name="message" value="#GiftCert.message#" maxlength="100" /></td>
+        </tr>
+        <tr>
+            <td class="align-top">Remarks<p class="subtext">Not Public</p></td>
+            <td><cftextarea name="remarks">#remarks_dec#</cftextarea></td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>
+                <button class="btn" type="submit" name="edit">
+                    {% if giftcertificate %}
+                        Edit
+                    {% else %}
+                        Add
+                    {% endif %}
+                </button>
+                {% if giftcertificate %}
+                <cfif tolltagid>
+                    <button
+                        class="btn delete"
+                        type="submit"
+                        name="delete"
+                        onclick="return confirmDelete(this.form, '{% url "backoffice:giftcert-delete" pk=giftcertificate.id %}', 'gift cert')"
+                    >
+                        Delete Gift Cert
+                    </button>
+                </cfif>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+    {% csrf_token %}
+    </form>
+
+{% endblock %}

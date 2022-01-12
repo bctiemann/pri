@@ -7,7 +7,7 @@ from fleet import views as fleet_views
 from backoffice import views
 from backoffice.views import (
     vehicles, reservations, rentals, guided_drives, employees, customers, coupons, toll_tags, tax_rates, bbs,
-    consigners, consignment_payments, news,
+    consigners, consignment_payments, news, gift_certificates,
 )
 
 
@@ -88,6 +88,11 @@ urlpatterns = [
     path('performance_experiences/create/', guided_drives.PerformanceExperienceCreateView.as_view(is_create_view=True), name='perfexp-create'),
     path('performance_experiences/<int:pk>/', guided_drives.PerformanceExperienceDetailView.as_view(), name='perfexp-detail'),
     path('performance_experiences/<int:pk>/delete/', guided_drives.PerformanceExperienceDeleteView.as_view(), name='perfexp-delete'),
+
+    path('gift_certificates/', gift_certificates.GiftCertificateListView.as_view(), name='giftcert-list'),
+    path('gift_certificates/create/', gift_certificates.GiftCertificateCreateView.as_view(is_create_view=True), name='giftcert-create'),
+    path('gift_certificates/<int:pk>/', gift_certificates.GiftCertificateDetailView.as_view(), name='giftcert-detail'),
+    path('gift_certificates/<int:pk>/delete/', gift_certificates.GiftCertificateDeleteView.as_view(), name='giftcert-delete'),
 
     path('bbs/', bbs.BBSListView.as_view(), name='bbs-list'),
     path('bbs/<int:pk>/reply/', bbs.BBSReplyPostView.as_view(), name='bbs-reply'),

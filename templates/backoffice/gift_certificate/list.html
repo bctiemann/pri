@@ -1,0 +1,111 @@
+{% extends "backoffice/gift_certificate/base.html" %}
+{% load humanize %}
+
+{% block content %}
+
+    {% comment %}
+    <cfif IsDefined("URL.deleted")>
+        <p>Vehicle deleted successfully.</p>
+    </cfif>
+
+    <cfset sortCols = "vehicleid,make,model,year,status">
+
+    <cfif NOT IsDefined("URL.sortby") OR NOT ListContains(sortCols, URL.sortby)>
+        <cfset URL.sortby = "vehicleid">
+    </cfif>
+    <cfif NOT IsDefined("URL.sortdir") OR NOT ListContains("ASC,DESC", URL.sortdir)>
+        <cfset URL.sortdir = "ASC">
+    </cfif>
+    <cfif NOT IsDefined("URL.page") OR NOT IsNumeric(URL.page) OR URL.page LT 1>
+        <cfset URL.page = 1>
+    </cfif>
+
+    <CFQUERY NAME="allRecords" DATASOURCE="#DSN#">
+        SELECT vehicleid FROM Vehicles
+        WHERE 1
+        <cfif IsDefined("Form.query")>
+            AND (
+                make LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR"> OR
+                model LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR"> OR
+                year LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR">
+            )
+        </cfif>
+        <cfif IsDefined("URL.type") AND IsValid("integer",URL.type)>
+            AND type = <CFQUERYPARAM value="#URL.type#" CFSQLType="CF_SQL_INTEGER">
+        </cfif>
+        <cfif NOT (IsDefined("URL.showall") AND URL.showall IS 1)>
+            AND status != 3
+        </cfif>
+    </CFQUERY>
+
+    <cfset pageViewLink = getPageViewLink(allRecords.recordCount)>
+    <CFSET Pages = pagesLink(#allRecords.recordCount#,#rowsperpage#,int(#URL.page#),#CGI.SCRIPT_NAME#,#URL#)>
+
+    <CFQUERY NAME="Vehicles" DATASOURCE="#DSN#" result="result">
+        SELECT Vehicles.vehicleid,make,model,year,type,plate,vin,mileage,damage,Vehicles.notes,policyno,policyco,policytel,
+        status,weighting,tagnumber FROM Vehicles
+        LEFT JOIN TollTags ON TollTags.vehicleid=Vehicles.vehicleid
+        WHERE 1
+        <cfif IsDefined("Form.query")>
+            AND (
+                make LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR"> OR
+                model LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR"> OR
+                year LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR">
+            )
+        </cfif>
+        <cfif IsDefined("URL.type") AND IsValid("integer",URL.type)>
+            AND type = <CFQUERYPARAM value="#URL.type#" CFSQLType="CF_SQL_INTEGER">
+        </cfif>
+        <cfif NOT (IsDefined("URL.showall") AND URL.showall IS 1)>
+            AND status != 3
+        </cfif>
+        ORDER BY #URL.sortby# #URL.sortdir#
+        LIMIT #Pages.offset#,#Pages.thispage#
+    </CFQUERY>
+
+    <CFOUTPUT>
+    <div class="pager">
+    #pageViewLink#
+    #Pages.pages#
+    </div>
+    </CFOUTPUT>
+    {% endcomment %}
+
+    {% include "backoffice/includes/paginator.html" %}
+
+    {% include "backoffice/includes/search_form.html" %}
+
+    <table class="data alternating" sortedby="{{ sortby }}">
+    <tr>
+        <cfoutput>
+        <th col="id" default-sort="desc">ID</th>
+        <th col="created_at" default-sort="desc">Created</th>
+        <th col="issued_at" default-sort="desc">Issued</th>
+        <th>Tag</th>
+        <th col="cc_name">Billing Name</th>
+        <th col="beneficiary_name">Beneficiary</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Amount</th>
+        <th>Is Paid</th>
+        <th>Used</th>
+        </cfoutput>
+    </tr>
+    {% for gift_certificate in giftcertificate_list %}
+        <tr class="clickable click-to-edit" destination="{% url "backoffice:giftcert-detail" pk=gift_certificate.id %}">
+            <td><a href="{% url "backoffice:giftcert-detail" pk=gift_certificate.id %}">{{ gift_certificate.id }}</a></td>
+            <td>{{ gift_certificate.created_at|date:"m/d/Y" }}</td>
+            <td>{{ gift_certificate.issued_at|date:"m/d/Y" }}</td>
+            <td>{{ gift_certificate.tag }}</td>
+            <td>{{ gift_certificate.cc_name }}</td>
+            <td>{{ gift_certificate.beneficiary_name }}</td>
+            <td><a href="mailto:{{ gift_certificate.email }}">{{ gift_certificate.email }}</a></td>
+            <td>{{ gift_certificate.phone.as_national }}</td>
+            <td>${{ gift_certificate.amount|intcomma }}</td>
+            <td>{% if gift_certificate.is_paid %}<CFIF ispaid IS 1>&#10003;</CFIF>{% endif %}</td>
+            <td>{% if gift_certificate.is_used %}<CFIF used IS 1>&#10003;</CFIF>{% endif %}</td>
+        </tr>
+    {% endfor %}
+    </table>
+
+{% endblock %}

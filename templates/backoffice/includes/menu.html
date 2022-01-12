@@ -116,11 +116,13 @@
 	<a class="tnav <CFIF scrpt IS "damage.cfm">selected</CFIF>" href="damage.cfm">Damage</a>
 	</li>
 </CFIF>
+{% if user.employee.admin_access %}
 <CFIF YourID.acclev IS 1>
 	<li>
-	<a class="tnav <CFIF scrpt IS "gift.cfm">selected</CFIF>" href="gift.cfm">Gift Certificates</a>
+	<a class="tnav {% if page_group == 'gift_certificates' %}selected{% endif %}" href="{% url "backoffice:giftcert-list" %}">Gift Certificates</a>
 	</li>
 </CFIF>
+{% endif %}
 {% if user.employee.admin_access %}
 <CFIF YourID.acclev IS 1>
 	<li>
