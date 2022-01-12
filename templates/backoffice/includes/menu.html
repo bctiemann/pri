@@ -253,11 +253,13 @@
         <a class="tnav <CFIF scrpt IS "massemail.cfm" OR scrpt IS "emailimg.cfm">selected</CFIF>" href="massemail.cfm">Mass Email</a>
     </li>
     </CFIF>
+    {% if user.employee.marketing_access %}
     <CFIF YourID.acclev IS 1 OR YourID.acclev IS 4>
     <li>
-        <a class="tnav <CFIF scrpt IS "news.cfm">selected</CFIF>" href="news.cfm">News</a>
+        <a class="tnav {% if page_group == 'news' %}selected{% endif %}" href="{% url "backoffice:news-list" %}">News</a>
     </li>
     </CFIF>
+    {% endif %}
     <CFIF YourID.acclev IS 1 OR YourID.acclev IS 4>
     <li>
         <a class="tnav <CFIF scrpt IS "content.cfm">selected</CFIF>" href="content.cfm">Content</a>

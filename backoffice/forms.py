@@ -14,6 +14,7 @@ from sales.enums import (
     TRUE_FALSE_CHOICES, DELIVERY_REQUIRED_CHOICES, birth_years, operational_years, get_service_hours,
     current_year, get_exp_year_choices, get_exp_month_choices, get_vehicle_choices, get_extra_miles_choices
 )
+from marketing.models import NewsItem
 
 
 class CSSClassMixin:
@@ -455,5 +456,13 @@ class ConsignerForm(forms.ModelForm):
 
     class Meta:
         model = Consigner
+        fields = '__all__'
+        # exclude = ('confirmation_code',)
+
+
+class NewsItemForm(forms.ModelForm):
+
+    class Meta:
+        model = NewsItem
         fields = '__all__'
         # exclude = ('confirmation_code',)

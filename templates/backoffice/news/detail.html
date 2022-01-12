@@ -1,0 +1,62 @@
+{% extends "backoffice/news/base.html" %}
+
+{% block content %}
+
+    {% if newsitem %}
+        <h2>Edit News</h2>
+    {% else %}
+        <h2>Add News</h2>
+    {% endif %}
+
+    {{ form.errors }}
+    {% if tolltag %}
+        <form method="POST" action="{% url "backoffice:news-detail" pk=newsitem.id %}">
+    {% else %}
+        <form method="POST" action="{% url "backoffice:news-create" %}">
+    {% endif %}
+
+    <table class="inputform news">
+        <tr>
+            <td>Subject</td>
+            <td>
+                {{ form.subject }}
+                <cfinput name="subject" value="#News.subject#" required="yes" message="Enter a subject." maxlength="255" />
+            </td>
+        </tr>
+        <tr>
+            <td class="align-top">News</td>
+            <td>
+                {{ form.body }}
+{#                <cftextarea name="thenews">#News.thenews#</cftextarea>#}
+            </td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>
+                <button class="btn" type="submit" name="edit">
+                    {% if newsitem %}
+                        Edit
+                    {% else %}
+                        Add
+                    {% endif %}
+                </button>
+                {% if newsitem %}
+                <cfif tolltagid>
+                    <button
+                        class="btn delete"
+                        type="submit"
+                        name="delete"
+                        onclick="return confirmDelete(this.form, '{% url "backoffice:news-delete" pk=newsitem.id %}', 'news item')"
+                    >
+                        Delete News Item
+                    </button>
+                </cfif>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+    {% csrf_token %}
+    </form>
+
+{% endblock %}
