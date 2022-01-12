@@ -57,11 +57,12 @@ class PerformanceExperienceListView(PerformanceExperienceViewMixin, GuidedEventL
 
 class GuidedDriveDetailView(GuidedDriveContextMixin, ListViewMixin, UpdateView):
 
-    # def form_valid(self, form):
-    #     # tax_rate = form.save(commit=False)
-    #     # tax_rate.total_rate = form.cleaned_data['total_rate_as_percent'] / 100
-    #     # tax_rate.save()
-    #     return HttpResponseRedirect(self.get_success_url())
+    def form_valid(self, form):
+        event = form.save(commit=False)
+        if not event.confirmation_code:
+            event.confirmation_code = event.get_confirmation_code()
+        event.save()
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)

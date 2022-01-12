@@ -14,7 +14,7 @@ from django.utils.timezone import now
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import reverse
 
-from sales.enums import RESERVATION_TYPE_CODE_MAP, ServiceType
+from sales.enums import RESERVATION_TYPE_CODE_MAP, ReservationType, ServiceType
 
 
 def generate_code(reservation_type):
@@ -314,6 +314,9 @@ class JoyRide(GuidedDrive):
         )
         return price_calculator.get_price_data()
 
+    def get_confirmation_code(self):
+        return generate_code(ReservationType.JOY_RIDE.value)
+
 
 
 class PerformanceExperience(GuidedDrive):
@@ -333,6 +336,9 @@ class PerformanceExperience(GuidedDrive):
             override_subtotal=self.override_subtotal,
         )
         return price_calculator.get_price_data()
+
+    def get_confirmation_code(self):
+        return generate_code(ReservationType.PERFORMANCE_EXPERIENCE.value)
 
 
 class GiftCertificate(models.Model):
