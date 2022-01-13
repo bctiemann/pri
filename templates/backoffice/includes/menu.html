@@ -273,11 +273,13 @@
     </li>
     </CFIF>
     {% endif %}
+    {% if user.employee.marketing_access %}
     <CFIF YourID.acclev IS 1 OR YourID.acclev IS 4>
     <li>
-        <a class="tnav <CFIF scrpt IS "newsletter.cfm">selected</CFIF>" href="newsletter.cfm">Newsletter Subscriptions</a>
+        <a class="tnav {% if page_group == 'newsletter_subscriptions' %}selected{% endif %}" href="{% url "backoffice:subscription-list" %}">Newsletter Subscriptions</a>
     </li>
     </CFIF>
+    {% endif %}
     <li>
         <a class="tnav {% if page_group == 'taxrates' %}selected{% endif %}" href="{% url "backoffice:taxrate-list" %}">Sales Tax</a>
     </li>
