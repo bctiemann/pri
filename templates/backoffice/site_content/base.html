@@ -1,0 +1,12 @@
+{% extends "backoffice/base.html" %}
+
+{% block nav %}
+    <h1 class="pageheader">
+        Front Site Content
+        <ul class="nav_subpage">
+            <a href="{% url "backoffice:sitecontent-list" %}">
+                <li {% if is_unfiltered_list_view %}class="selected"{% endif %}>List</li>
+            </a>
+        </ul>
+    </h1>
+{% endblock %}

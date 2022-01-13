@@ -796,6 +796,10 @@ table.drivers td:first-child {
 	width: auto;
 }
 
+#id_content {
+	width: 600px;
+	height: 400px;
+}
 
 p {
  margin: 0.5em;

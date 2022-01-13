@@ -14,7 +14,7 @@ from sales.enums import (
     TRUE_FALSE_CHOICES, DELIVERY_REQUIRED_CHOICES, birth_years, operational_years, get_service_hours,
     current_year, get_exp_year_choices, get_exp_month_choices, get_vehicle_choices, get_extra_miles_choices
 )
-from marketing.models import NewsItem
+from marketing.models import NewsItem, SiteContent
 
 
 class CSSClassMixin:
@@ -494,6 +494,14 @@ class NewsItemForm(forms.ModelForm):
         model = NewsItem
         # fields = '__all__'
         exclude = ('slug',)
+
+
+class SiteContentForm(forms.ModelForm):
+
+    class Meta:
+        model = SiteContent
+        # fields = '__all__'
+        exclude = ('page', 'name',)
 
 
 class GiftCertificateForm(forms.ModelForm):

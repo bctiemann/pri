@@ -74,11 +74,11 @@ class Command(BaseCommand):
         # 'do_admins': True,
         # 'do_newsitems': True,
         # 'do_bbsposts': True,
-        # 'do_sitecontent': True,
+        'do_sitecontent': True,
         # 'do_newslettersubscriptions': True,
         # 'do_coupons': True,
         # 'do_guideddrives': True,
-        'do_giftcertificates': True,
+        # 'do_giftcertificates': True,
     }
 
     def add_arguments(self, parser):
@@ -615,18 +615,19 @@ class Command(BaseCommand):
             if clear_existing:
                 SiteContent.objects.all().delete()
             for page in (
-                ('about', 'about',),
-                ('policies', 'policies',),
-                ('contact', 'contact',),
-                ('servicescont', 'services',),
-                ('reservations', 'specials',),
+                ('about', 'about', 'About the Company',),
+                ('policies', 'policies', 'Policies',),
+                ('contact', 'contact', 'Contact',),
+                ('servicescont', 'services', 'Our Services',),
+                ('reservations', 'specials', 'Specials',),
             ):
-                db_key, page_key = page
+                db_key, page_key, page_name = page
                 back_cursor.execute(f"""SELECT {db_key} FROM vars""")
                 old_content = back_cursor.fetchone()
                 print(old_content)
                 new = SiteContent.objects.create(
                     page=page_key,
+                    name=page_name,
                     content=old_content[db_key],
                 )
 

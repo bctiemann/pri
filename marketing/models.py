@@ -5,7 +5,8 @@ from users.models import LowercaseEmailField
 
 
 class SiteContent(models.Model):
-    page = models.CharField(max_length=100)
+    page = models.CharField(max_length=100, primary_key=True)
+    name = models.CharField(max_length=100, blank=True)
     content = models.TextField(blank=True)
 
     def __str__(self):

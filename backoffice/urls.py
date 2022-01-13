@@ -7,7 +7,7 @@ from fleet import views as fleet_views
 from backoffice import views
 from backoffice.views import (
     vehicles, reservations, rentals, guided_drives, employees, customers, coupons, toll_tags, tax_rates, bbs,
-    consigners, consignment_payments, news, gift_certificates,
+    consigners, consignment_payments, news, site_content, gift_certificates,
 )
 
 
@@ -113,4 +113,7 @@ urlpatterns = [
     path('news/create/', news.NewsItemCreateView.as_view(is_create_view=True), name='news-create'),
     path('news/<int:pk>/', news.NewsItemDetailView.as_view(), name='news-detail'),
     path('news/<int:pk>/delete/', news.NewsItemDeleteView.as_view(), name='news-delete'),
+
+    path('site_content/', site_content.SiteContentListView.as_view(), name='sitecontent-list'),
+    path('site_content/<str:page>/', site_content.SiteContentDetailView.as_view(), name='sitecontent-detail'),
 ]

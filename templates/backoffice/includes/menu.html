@@ -264,11 +264,13 @@
     </li>
     </CFIF>
     {% endif %}
+    {% if user.employee.marketing_access %}
     <CFIF YourID.acclev IS 1 OR YourID.acclev IS 4>
     <li>
-        <a class="tnav <CFIF scrpt IS "content.cfm">selected</CFIF>" href="content.cfm">Content</a>
+        <a class="tnav {% if page_group == 'site_content' %}selected{% endif %}" href="{% url "backoffice:sitecontent-list" %}">Content</a>
     </li>
     </CFIF>
+    {% endif %}
     <CFIF YourID.acclev IS 1 OR YourID.acclev IS 4>
     <li>
         <a class="tnav <CFIF scrpt IS "newsletter.cfm">selected</CFIF>" href="newsletter.cfm">Newsletter Subscriptions</a>
