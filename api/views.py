@@ -2,12 +2,15 @@ import datetime
 import logging
 import pytz
 import requests
+import stripe
 
+from rest_framework import viewsets, mixins, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import APIException
 from rest_framework.permissions import BasePermission
 from rest_framework.authentication import SessionAuthentication
+from rest_framework.decorators import action
 
 from django.conf import settings
 from django.urls import reverse_lazy, reverse
@@ -15,6 +18,7 @@ from django.db import IntegrityError
 from django.db.models import Q
 from django.contrib.auth import authenticate, login
 from django.http import Http404, HttpResponseRedirect
+from django.forms.models import model_to_dict
 
 from sales.forms import ReservationRentalDetailsForm, ReservationRentalPaymentForm, ReservationRentalLoginForm
 from marketing.forms import NewsletterSubscribeForm
@@ -22,11 +26,12 @@ from sales.models import BaseReservation, Reservation, Rental, TaxRate, generate
 from sales.enums import ReservationType
 from sales.tasks import send_email
 from sales.calculators import PriceCalculator
+from sales.models import Card
 from users.models import User, Customer, Employee, generate_password
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture
 from api.serializers import (
     VehicleSerializer, VehicleDetailSerializer, CustomerSearchSerializer, ScheduleConflictSerializer,
-    TaxRateFetchSerializer
+    TaxRateFetchSerializer, CardSerializer
 )
 
 logger = logging.getLogger(__name__)
@@ -270,6 +275,67 @@ class LegacyVehiclePicView(APIView):
         except VehiclePicture.DoesNotExist:
             raise Http404
         return HttpResponseRedirect(vehicle_picture.image.url)
+
+
+# Stripe payment endpoints
+
+# This is all from Pikpac; needs to be reworked for customer-facing functionality during a reservation
+# (use the Stripe class in sales.stripe)
+class CardViewSet(viewsets.ModelViewSet):
+
+    serializer_class = CardSerializer
+
+    def get_queryset(self):
+        return Card.objects.filter(user=self.request.user)
+
+    @action(detail=False, methods=['get'])
+    def get_token(self, request):
+        logger.info(request.GET)
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+
+        token = stripe.Token.retrieve(request.GET['token'])
+
+        return Response(token, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['post'])
+    def add(self, request):
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        logger.info(request.data)
+
+        try:
+            stripe_card = stripe.Customer.create_source(
+                request.user.stripe_customer,
+                source=request.data['token']['id'],
+                # source='tok_chargeCustomerFail',
+            )
+        except (stripe.error.CardError, stripe.error.InvalidRequestError) as e:
+            body = e.json_body
+            err = body.get('error', {})
+
+            logger.info("Status is: %s" % e.http_status)
+            logger.info("Type is: %s" % err.get('type'))
+            logger.info("Code is: %s" % err.get('code'))
+            # param is '' in this case
+            logger.info("Param is: %s" % err.get('param'))
+            logger.info("Message is: %s" % err.get('message'))
+
+            return Response({'status': 'error', 'error': err})
+
+        card = Card.objects.create(
+            stripe_card=stripe_card.id,
+            user=request.user,
+            brand=stripe_card.brand,
+            last_4=stripe_card.last4,
+            exp_month=stripe_card.exp_month,
+            exp_year=stripe_card.exp_year,
+            fingerprint=stripe_card.fingerprint,
+        )
+        request.user.default_card = card
+        request.user.save()
+        serializer = self.get_serializer(data=model_to_dict(card))
+        serializer.is_valid(raise_exception=True)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 # Backoffice API endpoints (authenticated)

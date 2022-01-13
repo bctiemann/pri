@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.db.models import JSONField
 
 from sales.models import (
-    Reservation, Rental, Promotion, Coupon, TaxRate, JoyRide, PerformanceExperience, GiftCertificate, AdHocPayment
+    Reservation, Rental, Promotion, Coupon, TaxRate, JoyRide, PerformanceExperience, GiftCertificate, AdHocPayment, Card
 )
 
 
@@ -51,6 +51,11 @@ class AdHocPaymentAdmin(admin.ModelAdmin):
     list_display = ('id', 'full_name', 'email', 'amount',)
 
 
+class CardAdmin(admin.ModelAdmin):
+    list_display = ('id', 'customer', 'last_4', 'stripe_card',)
+    autocomplete_fields = ('customer',)
+
+
 admin.site.register(Reservation, ReservationAdmin)
 admin.site.register(Rental, RentalAdmin)
 admin.site.register(JoyRide, JoyRideAdmin)
@@ -60,3 +65,4 @@ admin.site.register(Coupon, CouponAdmin)
 admin.site.register(TaxRate, TaxRateAdmin)
 admin.site.register(GiftCertificate, GiftCertificateAdmin)
 admin.site.register(AdHocPayment, AdHocPaymentAdmin)
+admin.site.register(Card, CardAdmin)

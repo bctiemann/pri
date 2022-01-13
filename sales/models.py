@@ -3,6 +3,7 @@ import json
 import pytz
 import decimal
 import random
+import uuid
 from localflavor.us.models import USStateField, USZipCodeField
 from avalara import AvataxClient
 from requests import HTTPError
@@ -459,3 +460,19 @@ class AdHocPayment(models.Model):
 
 class Charge(models.Model):
     pass
+
+
+class Card(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    customer = models.ForeignKey('users.Customer', null=True, blank=True, on_delete=models.SET_NULL)
+    date_created = models.DateTimeField(auto_now_add=True)
+    stripe_card = models.CharField(null=True, blank=True, max_length=30)
+    fingerprint = models.CharField(null=True, blank=True, max_length=30)
+    brand = models.CharField(null=True, blank=True, max_length=30)
+    name = models.CharField(null=True, blank=True, max_length=30)
+    last_4 = models.CharField(null=True, blank=True, max_length=4)
+    exp_month = models.CharField(null=True, blank=True, max_length=2)
+    exp_year = models.CharField(null=True, blank=True, max_length=4)
+
+    def __str__(self):
+        return '{0} ({1})'.format(self.brand, self.last_4)

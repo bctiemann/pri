@@ -133,10 +133,7 @@ class ReservationRentalDetailsForm(forms.ModelForm):
             self.customer = Customer.objects.get(user__email=self.cleaned_data['email'])
         except (Customer.DoesNotExist, KeyError):
             pass
-        try:
-            self.vehicle = Vehicle.objects.get(pk=self.cleaned_data['vehicle_marketing'].vehicle_id)
-        except Vehicle.DoesNotExist:
-            raise forms.ValidationError(f"Vehicle {self.cleaned_data['vehicle_marketing']} mapped incorrectly.")
+        self.vehicle = Vehicle.objects.filter(vehicle_marketing_id=self.cleaned_data['vehicle_marketing'].id).first()
         return super().clean()
 
     @property

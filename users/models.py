@@ -13,6 +13,9 @@ from django.utils import timezone
 
 from users.enums import AdminIdleTimeCSSClass
 from sales.utils import format_cc_number
+from sales.stripe import Stripe
+
+stripe = Stripe()
 
 
 def generate_password():
@@ -351,6 +354,8 @@ class Customer(models.Model):
     registration_long = models.FloatField(null=True, blank=True, verbose_name='Registration longitude')
     registration_lat = models.FloatField(null=True, blank=True, verbose_name='Registration latitude')
 
+    stripe_customer = models.CharField(max_length=50, blank=True)
+
     @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
@@ -360,6 +365,10 @@ class Customer(models.Model):
         if self.user:
             return self.user.email
         return None
+
+    @property
+    def phone(self):
+        return self.home_phone or self.mobile_phone or self.work_phone
 
     @property
     def ip_country(self):
@@ -383,6 +392,11 @@ class Customer(models.Model):
     @property
     def primary_phone(self):
         return self.home_phone or self.mobile_phone or self.work_phone
+
+    def add_to_stripe(self):
+        stripe_customer = stripe.add_customer(self.full_name, self.email, self.phone)
+        self.stripe_customer = stripe_customer.id
+        self.save()
 
     def save(self, *args, **kwargs):
         self.cc_number = format_cc_number(self.cc_number)

@@ -5,7 +5,7 @@ from phonenumber_field.serializerfields import PhoneNumberField
 
 from fleet.models import Vehicle, VehicleMarketing
 from users.models import Customer
-from sales.models import BaseReservation
+from sales.models import BaseReservation, Card
 
 
 class NationalizedPhoneNumberField(PhoneNumberField):
@@ -104,3 +104,19 @@ class ScheduleConflictSerializer(serializers.ModelSerializer):
 class TaxRateFetchSerializer(serializers.Serializer):
     zip = serializers.CharField()
     force_refresh = serializers.BooleanField()
+
+
+class CardSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Card
+        fields = (
+            'id',
+            'stripe_card',
+            'brand',
+            'name',
+            'last_4',
+            'exp_month',
+            'exp_year',
+            'fingerprint',
+        )

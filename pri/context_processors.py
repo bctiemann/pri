@@ -13,6 +13,7 @@ def settings_constants(request):
         'extend_threshold_hours': settings.EXTEND_THRESHOLD_HOURS,
         'company_name': settings.COMPANY_NAME,
         'company_phone': settings.COMPANY_PHONE,
+        'stripe_publishable_key': settings.STRIPE_PUBLIC_KEY,
     }
     return context
 

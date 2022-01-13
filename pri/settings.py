@@ -162,6 +162,67 @@ AUTH_EXEMPT_ROUTES = (
     'login',
 )
 
+# This logging setup has the following attributes:
+# When DEBUG = True, debug information will be displayed on requested page.
+# It will also show any errors/warnings/info in the console output.
+# When DEBUG = False (on production), no debug information will be displayed
+# but any errors will be logged in /logs/django.log (project_dir)
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt' : "%d/%b/%Y %H:%M:%S"
+        },
+        'colored': {
+            '()': 'colorlog.ColoredFormatter',
+            'datefmt' : "%d/%b/%Y %H:%M:%S",
+            'format': "%(purple)s[%(asctime)s] %(cyan)s[%(name)s:%(lineno)s] %(log_color)s%(levelname)-4s%(reset)s %(white)s%(message)s"
+        }
+    },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+#            '()': 'django.utils.log.RequireDebugTrue'
+        }
+    },
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        },
+        'logfile': {
+            'level':'INFO',
+            'filters': [],
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename': str(BASE_DIR) + "/logs/django.log",
+            'maxBytes': 1024*1024*64,  # 64mb
+            'backupCount': 5,
+            'formatter': 'colored',
+        },
+    },
+    'loggers': {
+        # Might have to remove django.request to just '' to get the e-mail
+        # to admin on ERROR working
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        '': {
+            'handlers': ['logfile'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django.db.backends': {
+            'level': 'WARN',
+            'handlers': ['logfile'],
+        }
+    },
+}
+
 LOGIN_URL = 'two_factor:login'
 # LOGIN_URL = '/account/login/'
 LOGIN_REDIRECT_URL = '/account/two_factor/'
@@ -262,6 +323,10 @@ AVALARA_MACHINE_NAME = 'Backend server 001'
 AVALARA_ENVIRONMENT = None
 DEFAULT_TAX_ZIP = '07456'
 DEFAULT_TAX_RATE = '0.07'
+
+# Stripe
+STRIPE_PUBLIC_KEY = None
+STRIPE_SECRET_KEY = None
 
 # Google Maps embed API
 GOOGLE_MAPS_API_KEY = None
