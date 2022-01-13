@@ -628,6 +628,7 @@ table.inputform textarea {
 table.inputform input[type=text],
 table.inputform input[type=number],
 table.inputform input[type=email],
+table.inputform input[type=tel],
 table.inputform input[type=search],
 table.inputform input[type=password] {
         width: 240px;

@@ -7,7 +7,7 @@ from fleet import views as fleet_views
 from backoffice import views
 from backoffice.views import (
     vehicles, reservations, rentals, guided_drives, employees, customers, coupons, toll_tags, tax_rates, bbs,
-    consigners, consignment_payments, news, site_content, gift_certificates,
+    consigners, consignment_payments, news, site_content, gift_certificates, adhoc_payments,
 )
 
 
@@ -93,6 +93,11 @@ urlpatterns = [
     path('gift_certificates/create/', gift_certificates.GiftCertificateCreateView.as_view(is_create_view=True), name='giftcert-create'),
     path('gift_certificates/<int:pk>/', gift_certificates.GiftCertificateDetailView.as_view(), name='giftcert-detail'),
     path('gift_certificates/<int:pk>/delete/', gift_certificates.GiftCertificateDeleteView.as_view(), name='giftcert-delete'),
+
+    path('adhoc_payments/', adhoc_payments.AdHocPaymentListView.as_view(), name='adhocpayment-list'),
+    path('adhoc_payments/create/', adhoc_payments.AdHocPaymentCreateView.as_view(is_create_view=True), name='adhocpayment-create'),
+    path('adhoc_payments/<int:pk>/', adhoc_payments.AdHocPaymentDetailView.as_view(), name='adhocpayment-detail'),
+    path('adhoc_payments/<int:pk>/delete/', adhoc_payments.AdHocPaymentDeleteView.as_view(), name='adhocpayment-delete'),
 
     path('bbs/', bbs.BBSListView.as_view(), name='bbs-list'),
     path('bbs/<int:pk>/reply/', bbs.BBSReplyPostView.as_view(), name='bbs-reply'),

@@ -23,7 +23,7 @@ from fleet.models import (
 from users.models import Customer, Employee, User, MusicGenre
 from sales.models import (
     Promotion, Coupon, BaseReservation, Reservation, Rental, Driver, JoyRide, PerformanceExperience, GiftCertificate,
-    generate_code
+    AdHocPayment, generate_code
 )
 from consignment.models import Consigner, ConsignmentPayment
 from sales.enums import ReservationType
@@ -74,11 +74,12 @@ class Command(BaseCommand):
         # 'do_admins': True,
         # 'do_newsitems': True,
         # 'do_bbsposts': True,
-        'do_sitecontent': True,
+        # 'do_sitecontent': True,
         # 'do_newslettersubscriptions': True,
         # 'do_coupons': True,
         # 'do_guideddrives': True,
         # 'do_giftcertificates': True,
+        'do_adhocpayments': True,
     }
 
     def add_arguments(self, parser):
@@ -614,14 +615,14 @@ class Command(BaseCommand):
         if 'do_sitecontent' in self.enabled:
             if clear_existing:
                 SiteContent.objects.all().delete()
-            for page in (
-                ('about', 'about', 'About the Company',),
-                ('policies', 'policies', 'Policies',),
-                ('contact', 'contact', 'Contact',),
-                ('servicescont', 'services', 'Our Services',),
-                ('reservations', 'specials', 'Specials',),
-            ):
                 db_key, page_key, page_name = page
+            for page in (
+                    ('about', 'about', 'About the Company',),
+                    ('policies', 'policies', 'Policies',),
+                    ('contact', 'contact', 'Contact',),
+                    ('servicescont', 'services', 'Our Services',),
+                    ('reservations', 'specials', 'Specials',),
+            ):
                 back_cursor.execute(f"""SELECT {db_key} FROM vars""")
                 old_content = back_cursor.fetchone()
                 print(old_content)
@@ -756,4 +757,37 @@ class Command(BaseCommand):
                 )
                 if old['created']:
                     new.created_at = old['created']
+                    new.save()
+
+        if 'do_adhocpayments' in self.enabled:
+            if clear_existing:
+                AdHocPayment.objects.all().delete()
+            back_cursor.execute("""SELECT * FROM subp""")
+            for old in back_cursor.fetchall():
+                print(old)
+                new = AdHocPayment.objects.create(
+                    full_name=old['fullname'],
+                    email=old['email'],
+                    amount=old['amount'],
+                    is_paid=old['ispaid'],
+                    paid_at=old['paidon'] or timezone.now() if old['ispaid'] else None,
+                    item=old['item'],
+                    message=old['mesg'],
+                    comments=old['comments'] or '',
+                    cc_number=self.decrypt(old['ccnum']),
+                    cc_exp_yr=old['ccexpyr'],
+                    cc_exp_mo=old['ccexpmo'],
+                    cc_cvv=old['cccvv'],
+                    cc_address=self.decrypt(old['addr']),
+                    cc_city=old['city'],
+                    cc_state=old['state'],
+                    cc_zip=old['zip'],
+                    phone=old['tel'],
+                    foreign_region=old['ostate'] or '',
+                    country=old['country'],
+                    is_submitted=old['issub'],
+                    submitted_at=old['paidon'] or timezone.now() if old['issub'] else None,
+                )
+                if old['stamp']:
+                    new.created_at = old['stamp']
                     new.save()

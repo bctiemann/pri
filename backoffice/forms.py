@@ -9,7 +9,9 @@ from phonenumber_field.formfields import PhoneNumberField
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, TollTag
 from consignment.models import Consigner, ConsignmentPayment
 from users.models import User, Employee, Customer
-from sales.models import Reservation, Rental, GuidedDrive, JoyRide, PerformanceExperience, Coupon, TaxRate, GiftCertificate
+from sales.models import (
+    Reservation, Rental, GuidedDrive, JoyRide, PerformanceExperience, Coupon, TaxRate, GiftCertificate, AdHocPayment
+)
 from sales.enums import (
     TRUE_FALSE_CHOICES, DELIVERY_REQUIRED_CHOICES, birth_years, operational_years, get_service_hours,
     current_year, get_exp_year_choices, get_exp_month_choices, get_vehicle_choices, get_extra_miles_choices
@@ -359,6 +361,23 @@ class CouponForm(forms.ModelForm):
     class Meta:
         model = Coupon
         fields = '__all__'
+
+
+class AdHocPaymentForm(forms.ModelForm):
+    is_paid = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
+    is_submitted = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
+    cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices(since_founding=True, allow_null=False))
+    cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(allow_null=False))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['cc_number'].widget.attrs['class'] = 'cc-field'
+
+    class Meta:
+        model = AdHocPayment
+        # fields = '__all__'
+        exclude = ('submitted_at', 'is_submitted', 'paid_at', 'is_paid',)
 
 
 class TollTagForm(forms.ModelForm):

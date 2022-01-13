@@ -3,7 +3,9 @@ from prettyjson import PrettyJSONWidget
 from django.contrib import admin
 from django.db.models import JSONField
 
-from sales.models import Reservation, Rental, Promotion, Coupon, TaxRate, JoyRide, PerformanceExperience, GiftCertificate
+from sales.models import (
+    Reservation, Rental, Promotion, Coupon, TaxRate, JoyRide, PerformanceExperience, GiftCertificate, AdHocPayment
+)
 
 
 class ReservationAdmin(admin.ModelAdmin):
@@ -45,6 +47,10 @@ class GiftCertificateAdmin(admin.ModelAdmin):
     list_display = ('id', 'created_at', 'tag', 'cc_name', 'beneficiary_name', 'amount',)
 
 
+class AdHocPaymentAdmin(admin.ModelAdmin):
+    list_display = ('id', 'full_name', 'email', 'amount',)
+
+
 admin.site.register(Reservation, ReservationAdmin)
 admin.site.register(Rental, RentalAdmin)
 admin.site.register(JoyRide, JoyRideAdmin)
@@ -53,3 +59,4 @@ admin.site.register(Promotion, PromotionAdmin)
 admin.site.register(Coupon, CouponAdmin)
 admin.site.register(TaxRate, TaxRateAdmin)
 admin.site.register(GiftCertificate, GiftCertificateAdmin)
+admin.site.register(AdHocPayment, AdHocPaymentAdmin)

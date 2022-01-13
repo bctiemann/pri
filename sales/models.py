@@ -8,6 +8,8 @@ from avalara import AvataxClient
 from requests import HTTPError
 from encrypted_fields import fields
 from phonenumber_field.modelfields import PhoneNumberField
+from django_countries.fields import CountryField
+from django_countries import Countries
 
 from django.conf import settings
 from django.db import models
@@ -24,6 +26,9 @@ def generate_code(reservation_type):
     numeric_str = random.randrange(10, 100)
     return f'{RESERVATION_TYPE_CODE_MAP.get(reservation_type)}{alpha_str}{numeric_str}'
 
+
+class AllCountries(Countries):
+    only = []
 
 # class ServiceType(models.TextChoices):
 #     RENTAL = ('rental', 'Rental')
@@ -424,7 +429,32 @@ class Ban(models.Model):
 
 
 class AdHocPayment(models.Model):
-    pass
+    full_name = models.CharField(max_length=100, blank=True)
+    email = models.EmailField(blank=True)
+    amount = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    is_paid = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_submitted = models.BooleanField(default=False)
+    submitted_at = models.DateTimeField(null=True, blank=True)
+    paid_at = models.DateTimeField(null=True, blank=True)
+    item = models.CharField(max_length=255, blank=True)
+    message = models.TextField(blank=True)
+    comments = models.TextField(blank=True)
+    cc_number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC number')
+    cc_exp_yr = models.CharField(max_length=4, blank=True, verbose_name='CC exp year')
+    cc_exp_mo = models.CharField(max_length=2, blank=True, verbose_name='CC exp month')
+    cc_cvv = models.CharField(max_length=6, blank=True, verbose_name='CC CVV')
+    cc_address = fields.EncryptedCharField(max_length=255, null=True, blank=True)
+    cc_city = models.CharField(max_length=255, blank=True)
+    cc_state = USStateField(null=True, blank=True)
+    cc_zip = USZipCodeField(null=True, blank=True)
+    phone = PhoneNumberField(blank=True, verbose_name='CC contact phone')
+    foreign_region = models.CharField(max_length=100, blank=True)
+    country = CountryField(blank=True, countries=AllCountries)
+
+    def save(self, *args, **kwargs):
+        self.cc_number = format_cc_number(self.cc_number)
+        super().save(*args, **kwargs)
 
 
 class Charge(models.Model):
