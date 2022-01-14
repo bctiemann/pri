@@ -15,7 +15,7 @@ from django.core.files.temp import NamedTemporaryFile
 from django.core.files import File
 
 from backoffice.models import BBSPost
-from marketing.models import NewsItem, SiteContent, NewsletterSubscription
+from marketing.models import NewsItem, SiteContent, NewsletterSubscription, SurveyResponse
 from fleet.models import (
     Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, TransmissionType, Location, TollTag,
     get_vehicle_picture_path, get_vehicle_video_path
@@ -81,7 +81,8 @@ class Command(BaseCommand):
         # 'do_giftcertificates': True,
         # 'do_adhocpayments': True,
         # 'do_charges': True,
-        'do_redflags': True,
+        # 'do_redflags': True,
+        'do_surveyresponses': True,
     }
 
     def add_arguments(self, parser):
@@ -843,6 +844,30 @@ class Command(BaseCommand):
                     license_state=old['licensestate'],
                     ssn=old['ssn'],
                     remarks=old['remarks'],
+                )
+                new.created_at = old['stamp']
+                new.save()
+
+        if 'do_surveyresponses' in self.enabled:
+            if clear_existing:
+                SurveyResponse.objects.all().delete()
+            front_cursor.execute("""SELECT * FROM surveys""")
+            for old in front_cursor.fetchall():
+                print(old)
+                customer = Customer.objects.filter(pk=old['customerid']).first()
+                new = SurveyResponse.objects.create(
+                    customer=customer,
+                    ip=old['ip'],
+                    heard_about=old['hearabout'],
+                    general_rating=old['prirating'],
+                    rental_frequency=old['howmany'],
+                    vehicle_rating=old['vehiclerating'],
+                    would_recommend=old['recommend'],
+                    pricing=old['pricing'],
+                    email_frequency=old['email'],
+                    vehicle_types=old['types'],
+                    new_vehicles=old['newvehicles'],
+                    comments=old['comments'],
                 )
                 new.created_at = old['stamp']
                 new.save()
