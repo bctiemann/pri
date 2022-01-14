@@ -23,7 +23,7 @@ from fleet.models import (
 from users.models import Customer, Employee, User, MusicGenre
 from sales.models import (
     Promotion, Coupon, BaseReservation, Reservation, Rental, Driver, JoyRide, PerformanceExperience, GiftCertificate,
-    AdHocPayment, Charge, generate_code
+    AdHocPayment, Charge, RedFlag, generate_code
 )
 from consignment.models import Consigner, ConsignmentPayment
 from sales.enums import ReservationType
@@ -80,7 +80,8 @@ class Command(BaseCommand):
         # 'do_guideddrives': True,
         # 'do_giftcertificates': True,
         # 'do_adhocpayments': True,
-        'do_charges': True,
+        # 'do_charges': True,
+        'do_redflags': True,
     }
 
     def add_arguments(self, parser):
@@ -823,3 +824,25 @@ class Command(BaseCommand):
                 if old['stamp']:
                     new.created_at = old['stamp']
                     new.save()
+
+        if 'do_redflags' in self.enabled:
+            if clear_existing:
+                RedFlag.objects.all().delete()
+            back_cursor.execute("""SELECT * FROM tards""")
+            for old in back_cursor.fetchall():
+                print(old)
+                new = RedFlag.objects.create(
+                    full_name=old['name'],
+                    phone=old['tel'] or old['cel'],
+                    email=old['email'],
+                    address=old['address'],
+                    city=old['city'],
+                    state=old['state'],
+                    zip=old['zip'],
+                    license_number=old['licenseno'],
+                    license_state=old['licensestate'],
+                    ssn=old['ssn'],
+                    remarks=old['remarks'],
+                )
+                new.created_at = old['stamp']
+                new.save()

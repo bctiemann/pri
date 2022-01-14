@@ -1,3 +1,6 @@
+from encrypted_fields import fields
+from localflavor.us.models import USStateField, USZipCodeField, USSocialSecurityNumberField
+
 
 def format_cc_number(cc_number):
     if len(cc_number) == 16:
@@ -5,3 +8,7 @@ def format_cc_number(cc_number):
     elif len(cc_number) == 15:
         cc_number = cc_number[0:4] + ' ' + cc_number[4:10] + ' ' + cc_number[10:15]
     return cc_number
+
+
+class EncryptedUSSocialSecurityNumberField(fields.EncryptedFieldMixin, USSocialSecurityNumberField):
+    pass

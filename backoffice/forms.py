@@ -11,7 +11,7 @@ from consignment.models import Consigner, ConsignmentPayment
 from users.models import User, Employee, Customer
 from sales.models import (
     Reservation, Rental, GuidedDrive, JoyRide, PerformanceExperience, Coupon, TaxRate, GiftCertificate, AdHocPayment,
-    Charge, Card
+    Charge, Card, RedFlag
 )
 from sales.enums import (
     TRUE_FALSE_CHOICES, DELIVERY_REQUIRED_CHOICES, birth_years, operational_years, get_service_hours,
@@ -588,3 +588,10 @@ class CardForm(forms.ModelForm):
         fields = '__all__'
         # exclude = ('uuid',)
 
+
+class RedFlagForm(forms.ModelForm):
+
+    class Meta:
+        model = RedFlag
+        fields = '__all__'
+        # exclude = ('confirmation_code',)

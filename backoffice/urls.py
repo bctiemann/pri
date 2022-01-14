@@ -8,7 +8,7 @@ from backoffice import views
 from backoffice.views import (
     vehicles, reservations, rentals, guided_drives, employees, customers, coupons, toll_tags, tax_rates, bbs,
     consigners, consignment_payments, news, site_content, gift_certificates, adhoc_payments, newsletter_subscriptions,
-    stripe_charges,
+    stripe_charges, red_flags
 )
 
 
@@ -105,6 +105,11 @@ urlpatterns = [
     path('stripe_charges/create/', stripe_charges.StripeChargeCreateView.as_view(is_create_view=True), name='charge-create'),
     path('stripe_charges/<int:pk>/', stripe_charges.StripeChargeDetailView.as_view(), name='charge-detail'),
     path('stripe_charges/<int:pk>/delete/', stripe_charges.StripeChargeDeleteView.as_view(), name='charge-delete'),
+
+    path('red_flags/', red_flags.RedFlagListView.as_view(), name='redflag-list'),
+    path('red_flags/create/', red_flags.RedFlagCreateView.as_view(is_create_view=True), name='redflag-create'),
+    path('red_flags/<int:pk>/', red_flags.RedFlagDetailView.as_view(), name='redflag-detail'),
+    path('red_flags/<int:pk>/delete/', red_flags.RedFlagDeleteView.as_view(), name='redflag-delete'),
 
     path('bbs/', bbs.BBSListView.as_view(), name='bbs-list'),
     path('bbs/<int:pk>/reply/', bbs.BBSReplyPostView.as_view(), name='bbs-reply'),

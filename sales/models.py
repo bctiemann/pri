@@ -19,7 +19,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import reverse
 
 from sales.enums import RESERVATION_TYPE_CODE_MAP, ReservationType, ServiceType
-from sales.utils import format_cc_number
+from sales.utils import EncryptedUSSocialSecurityNumberField, format_cc_number
 
 
 def generate_code(reservation_type):
@@ -426,8 +426,20 @@ class TaxRate(models.Model):
             self.update()
 
 
-class Ban(models.Model):
-    pass
+class RedFlag(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    full_name = models.CharField(max_length=255, blank=True)
+    home_phone = PhoneNumberField(blank=True)
+    mobile_phone = PhoneNumberField(blank=True)
+    address = fields.EncryptedCharField(max_length=255, null=True, blank=True)
+    city = models.CharField(max_length=255, blank=True)
+    state = USStateField(blank=True)
+    zip = USZipCodeField(blank=True)
+    email = models.EmailField(blank=True)
+    license_number = models.CharField(max_length=30, blank=True)
+    license_state = USStateField(blank=True)
+    ssn = EncryptedUSSocialSecurityNumberField(null=True, blank=True)
+    remarks = models.TextField(blank=True)
 
 
 class AdHocPayment(models.Model):

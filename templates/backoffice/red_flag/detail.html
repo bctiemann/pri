@@ -1,0 +1,140 @@
+{% extends "backoffice/red_flag/base.html" %}
+
+{% block content %}
+
+    {% if redflag %}
+        <h2>Edit Tard</h2>
+    {% else %}
+        <h2>Add Tard</h2>
+    {% endif %}
+
+    {{ form.errors }}
+    {% if redflag %}
+        <form method="POST" action="{% url "backoffice:redflag-detail" pk=redflag.id %}">
+    {% else %}
+        <form method="POST" action="{% url "backoffice:redflag-create" %}">
+    {% endif %}
+
+    <table class="inputform redflags">
+        <tr>
+            <td>Name</td>
+            <td>
+                {{ form.full_name }}
+                <cfinput name="name" value="#Tard.name#" required="yes" message="Enter a name of some sort. If unknown, specify as such." maxlength="255" />
+            </td>
+        </tr>
+        <tr>
+            <td class="align-top">Remarks</td>
+            <td>
+                {{ form.remarks }}
+{#                <cftextarea name="remarks">#Tard.remarks#</cftextarea>#}
+            </td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td>
+                {{ form.email }}
+                <cfinput name="email" value="#Tard.email#" validate="email" maxlength="255" />
+            </td>
+        </tr>
+        <tr>
+            <td>Home Phone</td>
+            <td>
+                {{ form.home_phone }}
+                <cfinput name="tel" class="phone short" value="#Tard.tel#" maxlength="20" />
+            </td>
+        </tr>
+        <tr>
+            <td>Mobile Phone</td>
+            <td>
+                {{ form.mobile_phone }}
+                <cfinput name="cel" class="phone short" value="#Tard.cel#" maxlength="20" />
+            </td>
+        </tr>
+        <tr>
+            <td>Address</td>
+            <td>
+                {{ form.address }}
+                <cfinput name="addr" value="#Tard.addr#" />
+            </td>
+        </tr>
+        <tr>
+            <td>City</td>
+            <td>
+                {{ form.city }}
+                <cfinput name="city" value="#Tard.city#" maxlength="255" />
+            </td>
+        </tr>
+        <tr>
+            <td>State</td>
+            <td>
+                {{ form.state }}
+                <cfselect name="state">
+                    <cfloop array="#states#" index="state">
+                        <option value="#state.abbr#" <CFIF Tard.state IS state.abbr>selected</CFIF>>#state.name#</option>
+                    </cfloop>
+                </cfselect>
+            </td>
+        </tr>
+        <tr>
+            <td>Zip</td>
+            <td>
+                {{ form.zip }}
+                <cfinput name="zip" value="#Tard.zip#" maxlength="10" validate="zipcode" class="short" />
+            </td>
+        </tr>
+        <tr>
+            <td>SSN</td>
+            <td>
+                {{ form.ssn }}
+                <cfinput name="ssn" class="ssn short" value="#Tard.ssn#" maxlength="12" />
+            </td>
+        </tr>
+        <tr>
+            <td>License No.</td>
+            <td>
+                {{ form.license_number }}
+                <cfinput name="licenseno" value="#Tard.licenseno#" maxlength="30" />
+            </td>
+        </tr>
+        <tr>
+            <td>License State</td>
+            <td>
+                {{ form.license_state }}
+                <cfselect name="licensestate">
+                    <cfloop array="#states#" index="state">
+                        <option value="#state.abbr#" <CFIF Tard.licensestate IS state.abbr>selected</CFIF>>#state.name#</option>
+                    </cfloop>
+                </cfselect>
+            </td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>
+                <button class="btn" type="submit" name="edit">
+                    {% if redflag %}
+                        Edit
+                    {% else %}
+                        Add
+                    {% endif %}
+                </button>
+                {% if redflag %}
+                <cfif tolltagid>
+                    <button
+                        class="btn delete"
+                        type="submit"
+                        name="delete"
+                        onclick="return confirmDelete(this.form, '{% url "backoffice:redflag-delete" pk=redflag.id %}', 'tard')"
+                    >
+                        Delete Sales Tax
+                    </button>
+                </cfif>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+    {% csrf_token %}
+    </form>
+
+{% endblock %}

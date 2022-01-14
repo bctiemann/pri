@@ -165,11 +165,13 @@
 	<a class="tnav <CFIF scrpt IS "survey.cfm">selected</CFIF>" href="survey.cfm">Survey Results</a>
 	</li>
 </CFIF>
+{% if user.employee.admin_access %}
 <CFIF YourID.acclev IS 1>
 	<li>
-	<a class="tnav <CFIF scrpt IS "tards.cfm">selected</CFIF>" href="tards.cfm">Tards</a>
+	<a class="tnav {% if page_group == 'red_flags' %}selected{% endif %}" href="{% url "backoffice:redflag-list" %}">Tards</a>
 	</li>
 </CFIF>
+{% endif %}
 {% if user.employee.admin_access %}
 <CFIF YourID.acclev IS 1>
 	<li>

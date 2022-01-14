@@ -12,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
 from users.enums import AdminIdleTimeCSSClass
-from sales.utils import format_cc_number
+from sales.utils import EncryptedUSSocialSecurityNumberField, format_cc_number
 from sales.stripe import Stripe
 
 stripe = Stripe()
@@ -37,10 +37,6 @@ class LowercaseEmailField(models.EmailField):
         if isinstance(value, str):
             return value.lower()
         return value
-
-
-class EncryptedUSSocialSecurityNumberField(fields.EncryptedFieldMixin, USSocialSecurityNumberField):
-    pass
 
 
 class UserManager(BaseUserManager):
