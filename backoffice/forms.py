@@ -10,7 +10,8 @@ from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo
 from consignment.models import Consigner, ConsignmentPayment
 from users.models import User, Employee, Customer
 from sales.models import (
-    Reservation, Rental, GuidedDrive, JoyRide, PerformanceExperience, Coupon, TaxRate, GiftCertificate, AdHocPayment
+    Reservation, Rental, GuidedDrive, JoyRide, PerformanceExperience, Coupon, TaxRate, GiftCertificate, AdHocPayment,
+    Charge
 )
 from sales.enums import (
     TRUE_FALSE_CHOICES, DELIVERY_REQUIRED_CHOICES, birth_years, operational_years, get_service_hours,
@@ -538,3 +539,11 @@ class GiftCertificateForm(forms.ModelForm):
         model = GiftCertificate
         # fields = '__all__'
         exclude = ('tag',)
+
+
+class StripeChargeForm(forms.ModelForm):
+
+    class Meta:
+        model = Charge
+        # fields = '__all__'
+        exclude = ('uuid',)

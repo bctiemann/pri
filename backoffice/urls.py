@@ -8,6 +8,7 @@ from backoffice import views
 from backoffice.views import (
     vehicles, reservations, rentals, guided_drives, employees, customers, coupons, toll_tags, tax_rates, bbs,
     consigners, consignment_payments, news, site_content, gift_certificates, adhoc_payments, newsletter_subscriptions,
+    stripe_charges,
 )
 
 
@@ -98,6 +99,12 @@ urlpatterns = [
     path('adhoc_payments/create/', adhoc_payments.AdHocPaymentCreateView.as_view(is_create_view=True), name='adhocpayment-create'),
     path('adhoc_payments/<int:pk>/', adhoc_payments.AdHocPaymentDetailView.as_view(), name='adhocpayment-detail'),
     path('adhoc_payments/<int:pk>/delete/', adhoc_payments.AdHocPaymentDeleteView.as_view(), name='adhocpayment-delete'),
+
+    path('stripe_charges/', stripe_charges.StripeChargeListView.as_view(), name='charge-list'),
+    path('stripe_charges/charge/', stripe_charges.StripeChargeChargeView.as_view(), name='charge-charge'),
+    path('stripe_charges/create/', stripe_charges.StripeChargeCreateView.as_view(is_create_view=True), name='charge-create'),
+    path('stripe_charges/<int:pk>/', stripe_charges.StripeChargeDetailView.as_view(), name='charge-detail'),
+    path('stripe_charges/<int:pk>/delete/', stripe_charges.StripeChargeDeleteView.as_view(), name='charge-delete'),
 
     path('bbs/', bbs.BBSListView.as_view(), name='bbs-list'),
     path('bbs/<int:pk>/reply/', bbs.BBSReplyPostView.as_view(), name='bbs-reply'),

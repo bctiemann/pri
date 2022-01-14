@@ -23,7 +23,7 @@ from fleet.models import (
 from users.models import Customer, Employee, User, MusicGenre
 from sales.models import (
     Promotion, Coupon, BaseReservation, Reservation, Rental, Driver, JoyRide, PerformanceExperience, GiftCertificate,
-    AdHocPayment, generate_code
+    AdHocPayment, Charge, generate_code
 )
 from consignment.models import Consigner, ConsignmentPayment
 from sales.enums import ReservationType
@@ -79,7 +79,8 @@ class Command(BaseCommand):
         # 'do_coupons': True,
         # 'do_guideddrives': True,
         # 'do_giftcertificates': True,
-        'do_adhocpayments': True,
+        # 'do_adhocpayments': True,
+        'do_charges': True,
     }
 
     def add_arguments(self, parser):
@@ -787,6 +788,37 @@ class Command(BaseCommand):
                     country=old['country'],
                     is_submitted=old['issub'],
                     submitted_at=old['paidon'] or timezone.now() if old['issub'] else None,
+                )
+                if old['stamp']:
+                    new.created_at = old['stamp']
+                    new.save()
+
+        if 'do_charges' in self.enabled:
+            if clear_existing:
+                Charge.objects.all().delete()
+            back_cursor.execute("""SELECT * FROM Charges""")
+            for old in back_cursor.fetchall():
+                print(old)
+                new = Charge.objects.create(
+                    full_name=old['fullname'],
+                    email=old['email'],
+                    amount=old['amount'],
+                    capture=old['capture'],
+                    charged_at=old['chargedon'],
+                    notes=old['notes'],
+                    cc_number=self.decrypt(old['ccnum']),
+                    cc_exp_yr=old['ccexpyr'],
+                    cc_exp_mo=old['ccexpmo'],
+                    cc_cvv=old['cccvv'],
+                    cc_address=self.decrypt(old['addr']),
+                    cc_city=old['city'],
+                    cc_state=old['state'],
+                    cc_zip=old['zip'],
+                    phone=old['tel'],
+                    foreign_region=old['ostate'] or '',
+                    country=old['country'],
+                    processor_charge_id=old['processorchargeid'],
+                    error_code=old['errorcode'] or '',
                 )
                 if old['stamp']:
                     new.created_at = old['stamp']

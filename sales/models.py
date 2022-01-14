@@ -459,7 +459,27 @@ class AdHocPayment(models.Model):
 
 
 class Charge(models.Model):
-    pass
+    uuid = models.UUIDField(default=uuid.uuid4)
+    full_name = models.CharField(max_length=100, blank=True)
+    email = models.EmailField(blank=True)
+    amount = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    capture = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    charged_at = models.DateTimeField(null=True, blank=True)
+    notes = models.TextField(blank=True)
+    cc_number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC number')
+    cc_exp_yr = models.CharField(max_length=4, blank=True, verbose_name='CC exp year')
+    cc_exp_mo = models.CharField(max_length=2, blank=True, verbose_name='CC exp month')
+    cc_cvv = models.CharField(max_length=6, blank=True, verbose_name='CC CVV')
+    cc_address = fields.EncryptedCharField(max_length=255, null=True, blank=True)
+    cc_city = models.CharField(max_length=255, blank=True)
+    cc_state = USStateField(null=True, blank=True)
+    cc_zip = USZipCodeField(null=True, blank=True)
+    phone = PhoneNumberField(blank=True, verbose_name='CC contact phone')
+    foreign_region = models.CharField(max_length=100, blank=True)
+    country = CountryField(blank=True, countries=AllCountries)
+    processor_charge_id = models.CharField(max_length=50, blank=True)
+    error_code = models.CharField(max_length=30, blank=True)
 
 
 class Card(models.Model):

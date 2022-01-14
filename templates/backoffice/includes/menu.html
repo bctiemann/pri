@@ -144,16 +144,22 @@
 	</li>
 </CFIF>
 {% endif %}
+{% comment %}
+{% if user.employee.admin_access %}
 <CFIF YourID.acclev IS 1>
 	<li>
-	<a class="tnav <CFIF scrpt IS "stripepay.cfm">selected</CFIF>" href="stripepay.cfm">Charge Card via Stripe</a>
+	<a class="tnav" href="{% url "backoffice:charge-charge" %}">Charge Card via Stripe</a>
 	</li>
 </CFIF>
+{% endif %}
+{% endcomment %}
+{% if user.employee.admin_access %}
 <CFIF YourID.acclev IS 1>
 	<li>
-	<a class="tnav <CFIF scrpt IS "charges.cfm">selected</CFIF>" href="charges.cfm">Stripe Charges</a>
+	<a class="tnav {% if page_group == 'stripe_charges' %}selected{% endif %}" href="{% url "backoffice:charge-list" %}">Stripe Charges</a>
 	</li>
 </CFIF>
+{% endif %}
 <CFIF YourID.acclev IS 1 OR YourID.acclev IS 4>
 	<li>
 	<a class="tnav <CFIF scrpt IS "survey.cfm">selected</CFIF>" href="survey.cfm">Survey Results</a>

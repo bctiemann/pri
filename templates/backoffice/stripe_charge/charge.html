@@ -1,0 +1,120 @@
+{% extends "backoffice/stripe_charge/base.html" %}
+
+{% block content %}
+
+    <h2>Charge Card</h2>
+
+    <table class="inputform stripecharge">
+        <tr>
+            <td>Amount</td>
+            <td class="currency"><span class="currency-prefix">$</span><cfinput name="amount" value="#Customer.amount#" maxlength="10" class="short" /></td>
+        </tr>
+        <tr>
+            <td>Charge Type</td>
+            <td>
+                <cfselect name="capture">
+                    <option value="1">Charge</option>
+                    <option value="0">Auth Only</option>
+                </cfselect>
+            </td>
+        </tr>
+        <tr>
+            <td>Cardholder Name</td>
+            <td>
+                <cftry>
+                    <cfset ccname = Form.ccname>
+                    <cfcatch>
+                        <cfset ccname = Customer.fname & " " & Customer.lname>
+                    </cfcatch>
+                </cftry>
+                <cfinput name="ccname" value="#ccname#" required="yes" maxlength="255" />
+            </td>
+        </tr>
+        <tr>
+            <td class="align-top">Address</td>
+            <td><cftextarea name="addr" id="addr" style="height: 40px;">#addr_dec#</cftextarea></td>
+        </tr>
+        <tr>
+            <td>City</td>
+            <td><cfinput name="city" value="#Customer.city#" maxlength="255" /></td>
+        </tr>
+        <tr>
+            <td>State</td>
+            <td>
+                <cfselect name="state">
+                    <option value="">(Select state)</option>
+                    <cfloop array="#states#" index="state">
+                        <option value="#state.abbr#" <CFIF Customer.state IS state.abbr>selected</CFIF>>#state.name#</option>
+                    </cfloop>
+                </cfselect>
+            </td>
+        </tr>
+        <tr>
+            <td>ZIP</td>
+            <td><cfinput name="zip" value="#Customer.zip#" maxlength="10" class="short" /></td>
+        </tr>
+
+        <tr>
+            <td>
+                Credit Card Number
+            </td>
+            <td>
+                <cfinput name="ccnum" value="#formatCCNumber(ccnum)#" class="cc-field">
+                <cfif customerid>
+                    <small>
+                    <a href="#CGI.SCRIPT_NAME#?customerid=#customerid#&card=1">1</a>
+                    <a href="#CGI.SCRIPT_NAME#?customerid=#customerid#&card=2">2</a>
+                    </small>
+                </cfif>
+            </td>
+        </tr>
+        <tr>
+            <td>Credit Card Expiration</td>
+            <td>
+                <cfselect name="ccexpmo">
+                    <option value="01" <cfif ccexpmo IS "01">selected</cfif>>January (01)</option>
+                    <option value="02" <cfif ccexpmo IS "02">selected</cfif>>February (02)</option>
+                    <option value="03" <cfif ccexpmo IS "03">selected</cfif>>March (03)</option>
+                    <option value="04" <cfif ccexpmo IS "04">selected</cfif>>April (04)</option>
+                    <option value="05" <cfif ccexpmo IS "05">selected</cfif>>May (05)</option>
+                    <option value="06" <cfif ccexpmo IS "06">selected</cfif>>June (06)</option>
+                    <option value="07" <cfif ccexpmo IS "07">selected</cfif>>July (07)</option>
+                    <option value="08" <cfif ccexpmo IS "08">selected</cfif>>August (08)</option>
+                    <option value="09" <cfif ccexpmo IS "09">selected</cfif>>September (09)</option>
+                    <option value="10" <cfif ccexpmo IS "10">selected</cfif>>October (10)</option>
+                    <option value="11" <cfif ccexpmo IS "11">selected</cfif>>November (11)</option>
+                    <option value="12" <cfif ccexpmo IS "12">selected</cfif>>December (12)</option>
+                </cfselect> /
+
+                <cfset tyear = #Dateformat(Now(),"yyyy")#>
+                <cfset fyear = tyear+15>
+                <cfset ynow=#LSDateFormat(Now(),"yyyy")#>
+                <cfset ythen=(#ynow# + 11)>
+                <cfset mnow=#LSDateFormat(Now(),"mm")#>
+                <cfset dyear=ynow>
+                <cfselect name="ccexpyr">
+                    <cfoutput>
+                    <cfloop index="year" from="#ynow#" to="#ythen#">
+                        <option value="#dyear#" <cfif ccexpyr IS dyear>selected</cfif>>#dyear#</option>>
+                        <cfset dyear = dyear + 1>
+                    </cfloop>
+                    </cfoutput>
+                </cfselect>
+            </td>
+        </tr>
+        <tr>
+            <td>Credit Card CVV</td>
+            <td><cfinput name="cccvv" value="#cccvv#" maxlength="6" class="short" /></td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>
+                <button class="btn" type="submit">Charge Card</button>
+            </td>
+        </tr>
+    </table>
+    {% csrf_token %}
+    </form>
+
+{% endblock %}

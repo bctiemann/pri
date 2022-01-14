@@ -1,0 +1,18 @@
+{% extends "backoffice/base.html" %}
+
+{% block nav %}
+    <h1 class="pageheader">
+        Stripe Payment
+        <ul class="nav_subpage">
+            <a href="{% url "backoffice:charge-list" %}">
+                <li {% if is_unfiltered_list_view %}class="selected"{% endif %}>List</li>
+            </a>
+            <a href="{% url "backoffice:charge-create" %}">
+                <li {% if is_create_view %}class="selected"{% endif %}>Add</li>
+            </a>
+            <a href="{% url "backoffice:charge-charge" %}">
+                <li {% if is_charge_view %}class="selected"{% endif %}>Charge Card</li>
+            </a>
+        </ul>
+    </h1>
+{% endblock %}
