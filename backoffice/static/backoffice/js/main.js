@@ -610,12 +610,15 @@ var serialize = function(obj) {
 var stripeResponseHandler = function(status, response) {
     var $form = $('#stripe_form');
 console.log(response);
+        $('#id_stripe_error').val('');
+        $('#id_stripe_error_param').val('');
+        $('#id_stripe_token').val('');
     if (response.error) {
-        $('#stripe_error').val(response.error.message);
-        $('#stripe_error_param').val(response.error.param);
+        $('#id_stripe_error').val(response.error.message);
+        $('#id_stripe_error_param').val(response.error.param);
         $form.get(0).submit();
     } else {
-        $('#stripe_token').val(response.id);
+        $('#id_stripe_token').val(response.id);
         $form.get(0).submit();
     }
 };
@@ -903,21 +906,21 @@ $(document).ready(function() {
 
     // Stripe payment form
     $('#stripe_form').submit(function(event) {
+        event.preventDefault();
         var $form = $(this);
         // Disable the submit button to prevent repeated clicks
         $form.find('button').prop('disabled', true);
-        var addr = $('#addr').val().split('\n');
+        // var addr = $('#addr').val().split('\n');
         Stripe.card.createToken({
-            name: $('#ccname').val(),
-            number: $('#ccnum').val(),
-            cvc: $('#cccvv').val(),
-            exp_month: $('#ccexpmo').val(),
-            exp_year: $('#ccexpyr').val(),
-            address_line1: addr[0],
-            address_line2: addr[1],
-            address_city: $('#city').val(),
-            address_state: $('#state').val(),
-            address_zip: $('#zip').val(),
+            name: $('#id_full_name').val(),
+            number: $('#id_cc_number').val(),
+            cvc: $('#id_cc_cvv').val(),
+            exp_month: $('#id_cc_exp_mo').val(),
+            exp_year: $('#id_cc_exp_yr').val(),
+            address_line1: $('#id_cc_address').val(),
+            address_city: $('#id_cc_city').val(),
+            address_state: $('#id_cc_state').val(),
+            address_zip: $('#id_cc_zip').val(),
         }, stripeResponseHandler);
         return false;
     });

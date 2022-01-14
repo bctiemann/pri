@@ -4,6 +4,8 @@
 
     <h2>Charge Card</h2>
 
+    {{ form.errors }}
+    <form method="POST" action="{% url "backoffice:charge-charge" %}" id="stripe_form">
     <table class="inputform stripecharge">
         <tr>
             <td>Amount</td>
@@ -37,15 +39,22 @@
         </tr>
         <tr>
             <td class="align-top">Address</td>
-            <td><cftextarea name="addr" id="addr" style="height: 40px;">#addr_dec#</cftextarea></td>
+            <td>
+                {{ form.cc_address }}
+{#                <cftextarea name="addr" id="addr" style="height: 40px;">#addr_dec#</cftextarea>#}
+            </td>
         </tr>
         <tr>
             <td>City</td>
-            <td><cfinput name="city" value="#Customer.city#" maxlength="255" /></td>
+            <td>
+                {{ form.cc_city }}
+                <cfinput name="city" value="#Customer.city#" maxlength="255" />
+            </td>
         </tr>
         <tr>
             <td>State</td>
             <td>
+                {{ form.cc_state }}
                 <cfselect name="state">
                     <option value="">(Select state)</option>
                     <cfloop array="#states#" index="state">
@@ -56,7 +65,10 @@
         </tr>
         <tr>
             <td>ZIP</td>
-            <td><cfinput name="zip" value="#Customer.zip#" maxlength="10" class="short" /></td>
+            <td>
+                {{ form.cc_zip }}
+                <cfinput name="zip" value="#Customer.zip#" maxlength="10" class="short" />
+            </td>
         </tr>
 
         <tr>
@@ -77,7 +89,8 @@
         <tr>
             <td>Credit Card Expiration</td>
             <td>
-                {{ form.exp_month }}
+                {{ form.cc_exp_mo }} / {{ form.cc_exp_yr }}
+                {% comment %}
                 <cfselect name="ccexpmo">
                     <option value="01" <cfif ccexpmo IS "01">selected</cfif>>January (01)</option>
                     <option value="02" <cfif ccexpmo IS "02">selected</cfif>>February (02)</option>
@@ -93,7 +106,6 @@
                     <option value="12" <cfif ccexpmo IS "12">selected</cfif>>December (12)</option>
                 </cfselect> /
 
-                {{ form.exp_year }}
                 <cfset tyear = #Dateformat(Now(),"yyyy")#>
                 <cfset fyear = tyear+15>
                 <cfset ynow=#LSDateFormat(Now(),"yyyy")#>
@@ -108,12 +120,13 @@
                     </cfloop>
                     </cfoutput>
                 </cfselect>
+                {% endcomment %}
             </td>
         </tr>
         <tr>
             <td>Credit Card CVV</td>
             <td>
-                {{ form.cvv }}
+                {{ form.cc_cvv }}
                 <cfinput name="cccvv" value="#cccvv#" maxlength="6" class="short" />
             </td>
         </tr>
@@ -126,6 +139,9 @@
         </tr>
     </table>
     {% csrf_token %}
+    {{ form.stripe_token }}
+    {{ form.stripe_error }}
+    {{ form.stripe_error_param }}
     </form>
 
 {% endblock %}

@@ -47,13 +47,22 @@ class StripeChargeChargeView(StripeChargeViewMixin, CreateView):
     template_name = 'backoffice/stripe_charge/charge.html'
     form_class = StripeChargeForm
 
+    def form_invalid(self, form):
+        print(form.data)
+        print(form.errors)
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        print(form.data)
+        return HttpResponseRedirect(self.get_success_url())
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['is_charge_view'] = True
         return context
 
     def get_success_url(self):
-        return reverse('backoffice:charge-charge', kwargs={'pk': self.object.id})
+        return reverse('backoffice:charge-list')
 
 
 class StripeChargeDeleteView(DeleteView):

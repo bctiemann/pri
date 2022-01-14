@@ -12,8 +12,9 @@
 {#    <cfif Login IS False>#}
 {#        <meta Http-equiv="refresh" Content="1500; Url=zzz.cfm">#}
 {#    </cfif>#}
-    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://js.stripe.com/v2/"></script>
     <script type="text/javascript">
-        var stripe = Stripe('{{ stripe_publishable_key }}');
+        // var stripe = Stripe('{{ stripe_publishable_key }}');
+        Stripe.setPublishableKey('{{ stripe_publishable_key }}');
     </script>
 </head>
