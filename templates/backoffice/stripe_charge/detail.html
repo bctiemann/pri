@@ -45,21 +45,21 @@
         <tr>
             <td>Payer Name</td>
             <td>
-                {{ charge.full_name }}
+                {{ form.full_name }}
                 <cfinput name="fullname" value="#Charge.fullname#" required="yes" message="Enter payer name." maxlength="40" />
             </td>
         </tr>
         <tr>
             <td>Payer E-mail</td>
             <td>
-                {{ charge.email }}
+                {{ form.email }}
                 <cfinput name="email" value="#Charge.email#" required="yes" validate="email" message="You must enter a valid email address." />
             </td>
         </tr>
         <tr>
             <td>Contact Phone Number</td>
             <td>
-                {{ charge.phone }}
+                {{ form.phone }}
                 <cfinput name="tel" class="phone short" value="#Charge.tel#" maxlength="20" />
             </td>
         </tr>
