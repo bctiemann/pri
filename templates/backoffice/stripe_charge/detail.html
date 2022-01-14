@@ -29,33 +29,39 @@
         <tr>
             <td>Charge Status</td>
             <td>
-                <cfif Charge.processorchargeid IS NOT "" AND Charge.errorcode IS "">
-                    success
-                <cfelseif Charge.errorcode IS NOT "">
-                    #Charge.errorcode# <cfinput type="checkbox" name="clearcharge" value="1" /> <label for="clearcharge">Clear & retry</label>
-                <cfelse>
-                    pending
-                </cfif>
+                {{ charge.status }}
             </td>
         </tr>
         <tr>
             <td>Charge Date</td>
-            <td><cfif Charge.chargedon IS NOT "">#DateFormat(Charge.chargedon,"MM/DD/YYYY")#</cfif></td>
+            <td>
+                {{ charge.charged_at|date:"m/d/Y" }}
+{#                <cfif Charge.chargedon IS NOT "">#DateFormat(Charge.chargedon,"MM/DD/YYYY")#</cfif>#}
+            </td>
         </tr>
         </cfif>
         {% endif %}
 
         <tr>
             <td>Payer Name</td>
-            <td><cfinput name="fullname" value="#Charge.fullname#" required="yes" message="Enter payer name." maxlength="40" /></td>
+            <td>
+                {{ charge.full_name }}
+                <cfinput name="fullname" value="#Charge.fullname#" required="yes" message="Enter payer name." maxlength="40" />
+            </td>
         </tr>
         <tr>
             <td>Payer E-mail</td>
-            <td><cfinput name="email" value="#Charge.email#" required="yes" validate="email" message="You must enter a valid email address." /></td>
+            <td>
+                {{ charge.email }}
+                <cfinput name="email" value="#Charge.email#" required="yes" validate="email" message="You must enter a valid email address." />
+            </td>
         </tr>
         <tr>
             <td>Contact Phone Number</td>
-            <td><cfinput name="tel" class="phone short" value="#Charge.tel#" maxlength="20" /></td>
+            <td>
+                {{ charge.phone }}
+                <cfinput name="tel" class="phone short" value="#Charge.tel#" maxlength="20" />
+            </td>
         </tr>
         <tr>
             <td>Charge Amount<br /><small>Decimal format. 100.00</small></td>
@@ -63,11 +69,15 @@
             <cfif Charge.amount GT 0>
                 <cfset amount = Charge.amount>
             </cfif>
-            <td class="currency"><span class="currency-prefix">$</span><cfinput name="amount" value="#amount#" class="short" /></td>
+            <td class="currency">
+                <span class="currency-prefix">$</span>{{ form.amount }}
+                <cfinput name="amount" value="#amount#" class="short" />
+            </td>
         </tr>
         <tr>
             <td>Charge Type</td>
             <td>
+                {{ form.charge_type }}
                 <cfselect name="capture">
                     <option value="1" <cfif Charge.capture IS 1>selected</cfif>>Charge</option>
                     <option value="0" <cfif Charge.capture IS 0>selected</cfif>>Auth Only</option>
@@ -77,19 +87,29 @@
 
         <tr>
             <td class="align-top">Notes</td>
-            <td><cftextarea name="notes">#Charge.notes#</cftextarea></td>
+            <td>
+                {{ form.notes }}
+{#                <cftextarea name="notes">#Charge.notes#</cftextarea>#}
+            </td>
         </tr>
         <tr>
             <td>Billing Address</td>
-            <td><cfinput name="addr" value="#addr_dec#" maxlength="255" /></td>
+            <td>
+                {{ form.cc_address }}
+                <cfinput name="addr" value="#addr_dec#" maxlength="255" />
+            </td>
         </tr>
         <tr>
             <td>Billing City</td>
-            <td><cfinput name="city" value="#Charge.city#" maxlength="150" /></td>
+            <td>
+                {{ form.cc_city }}
+                <cfinput name="city" value="#Charge.city#" maxlength="150" />
+            </td>
         </tr>
         <tr>
             <td>Billing State</td>
             <td>
+                {{ form.cc_state }}
                 <cfselect name="state">
                     <cfloop array="#states#" index="state">
                         <option value="#state.abbr#" <CFIF Charge.state IS state.abbr>selected</CFIF>>#state.name#</option>
@@ -99,23 +119,37 @@
         </tr>
         <tr>
             <td>Other State</td>
-            <td><cfinput name="ostate" value="#Charge.ostate#" maxlength="150" /> <small>(Non-US state/prov)</small></td>
+            <td>
+                {{ form.foreign_region }}
+                <cfinput name="ostate" value="#Charge.ostate#" maxlength="150" /> <small>(Non-US state/prov)</small>
+            </td>
         </tr>
         <tr>
             <td>Billing Country</td>
-            <td><cfinput name="country" value="#Charge.country#" maxlength="2" /></td>
+            <td>
+                {{ form.country }}
+                <cfinput name="country" value="#Charge.country#" maxlength="2" />
+            </td>
         </tr>
         <tr>
             <td>Billing Zip</td>
-            <td><cfinput name="zip" value="#Charge.zip#" maxlength="10" /></td>
+            <td>
+                {{ form.cc_zip }}
+                <cfinput name="zip" value="#Charge.zip#" maxlength="10" />
+            </td>
         </tr>
         <tr>
             <td>Credit Card Number</td>
-            <td><cfinput name="ccnum" class="cc-field" value="#formatCCNumber(ccnum_dec)#" maxlength="30" /></td>
+            <td>
+                {{ form.cc_number }}
+                <cfinput name="ccnum" class="cc-field" value="#formatCCNumber(ccnum_dec)#" maxlength="30" />
+            </td>
         </tr>
         <tr>
             <td>Credit Card Expiration</td>
             <td>
+                {{ form.cc_exp_mo }} / {{ form.cc_exp_yr }}
+                {% comment %}
                 <cfselect name="ccexpmo">
                     <option value="01" <cfif Charge.ccexpmo IS "01">selected</cfif>>January (01)</option>
                     <option value="02" <cfif Charge.ccexpmo IS "02">selected</cfif>>February (02)</option>
@@ -145,11 +179,15 @@
                     </cfloop>
                     </cfoutput>
                 </cfselect>
+                {% endcomment %}
             </td>
         </tr>
         <tr>
             <td>Credit Card<br> Security Code (CVV)</td>
-            <td><cfinput name="cccvv" value="#Charge.cccvv#" maxlength="5" message="Enter a valid CVV number for the credit card." /></td>
+            <td>
+                {{ form.cc_cvv }}
+                <cfinput name="cccvv" value="#Charge.cccvv#" maxlength="5" message="Enter a valid CVV number for the credit card." />
+            </td>
         </tr>
 
         <tr>

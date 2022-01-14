@@ -98,15 +98,7 @@
             <td>${{ charge.amount|intcomma }}</td>
             <td>{{ capture|yesno:"Charge,Auth Only" }}</td>
             <td>{{ charge.processor_charge_id }}</CFIF></td>
-            <td>
-                {% if charge.processor_charge_id and not charge.error_code %}
-                    success
-                {% elif charge.error_code %}
-                    {{ charge.error_code }}
-                {% else %}
-                    pending
-                {% endif %}
-            </td>
+            <td>{{ charge.status }}</td>
             <td>{{ charge.charged_at|date:"m/d/Y" }}</td>
         </tr>
 

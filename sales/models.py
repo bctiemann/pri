@@ -30,6 +30,7 @@ def generate_code(reservation_type):
 
 class AllCountries(Countries):
     only = []
+    first = ['US', 'CA']
 
 # class ServiceType(models.TextChoices):
 #     RENTAL = ('rental', 'Rental')
@@ -480,6 +481,18 @@ class Charge(models.Model):
     country = CountryField(blank=True, countries=AllCountries)
     processor_charge_id = models.CharField(max_length=50, blank=True)
     error_code = models.CharField(max_length=30, blank=True)
+
+    @property
+    def status(self):
+        if self.processor_charge_id and not self.error_code:
+            return 'success'
+        elif self.error_code:
+            return self.error_code
+        return 'pending'
+
+    def save(self, *args, **kwargs):
+        self.cc_number = format_cc_number(self.cc_number)
+        super().save(*args, **kwargs)
 
 
 class Card(models.Model):
