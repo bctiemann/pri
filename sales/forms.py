@@ -56,7 +56,7 @@ class ReservationRentalDetailsForm(forms.ModelForm):
     extra_miles = forms.ChoiceField()
     email = forms.EmailField()
     coupon_code = forms.CharField(required=False)
-    is_military = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
+    is_military = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
     notes = forms.CharField(widget=forms.Textarea(), required=False)
 
     def __init__(self, *args, **kwargs):

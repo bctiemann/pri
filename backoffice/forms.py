@@ -11,7 +11,7 @@ from consignment.models import Consigner, ConsignmentPayment
 from users.models import User, Employee, Customer
 from sales.models import (
     Reservation, Rental, GuidedDrive, JoyRide, PerformanceExperience, Coupon, TaxRate, GiftCertificate, AdHocPayment,
-    Charge
+    Charge, Card
 )
 from sales.enums import (
     TRUE_FALSE_CHOICES, DELIVERY_REQUIRED_CHOICES, birth_years, operational_years, get_service_hours,
@@ -83,7 +83,7 @@ class VehicleMarketingForm(CSSClassMixin, forms.ModelForm):
         (3, '+3'),
     )
 
-    tight_fit = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
+    tight_fit = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
     weighting = forms.ChoiceField(choices=WEIGHTING_CHOICES)
 
     def __init__(self, *args, **kwargs):
@@ -289,7 +289,7 @@ class EmployeeForm(forms.ModelForm):
 class CustomerForm(CSSClassMixin, forms.ModelForm):
 
     email = forms.EmailField(required=True)
-    receive_email = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
+    receive_email = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
     cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices(since_founding=True, allow_null=False))
     cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(allow_null=False))
     cc2_exp_yr = forms.ChoiceField(choices=get_exp_year_choices(since_founding=True, allow_null=True), required=False)
@@ -365,8 +365,8 @@ class CouponForm(forms.ModelForm):
 
 
 class AdHocPaymentForm(forms.ModelForm):
-    is_paid = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
-    is_submitted = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
+    is_paid = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
+    is_submitted = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
     cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices(since_founding=True, allow_null=False))
     cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(allow_null=False))
 
@@ -426,7 +426,7 @@ class GuidedDriveForm(CSSClassMixin, forms.ModelForm):
     home_phone = PhoneNumberField(required=False)
     work_phone = PhoneNumberField(required=False)
     mobile_phone = PhoneNumberField(required=False)
-    big_and_tall = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
+    big_and_tall = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
     customer_notes = forms.CharField(widget=forms.Textarea(attrs={'class': 'customer-notes'}), required=False)
 
     def __init__(self, *args, **kwargs):
@@ -525,8 +525,8 @@ class SiteContentForm(forms.ModelForm):
 
 
 class GiftCertificateForm(forms.ModelForm):
-    is_paid = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
-    is_used = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
+    is_paid = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
+    is_used = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
     cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices(since_founding=True, allow_null=False))
     cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(allow_null=False))
 
@@ -543,7 +543,23 @@ class GiftCertificateForm(forms.ModelForm):
 
 class StripeChargeForm(forms.ModelForm):
 
+    CHARGE_TYPE_CHOICES = (
+        (True, 'Charge'),
+        (False, 'Auth only'),
+    )
+
+    charge_type = forms.ChoiceField(choices=CHARGE_TYPE_CHOICES, initial=False)
+
     class Meta:
         model = Charge
         # fields = '__all__'
         exclude = ('uuid',)
+
+
+class CardForm(forms.ModelForm):
+
+    class Meta:
+        model = Card
+        fields = '__all__'
+        # exclude = ('uuid',)
+

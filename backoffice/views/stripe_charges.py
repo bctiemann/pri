@@ -8,7 +8,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from . import ListViewMixin
-from backoffice.forms import StripeChargeForm
+from backoffice.forms import StripeChargeForm, CardForm
 from sales.models import Charge
 
 
