@@ -160,11 +160,13 @@
 	</li>
 </CFIF>
 {% endif %}
+{% if user.employee.marketing_access %}
 <CFIF YourID.acclev IS 1 OR YourID.acclev IS 4>
 	<li>
-	<a class="tnav <CFIF scrpt IS "survey.cfm">selected</CFIF>" href="survey.cfm">Survey Results</a>
+	<a class="tnav {% if page_group == 'survey_responses' %}selected{% endif %}" href="{% url "backoffice:surveyresponse-list" %}">Survey Results</a>
 	</li>
 </CFIF>
+{% endif %}
 {% if user.employee.admin_access %}
 <CFIF YourID.acclev IS 1>
 	<li>

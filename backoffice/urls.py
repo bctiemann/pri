@@ -8,7 +8,7 @@ from backoffice import views
 from backoffice.views import (
     vehicles, reservations, rentals, guided_drives, employees, customers, coupons, toll_tags, tax_rates, bbs,
     consigners, consignment_payments, news, site_content, gift_certificates, adhoc_payments, newsletter_subscriptions,
-    stripe_charges, red_flags
+    stripe_charges, red_flags, survey_responses
 )
 
 
@@ -133,6 +133,9 @@ urlpatterns = [
 
     path('newsletter_subscriptions/', newsletter_subscriptions.NewsletterSubscriptionListView.as_view(), name='subscription-list'),
     path('newsletter_subscriptions/<int:pk>/delete/', newsletter_subscriptions.NewsletterSubscriptionDeleteView.as_view(), name='subscription-delete'),
+
+    path('survey_responses/', survey_responses.SurveyResponseListView.as_view(), name='surveyresponse-list'),
+    path('survey_responses/<int:pk>/delete/', survey_responses.SurveyResponseDeleteView.as_view(), name='surveyresponse-delete'),
 
     path('site_content/', site_content.SiteContentListView.as_view(), name='sitecontent-list'),
     path('site_content/<str:page>/', site_content.SiteContentDetailView.as_view(), name='sitecontent-detail'),

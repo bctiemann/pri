@@ -802,6 +802,7 @@ class Command(BaseCommand):
             for old in back_cursor.fetchall():
                 print(old)
                 new = Charge.objects.create(
+                    id=old['chargeid'],
                     full_name=old['fullname'],
                     email=old['email'],
                     amount=old['amount'],
@@ -856,6 +857,7 @@ class Command(BaseCommand):
                 print(old)
                 customer = Customer.objects.filter(pk=old['customerid']).first()
                 new = SurveyResponse.objects.create(
+                    id=old['surveyid'],
                     customer=customer,
                     ip=old['ip'],
                     heard_about=old['hearabout'],

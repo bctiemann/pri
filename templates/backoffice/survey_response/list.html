@@ -1,0 +1,131 @@
+{% extends "backoffice/survey_response/base.html" %}
+{% load bbcode_tags %}
+
+{% block content %}
+
+    {% comment %}
+    <cfif IsDefined("URL.deleted")>
+        <p>Vehicle deleted successfully.</p>
+    </cfif>
+
+    <cfset sortCols = "vehicleid,make,model,year,status">
+
+    <cfif NOT IsDefined("URL.sortby") OR NOT ListContains(sortCols, URL.sortby)>
+        <cfset URL.sortby = "vehicleid">
+    </cfif>
+    <cfif NOT IsDefined("URL.sortdir") OR NOT ListContains("ASC,DESC", URL.sortdir)>
+        <cfset URL.sortdir = "ASC">
+    </cfif>
+    <cfif NOT IsDefined("URL.page") OR NOT IsNumeric(URL.page) OR URL.page LT 1>
+        <cfset URL.page = 1>
+    </cfif>
+
+    <CFQUERY NAME="allRecords" DATASOURCE="#DSN#">
+        SELECT vehicleid FROM Vehicles
+        WHERE 1
+        <cfif IsDefined("Form.query")>
+            AND (
+                make LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR"> OR
+                model LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR"> OR
+                year LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR">
+            )
+        </cfif>
+        <cfif IsDefined("URL.type") AND IsValid("integer",URL.type)>
+            AND type = <CFQUERYPARAM value="#URL.type#" CFSQLType="CF_SQL_INTEGER">
+        </cfif>
+        <cfif NOT (IsDefined("URL.showall") AND URL.showall IS 1)>
+            AND status != 3
+        </cfif>
+    </CFQUERY>
+
+    <cfset pageViewLink = getPageViewLink(allRecords.recordCount)>
+    <CFSET Pages = pagesLink(#allRecords.recordCount#,#rowsperpage#,int(#URL.page#),#CGI.SCRIPT_NAME#,#URL#)>
+
+    <CFQUERY NAME="Vehicles" DATASOURCE="#DSN#" result="result">
+        SELECT Vehicles.vehicleid,make,model,year,type,plate,vin,mileage,damage,Vehicles.notes,policyno,policyco,policytel,
+        status,weighting,tagnumber FROM Vehicles
+        LEFT JOIN TollTags ON TollTags.vehicleid=Vehicles.vehicleid
+        WHERE 1
+        <cfif IsDefined("Form.query")>
+            AND (
+                make LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR"> OR
+                model LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR"> OR
+                year LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR">
+            )
+        </cfif>
+        <cfif IsDefined("URL.type") AND IsValid("integer",URL.type)>
+            AND type = <CFQUERYPARAM value="#URL.type#" CFSQLType="CF_SQL_INTEGER">
+        </cfif>
+        <cfif NOT (IsDefined("URL.showall") AND URL.showall IS 1)>
+            AND status != 3
+        </cfif>
+        ORDER BY #URL.sortby# #URL.sortdir#
+        LIMIT #Pages.offset#,#Pages.thispage#
+    </CFQUERY>
+
+    <CFOUTPUT>
+    <div class="pager">
+    #pageViewLink#
+    #Pages.pages#
+    </div>
+    </CFOUTPUT>
+    {% endcomment %}
+
+    {% include "backoffice/includes/paginator.html" %}
+
+    {% include "backoffice/includes/search_form.html" %}
+
+    <table class="data alternating" sortedby="{{ sortby }}">
+    <tr>
+        <cfoutput>
+        <th col="id" default-sort="desc">ID</th>
+        <th col="customer__last_name">Customer</th>
+        <th col="created_at" default-sort="desc">Date</th>
+        <th>PRI Rating</th>
+        <th>Frequency</th>
+        <th>Vehicle</th>
+        <th>Recommend</th>
+        <th>Pricing</th>
+        <th>Email</th>
+        <th>Types</th>
+        <th>Comments</th>
+        <th></th>
+        </cfoutput>
+    </tr>
+    {% for response in surveyresponse_list %}
+        <form method="POST" action="#CGI.SCRIPT_NAME#">
+        <tr class="clickable survey" itemid="{{ response.id }}">
+            <td>{{ response.id }}</td>
+            <td>
+                {% if response.customer %}
+                    <a href="{% url "backoffice:customer-detail" pk=response.customer.id %}">{{ response.customer.full_name }}</a>
+                {% endif %}
+            </td>
+            <td>{{ response.created_at|date:"m/d/Y" }}</td>
+            <td>{{ response.general_rating }} - {{ response.get_general_rating_display }}</td>
+            <td>{{ response.get_rental_frequency_display }}</td>
+            <td>{{ response.vehicle_rating }} - {{ response.get_vehicle_rating_display }}</td>
+            <td>{{ response.get_would_recommend_display }}</td>
+            <td>{{ response.pricing }} - {{ response.get_pricing_display }}</td>
+            <td>{{ response.get_email_frequency_display }}</td>
+            <td>{{ response.get_vehicle_types_display }}</td>
+            <td class="no-overflow" style="max-width: 100px;">{{ response.comments }}</td>
+            <td><button class="btn delete" type="submit" name="delete" onclick="return confirmDelete(this.form, '{% url "backoffice:surveyresponse-delete" pk=response.id %}', 'survey result')">Delete</button></td>
+        </tr>
+        <div class="hidden dialog-survey" surveyid="{{ response.id }}" title="Survey Details">
+            <h4>Heard about:</h4>
+            <p>{{ response.heard_about|bbcode|safe }}</p>
+            <h4>New Vehicles:</h4>
+            <p>{{ response.new_vehicles|bbcode|safe }}</p>
+            <h4>Comments:</h4>
+            <p>{{ response.comments|bbcode|safe }}</p>
+        </div>
+        <cfinput type="hidden" name="fnc" value="delete" />
+        <cfinput type="hidden" name="delete" value="1" />
+        <cfinput type="hidden" name="surveyid" value="#surveyid#" />
+        {% csrf_token %}
+        </form>
+    {% endfor %}
+    </table>
+
+{% endblock %}

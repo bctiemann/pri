@@ -300,7 +300,8 @@ class GuidedDrive(models.Model):
 
     def save(self, *args, **kwargs):
         self.coupon_code = self.coupon_code.upper()
-        self.final_price_data = json.loads(json.dumps(self.get_price_data(), cls=DjangoJSONEncoder))
+        if self.id:
+            self.final_price_data = json.loads(json.dumps(self.get_price_data(), cls=DjangoJSONEncoder))
         super().save(*args, **kwargs)
 
     class Meta:
