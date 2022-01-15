@@ -517,8 +517,15 @@ class Card(models.Model):
     brand = models.CharField(null=True, blank=True, max_length=30)
     name = models.CharField(null=True, blank=True, max_length=30)
     last_4 = models.CharField(null=True, blank=True, max_length=4)
+
+    number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC number')
     exp_month = models.CharField(null=True, blank=True, max_length=2)
     exp_year = models.CharField(null=True, blank=True, max_length=4)
+    cvv = models.CharField(max_length=6, blank=True, verbose_name='CC CVV')
+    address = fields.EncryptedCharField(max_length=255, null=True, blank=True)
+    city = models.CharField(max_length=255, blank=True)
+    state = USStateField(null=True, blank=True)
+    zip = USZipCodeField(null=True, blank=True)
 
     def __str__(self):
         return '{0} ({1})'.format(self.brand, self.last_4)

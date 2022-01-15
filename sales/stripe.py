@@ -20,7 +20,7 @@ class Stripe:
             email=email,
             phone=phone,
         )
-        return customer
+        return customer.id
 
     def get_card_token(self, number, exp_month, exp_year, cvc):
         token = stripe.Token.create(

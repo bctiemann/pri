@@ -303,6 +303,20 @@
         </tr>
 
         <tr>
+            <td>Stripe customer ID</td>
+            <td>
+                <a href="https://dashboard.stripe.com/customers/{{ customer.stripe_customer }}" target="_blank">
+                    {{ customer.stripe_customer }}
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td>Credit Card (1) Stripe ID</td>
+            <td>
+                {{ customer.card_1.stripe_card }}
+            </td>
+        </tr>
+        <tr>
             <td>Credit Card (1) Number</td>
             <td>
                 {{ form.cc_number }}
@@ -369,6 +383,12 @@
             </td>
         </tr>
 
+        <tr>
+            <td>Credit Card (2) Stripe</td>
+            <td>
+                {{ customer.card_1.stripe_card }}
+            </td>
+        </tr>
         <tr>
             <td>Credit Card (2) Number</td>
             <td>
