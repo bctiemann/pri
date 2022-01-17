@@ -64,9 +64,9 @@ class SurveyResponse(models.Model):
         FREQUENCY_1 = (1, 'This was my first')
 
     class Recommendation(models.IntegerChoices):
-        YES = (3, 'Yes')
-        MAYBE = (2, 'Maybe')
-        NO = (1, 'No')
+        RECOMMEND_3 = (3, 'Yes')
+        RECOMMEND_2 = (2, 'Maybe')
+        RECOMMEND_1 = (1, 'No')
 
     class Pricing(models.IntegerChoices):
         PRICING_5 = (5, 'Excellent Value')

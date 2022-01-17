@@ -71,6 +71,51 @@
     </CFOUTPUT>
     {% endcomment %}
 
+    <ul class="drop-right">
+        Requested Vehicles:
+        {% for vehicle_type in vehicle_types %}
+        <cfoutput query="maxcounts">
+            <li>{{ vehicle_type.vehicle_type_count }} - {{ vehicle_type.label }}</li>
+        </cfoutput>
+        {% endfor %}
+    </ul>
+
+    <table class="inputform noinput" style="width: 40%; margin-bottom: 40px;">
+        <tr>
+            <th colspan="3" class="header">Averages</th>
+        </tr>
+        <tr>
+            <td>PRI Rating</td>
+            <td>{{ average_labels.general_rating.label }}</td>
+            <td>{{ averages.general_rating }}</td>
+        </tr>
+        <tr>
+            <td>Rentals/Year</td>
+            <td>{{ average_labels.rental_frequency.label }}</td>
+            <td>{{ averages.rental_frequency }}</td>
+        </tr>
+        <tr>
+            <td>Vehicle</td>
+            <td>{{ average_labels.vehicle_rating.label }}</td>
+            <td>{{ averages.vehicle_rating }}</td>
+        </tr>
+        <tr>
+            <td>Would Recommend</td>
+            <td>{{ average_labels.would_recommend.label }}</td>
+            <td>{{ averages.would_recommend }}</td>
+        </tr>
+        <tr>
+            <td>Pricing</td>
+            <td>{{ average_labels.pricing.label }}</td>
+            <td>{{ averages.pricing }}</td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td>{{ average_labels.email_frequency.label }}</td>
+            <td>{{ averages.email_frequency }}</td>
+        </tr>
+    </table>
+
     {% include "backoffice/includes/paginator.html" %}
 
     {% include "backoffice/includes/search_form.html" %}
