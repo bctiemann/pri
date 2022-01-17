@@ -636,6 +636,32 @@ class DamageForm(CSSClassMixin, forms.ModelForm):
 
 class ScheduledServiceForm(CSSClassMixin, forms.ModelForm):
 
+    done_on = forms.DateField(widget=forms.DateInput(), required=False)
+    next_on = forms.DateField(widget=forms.DateInput(), required=False)
+    is_due = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['vehicle'].choices = get_vehicle_choices()
+        if self.instance.done_at:
+            done_at_localized = self.instance.done_at.astimezone(pytz.timezone(settings.TIME_ZONE))
+            self.fields['done_on'].initial = done_at_localized.strftime('%m/%d/%Y')
+        if self.instance.next_at:
+            next_at_localized = self.instance.next_at.astimezone(pytz.timezone(settings.TIME_ZONE))
+            self.fields['next_on'].initial = next_at_localized.strftime('%m/%d/%Y')
+
+        short_fields = [
+            'done_on', 'done_mileage', 'next_on', 'next_mileage',
+        ]
+        for field in short_fields:
+            self.add_widget_css_class(field, 'short')
+
+    def clean(self):
+        super().clean()
+        self.cleaned_data['done_at'] = self.cleaned_data['done_on']
+        self.cleaned_data['next_at'] = self.cleaned_data['next_on']
+
     class Meta:
         model = ScheduledService
         fields = '__all__'
@@ -643,6 +669,26 @@ class ScheduledServiceForm(CSSClassMixin, forms.ModelForm):
 
 
 class IncidentalServiceForm(CSSClassMixin, forms.ModelForm):
+
+    done_on = forms.DateField(widget=forms.DateInput(), required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['vehicle'].choices = get_vehicle_choices()
+        if self.instance.done_at:
+            done_at_localized = self.instance.done_at.astimezone(pytz.timezone(settings.TIME_ZONE))
+            self.fields['done_on'].initial = done_at_localized.strftime('%m/%d/%Y')
+
+        short_fields = [
+            'done_on', 'mileage',
+        ]
+        for field in short_fields:
+            self.add_widget_css_class(field, 'short')
+
+    def clean(self):
+        super().clean()
+        self.cleaned_data['done_at'] = self.cleaned_data['done_on']
 
     class Meta:
         model = IncidentalService

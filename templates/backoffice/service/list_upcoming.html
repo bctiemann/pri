@@ -1,5 +1,4 @@
 {% extends "backoffice/service/base.html" %}
-{% load humanize bbcode_tags %}
 
 {% block content %}
 
@@ -71,9 +70,15 @@
     </CFOUTPUT>
     {% endcomment %}
 
-    <h2>Service History</h2>
+    {% if due_only %}
+    <cfif list IS "due">
+        <h2>Due Services</h2>
+    {% elif upcoming_only %}
+    <cfelseif list IS "upcoming">
+        <h2>Upcoming Services</h2>
+    </cfif>
+    {% endif %}
 
-    {{ vehicle_selector_form.select_vehicle }}
     {% comment %}
     <select id="vehicle_select" onchange="selectVehicle()">
         <option value="0">(Select Vehicle)</option>
@@ -90,106 +95,9 @@
     </select>
     {% endcomment %}
 
-    {% if filter_vehicle %}
+    {% comment %}
+    {% include "backoffice/includes/paginator.html" %}
 
-        {% include "backoffice/includes/paginator.html" %}
-
-        {% comment %}
-        <CFOUTPUT>
-        <div class="pager">
-        #pageViewLink#
-        #Pages.pages#
-        </div>
-        </CFOUTPUT>
-        {% endcomment %}
-
-        <h3>Incidental Services</h3>
-
-        {% if incidental_services %}
-        <cfif ServiceHist.recordCount GT 0>
-
-            <cfoutput>
-            <table class="data alternating" sortedby="{{ sortby }}">
-            </cfoutput>
-                <tr>
-                    <cfoutput>
-                    <th col="id" default-sort="desc">ID</th>
-                    <th>Vehicle</th>
-                    <th>Title</th>
-                    <th>Done On</th>
-                    <th>Done Miles</th>
-                    <th>Notes</th>
-                    </cfoutput>
-                </tr>
-                {% for service in incidental_services %}
-                <cfoutput query="ServiceHist">
-                <tr class="clickable click-to-edit" destination="{% url "backoffice:service-detail-incidental" pk=service.id %}">
-                    <td><a href="{% url "backoffice:service-detail-incidental" pk=service.id %}">{{ service.id }}</a></td>
-                    <td>{{ service.vehicle.vehicle_name }}</td>
-                    <td>{{ service.title }}</td>
-                    <td>{{ service.done_at|date:"m/d/Y" }}</td>
-                    <td>{{ service.mileage|default_if_none:""|intcomma }}</td>
-                    <td class="truncate">{{ service.notes|bbcode|safe }}</td>
-                </tr>
-                </cfoutput>
-                {% endfor %}
-            </table>
-
-        {% else %}
-        <cfelse>
-
-            <p class="no-records">(No records)</p>
-
-        </cfif>
-        {% endif %}
-
-        <h3>Scheduled Services</h3>
-
-        {% if scheduled_services %}
-        <cfif Service.recordCount GT 0>
-
-            <cfoutput>
-            <table class="data alternating" sortedby="{{ sortby }}">
-            </cfoutput>
-                <tr>
-                    <cfoutput>
-                    <th col="id" default-sort="desc">ID</th>
-                    <th>Vehicle</th>
-                    <th>Name</th>
-                    <th>Done On</th>
-                    <th>Done Miles</th>
-                    <th>Next On</th>
-                    <th>Next Miles</th>
-                    <th>Due</th>
-                    <th>Notes</th>
-                    </cfoutput>
-                </tr>
-                {% for service in scheduled_services %}
-                <cfoutput query="Service">
-                <tr class="clickable click-to-edit" destination="{% url "backoffice:service-detail-scheduled" pk=service.id %}">
-                    <td><a href="{% url "backoffice:service-detail-scheduled" pk=service.id %}">{{ service.id }}</a></td>
-                    <td>{{ service.vehicle.vehicle_name }}</td>
-                    <td>{{ service.name }}</td>
-                    <td>{{ service.done_at|date:"m/d/Y" }}</td>
-                    <td>{{ service.done_mileage|default_if_none:""|intcomma }}</td>
-                    <td>{{ service.next_at|date:"m/d/Y" }}</td>
-                    <td>{{ service.next_mileage|default_if_none:""|intcomma }}</td>
-                    <td>{{ service.is_due }}</td>
-                    <td class="truncate">{{ service.notes|bbcode|safe }}</td>
-                </tr>
-                </cfoutput>
-                {% endfor %}
-            </table>
-
-        {% else %}
-        <cfelse>
-
-            <p class="no-records">(No records)</p>
-
-        </cfif>
-        {% endif %}
-
-        {% comment %}
     <table class="data alternating" sortedby="{{ sortby }}">
     <tr>
         <cfoutput>
@@ -213,6 +121,33 @@
     </table>
     {% endcomment %}
 
-    {% endif %}
+    {% for vehicle in vehicle_list %}
+
+        {% if vehicle.upcoming_services.exists %}
+
+            <div class="vehicle-services type-#Vehicles.type#">
+                <h3>{{ vehicle.vehicle_name }}</h3>
+
+                {% for service in vehicle.upcoming_services %}
+                    {% include "backoffice/service/service_detail.html" %}
+                    {% comment %}
+                    <cfoutput query="Service">
+                        <a href="#CGI.SCRIPT_NAME#?edit=1&serviceid=#serviceid#">
+                        <div class="service-item">
+                            <p>#name#</p>
+                            <p>#nextstamp GT 0 ? DateFormat(nextstamp,"MM/DD/YYYY") : "(Date not set)"#</p>
+                            <p>#nextmiles GT 0 ? NumberFormat(nextmiles,",") & " mi." : "(Mileage not set)"#</p>
+                            <div class="notes">#parseNewlines(notes)#</div>
+                        </div>
+                        </a>
+                    </cfoutput>
+                    {% endcomment %}
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+    {% endfor %}
 
 {% endblock %}

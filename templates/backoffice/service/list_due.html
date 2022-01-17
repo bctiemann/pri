@@ -79,7 +79,6 @@
     </cfif>
     {% endif %}
 
-    {{ vehicle_selector_form.select_vehicle }}
     {% comment %}
     <select id="vehicle_select" onchange="selectVehicle()">
         <option value="0">(Select Vehicle)</option>
@@ -96,6 +95,7 @@
     </select>
     {% endcomment %}
 
+    {% comment %}
     {% include "backoffice/includes/paginator.html" %}
 
     <table class="data alternating" sortedby="{{ sortby }}">
@@ -119,5 +119,35 @@
 
     {% endfor %}
     </table>
+    {% endcomment %}
+
+    {% for vehicle in vehicle_list %}
+
+        {% if vehicle.due_services.exists %}
+
+            <div class="vehicle-services type-#Vehicles.type#">
+                <h3>{{ vehicle.vehicle_name }}</h3>
+
+                {% for service in vehicle.due_services %}
+                    {% include "backoffice/service/service_detail.html" %}
+                    {% comment %}
+                    <cfoutput query="Service">
+                        <a href="#CGI.SCRIPT_NAME#?edit=1&serviceid=#serviceid#">
+                        <div class="service-item">
+                            <p>#name#</p>
+                            <p>#nextstamp GT 0 ? DateFormat(nextstamp,"MM/DD/YYYY") : "(Date not set)"#</p>
+                            <p>#nextmiles GT 0 ? NumberFormat(nextmiles,",") & " mi." : "(Mileage not set)"#</p>
+                            <div class="notes">#parseNewlines(notes)#</div>
+                        </div>
+                        </a>
+                    </cfoutput>
+                    {% endcomment %}
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+    {% endfor %}
 
 {% endblock %}

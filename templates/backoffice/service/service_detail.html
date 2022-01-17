@@ -1,0 +1,10 @@
+{% load bbcode_tags %}
+
+<a href="{% url "backoffice:service-detail-scheduled" pk=service.id %}">
+    <div class="service-item">
+        <p>{{ service.service_item.name }}</p>
+        <p>{{ service.next_at|date:"m/d/Y"|default_if_none:"(Date not set)" }}{# #nextstamp GT 0 ? DateFormat(nextstamp,"MM/DD/YYYY") : "(Date not set)"# #}</p>
+        <p>{{ service.next_mileage|default_if_none:"(Mileage not set)" }}{# #nextmiles GT 0 ? NumberFormat(nextmiles,",") & " mi." : "(Mileage not set)"# #}</p>
+        <div class="notes">{{ service.notes|bbcode|safe }}</div>
+    </div>
+</a>

@@ -822,8 +822,8 @@ $(document).ready(function() {
     $('#id_deposit_refunded_on').datepicker({});
     $('#id_requested_date_picker').datepicker({});
     $('#id_backup_date_picker').datepicker({});
-    $('#donestamp').datepicker({});
-    $('#nextstamp').datepicker({});
+    $('#id_done_on').datepicker({});
+    $('#id_next_on').datepicker({});
     $('#id_paid_on_picker').datepicker({});
     $('#id_damaged_on').datepicker({});
     $('#id_repaired_on').datepicker({});

@@ -12,6 +12,9 @@ class ScheduledService(models.Model):
     is_due = models.BooleanField(default=False)
     notes = models.TextField(blank=True)
 
+    class Meta:
+        ordering = ('next_mileage',)
+
 
 class IncidentalService(models.Model):
     vehicle = models.ForeignKey('fleet.Vehicle', null=True, blank=True, on_delete=models.SET_NULL)

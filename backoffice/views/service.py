@@ -29,16 +29,16 @@ class ServiceViewMixin:
     def is_unfiltered_list_view(self):
         return not self.due_only and not self.upcoming_only and self.history_only and super().is_unfiltered_list_view
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        # if self.unrepaired_only:
-        #     queryset = queryset.filter(is_repaired=False)
-        # elif self.repaired_only:
-        #     queryset = queryset.filter(is_repaired=True)
-        self.filter_vehicle = self.get_filter_vehicle()
-        if self.filter_vehicle:
-            queryset = queryset.filter(vehicle=self.filter_vehicle)
-        return queryset
+    # def get_queryset(self):
+    #     queryset = super().get_queryset()
+    #     # if self.unrepaired_only:
+    #     #     queryset = queryset.filter(is_repaired=False)
+    #     # elif self.repaired_only:
+    #     #     queryset = queryset.filter(is_repaired=True)
+    #     self.filter_vehicle = self.get_filter_vehicle()
+    #     if self.filter_vehicle:
+    #         queryset = queryset.filter(vehicle=self.filter_vehicle)
+    #     return queryset
 
     def get_filter_vehicle(self):
         vehicle_id = self.request.GET.get('vehicle_id')
@@ -58,11 +58,20 @@ class ServiceViewMixin:
         return context
 
 
-class ScheduledServiceListView(PermissionRequiredMixin, ServiceViewMixin, ListViewMixin, ListView):
+class DueServiceListView(PermissionRequiredMixin, ServiceViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_service',)
-    template_name = 'backoffice/service/list_scheduled.html'
+    template_name = 'backoffice/service/list_due.html'
     search_fields = ('title', 'notes',)
+    model = Vehicle
+
+
+class UpcomingServiceListView(PermissionRequiredMixin, ServiceViewMixin, ListViewMixin, ListView):
+    # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
+    permission_required = ('users.view_service',)
+    template_name = 'backoffice/service/list_upcoming.html'
+    search_fields = ('title', 'notes',)
+    model = Vehicle
 
 
 class ServiceHistoryListView(PermissionRequiredMixin, ServiceViewMixin, ListViewMixin, TemplateView):

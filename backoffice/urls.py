@@ -149,8 +149,8 @@ urlpatterns = [
     path('damage/<int:pk>/delete/', damage.DamageDeleteView.as_view(), name='damage-delete'),
 
     path('service/', RedirectView.as_view(url='/service/due/'), name='service-list-redirect'),
-    path('service/due/', service.ScheduledServiceListView.as_view(due_only=True), name='service-list-due'),
-    path('service/upcoming/', service.ScheduledServiceListView.as_view(upcoming_only=True), name='service-list-upcoming'),
+    path('service/due/', service.DueServiceListView.as_view(due_only=True), name='service-list-due'),
+    path('service/upcoming/', service.UpcomingServiceListView.as_view(upcoming_only=True), name='service-list-upcoming'),
     path('service/history/', service.ServiceHistoryListView.as_view(history_only=True), name='service-list-history'),
     path('service/create/scheduled/', service.ScheduledServiceCreateView.as_view(is_create_view=True), name='service-create-scheduled'),
     path('service/create/incidental/', service.IncidentalServiceCreateView.as_view(is_create_view=True), name='service-create-incidental'),

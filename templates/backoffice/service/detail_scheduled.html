@@ -20,6 +20,7 @@
             <td>Vehicle</td>
             <td>
                 {{ form.vehicle }}
+                {% comment %}
                 <cfquery name="Vehicles" datasource="#DSN#">
                     SELECT vehicleid,make,model,year,type FROM Vehicles
                     ORDER BY make,model,year
@@ -29,12 +30,14 @@
                         <option value="#vehicleid#" <cfif vehicleid IS Service.vehicleid>selected</cfif>>#make# #model#</option>
                     </cfloop>
                 </cfselect>
+                {% endcomment %}
             </td>
         </tr>
         <tr>
             <td>Service Item</td>
             <td>
                 {{ form.service_item }}
+                {% comment %}
                 <cfquery name="ServiceItems" datasource="#DSN#">
                     SELECT serviceitemid,name FROM ServiceItems
                     ORDER BY serviceitemid
@@ -44,6 +47,7 @@
                         <option value="#serviceitemid#" <cfif serviceitemid IS Service.serviceitemid>selected</cfif>>#name#</option>
                     </cfloop>
                 </cfselect>
+                {% endcomment %}
             </td>
         </tr>
         <tr>
@@ -90,17 +94,19 @@
             <td>Due</td>
             <td>
                 {{ form.is_due }}
+                {% comment %}
                 <cfselect name="due">
                     <option value="0" <cfif Service.due IS 0>selected</cfif>>No</option>
                     <option value="1" <cfif Service.due IS 1>selected</cfif>>Yes</option>
                 </cfselect>
+                {% endcomment %}
             </td>
         </tr>
         <tr>
             <td class="align-top">Notes</td>
             <td>
                 {{ form.notes }}
-                <cftextarea name="notes">#Service.notes#</cftextarea>
+{#                <cftextarea name="notes">#Service.notes#</cftextarea>#}
             </td>
         </tr>
 
