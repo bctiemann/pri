@@ -8,8 +8,9 @@ from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from . import ListViewMixin
-from backoffice.forms import DamageForm
+from backoffice.forms import DamageForm, VehicleSelectorForm
 from service.models import Damage
+from fleet.models import Vehicle
 
 
 # Template generics-based CRUD views
@@ -20,6 +21,7 @@ class DamageViewMixin:
     default_sort = '-id'
     unrepaired_only = False
     repaired_only = False
+    filter_vehicle = None
 
     @property
     def is_unfiltered_list_view(self):
@@ -31,12 +33,23 @@ class DamageViewMixin:
             queryset = queryset.filter(is_repaired=False)
         elif self.repaired_only:
             queryset = queryset.filter(is_repaired=True)
+        self.filter_vehicle = self.get_filter_vehicle()
+        if self.filter_vehicle:
+            queryset = queryset.filter(vehicle=self.filter_vehicle)
         return queryset
+
+    def get_filter_vehicle(self):
+        vehicle_id = self.request.GET.get('vehicle_id')
+        if vehicle_id:
+            return Vehicle.objects.filter(pk=vehicle_id).first()
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['unrepaired_only'] = self.unrepaired_only
         context['repaired_only'] = self.repaired_only
+        context['vehicle_selector_form'] = VehicleSelectorForm(
+            data={'select_vehicle': self.filter_vehicle.id if self.filter_vehicle else None}
+        )
         return context
 
 

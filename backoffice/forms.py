@@ -632,3 +632,7 @@ class DamageForm(CSSClassMixin, forms.ModelForm):
         model = Damage
         fields = '__all__'
         # exclude = ('confirmation_code',)
+
+
+class VehicleSelectorForm(forms.Form):
+    select_vehicle = forms.ChoiceField(choices=get_vehicle_choices(allow_null=True, null_display_value='(Select vehicle)'))

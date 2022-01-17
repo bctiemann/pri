@@ -70,6 +70,23 @@
     </CFOUTPUT>
     {% endcomment %}
 
+    {{ vehicle_selector_form.select_vehicle }}
+    {% comment %}
+    <select id="vehicle_select" onchange="selectVehicle()">
+        <option value="0">(Select Vehicle)</option>
+        <optgroup label="Cars">
+            <cfoutput query="Cars">
+                <option value="#vehicleid#" <cfif vehicleid IS vehicleid_selected>selected</cfif>>#year# #make# #model#</option>
+            </cfoutput>
+        </optgroup>
+        <optgroup label="Motorcycles">
+            <cfoutput query="Motorcycles">
+                <option value="#vehicleid#" <cfif vehicleid IS vehicleid_selected>selected</cfif>>#year# #make# #model#</option>
+            </cfoutput>
+        </optgroup>
+    </select>
+    {% endcomment %}
+
     {% include "backoffice/includes/paginator.html" %}
 
     {% include "backoffice/includes/search_form.html" %}

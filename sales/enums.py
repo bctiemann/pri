@@ -51,22 +51,22 @@ def get_exp_month_choices(allow_null=False):
     return month_choices
 
 
-def get_exp_year_choices(since_founding=False, allow_null=False):
+def get_exp_year_choices(since_founding=False, allow_null=False, null_display_value='----'):
     start_year = current_year
     if since_founding:
         start_year = settings.COMPANY_FOUNDING_YEAR
     choices = [(year, year) for year in range(start_year, current_year + 11)]
     if allow_null:
-        choices = [(None, '----')] + choices
+        choices = [(None, null_display_value)] + choices
     return choices
 
 
-def get_vehicle_choices(allow_null=False):
+def get_vehicle_choices(allow_null=False, null_display_value='----'):
     vehicle_choices = []
     vehicle_choices.append(('Cars', list((v.id, v.vehicle_name) for v in Vehicle.objects.filter(vehicle_type=VehicleType.CAR))))
     vehicle_choices.append(('Motorcycles', list((v.id, v.vehicle_name) for v in Vehicle.objects.filter(vehicle_type=VehicleType.BIKE))))
     if allow_null:
-        vehicle_choices = [(None, '----')] + vehicle_choices
+        vehicle_choices = [(None, null_display_value)] + vehicle_choices
     return vehicle_choices
 
 

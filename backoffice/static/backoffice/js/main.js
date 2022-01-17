@@ -442,10 +442,10 @@ console.log(data);
 }
 
 var selectVehicle = function() {
-    var vehicleid = $('#vehicle_select').val();
+    var vehicleid = $('#id_select_vehicle').val();
     var baseurl = window.location.href.split('?')[0];
     var urlparams = getJsonFromUrl(true);
-    urlparams.vehicleid = vehicleid;
+    urlparams.vehicle_id = vehicleid;
     window.location.href = baseurl + '?' + serialize(urlparams);
 };
 
@@ -827,6 +827,10 @@ $(document).ready(function() {
     $('#id_paid_on_picker').datepicker({});
     $('#id_damaged_on').datepicker({});
     $('#id_repaired_on').datepicker({});
+
+    $('#id_select_vehicle').change(function() {
+        selectVehicle();
+    });
 
     // Tooltip for vehicle specs model
     $('.specs-model').tooltip({
