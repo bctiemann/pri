@@ -100,9 +100,25 @@ class ScheduledServiceCreateView(ServiceViewMixin, ListViewMixin, CreateView):
         return reverse('backoffice:service-detail-scheduled', kwargs={'pk': self.object.id})
 
 
-class IncidentalServiceCreateView(ServiceViewMixin, ListViewMixin, CreateView):
-    template_name = 'backoffice/service/detail_scheduled.html'
+class IncidentalServiceDetailView(ServiceViewMixin, ListViewMixin, UpdateView):
+    template_name = 'backoffice/service/detail_incidental.html'
     form_class = IncidentalServiceForm
+    model = IncidentalService
+
+    # def form_valid(self, form):
+    #     tax_rate = form.save(commit=False)
+    #     tax_rate.total_rate = form.cleaned_data['total_rate_as_percent'] / 100
+    #     tax_rate.save()
+    #     return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('backoffice:service-detail-incidental', kwargs={'pk': self.object.id})
+
+
+class IncidentalServiceCreateView(ServiceViewMixin, ListViewMixin, CreateView):
+    template_name = 'backoffice/service/detail_incidental.html'
+    form_class = IncidentalServiceForm
+    model = IncidentalService
 
     def get_success_url(self):
         return reverse('backoffice:service-detail-incidental', kwargs={'pk': self.object.id})

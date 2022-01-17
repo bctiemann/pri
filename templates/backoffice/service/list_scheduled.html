@@ -70,6 +70,15 @@
     </CFOUTPUT>
     {% endcomment %}
 
+    {% if due_only %}
+    <cfif list IS "due">
+        <h2>Due Services</h2>
+    {% elif upcoming_only %}
+    <cfelseif list IS "upcoming">
+        <h2>Upcoming Services</h2>
+    </cfif>
+    {% endif %}
+
     {{ vehicle_selector_form.select_vehicle }}
     {% comment %}
     <select id="vehicle_select" onchange="selectVehicle()">
@@ -88,8 +97,6 @@
     {% endcomment %}
 
     {% include "backoffice/includes/paginator.html" %}
-
-    {% include "backoffice/includes/search_form.html" %}
 
     <table class="data alternating" sortedby="{{ sortby }}">
     <tr>

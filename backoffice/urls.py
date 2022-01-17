@@ -155,6 +155,7 @@ urlpatterns = [
     path('service/create/scheduled/', service.ScheduledServiceCreateView.as_view(is_create_view=True), name='service-create-scheduled'),
     path('service/create/incidental/', service.IncidentalServiceCreateView.as_view(is_create_view=True), name='service-create-incidental'),
     path('service/scheduled/<int:pk>/', service.ScheduledServiceDetailView.as_view(), name='service-detail-scheduled'),
+    path('service/incidental/<int:pk>/', service.IncidentalServiceDetailView.as_view(), name='service-detail-incidental'),
     path('service/scheduled/<int:pk>/delete/', service.ScheduledServiceDeleteView.as_view(), name='service-delete-scheduled'),
     path('service/incidental/<int:pk>/delete/', service.IncidentalServiceDeleteView.as_view(), name='service-delete-incidental'),
 ]

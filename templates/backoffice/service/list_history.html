@@ -1,4 +1,5 @@
 {% extends "backoffice/service/base.html" %}
+{% load humanize %}
 
 {% block content %}
 
@@ -70,6 +71,8 @@
     </CFOUTPUT>
     {% endcomment %}
 
+    <h2>Service History</h2>
+
     {{ vehicle_selector_form.select_vehicle }}
     {% comment %}
     <select id="vehicle_select" onchange="selectVehicle()">
@@ -91,96 +94,100 @@
 
         {% include "backoffice/includes/paginator.html" %}
 
-        {% include "backoffice/includes/search_form.html" %}
+        {% comment %}
+        <CFOUTPUT>
+        <div class="pager">
+        #pageViewLink#
+        #Pages.pages#
+        </div>
+        </CFOUTPUT>
+        {% endcomment %}
 
-            <CFOUTPUT>
-            <div class="pager">
-            #pageViewLink#
-            #Pages.pages#
-            </div>
-            </CFOUTPUT>
+        <h3>Incidental Services</h3>
 
-            <h3>Incidental Services</h3>
+        {% if incidental_services %}
+        <cfif ServiceHist.recordCount GT 0>
 
-            {% if incidental_services %}
-            <cfif ServiceHist.recordCount GT 0>
-
-                <cfoutput>
-                <table class="data alternating" sortedby="{{ sortby }}">
-                </cfoutput>
-                    <tr>
-                        <cfoutput>
-                        <th defaultdir="DESC" col="servicehistid">ID</th>
-                        <th>Vehicle</th>
-                        <th>Title</th>
-                        <th>Done On</th>
-                        <th>Done Miles</th>
-                        <th>Notes</th>
-                        </cfoutput>
-                    </tr>
-                    <cfoutput query="ServiceHist">
-                    <tr class="clickable click-to-edit" idfield="servicehistid" itemid="#servicehistid#">
-                        <td><a href="#CGI.SCRIPT_NAME#?edit=1&servicehistid=#servicehistid#">#servicehistid#</a></td>
-                        <td>#make# #model#</td>
-                        <td>#title#</td>
-                        <td>#DateFormat(stamp,"MM/DD/YYYY")#</td>
-                        <td>#NumberFormat(mileage,",")#</td>
-                        <td class="truncate">#notes#</td>
-                    </tr>
+            <cfoutput>
+            <table class="data alternating" sortedby="{{ sortby }}">
+            </cfoutput>
+                <tr>
+                    <cfoutput>
+                    <th col="id" default-sort="desc">ID</th>
+                    <th>Vehicle</th>
+                    <th>Title</th>
+                    <th>Done On</th>
+                    <th>Done Miles</th>
+                    <th>Notes</th>
                     </cfoutput>
-                </table>
-
-            {% else %}
-            <cfelse>
-
-                <p class="no-records">(No records)</p>
-
-            </cfif>
-            {% endif %}
-
-            <h3>Scheduled Services</h3>
-
-            {% if scheduled_services %}
-            <cfif Service.recordCount GT 0>
-
-                <cfoutput>
-                <table class="data alternating" sortedby="{{ sortby }}">
+                </tr>
+                {% for service in incidental_services %}
+                <cfoutput query="ServiceHist">
+                <tr class="clickable click-to-edit" destination="{% url "backoffice:service-detail-incidental" pk=service.id %}">
+                    <td><a href="{% url "backoffice:service-detail-incidental" pk=service.id %}">{{ service.id }}</a></td>
+                    <td>{{ service.vehicle.vehicle_name }}</td>
+                    <td>{{ service.title }}</td>
+                    <td>{{ service.done_at|date:"m/d/Y" }}</td>
+                    <td>{{ service.mileage|intcomma }}</td>
+                    <td class="truncate">{{ service.notes }}</td>
+                </tr>
                 </cfoutput>
-                    <tr>
-                        <cfoutput>
-                        <th defaultdir="DESC" col="serviceid">ID</th>
-                        <th>Vehicle</th>
-                        <th>Name</th>
-                        <th>Done On</th>
-                        <th>Done Miles</th>
-                        <th>Next On</th>
-                        <th>Next Miles</th>
-                        <th>Due</th>
-                        <th>Notes</th>
-                        </cfoutput>
-                    </tr>
-                    <cfoutput query="Service">
-                    <tr class="clickable click-to-edit" idfield="serviceid" itemid="#serviceid#">
-                        <td><a href="#CGI.SCRIPT_NAME#?edit=1&serviceid=#serviceid#">#serviceid#</a></td>
-                        <td>#make# #model#</td>
-                        <td>#name#</td>
-                        <td>#DateFormat(donestamp,"MM/DD/YYYY")#</td>
-                        <td>#NumberFormat(donemiles,",")#</td>
-                        <td>#DateFormat(nextstamp,"MM/DD/YYYY")#</td>
-                        <td>#NumberFormat(nextmiles,",")#</td>
-                        <td>#due#</td>
-                        <td class="truncate">#notes#</td>
-                    </tr>
+                {% endfor %}
+            </table>
+
+        {% else %}
+        <cfelse>
+
+            <p class="no-records">(No records)</p>
+
+        </cfif>
+        {% endif %}
+
+        <h3>Scheduled Services</h3>
+
+        {% if scheduled_services %}
+        <cfif Service.recordCount GT 0>
+
+            <cfoutput>
+            <table class="data alternating" sortedby="{{ sortby }}">
+            </cfoutput>
+                <tr>
+                    <cfoutput>
+                    <th col="id" default-sort="desc">ID</th>
+                    <th>Vehicle</th>
+                    <th>Name</th>
+                    <th>Done On</th>
+                    <th>Done Miles</th>
+                    <th>Next On</th>
+                    <th>Next Miles</th>
+                    <th>Due</th>
+                    <th>Notes</th>
                     </cfoutput>
-                </table>
+                </tr>
+                {% for service in scheduled_services %}
+                <cfoutput query="Service">
+                <tr class="clickable click-to-edit" destination="{% url "backoffice:service-detail-scheduled" pk=service.id %}">
+                    <td><a href="{% url "backoffice:service-detail-scheduled" pk=service.id %}">{{ service.id }}</a></td>
+                    <td>{{ service.vehicle.vehicle_name }}</td>
+                    <td>{{ service.name }}</td>
+                    <td>{{ service.done_at|date:"m/d/Y" }}</td>
+                    <td>{{ service.done_mileage|intcomma }}</td>
+                    <td>{{ service.next_at|date:"m/d/Y" }}</td>
+                    <td>{{ service.next_mileage|intcomma }}</td>
+                    <td>{{ service.is_due }}</td>
+                    <td class="truncate">{{ service.notes }}</td>
+                </tr>
+                </cfoutput>
+                {% endfor %}
+            </table>
 
-            {% else %}
-            <cfelse>
+        {% else %}
+        <cfelse>
 
-                <p class="no-records">(No records)</p>
+            <p class="no-records">(No records)</p>
 
-            </cfif>
-            {% endif %}
+        </cfif>
+        {% endif %}
 
         {% comment %}
     <table class="data alternating" sortedby="{{ sortby }}">
