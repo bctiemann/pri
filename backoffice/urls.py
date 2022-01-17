@@ -161,6 +161,7 @@ urlpatterns = [
 
     path('mass_email/plain_text/', mass_email.MassEmailComposeView.as_view(is_plain_text=True), name='massemail-compose-plaintext'),
     path('mass_email/rich_text/', mass_email.MassEmailComposeView.as_view(is_rich_text=True), name='massemail-compose-richtext'),
+    path('mass_email/done/', mass_email.MassEmailComposeDoneView.as_view(is_rich_text=True), name='massemail-compose-done'),
     path('mass_email/images/', mass_email.MassEmailImageListView.as_view(), name='massemail-image-list'),
     path('mass_email/images/create/', mass_email.MassEmailImageCreateView.as_view(is_create_view=True), name='massemail-image-create'),
     path('mass_email/images/<int:pk>/delete/', mass_email.MassEmailImageDeleteView.as_view(), name='massemail-image-delete'),

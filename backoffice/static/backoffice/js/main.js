@@ -95,6 +95,15 @@ var confirmDelete = function(form, deleteUrl, objectName) {
     return false;
 };
 
+var confirmSend = function(form, objectName) {
+    const confirmStr = `This ${objectName} will be sent to many recipients. Are you sure?`
+    if (confirm(confirmStr)) {
+        $('#id_preview').val(false);
+        form.submit();
+    }
+    return false;
+}
+
 var convertToRental = function(form, convertUrl) {
     console.log(form.submit);
     form.action = convertUrl;
@@ -960,6 +969,10 @@ $(document).ready(function() {
     //     window.open('customers.cfm?edit=1&customerid=' + $(this).attr('customerid'));
     // });
 
+    // tinymce.init({
+    //     selector: '#id_body'
+    // });
+    //
     refreshDrivers();
     refreshMedia();
 

@@ -3,7 +3,7 @@ from rest_framework.response import Response
 
 from django.shortcuts import render, reverse
 from django.views.generic.list import ListView
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, FormView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -28,18 +28,24 @@ class MassEmailViewMixin:
         return context
 
 
-class MassEmailComposeView(MassEmailViewMixin, TemplateView):
+class MassEmailComposeView(MassEmailViewMixin, FormView):
     template_name = 'backoffice/mass_email/compose.html'
     form_class = MassEmailForm
 
-    # def form_valid(self, form):
-    #     tax_rate = form.save(commit=False)
-    #     tax_rate.total_rate = form.cleaned_data['total_rate_as_percent'] / 100
-    #     tax_rate.save()
-    #     return HttpResponseRedirect(self.get_success_url())
+    def form_valid(self, form):
+        if form.cleaned_data['preview']:
+            return self.render_to_response(self.get_context_data(form=form))
+
+        # TODO: Send out email here
+
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse('backoffice:massemail-done')
+        return reverse('backoffice:massemail-compose-done')
+
+
+class MassEmailComposeDoneView(MassEmailViewMixin, TemplateView):
+    template_name = 'backoffice/mass_email/done.html'
 
 
 class MassEmailImageListView(MassEmailViewMixin, ListViewMixin, ListView):

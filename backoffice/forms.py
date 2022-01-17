@@ -702,7 +702,8 @@ class VehicleSelectorForm(forms.Form):
 
 class MassEmailForm(forms.Form):
     subject = forms.CharField()
-    body = forms.CharField(widget=forms.Textarea())
+    body = forms.CharField(widget=forms.Textarea(), required=False)
+    preview = forms.BooleanField(widget=forms.HiddenInput(), initial=True, required=False)
 
 
 class EmailImageForm(forms.ModelForm):

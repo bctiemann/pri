@@ -2,6 +2,14 @@
 
 {% block content %}
 
+    {% if is_rich_text %}
+        <script>
+            tinymce.init({
+                selector: '#id_body'
+            });
+        </script>
+    {% endif %}
+
     <cfset to = IsDefined("Form.to") ? Form.to : "">
     <cfset subject = IsDefined("Form.preview") ? Form.subject : "">
     <cfset body = IsDefined("Form.preview") ? Form.body : "">
@@ -31,7 +39,7 @@
     </cfif>
 
     <cfoutput>
-    <form method="POST" action="#CGI.SCRIPT_NAME#">
+    <form method="POST" action="">
     <table class="inputform massemail">
         <tr>
             <td>Email To</td>
@@ -48,7 +56,10 @@
         </tr>
         <tr>
             <td>Subject</td>
-            <td><cfinput name="subject" value="#subject#" required="yes" message="Enter a subject." maxlength="255" /></td>
+            <td>
+                {{ form.subject }}
+                <cfinput name="subject" value="#subject#" required="yes" message="Enter a subject." maxlength="255" />
+            </td>
         </tr>
         <cfif richtext>
         <tr>
@@ -64,7 +75,10 @@
         </cfif>
         <tr>
             <td class="align-top">Message</td>
-            <td><cftextarea name="body" required="yes" height="500" richtext="#richtext#" message="You must enter a message to send.">#body#</cftextarea></td>
+            <td>
+                {{ form.body }}
+{#                <cftextarea name="body" required="yes" height="500" richtext="#richtext#" message="You must enter a message to send.">#body#</cftextarea>#}
+            </td>
         </tr>
 
         <tr>
@@ -72,11 +86,12 @@
             <td>
                 <button class="btn" type="submit" name="preview">Preview</button>
                 <cfif IsDefined("Form.fnc")>
-                    <button class="btn" type="submit" name="send" onclick="return confirmSend(this.form, 'news item')">Send Mass Email</button>
+                    <button class="btn" type="submit" name="send" onclick="return confirmSend(this.form, 'mass email')">Send Mass Email</button>
                 </cfif>
             </td>
         </tr>
     </table>
+    {{ form.preview }}
     <cfinput type="hidden" name="fnc" value="preview" />
     <cfif richtext>
         <cfinput type="hidden" name="richtext" value="1" />
