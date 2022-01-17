@@ -234,9 +234,11 @@
 
 <div id="menu_admin" class="popupbox">
 <ul class="navmenu">
+    {% if user.employee.admin_access %}
     <li>
-        <a class="tnav <CFIF scrpt IS "accounts.cfm">selected</CFIF>" href="accounts.cfm">Accounts</a>
+        <a class="tnav" href="{% url "admin:users_user_changelist" %}">Accounts</a>
     </li>
+    {% endif %}
     {% if user.employee.admin_access %}
     <CFIF YourID.acclev IS 1>
     <li>
@@ -300,11 +302,13 @@
     <li>
         <a class="tnav {% if page_group == 'bbs' %}>selected{% endif %}" href="{% url "backoffice:bbs-list" %}">BBS</a>
     </li>
+    {% if user.employee.admin_access %}
     <CFIF YourID.acclev IS 1>
     <li>
-        <a class="tnav <CFIF scrpt IS "securitylogs.cfm">selected</CFIF>" href="securitylogs.cfm">Security</a>
+        <a class="tnav" href="{% url "admin:index" %}">Admin Backend</a>
     </li>
     </CFIF>
+    {% endif %}
 </ul>
 </div>
 
