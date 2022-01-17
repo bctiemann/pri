@@ -111,11 +111,13 @@
 	<a class="tnav <CFIF scrpt IS "service.cfm">selected</CFIF>" href="service.cfm">Service</a>
 	</li>
 </CFIF>
+{% if user.employee.maintenance_access %}
 <CFIF YourID.acclev IS 1 OR YourID.acclev IS 3>
 	<li>
-	<a class="tnav <CFIF scrpt IS "damage.cfm">selected</CFIF>" href="damage.cfm">Damage</a>
+	<a class="tnav {% if page_group == 'damage' %}selected{% endif %}" href="{% url "backoffice:damage-list" %}">Damage</a>
 	</li>
 </CFIF>
+{% endif %}
 {% if user.employee.admin_access %}
 <CFIF YourID.acclev IS 1>
 	<li>

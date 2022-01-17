@@ -8,7 +8,7 @@ from backoffice import views
 from backoffice.views import (
     vehicles, reservations, rentals, guided_drives, employees, customers, coupons, toll_tags, tax_rates, bbs,
     consigners, consignment_payments, news, site_content, gift_certificates, adhoc_payments, newsletter_subscriptions,
-    stripe_charges, red_flags, survey_responses
+    stripe_charges, red_flags, survey_responses, damage,
 )
 
 
@@ -139,4 +139,11 @@ urlpatterns = [
 
     path('site_content/', site_content.SiteContentListView.as_view(), name='sitecontent-list'),
     path('site_content/<str:page>/', site_content.SiteContentDetailView.as_view(), name='sitecontent-detail'),
+
+    path('damage/', damage.DamageListView.as_view(), name='damage-list'),
+    path('damage/unrepaired/', damage.DamageListView.as_view(unrepaired_only=True), name='damage-list-unrepaired'),
+    path('damage/repaired/', damage.DamageListView.as_view(repaired_only=True), name='damage-list-repaired'),
+    path('damage/create/', damage.DamageCreateView.as_view(is_create_view=True), name='damage-create'),
+    path('damage/<int:pk>/', damage.DamageDetailView.as_view(), name='damage-detail'),
+    path('damage/<int:pk>/delete/', damage.DamageDeleteView.as_view(), name='damage-delete'),
 ]

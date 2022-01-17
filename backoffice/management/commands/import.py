@@ -26,6 +26,7 @@ from sales.models import (
     AdHocPayment, Charge, RedFlag, generate_code
 )
 from consignment.models import Consigner, ConsignmentPayment
+from service.models import Damage
 from sales.enums import ReservationType
 from pri.cipher import AESCipher
 
@@ -82,7 +83,8 @@ class Command(BaseCommand):
         # 'do_adhocpayments': True,
         # 'do_charges': True,
         # 'do_redflags': True,
-        'do_surveyresponses': True,
+        # 'do_surveyresponses': True,
+        'do_damage': True,
     }
 
     def add_arguments(self, parser):
@@ -873,3 +875,26 @@ class Command(BaseCommand):
                 )
                 new.created_at = old['stamp']
                 new.save()
+
+        if 'do_damage' in self.enabled:
+            if clear_existing:
+                Damage.objects.all().delete()
+            back_cursor.execute("""SELECT * FROM Damage""")
+            for old in back_cursor.fetchall():
+                print(old)
+                vehicle = Vehicle.objects.filter(pk=old['vehicleid']).first()
+                new = Damage.objects.create(
+                    id=old['damageid'],
+                    vehicle=vehicle,
+                    title=old['title'],
+                    damaged_at=old['damageon'],
+                    repaired_at=old['repairedon'],
+                    is_repaired=old['repaired'],
+                    cost=old['cost'],
+                    fault=old['fault'],
+                    customer_billed_amount=old['billcustomer'],
+                    customer_paid_amount=old['paidamt'],
+                    is_paid=old['paid'],
+                    in_house_repair=old['inhouse'],
+                    notes=old['notes'] or '',
+                )

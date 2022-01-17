@@ -18,6 +18,7 @@ from sales.enums import (
     current_year, get_exp_year_choices, get_exp_month_choices, get_vehicle_choices, get_extra_miles_choices
 )
 from marketing.models import NewsItem, SiteContent
+from service.models import Damage
 
 
 class CSSClassMixin:
@@ -593,5 +594,41 @@ class RedFlagForm(forms.ModelForm):
 
     class Meta:
         model = RedFlag
+        fields = '__all__'
+        # exclude = ('confirmation_code',)
+
+
+class DamageForm(CSSClassMixin, forms.ModelForm):
+
+    damaged_on = forms.DateField(widget=forms.DateInput(), required=False)
+    repaired_on = forms.DateField(widget=forms.DateInput(), required=False)
+    is_repaired = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
+    is_paid = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
+    in_house_repair = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['vehicle'].choices = get_vehicle_choices()
+        if self.instance.damaged_at:
+            damaged_at_localized = self.instance.damaged_at.astimezone(pytz.timezone(settings.TIME_ZONE))
+            self.fields['damaged_on'].initial = damaged_at_localized.strftime('%m/%d/%Y')
+        if self.instance.repaired_at:
+            repaired_at_localized = self.instance.repaired_at.astimezone(pytz.timezone(settings.TIME_ZONE))
+            self.fields['repaired_on'].initial = repaired_at_localized.strftime('%m/%d/%Y')
+
+        short_fields = [
+            'damaged_on', 'repaired_on', 'cost', 'customer_billed_amount', 'customer_paid_amount',
+        ]
+        for field in short_fields:
+            self.add_widget_css_class(field, 'short')
+
+    def clean(self):
+        super().clean()
+        self.cleaned_data['damaged_at'] = self.cleaned_data['damaged_on']
+        self.cleaned_data['repaired_at'] = self.cleaned_data['repaired_on']
+
+    class Meta:
+        model = Damage
         fields = '__all__'
         # exclude = ('confirmation_code',)

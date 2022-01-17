@@ -1,0 +1,175 @@
+{% extends "backoffice/damage/base.html" %}
+
+{% block content %}
+
+    {% if damage %}
+        <h2>Edit Damage</h2>
+    {% else %}
+        <h2>Add Damage</h2>
+    {% endif %}
+
+    {{ form.errors }}
+    {% if damage %}
+        <form method="POST" action="{% url "backoffice:damage-detail" pk=damage.id %}">
+    {% else %}
+        <form method="POST" action="{% url "backoffice:damage-create" %}">
+    {% endif %}
+
+    <table class="inputform damage">
+        <tr>
+            <td>Vehicle</td>
+            <td>
+                {{ form.vehicle }}
+                {% comment %}
+                <cfquery name="Vehicles" datasource="#DSN#">
+                    SELECT vehicleid,make,model,year,type FROM Vehicles
+                    ORDER BY make,model,year
+                </cfquery>
+                <cfselect name="vehicleid">
+                    <cfloop query="Vehicles">
+                        <option value="#vehicleid#" <cfif vehicleid IS Damage.vehicleid>selected</cfif>>#make# #model#</option>
+                    </cfloop>
+                </cfselect>
+                {% endcomment %}
+            </td>
+        </tr>
+        <tr>
+            <td>Title</td>
+            <td>
+                {{ form.title }}
+                <cfinput name="title" value="#Damage.title#" maxlength="255" />
+            </td>
+        </tr>
+        <tr>
+            <td>Damaged On</td>
+            <td>
+                {{ form.damaged_on }}
+                <cftry>
+                    <cfset damageon = DateFormat(Damage.damageon,"MM/DD/YYYY")>
+                    <cfcatch type="Any">
+                        <cfset damageon = "">
+                    </cfcatch>
+                </cftry>
+                <cfinput name="damageon" value="#damageon#" maxlength="20" class="short" />
+            </td>
+        </tr>
+        <tr>
+            <td>Repaired?</td>
+            <td>
+                {{ form.is_repaired }}
+                {% comment %}
+                <select name="repaired">
+                    <option value="0" <CFIF Damage.repaired IS 0>selected</CFIF>>No</option>
+                    <option value="1" <CFIF Damage.repaired IS 1>selected</CFIF>>Yes</option>
+                </select>
+                {% endcomment %}
+            </td>
+        </tr>
+        <tr>
+            <td>Repaired On</td>
+            <td>
+                {{ form.repaired_on }}
+                <cftry>
+                    <cfset repairedon = DateFormat(Damage.repairedon,"MM/DD/YYYY")>
+                    <cfcatch type="Any">
+                        <cfset repairedon = "">
+                    </cfcatch>
+                </cftry>
+                <cfinput name="repairedon" value="#repairedon#" maxlength="20" class="short" />
+            </td>
+        </tr>
+        <tr>
+            <td>Repair Cost</td>
+            <td class="currency">
+                <span class="currency-prefix">$</span>{{ form.cost }}
+                <cfinput name="cost" value="#NumberFormat(Damage.cost,".__")#" maxlength="10" class="short" />
+            </td>
+        </tr>
+        <tr>
+            <td>Fault</td>
+            <td>
+                {{ form.fault }}
+                {% comment %}
+                <select name="fault">
+                    <option value="0" <CFIF Damage.fault IS 0>selected</CFIF>>None</option>
+                    <option value="1" <CFIF Damage.fault IS 1>selected</CFIF>>Customer</option>
+                    <option value="2" <CFIF Damage.fault IS 2>selected</CFIF>>Us</option>
+                </select>
+                {% endcomment %}
+            </td>
+        </tr>
+        <tr>
+            <td>Amount Billed Customer</td>
+            <td class="currency">
+                <span class="currency-prefix">$</span>{{ form.customer_billed_amount }}
+                <cfinput name="billcustomer" value="#NumberFormat(Damage.billcustomer,".__")#" class="short" />
+            </td>
+        </tr>
+        <tr>
+            <td>Damage Paid For?</td>
+            <td>
+                {{ form.is_paid }}
+                {% comment %}
+                <select name="paid">
+                    <option value="0" <CFIF Damage.paid IS 0>selected</CFIF>>No</option>
+                    <option value="1" <CFIF Damage.paid IS 1>selected</CFIF>>Yes</option>
+                </select>
+                {% endcomment %}
+            </td>
+        </tr>
+        <tr>
+            <td>In-House Repair?</td>
+            <td>
+                {{ form.in_house_repair }}
+                {% comment %}
+                <select name="inhouse">
+                    <option value="0" <CFIF Damage.inhouse IS 0>selected</CFIF>>No</option>
+                    <option value="1" <CFIF Damage.inhouse IS 1>selected</CFIF>>Yes</option>
+                </select>
+                {% endcomment %}
+             </td>
+        </tr>
+        <tr>
+            <td>Amount Customer Paid</td>
+            <td class="currency">
+                <span class="currency-prefix">$</span>{{ form.customer_paid_amount }}
+                <cfinput name="paidamt" value="#NumberFormat(Damage.paidamt,".__")#" class="short" />
+            </td>
+        </tr>
+        <tr>
+            <td class="align-top">Notes</td>
+            <td>
+                {{ form.notes }}
+{#                <cftextarea name="notes">#Damage.notes#</cftextarea>#}
+            </td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>
+                <button class="btn" type="submit" name="edit">
+                    {% if damage %}
+                        Edit
+                    {% else %}
+                        Add
+                    {% endif %}
+                </button>
+                {% if damage %}
+                <cfif tolltagid>
+                    <button
+                        class="btn delete"
+                        type="submit"
+                        name="delete"
+                        onclick="return confirmDelete(this.form, '{% url "backoffice:damage-delete" pk=damage.id %}', 'damage')"
+                    >
+                        Delete Damage
+                    </button>
+                </cfif>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+    {% csrf_token %}
+    </form>
+
+{% endblock %}

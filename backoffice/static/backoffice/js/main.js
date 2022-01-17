@@ -825,8 +825,8 @@ $(document).ready(function() {
     $('#donestamp').datepicker({});
     $('#nextstamp').datepicker({});
     $('#id_paid_on_picker').datepicker({});
-    $('#damageon').datepicker({});
-    $('#repairedon').datepicker({});
+    $('#id_damaged_on').datepicker({});
+    $('#id_repaired_on').datepicker({});
 
     // Tooltip for vehicle specs model
     $('.specs-model').tooltip({

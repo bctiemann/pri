@@ -153,7 +153,7 @@
             <td>{{ response.get_would_recommend_display }}</td>
             <td>{{ response.pricing }} - {{ response.get_pricing_display }}</td>
             <td>{{ response.get_email_frequency_display }}</td>
-            <td>{{ response.get_vehicle_types_display }}</td>
+            <td class="no-overflow" style="max-width: 100px;">{{ response.get_vehicle_types_display }}</td>
             <td class="no-overflow" style="max-width: 100px;">{{ response.comments }}</td>
             <td><button class="btn delete" type="submit" name="delete" onclick="return confirmDelete(this.form, '{% url "backoffice:surveyresponse-delete" pk=response.id %}', 'survey result')">Delete</button></td>
         </tr>

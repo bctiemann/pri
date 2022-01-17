@@ -1,0 +1,21 @@
+{% extends "backoffice/base.html" %}
+
+{% block nav %}
+    <h1 class="pageheader">
+        Damage
+        <ul class="nav_subpage">
+            <a href="{% url "backoffice:damage-list-unrepaired" %}">
+                <li {% if unrepaired_only %}class="selected"{% endif %}>Unrepaired</li>
+            </a>
+            <a href="{% url "backoffice:damage-list-repaired" %}">
+                <li {% if repaired_only %}class="selected"{% endif %}>Repaired</li>
+            </a>
+            <a href="{% url "backoffice:damage-list" %}">
+                <li {% if is_unfiltered_list_view %}class="selected"{% endif %}>List All</li>
+            </a>
+            <a href="{% url "backoffice:damage-create" %}">
+                <li {% if is_create_view %}class="selected"{% endif %}>Add</li>
+            </a>
+        </ul>
+    </h1>
+{% endblock %}
