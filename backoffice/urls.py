@@ -2,13 +2,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls import static
 from django.conf import settings
+from django.views.generic.base import RedirectView
 
 from fleet import views as fleet_views
 from backoffice import views
 from backoffice.views import (
     vehicles, reservations, rentals, guided_drives, employees, customers, coupons, toll_tags, tax_rates, bbs,
     consigners, consignment_payments, news, site_content, gift_certificates, adhoc_payments, newsletter_subscriptions,
-    stripe_charges, red_flags, survey_responses, damage,
+    stripe_charges, red_flags, survey_responses, damage, service,
 )
 
 
@@ -146,4 +147,14 @@ urlpatterns = [
     path('damage/create/', damage.DamageCreateView.as_view(is_create_view=True), name='damage-create'),
     path('damage/<int:pk>/', damage.DamageDetailView.as_view(), name='damage-detail'),
     path('damage/<int:pk>/delete/', damage.DamageDeleteView.as_view(), name='damage-delete'),
+
+    path('service/', RedirectView.as_view(url='/service/due/'), name='service-list-redirect'),
+    path('service/due/', service.ScheduledServiceListView.as_view(due_only=True), name='service-list-due'),
+    path('service/upcoming/', service.ScheduledServiceListView.as_view(upcoming_only=True), name='service-list-upcoming'),
+    path('service/history/', service.ServiceHistoryListView.as_view(history_only=True), name='service-list-history'),
+    path('service/create/scheduled/', service.ScheduledServiceCreateView.as_view(is_create_view=True), name='service-create-scheduled'),
+    path('service/create/incidental/', service.IncidentalServiceCreateView.as_view(is_create_view=True), name='service-create-incidental'),
+    path('service/scheduled/<int:pk>/', service.ScheduledServiceDetailView.as_view(), name='service-detail-scheduled'),
+    path('service/scheduled/<int:pk>/delete/', service.ScheduledServiceDeleteView.as_view(), name='service-delete-scheduled'),
+    path('service/incidental/<int:pk>/delete/', service.IncidentalServiceDeleteView.as_view(), name='service-delete-incidental'),
 ]

@@ -2,15 +2,30 @@ from django.db import models
 
 
 class ScheduledService(models.Model):
-    pass
+    vehicle = models.ForeignKey('fleet.Vehicle', null=True, blank=True, on_delete=models.SET_NULL)
+    service_item = models.ForeignKey('service.ServiceItem', null=True, blank=True, on_delete=models.SET_NULL)
+    name = models.CharField(max_length=255, blank=True)
+    done_at = models.DateTimeField(null=True, blank=True)
+    done_mileage = models.IntegerField(null=True, blank=True)
+    next_at = models.DateTimeField(null=True, blank=True)
+    next_mileage = models.IntegerField(null=True, blank=True)
+    is_due = models.BooleanField(default=False)
+    notes = models.TextField(blank=True)
 
 
 class IncidentalService(models.Model):
-    pass
+    vehicle = models.ForeignKey('fleet.Vehicle', null=True, blank=True, on_delete=models.SET_NULL)
+    done_at = models.DateTimeField(null=True, blank=True)
+    title = models.CharField(max_length=255, blank=True)
+    notes = models.TextField(blank=True)
+    mileage = models.IntegerField(null=True, blank=True)
 
 
 class ServiceItem(models.Model):
-    pass
+    name = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Damage(models.Model):

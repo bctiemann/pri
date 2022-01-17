@@ -26,7 +26,7 @@ from sales.models import (
     AdHocPayment, Charge, RedFlag, generate_code
 )
 from consignment.models import Consigner, ConsignmentPayment
-from service.models import Damage
+from service.models import Damage, ServiceItem, ScheduledService, IncidentalService
 from sales.enums import ReservationType
 from pri.cipher import AESCipher
 
@@ -84,7 +84,10 @@ class Command(BaseCommand):
         # 'do_charges': True,
         # 'do_redflags': True,
         # 'do_surveyresponses': True,
-        'do_damage': True,
+        # 'do_damage': True,
+        # 'do_serviceitems': True,
+        # 'do_scheduledservices': True,
+        'do_incidentalservices': True,
     }
 
     def add_arguments(self, parser):
@@ -897,4 +900,52 @@ class Command(BaseCommand):
                     is_paid=old['paid'],
                     in_house_repair=old['inhouse'],
                     notes=old['notes'] or '',
+                )
+
+        if 'do_serviceitems' in self.enabled:
+            if clear_existing:
+                ServiceItem.objects.all().delete()
+            back_cursor.execute("""SELECT * FROM ServiceItems""")
+            for old in back_cursor.fetchall():
+                print(old)
+                new = ServiceItem.objects.create(
+                    id=old['serviceitemid'],
+                    name=old['name'],
+                )
+
+        if 'do_scheduledservices' in self.enabled:
+            if clear_existing:
+                ScheduledService.objects.all().delete()
+            back_cursor.execute("""SELECT * FROM Service""")
+            for old in back_cursor.fetchall():
+                print(old)
+                vehicle = Vehicle.objects.filter(pk=old['vehicleid']).first()
+                service_item = ServiceItem.objects.filter(pk=old['serviceitemid']).first()
+                new = ScheduledService.objects.create(
+                    id=old['serviceid'],
+                    vehicle=vehicle,
+                    service_item=service_item,
+                    name=old['name'],
+                    done_at=old['donestamp'],
+                    done_mileage=old['donemiles'],
+                    next_at=old['nextstamp'],
+                    next_mileage=old['nextmiles'],
+                    is_due=old['due'],
+                    notes=old['notes'] or '',
+                )
+
+        if 'do_incidentalservices' in self.enabled:
+            if clear_existing:
+                IncidentalService.objects.all().delete()
+            back_cursor.execute("""SELECT * FROM ServiceHist""")
+            for old in back_cursor.fetchall():
+                print(old)
+                vehicle = Vehicle.objects.filter(pk=old['vehicleid']).first()
+                new = IncidentalService.objects.create(
+                    id=old['servicehistid'],
+                    vehicle=vehicle,
+                    done_at=old['stamp'],
+                    title=old['title'],
+                    notes=old['notes'] or '',
+                    mileage=old['mileage'],
                 )

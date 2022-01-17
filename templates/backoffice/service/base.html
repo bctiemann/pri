@@ -1,0 +1,24 @@
+{% extends "backoffice/base.html" %}
+
+{% block nav %}
+    <h1 class="pageheader">
+        Service
+        <ul class="nav_subpage">
+            <a href="{% url "backoffice:service-list-due" %}">
+                <li {% if due_only %}class="selected"{% endif %}>Due</li>
+            </a>
+            <a href="{% url "backoffice:service-list-upcoming" %}">
+                <li {% if upcoming_only %}class="selected"{% endif %}>Upcoming</li>
+            </a>
+            <a href="{% url "backoffice:service-list-history" %}">
+                <li {% if history_only %}class="selected"{% endif %}>History</li>
+            </a>
+            <a href="{% url "backoffice:service-create-scheduled" %}">
+                <li {% if is_create_view %}class="selected"{% endif %}>Add Scheduled</li>
+            </a>
+            <a href="{% url "backoffice:service-create-incidental" %}">
+                <li {% if is_create_view %}class="selected"{% endif %}>Add Incidental</li>
+            </a>
+        </ul>
+    </h1>
+{% endblock %}

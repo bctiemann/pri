@@ -18,7 +18,7 @@ from sales.enums import (
     current_year, get_exp_year_choices, get_exp_month_choices, get_vehicle_choices, get_extra_miles_choices
 )
 from marketing.models import NewsItem, SiteContent
-from service.models import Damage
+from service.models import Damage, ScheduledService, IncidentalService
 
 
 class CSSClassMixin:
@@ -630,6 +630,22 @@ class DamageForm(CSSClassMixin, forms.ModelForm):
 
     class Meta:
         model = Damage
+        fields = '__all__'
+        # exclude = ('confirmation_code',)
+
+
+class ScheduledServiceForm(CSSClassMixin, forms.ModelForm):
+
+    class Meta:
+        model = ScheduledService
+        fields = '__all__'
+        # exclude = ('confirmation_code',)
+
+
+class IncidentalServiceForm(CSSClassMixin, forms.ModelForm):
+
+    class Meta:
+        model = IncidentalService
         fields = '__all__'
         # exclude = ('confirmation_code',)
 
