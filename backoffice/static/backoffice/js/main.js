@@ -87,6 +87,7 @@ console.log(data);
 
 var confirmDelete = function(form, deleteUrl, objectName) {
     const confirmStr = `This ${objectName} will be deleted. Are you sure?`
+    console.log(deleteUrl);
     if (confirm(confirmStr)) {
         form.action = deleteUrl;
         form.submit();

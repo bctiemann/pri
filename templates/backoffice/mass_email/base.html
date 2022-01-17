@@ -1,0 +1,18 @@
+{% extends "backoffice/base.html" %}
+
+{% block nav %}
+    <h1 class="pageheader">
+        Mass Email
+        <ul class="nav_subpage">
+            <a href="{% url "backoffice:massemail-compose-plaintext" %}">
+                <li {% if is_plain_text %}class="selected"{% endif %}>Plain Text</li>
+            </a>
+            <a href="{% url "backoffice:massemail-compose-richtext" %}">
+                <li {% if is_rich_text %}class="selected"{% endif %}>Rich Text</li>
+            </a>
+            <a href="{% url "backoffice:massemail-image-list" %}" target="_blank">
+                <li>Email Images</li>
+            </a>
+        </ul>
+    </h1>
+{% endblock %}

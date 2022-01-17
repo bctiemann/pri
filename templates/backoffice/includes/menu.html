@@ -270,11 +270,13 @@
     </li>
     </CFIF>
 --->
+    {% if user.employee.marketing_access %}
     <CFIF YourID.acclev IS 1 OR YourID.acclev IS 4>
     <li>
-        <a class="tnav <CFIF scrpt IS "massemail.cfm" OR scrpt IS "emailimg.cfm">selected</CFIF>" href="massemail.cfm">Mass Email</a>
+        <a class="tnav {% if page_group == 'mass_email' %}selected{% endif %}" href="{% url "backoffice:massemail-compose-plaintext" %}">Mass Email</a>
     </li>
     </CFIF>
+    {% endif %}
     {% if user.employee.marketing_access %}
     <CFIF YourID.acclev IS 1 OR YourID.acclev IS 4>
     <li>

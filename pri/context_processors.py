@@ -14,6 +14,7 @@ def settings_constants(request):
         'company_name': settings.COMPANY_NAME,
         'company_phone': settings.COMPANY_PHONE,
         'stripe_publishable_key': settings.STRIPE_PUBLIC_KEY,
+        'server_base_url': settings.SERVER_BASE_URL,
     }
     return context
 

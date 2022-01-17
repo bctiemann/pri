@@ -17,7 +17,7 @@ from sales.enums import (
     TRUE_FALSE_CHOICES, DELIVERY_REQUIRED_CHOICES, birth_years, operational_years, get_service_hours,
     current_year, get_exp_year_choices, get_exp_month_choices, get_vehicle_choices, get_extra_miles_choices
 )
-from marketing.models import NewsItem, SiteContent
+from marketing.models import NewsItem, SiteContent, EmailImage
 from service.models import Damage, ScheduledService, IncidentalService
 
 
@@ -698,3 +698,19 @@ class IncidentalServiceForm(CSSClassMixin, forms.ModelForm):
 
 class VehicleSelectorForm(forms.Form):
     select_vehicle = forms.ChoiceField(choices=get_vehicle_choices(allow_null=True, null_display_value='(Select vehicle)'))
+
+
+class MassEmailForm(forms.Form):
+    subject = forms.CharField()
+    body = forms.CharField(widget=forms.Textarea())
+
+
+class EmailImageForm(forms.ModelForm):
+
+    def clean(self):
+        super().clean()
+
+    class Meta:
+        model = EmailImage
+        fields = '__all__'
+        # exclude = ('confirmation_code',)

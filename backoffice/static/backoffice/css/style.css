@@ -1145,6 +1145,10 @@ img.showcase {
 	width: 100%;
 }
 
+.email-image-thumb {
+	max-width: 100px;
+}
+
 ul.drop-right {
 	float: right;
 }

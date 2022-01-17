@@ -1,0 +1,88 @@
+{% extends "backoffice/mass_email/base.html" %}
+
+{% block content %}
+
+    <cfset to = IsDefined("Form.to") ? Form.to : "">
+    <cfset subject = IsDefined("Form.preview") ? Form.subject : "">
+    <cfset body = IsDefined("Form.preview") ? Form.body : "">
+    <cfset richtext = IsDefined("URL.richtext") ? True : IsDefined("Form.richtext")>
+
+    <cfif IsDefined("Form.preview")>
+<span class="red">Preview:</span>
+<cfif richtext AND Form.head IS 1>
+<br>
+<small>HTML Header/footer will be wrapped around content below.</small>
+</cfif>
+<br><br>
+<div class="mailpreview">
+
+<b>Sending To:</b> <CFIF Form.to IS 1>Customers<CFELSEIF Form.to IS 2>Newsletter Subs<CFELSEIF Form.to IS 3>Best Customers<CFELSEIF Form.to IS 4>Test
+(Admin)</CFIF><br><br>
+
+<b>Subject:</b> <CFOUTPUT>#Form.subject#</CFOUTPUT><br><br>
+<cfif richtext>
+<CFOUTPUT>#Form.body#</CFOUTPUT>
+<cfelse>
+<pre>
+<CFOUTPUT>#Form.body#</CFOUTPUT>
+</pre>
+</cfif>
+</div>
+    </cfif>
+
+    <cfoutput>
+    <form method="POST" action="#CGI.SCRIPT_NAME#">
+    <table class="inputform massemail">
+        <tr>
+            <td>Email To</td>
+            <td>
+                <cfselect name="to">
+                    <option value="1" <cfif to IS 1>selected</cfif>>Customers (#cust.totalof#)</option>
+                    <option value="2" <cfif to IS 2>selected</cfif>>Newsletter Subs (#news.totalof#)</option>
+                    <option value="3" <cfif to IS 3>selected</cfif>>Best Customers (#best.totalof#)</option>
+                    <option value="5" <cfif to IS 5>selected</cfif>>Recently visiting Customers (3 day) (#rcount#)</option>
+                    <option value="6" <cfif to IS 6>selected</cfif>>Recently visiting News Subs (3 day) (#ncount#)</option>
+                    <option value="4" <cfif to IS 4 OR to IS "">selected</cfif>>Test (Administrators) (#test.totalof#)</option>
+                </cfselect>
+            </td>
+        </tr>
+        <tr>
+            <td>Subject</td>
+            <td><cfinput name="subject" value="#subject#" required="yes" message="Enter a subject." maxlength="255" /></td>
+        </tr>
+        <cfif richtext>
+        <tr>
+            <td>Include Header</td>
+            <td>
+                <cfselect name="head">
+                    <option value="0">No</option>
+                    <option value="1" selected>Yes</option>
+                </cfselect>
+                <small>Includes site logo and styling container div around content.</small>
+            </td>
+        </tr>
+        </cfif>
+        <tr>
+            <td class="align-top">Message</td>
+            <td><cftextarea name="body" required="yes" height="500" richtext="#richtext#" message="You must enter a message to send.">#body#</cftextarea></td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>
+                <button class="btn" type="submit" name="preview">Preview</button>
+                <cfif IsDefined("Form.fnc")>
+                    <button class="btn" type="submit" name="send" onclick="return confirmSend(this.form, 'news item')">Send Mass Email</button>
+                </cfif>
+            </td>
+        </tr>
+    </table>
+    <cfinput type="hidden" name="fnc" value="preview" />
+    <cfif richtext>
+        <cfinput type="hidden" name="richtext" value="1" />
+    </cfif>
+    {% csrf_token %}
+    </form>
+    </cfoutput>
+
+{% endblock %}

@@ -15,7 +15,7 @@ from django.core.files.temp import NamedTemporaryFile
 from django.core.files import File
 
 from backoffice.models import BBSPost
-from marketing.models import NewsItem, SiteContent, NewsletterSubscription, SurveyResponse
+from marketing.models import NewsItem, SiteContent, NewsletterSubscription, SurveyResponse, EmailImage, get_email_image_path
 from fleet.models import (
     Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, TransmissionType, Location, TollTag,
     get_vehicle_picture_path, get_vehicle_video_path
@@ -87,7 +87,8 @@ class Command(BaseCommand):
         # 'do_damage': True,
         # 'do_serviceitems': True,
         # 'do_scheduledservices': True,
-        'do_incidentalservices': True,
+        # 'do_incidentalservices': True,
+        'do_emailimages': True,
     }
 
     def add_arguments(self, parser):
@@ -146,6 +147,12 @@ class Command(BaseCommand):
         image_tempfile = self.get_image_tempfile(url)
         vehicle_marketing.mobile_thumbnail_image.save(get_vehicle_picture_path(None, 'temp.png'), File(image_tempfile))
         vehicle_marketing.save()
+
+    def import_email_image(self, email_image, email_pic_id, ext):
+        url = f'{SITE_ROOT}email/email-{email_pic_id}.{ext}'
+        image_tempfile = self.get_image_tempfile(url)
+        email_image.image.save(get_email_image_path(None, f'temp.{ext}'), File(image_tempfile))
+        email_image.save()
 
     def handle(self, *args, **options):
         key = options.get('key', None)
@@ -949,3 +956,14 @@ class Command(BaseCommand):
                     notes=old['notes'] or '',
                     mileage=old['mileage'],
                 )
+
+        if 'do_emailimages' in self.enabled:
+            if clear_existing:
+                EmailImage.objects.all().delete()
+            back_cursor.execute("""SELECT * FROM EmailPics""")
+            for old in back_cursor.fetchall():
+                print(old)
+                new = EmailImage.objects.create(
+                    id=old['emailpicid'],
+                )
+                self.import_email_image(new, old['emailpicid'], old['ext'])

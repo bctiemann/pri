@@ -1,7 +1,15 @@
+import uuid
+
 from django.db import models
 from django.utils.text import slugify
 
 from users.models import LowercaseEmailField
+
+
+def get_email_image_path(instance, filename):
+    extension = filename.split('.')[-1].lower()
+    filename = '{0}.{1}'.format(uuid.uuid4(), extension)
+    return 'email_pics/{0}'.format(filename)
 
 
 class SiteContent(models.Model):
@@ -113,3 +121,9 @@ class SurveyResponse(models.Model):
 
 class Tweet(models.Model):
     pass
+
+
+class EmailImage(models.Model):
+    image = models.ImageField(width_field='width', height_field='height', upload_to=get_email_image_path)
+    width = models.IntegerField(null=True, blank=True)
+    height = models.IntegerField(null=True, blank=True)

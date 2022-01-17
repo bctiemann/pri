@@ -9,7 +9,7 @@ from backoffice import views
 from backoffice.views import (
     vehicles, reservations, rentals, guided_drives, employees, customers, coupons, toll_tags, tax_rates, bbs,
     consigners, consignment_payments, news, site_content, gift_certificates, adhoc_payments, newsletter_subscriptions,
-    stripe_charges, red_flags, survey_responses, damage, service,
+    stripe_charges, red_flags, survey_responses, damage, service, mass_email,
 )
 
 
@@ -158,4 +158,10 @@ urlpatterns = [
     path('service/incidental/<int:pk>/', service.IncidentalServiceDetailView.as_view(), name='service-detail-incidental'),
     path('service/scheduled/<int:pk>/delete/', service.ScheduledServiceDeleteView.as_view(), name='service-delete-scheduled'),
     path('service/incidental/<int:pk>/delete/', service.IncidentalServiceDeleteView.as_view(), name='service-delete-incidental'),
+
+    path('mass_email/plain_text/', mass_email.MassEmailComposeView.as_view(is_plain_text=True), name='massemail-compose-plaintext'),
+    path('mass_email/rich_text/', mass_email.MassEmailComposeView.as_view(is_rich_text=True), name='massemail-compose-richtext'),
+    path('mass_email/images/', mass_email.MassEmailImageListView.as_view(), name='massemail-image-list'),
+    path('mass_email/images/create/', mass_email.MassEmailImageCreateView.as_view(is_create_view=True), name='massemail-image-create'),
+    path('mass_email/images/<int:pk>/delete/', mass_email.MassEmailImageDeleteView.as_view(), name='massemail-image-delete'),
 ]
