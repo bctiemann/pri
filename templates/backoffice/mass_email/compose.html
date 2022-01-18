@@ -15,28 +15,40 @@
     <cfset body = IsDefined("Form.preview") ? Form.body : "">
     <cfset richtext = IsDefined("URL.richtext") ? True : IsDefined("Form.richtext")>
 
+    {% if request.POST %}
     <cfif IsDefined("Form.preview")>
 <span class="red">Preview:</span>
-<cfif richtext AND Form.head IS 1>
-<br>
-<small>HTML Header/footer will be wrapped around content below.</small>
-</cfif>
+        {% if is_rich_text and form.data.include_header == 'True' %}
+            <cfif richtext AND Form.head IS 1>
+            <br>
+            <small>HTML Header/footer will be wrapped around content below.</small>
+            </cfif>
+        {% endif %}
 <br><br>
 <div class="mailpreview">
 
-<b>Sending To:</b> <CFIF Form.to IS 1>Customers<CFELSEIF Form.to IS 2>Newsletter Subs<CFELSEIF Form.to IS 3>Best Customers<CFELSEIF Form.to IS 4>Test
-(Admin)</CFIF><br><br>
+<b>Sending To:</b> {{ form.recipient_label }}
 
-<b>Subject:</b> <CFOUTPUT>#Form.subject#</CFOUTPUT><br><br>
+{% comment %}
+    <CFIF Form.to IS 1>Customers<CFELSEIF Form.to IS 2>Newsletter Subs<CFELSEIF Form.to IS 3>Best Customers<CFELSEIF Form.to IS 4>Test
+(Admin)</CFIF>
+{% endcomment %}
+<br><br>
+
+<b>Subject:</b> <CFOUTPUT>{{ request.POST.subject }}</CFOUTPUT><br><br>
+{% if is_rich_text %}
 <cfif richtext>
-<CFOUTPUT>#Form.body#</CFOUTPUT>
+    <CFOUTPUT>{{ form.body.value|safe }}</CFOUTPUT>
 <cfelse>
-<pre>
-<CFOUTPUT>#Form.body#</CFOUTPUT>
-</pre>
+{% else %}
+    <pre>
+    <CFOUTPUT>{{ form.body.value }}</CFOUTPUT>
+    </pre>
 </cfif>
+{% endif %}
 </div>
     </cfif>
+    {% endif %}
 
     <cfoutput>
     <form method="POST" action="">
@@ -44,6 +56,7 @@
         <tr>
             <td>Email To</td>
             <td>
+                {{ form.send_to }}
                 <cfselect name="to">
                     <option value="1" <cfif to IS 1>selected</cfif>>Customers (#cust.totalof#)</option>
                     <option value="2" <cfif to IS 2>selected</cfif>>Newsletter Subs (#news.totalof#)</option>
@@ -61,10 +74,12 @@
                 <cfinput name="subject" value="#subject#" required="yes" message="Enter a subject." maxlength="255" />
             </td>
         </tr>
+        {% if is_rich_text %}
         <cfif richtext>
         <tr>
             <td>Include Header</td>
             <td>
+                {{ form.include_header }}
                 <cfselect name="head">
                     <option value="0">No</option>
                     <option value="1" selected>Yes</option>
@@ -73,6 +88,7 @@
             </td>
         </tr>
         </cfif>
+        {% endif %}
         <tr>
             <td class="align-top">Message</td>
             <td>
@@ -85,9 +101,11 @@
             <td></td>
             <td>
                 <button class="btn" type="submit" name="preview">Preview</button>
+                {% if request.POST %}
                 <cfif IsDefined("Form.fnc")>
                     <button class="btn" type="submit" name="send" onclick="return confirmSend(this.form, 'mass email')">Send Mass Email</button>
                 </cfif>
+                {% endif %}
             </td>
         </tr>
     </table>

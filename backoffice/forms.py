@@ -19,6 +19,7 @@ from sales.enums import (
 )
 from marketing.models import NewsItem, SiteContent, EmailImage
 from service.models import Damage, ScheduledService, IncidentalService
+from marketing.utils import RECIPIENT_CLASS_METHOD_MAP, RECIPIENT_CLASS_LABEL_MAP
 
 
 class CSSClassMixin:
@@ -701,9 +702,29 @@ class VehicleSelectorForm(forms.Form):
 
 
 class MassEmailForm(forms.Form):
+    send_to = forms.ChoiceField()
     subject = forms.CharField()
     body = forms.CharField(widget=forms.Textarea(), required=False)
     preview = forms.BooleanField(widget=forms.HiddenInput(), initial=True, required=False)
+    include_header = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=True, required=False)
+    # include_header = forms.BooleanField(initial=True, required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Calculate all the counts of potential recipient classes
+        recipient_counts = {k: RECIPIENT_CLASS_METHOD_MAP[k]().count() for k in RECIPIENT_CLASS_LABEL_MAP.keys()}
+
+        # Create labels combining static text with the calculated counts
+        self.combined_labels = {key: f'{value} ({recipient_counts[key]})' for key, value in RECIPIENT_CLASS_LABEL_MAP.items()}
+
+        # Populate the recipient dropdown choices using centralized key names we can use to send out the
+        # actual emails later in the form_valid method in the view
+        send_to_choices = list((k, v) for k, v in self.combined_labels.items())
+        self.fields['send_to'].choices = send_to_choices
+
+    def clean(self):
+        self.recipient_label =  self.combined_labels[self.cleaned_data['send_to']]
 
 
 class EmailImageForm(forms.ModelForm):
