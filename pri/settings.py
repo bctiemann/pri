@@ -71,6 +71,7 @@ MIDDLEWARE = [
     'django_otp.middleware.OTPMiddleware',
     'pri.middleware.LoginRequiredMiddleware',
     'pri.middleware.PermissionsMiddleware',
+    'pri.middleware.LastAccessMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]

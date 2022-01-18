@@ -71,6 +71,13 @@ class NewsletterView(NavMenuMixin, FormView):
     template_name = 'front_site/newsletter.html'
     form_class = NewsletterSubscribeForm
 
+    def form_valid(self, form):
+        result = super().form_valid(form)
+
+        # TODO: Save email on session as "newsletter_email" or some such
+
+        return result
+
     def get_context_data(self, slug=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['recaptcha_site_key'] = settings.RECAPTCHA_SITE_KEY
@@ -80,19 +87,19 @@ class NewsletterView(NavMenuMixin, FormView):
 class NewsletterDoneView(NavMenuMixin, TemplateView):
     template_name = 'front_site/newsletter_done.html'
 
-    def get_context_data(self, slug=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['recaptcha_site_key'] = settings.RECAPTCHA_SITE_KEY
-        return context
+    # def get_context_data(self, slug=None, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['recaptcha_site_key'] = settings.RECAPTCHA_SITE_KEY
+    #     return context
 
 
 class NewsletterConfirmView(NavMenuMixin, TemplateView):
     template_name = 'front_site/newsletter_confirm.html'
 
-    def get_context_data(self, slug=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['recaptcha_site_key'] = settings.RECAPTCHA_SITE_KEY
-        return context
+    # def get_context_data(self, slug=None, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['recaptcha_site_key'] = settings.RECAPTCHA_SITE_KEY
+    #     return context
 
 
 class ServicesView(NavMenuMixin, TemplateView):

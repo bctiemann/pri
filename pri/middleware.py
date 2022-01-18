@@ -3,6 +3,7 @@ from django.conf import settings
 from django.urls import resolve, reverse, reverse_lazy
 from django.core.exceptions import PermissionDenied
 from django.utils.deprecation import MiddlewareMixin
+from django.utils import timezone
 
 import logging
 logger = logging.getLogger(__name__)
@@ -66,3 +67,9 @@ class PermissionsMiddleware(object):
                 raise PermissionDenied
 
         return self.get_response(request)
+
+
+class LastAccessMiddleware(MiddlewareMixin):
+
+    def process_request(self, request):
+        request.session['last_access'] = timezone.now().isoformat()
