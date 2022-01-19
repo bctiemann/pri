@@ -1,5 +1,5 @@
 {% extends "front_site/base.html" %}
-{% load static %}
+{% load static humanize bbcode_tags %}
 
 {% block content %}
 
@@ -50,6 +50,7 @@
 
     {% for vehicle in vehicles %}
         {% if vehicle.slug %}
+            {% comment %}
             <cfoutput query="Vehicles">
                 <cfquery name="VehicleFront" datasource="#FDSN#">
                     SELECT blurb,price,specs FROM VehiclesFront
@@ -63,6 +64,7 @@
                         <cfset headline = "">
                     </cfcatch>
                 </cftry>
+                {% endcomment %}
 
                 <div class="fleet-vehicle">
                     <a href="{% url "vehicle" slug=vehicle.slug %}">
@@ -74,10 +76,13 @@
 
                             <div class="price-fleet">
                             <div class="ih-item circle effect4 left_to_right price-bubble">
-                                <a href="#OnSecSite#reserve.cfm?vid=#vehicleid#">
+                                <a href="{% url "reserve" slug=vehicle.slug %}">
                                 <div class="img">
                                     <img class="click-to-reserve" src="{% static "images/ClickToReserve.png" %}" />
-                                    <img src="{% static "images/price-bg.jpg" %}" alt="img"><span class="price-centered"><p class="price">#NumberFormat(VehicleFront.price,"$,")#</p>/day</span>
+                                    <img src="{% static "images/price-bg.jpg" %}" alt="img">
+                                    <span class="price-centered">
+                                        <p class="price">${{ vehicle.price_per_day|floatformat:0|intcomma }}</p>/day
+                                    </span>
                                 </div>
                                 <div class="info">
                                     <h3>Reserve Now</h3>
@@ -89,11 +94,11 @@
                         <a href="{% url "vehicle" slug=vehicle.slug %}">
                         <h3>
                             {{ vehicle.make }} {{ vehicle.model }}
-                            <span class="trimlevel">#headline#</span>
+                            <span class="trimlevel">{{ vehicle.headline }}</span>
                         </h3>
                         </a>
                         <div class="blurb-fleet">
-                            #VehicleFront.blurb#
+                            {{ vehicle.blurb|bbcode|safe }}
                         </div>
                     </div>
                 </div>

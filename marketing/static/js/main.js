@@ -44,6 +44,8 @@ var reserveValidateForm = function(reservationType, section) {
     $('#reservation_' + section + '_error').hide();
 //    $.post('ajax_post.cfm',params,function(data) {
     console.log(method);
+    $('#reservation_payment').hide();
+    $('#reservation_existing_user').hide();
     $.post(`/api/validate/${reservationType}/${section}/`, params, function(data) {
         console.log(data);
         $('.' + section + ' .field-error').removeClass('field-error');
