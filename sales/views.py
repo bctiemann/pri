@@ -74,3 +74,12 @@ class PerformanceExperienceView(NavMenuMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['vehicle_type'] = VehicleType
         return context
+
+
+class JoyRideView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/joy_ride.html'
+
+    def get_context_data(self, slug=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['vehicle_type'] = VehicleType
+        return context
