@@ -521,6 +521,7 @@ class Card(models.Model):
     brand = models.CharField(null=True, blank=True, max_length=30)
     name = models.CharField(null=True, blank=True, max_length=30)
     last_4 = models.CharField(null=True, blank=True, max_length=4)
+    is_primary = models.BooleanField(default=False)
 
     number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC number')
     exp_month = models.CharField(null=True, blank=True, max_length=2)

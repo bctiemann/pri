@@ -320,9 +320,6 @@ class Customer(models.Model):
     insurance_company_phone = PhoneNumberField(blank=True)
     coverage_verified = models.BooleanField(default=False)
 
-    card_1 = models.ForeignKey('sales.Card', null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
-    card_2 = models.ForeignKey('sales.Card', null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
-
     cc_number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC1 number')
     cc_exp_yr = models.CharField(max_length=4, blank=True, verbose_name='CC1 exp year')
     cc_exp_mo = models.CharField(max_length=2, blank=True, verbose_name='CC1 exp month')
@@ -391,6 +388,14 @@ class Customer(models.Model):
     @property
     def primary_phone(self):
         return self.home_phone or self.mobile_phone or self.work_phone
+
+    @property
+    def card_1(self):
+        return self.card_set.filter(is_primary=True).first()
+
+    @property
+    def card_2(self):
+        return self.card_set.filter(is_primary=False).first()
 
     def add_to_stripe(self):
         stripe_customer = stripe.add_customer(self.full_name, self.email, self.phone)
