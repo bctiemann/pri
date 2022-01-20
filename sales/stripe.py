@@ -33,7 +33,7 @@ class Stripe:
         )
         return token
 
-    def add_card_to_customer(self, customer, card_token):
+    def add_card_to_customer(self, customer, card_token, card=None):
         try:
             stripe_card = stripe.Customer.create_source(
                 customer.stripe_customer,
@@ -53,13 +53,21 @@ class Stripe:
 
             raise e
 
-        card = Card.objects.create(
-            stripe_card=stripe_card.id,
-            customer=customer,
-            brand=stripe_card.brand,
-            last_4=stripe_card.last4,
-            exp_month=stripe_card.exp_month,
-            exp_year=stripe_card.exp_year,
-            fingerprint=stripe_card.fingerprint,
-        )
-        return card
+        if card:
+            card.stripe_card = stripe_card.id
+            card.brand = stripe_card.brand
+            card.last_4 = stripe_card.last4
+            card.exp_month = stripe_card.exp_month
+            card.exp_year = stripe_card.exp_year
+            card.fingerprint = stripe_card.fingerprint
+            card.save()
+        else:
+            card = Card.objects.create(
+                stripe_card=stripe_card.id,
+                customer=customer,
+                brand=stripe_card.brand,
+                last_4=stripe_card.last4,
+                exp_month=stripe_card.exp_month,
+                exp_year=stripe_card.exp_year,
+                fingerprint=stripe_card.fingerprint,
+            )

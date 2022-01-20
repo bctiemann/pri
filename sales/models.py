@@ -534,4 +534,8 @@ class Card(models.Model):
     phone = PhoneNumberField(blank=True, verbose_name='CC contact phone')
 
     def __str__(self):
-        return '{0} ({1})'.format(self.brand, self.last_4)
+        return '{0} ({1} {2})'.format(self.id, self.brand, self.last_4)
+
+    def save(self, *args, **kwargs):
+        self.number = format_cc_number(self.number)
+        super().save(*args, **kwargs)
