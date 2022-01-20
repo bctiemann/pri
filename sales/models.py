@@ -363,6 +363,8 @@ class GiftCertificate(models.Model):
     cc_state = USStateField(null=True, blank=True)
     cc_zip = USZipCodeField(null=True, blank=True)
 
+    card = models.ForeignKey('sales.Card', null=True, blank=True, on_delete=models.SET_NULL)
+
     cc_number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC number')
     cc_exp_yr = models.CharField(max_length=4, blank=True, verbose_name='CC exp year')
     cc_exp_mo = models.CharField(max_length=2, blank=True, verbose_name='CC exp month')
@@ -455,6 +457,7 @@ class AdHocPayment(models.Model):
     item = models.CharField(max_length=255, blank=True)
     message = models.TextField(blank=True)
     comments = models.TextField(blank=True)
+    card = models.ForeignKey('sales.Card', null=True, blank=True, on_delete=models.SET_NULL)
     cc_number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC number')
     cc_exp_yr = models.CharField(max_length=4, blank=True, verbose_name='CC exp year')
     cc_exp_mo = models.CharField(max_length=2, blank=True, verbose_name='CC exp month')
@@ -481,6 +484,7 @@ class Charge(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     charged_at = models.DateTimeField(null=True, blank=True)
     notes = models.TextField(blank=True)
+    card = models.ForeignKey('sales.Card', null=True, blank=True, on_delete=models.SET_NULL)
     cc_number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC number')
     cc_exp_yr = models.CharField(max_length=4, blank=True, verbose_name='CC exp year')
     cc_exp_mo = models.CharField(max_length=2, blank=True, verbose_name='CC exp month')
@@ -526,6 +530,7 @@ class Card(models.Model):
     city = models.CharField(max_length=255, blank=True)
     state = USStateField(null=True, blank=True)
     zip = USZipCodeField(null=True, blank=True)
+    phone = PhoneNumberField(blank=True, verbose_name='CC contact phone')
 
     def __str__(self):
         return '{0} ({1})'.format(self.brand, self.last_4)
