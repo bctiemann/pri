@@ -56,10 +56,9 @@ class Command(BaseCommand):
                         )
                         customer.save()
                     if register_stripe:
-                        cc_number = settings.CARD_NUMBER_OVERRIDE or customer.cc_number
                         try:
                             card_token = stripe.get_card_token(
-                                cc_number,
+                                customer.cc_number,
                                 customer.cc_exp_mo,
                                 customer.cc_exp_yr,
                                 customer.cc_cvv,
@@ -81,10 +80,9 @@ class Command(BaseCommand):
                         )
                         customer.save()
                     if register_stripe:
-                        cc2_number = settings.CARD_NUMBER_OVERRIDE or customer.cc2_number
                         try:
                             card_token = stripe.get_card_token(
-                                cc2_number,
+                                customer.cc2_number,
                                 customer.cc2_exp_mo,
                                 customer.cc2_exp_yr,
                                 customer.cc2_cvv,
