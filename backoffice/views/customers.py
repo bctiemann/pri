@@ -76,7 +76,7 @@ class CustomerDetailView(CustomerViewMixin, ListViewMixin, UpdateView):
                 card_1.save()
 
         if form.cleaned_data['cc2_number']:
-            card_2_changed = customer.card_1 and any((
+            card_2_changed = customer.card_2 and any((
                 customer.card_2.number != form.cleaned_data['cc2_number'],
                 customer.card_2.exp_month != form.cleaned_data['cc2_exp_mo'],
                 (customer.card_2.exp_year != form.cleaned_data['cc2_exp_yr'] and not settings.CARD_NUMBER_OVERRIDE),
