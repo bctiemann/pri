@@ -61,7 +61,7 @@ class Command(BaseCommand):
                             card_token = stripe.get_card_token(
                                 cc_number,
                                 customer.cc_exp_mo,
-                                stripe.get_future_year(customer.cc_exp_yr),
+                                customer.cc_exp_yr,
                                 customer.cc_cvv,
                             )
                             stripe.add_card_to_customer(customer, card_token, card=customer.card_1)
@@ -86,10 +86,10 @@ class Command(BaseCommand):
                             card_token = stripe.get_card_token(
                                 cc2_number,
                                 customer.cc2_exp_mo,
-                                stripe.get_future_year(customer.cc2_exp_yr),
+                                customer.cc2_exp_yr,
                                 customer.cc2_cvv,
                             )
-                            stripe.add_card_to_customer(customer, card_token, card=card_2)
+                            stripe.add_card_to_customer(customer, card_token, card=customer.card_2)
                         except CardError as e:
                             print(e)
 
