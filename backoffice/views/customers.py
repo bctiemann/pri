@@ -40,6 +40,9 @@ class CustomerDetailView(CustomerViewMixin, ListViewMixin, UpdateView):
     def form_valid(self, form):
         stripe = Stripe()
         customer = form.save()
+
+        # Update primary and secondary card. If any data has changed since the last saved Card object, refresh the
+        # Stripe object as well.
         if form.cleaned_data['cc_number']:
             card_1_changed = customer.card_1 and any((
                 customer.card_1.number != form.cleaned_data['cc_number'],

@@ -18,7 +18,7 @@ class Stripe:
         self.current_year = timezone.now().year
 
     def get_future_year(self, year):
-        if int(year) <= self.current_year:
+        if settings.CARD_NUMBER_OVERRIDE and int(year) <= self.current_year:
             return self.current_year + 5
         return year
 
