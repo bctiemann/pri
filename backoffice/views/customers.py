@@ -61,6 +61,7 @@ class CustomerDetailView(CustomerViewMixin, ListViewMixin, UpdateView):
                 card_1 = card_1_form.save()
                 card_1.customer = customer
                 card_1.is_primary = True
+                card_1.phone = form.cleaned_data['cc_phone']
                 card_1.save()
                 stripe.add_card_to_customer(customer, card=card_1)
 
@@ -82,6 +83,7 @@ class CustomerDetailView(CustomerViewMixin, ListViewMixin, UpdateView):
                 card_2 = card_2_form.save()
                 card_2.customer = customer
                 card_2.is_primary = False
+                card_2.phone = form.cleaned_data['cc2_phone']
                 card_2.save()
                 stripe.add_card_to_customer(customer, card=card_2)
         return HttpResponseRedirect(self.get_success_url())
