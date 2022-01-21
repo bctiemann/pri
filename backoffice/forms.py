@@ -288,6 +288,21 @@ class EmployeeForm(forms.ModelForm):
         exclude = ('user',)
 
 
+class CardForm(CSSClassMixin, forms.ModelForm):
+
+    cc_fields = ['number']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.cc_fields:
+            self.fields[field].widget.attrs['class'] = 'cc-field'
+
+    class Meta:
+        model = Card
+        fields = ('number', 'exp_year', 'exp_month', 'cvv',)
+        # exclude = ('user', 'rentals_count',)
+
+
 class CustomerForm(CSSClassMixin, forms.ModelForm):
 
     email = forms.EmailField(required=True)
@@ -329,7 +344,7 @@ class CustomerForm(CSSClassMixin, forms.ModelForm):
     class Meta:
         model = Customer
         # fields = '__all__'
-        exclude = ('user', 'rentals_count',)
+        exclude = ('user', 'rentals_count', 'stripe_customer',)
 
 
 class CloneCustomerForm(forms.ModelForm):

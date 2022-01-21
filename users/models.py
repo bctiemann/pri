@@ -399,7 +399,7 @@ class Customer(models.Model):
 
     def add_to_stripe(self):
         stripe_customer = stripe.add_customer(self.full_name, self.email, self.phone)
-        self.stripe_customer = stripe_customer.id
+        self.stripe_customer = stripe_customer
         self.save()
 
     def save(self, *args, **kwargs):

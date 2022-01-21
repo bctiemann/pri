@@ -9,7 +9,8 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from . import ListViewMixin
 from users.models import User, Customer, generate_password
-from backoffice.forms import CustomerForm, CloneCustomerForm
+from backoffice.forms import CustomerForm, CloneCustomerForm, CardForm
+from sales.stripe import Stripe
 
 
 # Template generics-based CRUD views
@@ -35,6 +36,52 @@ class CustomerDetailView(CustomerViewMixin, ListViewMixin, UpdateView):
     # def post(self, request, *args, **kwargs):
     #     result = super().post(request, *args, **kwargs)
     #     return result
+
+    def form_valid(self, form):
+        stripe = Stripe()
+        customer = form.save()
+        if form.cleaned_data['cc_number']:
+            card_1_changed = customer.card_1 and any((
+                customer.card_1.number != form.cleaned_data['cc_number'],
+                customer.card_1.exp_month != form.cleaned_data['cc_exp_mo'],
+                customer.card_1.exp_year != form.cleaned_data['cc_exp_yr'],
+                customer.card_1.cvv != form.cleaned_data['cc_cvv'],
+            ))
+            if card_1_changed or not customer.card_1:
+                card_1_data = {
+                    'number': form.cleaned_data['cc_number'],
+                    'exp_month': form.cleaned_data['cc_exp_mo'],
+                    'exp_year': form.cleaned_data['cc_exp_yr'],
+                    'cvv': form.cleaned_data['cc_cvv'],
+                }
+                card_1_form = CardForm(data=card_1_data, instance=customer.card_1)
+                card_1 = card_1_form.save()
+                card_1.customer = customer
+                card_1.is_primary = True
+                card_1.save()
+                stripe.add_card_to_customer(customer, card=card_1)
+
+        if form.cleaned_data['cc2_number']:
+            card_2_changed = customer.card_1 and any((
+                customer.card_2.number != form.cleaned_data['cc2_number'],
+                customer.card_2.exp_month != form.cleaned_data['cc2_exp_mo'],
+                customer.card_2.exp_year != form.cleaned_data['cc2_exp_yr'],
+                customer.card_2.cvv != form.cleaned_data['cc2_cvv'],
+            ))
+            if card_2_changed or not customer.card_2:
+                card_2_data = {
+                    'number': form.data['cc2_number'],
+                    'exp_month': form.data['cc2_exp_mo'],
+                    'exp_year': form.data['cc2_exp_yr'],
+                    'cvv': form.data['cc2_cvv'],
+                }
+                card_2_form = CardForm(data=card_2_data, instance=customer.card_2)
+                card_2 = card_2_form.save()
+                card_2.customer = customer
+                card_2.is_primary = False
+                card_2.save()
+                stripe.add_card_to_customer(customer, card=card_2)
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)

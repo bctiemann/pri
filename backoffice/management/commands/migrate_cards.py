@@ -3,7 +3,6 @@ from stripe.error import CardError
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.utils import timezone
 
 from sales.stripe import Stripe
 from users.models import Customer
@@ -21,22 +20,14 @@ class Command(BaseCommand):
         # 'do_giftcertificates': True,
         # 'do_stripecharges': True,
     }
-    current_year = None
 
     def add_arguments(self, parser):
         parser.add_argument('--register_stripe', dest='register_stripe', default=False, action='store_true',)
         parser.add_argument('--clear_existing', dest='clear_existing', default=False, action='store_true',)
 
-    def get_future_year(self, year):
-        if int(year) <= self.current_year:
-            return self.current_year + 5
-        return year
-
     def handle(self, *args, **options):
         register_stripe = options.get('register_stripe')
         clear_existing = options.get('clear_existing')
-
-        self.current_year = timezone.now().year
 
         if clear_existing:
             Card.objects.all().delete()
@@ -70,7 +61,7 @@ class Command(BaseCommand):
                             card_token = stripe.get_card_token(
                                 cc_number,
                                 customer.cc_exp_mo,
-                                self.get_future_year(customer.cc_exp_yr),
+                                stripe.get_future_year(customer.cc_exp_yr),
                                 customer.cc_cvv,
                             )
                             stripe.add_card_to_customer(customer, card_token, card=customer.card_1)
@@ -95,7 +86,7 @@ class Command(BaseCommand):
                             card_token = stripe.get_card_token(
                                 cc2_number,
                                 customer.cc2_exp_mo,
-                                self.get_future_year(customer.cc2_exp_yr),
+                                stripe.get_future_year(customer.cc2_exp_yr),
                                 customer.cc2_cvv,
                             )
                             stripe.add_card_to_customer(customer, card_token, card=card_2)
