@@ -307,10 +307,19 @@ class CustomerForm(CSSClassMixin, forms.ModelForm):
 
     email = forms.EmailField(required=True)
     receive_email = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
+
+    cc_number = forms.CharField(required=False)
     cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices(since_founding=True, allow_null=False))
     cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(allow_null=False))
+    cc_cvv = forms.CharField(required=False)
+    cc_phone = PhoneNumberField(region='US', required=False)
+
+    cc2_number = forms.CharField(required=False)
     cc2_exp_yr = forms.ChoiceField(choices=get_exp_year_choices(since_founding=True, allow_null=True), required=False)
     cc2_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(allow_null=True), required=False)
+    cc2_phone = PhoneNumberField(region='US', required=False)
+    cc2_cvv = forms.CharField(required=False)
+
     date_of_birth = forms.DateField(widget=forms.SelectDateWidget(years=birth_years))
     ban = forms.BooleanField(required=False)
     password = forms.CharField(widget=forms.PasswordInput(), required=True)
@@ -327,7 +336,7 @@ class CustomerForm(CSSClassMixin, forms.ModelForm):
         for field in cc_fields:
             self.fields[field].widget.attrs['class'] = 'cc-field'
         short_fields = [
-            'zip', 'home_phone', 'mobile_phone', 'work_phone', 'fax', 'insurance_company_phone', 'discount_pct',
+            'zip', 'fax', 'insurance_company_phone', 'discount_pct',
             'cc_cvv', 'cc_phone', 'cc2_cvv', 'cc2_phone',
         ]
         for field in short_fields:

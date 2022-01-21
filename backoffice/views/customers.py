@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from django.conf import settings
 from django.shortcuts import render, reverse
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -47,9 +48,10 @@ class CustomerDetailView(CustomerViewMixin, ListViewMixin, UpdateView):
             card_1_changed = customer.card_1 and any((
                 customer.card_1.number != form.cleaned_data['cc_number'],
                 customer.card_1.exp_month != form.cleaned_data['cc_exp_mo'],
-                customer.card_1.exp_year != form.cleaned_data['cc_exp_yr'],
+                (customer.card_1.exp_year != form.cleaned_data['cc_exp_yr'] and not settings.CARD_NUMBER_OVERRIDE),
                 customer.card_1.cvv != form.cleaned_data['cc_cvv'],
             ))
+            card_1 = customer.card_1
             if card_1_changed or not customer.card_1:
                 card_1_data = {
                     'number': form.cleaned_data['cc_number'],
@@ -61,17 +63,26 @@ class CustomerDetailView(CustomerViewMixin, ListViewMixin, UpdateView):
                 card_1 = card_1_form.save()
                 card_1.customer = customer
                 card_1.is_primary = True
-                card_1.phone = form.cleaned_data['cc_phone']
                 card_1.save()
                 stripe.add_card_to_customer(customer, card=card_1)
+
+            if card_1:
+                card_1.name = customer.full_name
+                card_1.phone = form.cleaned_data['cc_phone']
+                card_1.address = form.cleaned_data['address_line_1']
+                card_1.city = form.cleaned_data['city']
+                card_1.state = form.cleaned_data['state']
+                card_1.zip = form.cleaned_data['zip']
+                card_1.save()
 
         if form.cleaned_data['cc2_number']:
             card_2_changed = customer.card_1 and any((
                 customer.card_2.number != form.cleaned_data['cc2_number'],
                 customer.card_2.exp_month != form.cleaned_data['cc2_exp_mo'],
-                customer.card_2.exp_year != form.cleaned_data['cc2_exp_yr'],
+                (customer.card_2.exp_year != form.cleaned_data['cc2_exp_yr'] and not settings.CARD_NUMBER_OVERRIDE),
                 customer.card_2.cvv != form.cleaned_data['cc2_cvv'],
             ))
+            card_2 = customer.card_2
             if card_2_changed or not customer.card_2:
                 card_2_data = {
                     'number': form.data['cc2_number'],
@@ -86,6 +97,16 @@ class CustomerDetailView(CustomerViewMixin, ListViewMixin, UpdateView):
                 card_2.phone = form.cleaned_data['cc2_phone']
                 card_2.save()
                 stripe.add_card_to_customer(customer, card=card_2)
+
+            if card_2:
+                card_2.name = customer.full_name
+                card_2.phone = form.cleaned_data['cc2_phone']
+                card_2.address = form.cleaned_data['address_line_1']
+                card_2.city = form.cleaned_data['city']
+                card_2.state = form.cleaned_data['state']
+                card_2.zip = form.cleaned_data['zip']
+                card_2.save()
+
         return HttpResponseRedirect(self.get_success_url())
 
     def get_context_data(self, *args, **kwargs):
