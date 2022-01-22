@@ -317,8 +317,8 @@ class CustomerForm(CSSClassMixin, forms.ModelForm):
     cc2_number = forms.CharField(required=False)
     cc2_exp_yr = forms.ChoiceField(choices=get_exp_year_choices(since_founding=True, allow_null=True), required=False)
     cc2_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(allow_null=True), required=False)
-    cc2_phone = PhoneNumberField(region='US', required=False)
     cc2_cvv = forms.CharField(required=False)
+    cc2_phone = PhoneNumberField(region='US', required=False)
 
     date_of_birth = forms.DateField(widget=forms.SelectDateWidget(years=birth_years))
     ban = forms.BooleanField(required=False)
@@ -341,6 +341,21 @@ class CustomerForm(CSSClassMixin, forms.ModelForm):
         ]
         for field in short_fields:
             self.add_widget_css_class(field, 'short')
+
+        # Set initial values on CC fields from linked Card models
+        if self.instance.card_1:
+            self.fields['cc_number'].initial = self.instance.card_1.number
+            self.fields['cc_exp_yr'].initial = self.instance.card_1.exp_year
+            self.fields['cc_exp_mo'].initial = self.instance.card_1.exp_month
+            self.fields['cc_cvv'].initial = self.instance.card_1.cvv
+            self.fields['cc_phone'].initial = self.instance.card_1.phone
+
+        if self.instance.card_2:
+            self.fields['cc2_number'].initial = self.instance.card_2.number
+            self.fields['cc2_exp_yr'].initial = self.instance.card_2.exp_year
+            self.fields['cc2_exp_mo'].initial = self.instance.card_2.exp_month
+            self.fields['cc2_cvv'].initial = self.instance.card_2.cvv
+            self.fields['cc2_phone'].initial = self.instance.card_2.phone
 
     # def get_exp_year_choices(self):
     #     return ((year, year) for year in range(settings.COMPANY_FOUNDING_YEAR, current_year + 11))
