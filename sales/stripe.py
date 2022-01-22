@@ -22,14 +22,14 @@ class Stripe:
             return self.current_year + 5
         return year
 
-    def add_customer(self, full_name=None, email=None, phone=None):
-        customer = stripe.Customer.create(
+    def add_stripe_customer(self, full_name=None, email=None, phone=None):
+        stripe_customer = stripe.Customer.create(
             description=full_name,
             name=full_name,
             email=email,
             phone=phone,
         )
-        return customer.id
+        return stripe_customer.id
 
     def get_card_token(self, number, exp_month, exp_year, cvc):
         token = stripe.Token.create(
@@ -42,19 +42,10 @@ class Stripe:
         )
         return token
 
-    def add_card_to_customer(self, customer, card_token=None, card=None):
-        if not card and not card_token:
-            raise Exception('Provide either a card_token or a Card instance.')
-
-        if not card_token:
-            card_token = self.get_card_token(card.number, card.exp_month, card.exp_year, card.cvv)
-
-        if not customer.stripe_customer:
-            customer.add_to_stripe()
-
+    def add_card_to_stripe_customer(self, stripe_customer, card_token, card=None):
         try:
             stripe_card = stripe.Customer.create_source(
-                customer.stripe_customer,
+                stripe_customer,
                 source=card_token,
                 # source='tok_chargeCustomerFail',
             )
@@ -82,10 +73,26 @@ class Stripe:
         else:
             card = Card.objects.create(
                 stripe_card=stripe_card.id,
-                customer=customer,
                 brand=stripe_card.brand,
                 last_4=stripe_card.last4,
                 exp_month=stripe_card.exp_month,
                 exp_year=stripe_card.exp_year,
                 fingerprint=stripe_card.fingerprint,
             )
+
+        return card
+
+
+    def add_card_to_customer(self, customer, card_token=None, card=None):
+        if not card and not card_token:
+            raise Exception('Provide either a card_token or a Card instance.')
+
+        if not card_token:
+            card_token = self.get_card_token(card.number, card.exp_month, card.exp_year, card.cvv)
+
+        if not customer.stripe_customer:
+            customer.add_to_stripe()
+
+        card = self.add_card_to_stripe_customer(customer.stripe_customer, card_token, card=card)
+        card.customer = customer
+        card.save()

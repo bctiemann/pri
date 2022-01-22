@@ -53,8 +53,8 @@ class AdHocPaymentAdmin(admin.ModelAdmin):
 
 
 class CardAdmin(admin.ModelAdmin):
-    list_display = ('id', 'customer', 'last_4', 'stripe_card',)
-    search_fields = ('customer__last_name',)
+    list_display = ('id', 'customer', 'name', 'last_4', 'stripe_card',)
+    search_fields = ('id', 'name', 'customer__last_name',)
     autocomplete_fields = ('customer',)
 
 

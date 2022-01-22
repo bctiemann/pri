@@ -579,7 +579,7 @@ class GiftCertificateForm(forms.ModelForm):
     class Meta:
         model = GiftCertificate
         # fields = '__all__'
-        exclude = ('tag',)
+        exclude = ('tag', 'card',)
 
 
 class StripeChargeForm(forms.ModelForm):

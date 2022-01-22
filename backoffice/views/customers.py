@@ -1,7 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from django.conf import settings
 from django.shortcuts import render, reverse
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -45,20 +44,15 @@ class CustomerDetailView(CustomerViewMixin, ListViewMixin, UpdateView):
         # Update primary and secondary card. If any data has changed since the last saved Card object, refresh the
         # Stripe object as well.
         if form.cleaned_data['cc_number']:
-            card_1_changed = customer.card_1 and any((
-                customer.card_1.number != form.cleaned_data['cc_number'],
-                customer.card_1.exp_month != form.cleaned_data['cc_exp_mo'],
-                (customer.card_1.exp_year != form.cleaned_data['cc_exp_yr'] and not settings.CARD_NUMBER_OVERRIDE),
-                customer.card_1.cvv != form.cleaned_data['cc_cvv'],
-            ))
+            card_1_data = {
+                'number': form.cleaned_data['cc_number'],
+                'exp_month': form.cleaned_data['cc_exp_mo'],
+                'exp_year': form.cleaned_data['cc_exp_yr'],
+                'cvv': form.cleaned_data['cc_cvv'],
+            }
+            card_1_changed = customer.card_1 and customer.card_1.card_is_changed(**card_1_data)
             card_1 = customer.card_1
             if card_1_changed or not customer.card_1:
-                card_1_data = {
-                    'number': form.cleaned_data['cc_number'],
-                    'exp_month': form.cleaned_data['cc_exp_mo'],
-                    'exp_year': form.cleaned_data['cc_exp_yr'],
-                    'cvv': form.cleaned_data['cc_cvv'],
-                }
                 card_1_form = CardForm(data=card_1_data, instance=customer.card_1)
                 card_1 = card_1_form.save()
                 card_1.customer = customer
@@ -76,20 +70,15 @@ class CustomerDetailView(CustomerViewMixin, ListViewMixin, UpdateView):
                 card_1.save()
 
         if form.cleaned_data['cc2_number']:
-            card_2_changed = customer.card_2 and any((
-                customer.card_2.number != form.cleaned_data['cc2_number'],
-                customer.card_2.exp_month != form.cleaned_data['cc2_exp_mo'],
-                (customer.card_2.exp_year != form.cleaned_data['cc2_exp_yr'] and not settings.CARD_NUMBER_OVERRIDE),
-                customer.card_2.cvv != form.cleaned_data['cc2_cvv'],
-            ))
+            card_2_data = {
+                'number': form.data['cc2_number'],
+                'exp_month': form.data['cc2_exp_mo'],
+                'exp_year': form.data['cc2_exp_yr'],
+                'cvv': form.data['cc2_cvv'],
+            }
+            card_2_changed = customer.card_2 and customer.card_2.card_is_changed(**card_2_data)
             card_2 = customer.card_2
             if card_2_changed or not customer.card_2:
-                card_2_data = {
-                    'number': form.data['cc2_number'],
-                    'exp_month': form.data['cc2_exp_mo'],
-                    'exp_year': form.data['cc2_exp_yr'],
-                    'cvv': form.data['cc2_cvv'],
-                }
                 card_2_form = CardForm(data=card_2_data, instance=customer.card_2)
                 card_2 = card_2_form.save()
                 card_2.customer = customer

@@ -536,6 +536,14 @@ class Card(models.Model):
     def __str__(self):
         return '{0} ({1} {2})'.format(self.id, self.brand, self.last_4)
 
+    def card_is_changed(self, number, exp_month, exp_year, cvv):
+        return any((
+            self.number != number,
+            int(self.exp_month) != int(exp_month),
+            (self.exp_year != exp_year and not settings.CARD_NUMBER_OVERRIDE),
+            self.cvv != cvv,
+        ))
+
     def save(self, *args, **kwargs):
         self.number = format_cc_number(self.number)
         super().save(*args, **kwargs)

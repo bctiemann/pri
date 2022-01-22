@@ -398,7 +398,7 @@ class Customer(models.Model):
         return self.card_set.filter(is_primary=False).first()
 
     def add_to_stripe(self):
-        stripe_customer = stripe.add_customer(self.full_name, self.email, self.phone)
+        stripe_customer = stripe.add_stripe_customer(self.full_name, self.email, self.phone)
         self.stripe_customer = stripe_customer
         self.save()
 

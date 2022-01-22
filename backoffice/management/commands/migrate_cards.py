@@ -40,7 +40,7 @@ class Command(BaseCommand):
                 print(customer)
 
                 if register_stripe and not customer.stripe_customer:
-                    customer.stripe_customer = stripe.add_customer(customer.full_name, customer.email, customer.phone)
+                    customer.stripe_customer = stripe.add_stripe_customer(customer.full_name, customer.email, customer.phone)
                     customer.save()
 
                 if customer.cc_number:
