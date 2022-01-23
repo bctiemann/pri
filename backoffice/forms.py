@@ -632,6 +632,13 @@ class StripeChargeForm(forms.ModelForm):
         # for field in short_fields:
         #     self.add_widget_css_class(field, 'short')
 
+        # Set initial values on CC fields from linked Card models
+        if self.instance.card:
+            self.fields['cc_number'].initial = self.instance.card.number
+            self.fields['cc_exp_yr'].initial = self.instance.card.exp_year
+            self.fields['cc_exp_mo'].initial = self.instance.card.exp_month
+            self.fields['cc_cvv'].initial = self.instance.card.cvv
+
     # def clean_stripe_token(self):
     #     if self.cleaned_data['stripe_error']:
     #         raise forms.ValidationError(self.cleaned_data['stripe_error'])
@@ -643,7 +650,7 @@ class StripeChargeForm(forms.ModelForm):
     class Meta:
         model = Charge
         # fields = '__all__'
-        exclude = ('uuid',)
+        exclude = ('uuid', 'card',)
 
 
 class CardForm(forms.ModelForm):
