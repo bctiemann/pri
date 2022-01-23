@@ -408,18 +408,28 @@ class CouponForm(forms.ModelForm):
 class AdHocPaymentForm(forms.ModelForm):
     is_paid = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
     is_submitted = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
+
+    cc_number = forms.CharField(required=False)
     cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices(since_founding=True, allow_null=False))
     cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(allow_null=False))
+    cc_cvv = forms.CharField(required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.fields['cc_number'].widget.attrs['class'] = 'cc-field'
 
+        # Set initial values on CC fields from linked Card models
+        if self.instance.card:
+            self.fields['cc_number'].initial = self.instance.card.number
+            self.fields['cc_exp_yr'].initial = self.instance.card.exp_year
+            self.fields['cc_exp_mo'].initial = self.instance.card.exp_month
+            self.fields['cc_cvv'].initial = self.instance.card.cvv
+
     class Meta:
         model = AdHocPayment
         # fields = '__all__'
-        exclude = ('submitted_at', 'is_submitted', 'paid_at', 'is_paid',)
+        exclude = ('submitted_at', 'is_submitted', 'paid_at', 'is_paid', 'card',)
 
 
 class TollTagForm(forms.ModelForm):

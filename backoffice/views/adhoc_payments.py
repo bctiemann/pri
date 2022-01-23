@@ -8,8 +8,9 @@ from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from . import ListViewMixin
-from backoffice.forms import AdHocPaymentForm
+from backoffice.forms import AdHocPaymentForm, CardForm
 from sales.models import AdHocPayment
+from sales.stripe import Stripe
 
 
 # Template generics-based CRUD views
@@ -30,6 +31,46 @@ class AdHocPaymentListView(PermissionRequiredMixin, AdHocPaymentViewMixin, ListV
 class AdHocPaymentDetailView(AdHocPaymentViewMixin, ListViewMixin, UpdateView):
     template_name = 'backoffice/adhoc_payment/detail.html'
     form_class = AdHocPaymentForm
+
+    def form_valid(self, form):
+        stripe = Stripe()
+        adhoc_payment = form.save()
+
+        # Update primary and secondary card. If any data has changed since the last saved Card object, refresh the
+        # Stripe object as well.
+        if form.cleaned_data['cc_number']:
+            card_data = {
+                'number': form.cleaned_data['cc_number'],
+                'exp_month': form.cleaned_data['cc_exp_mo'],
+                'exp_year': form.cleaned_data['cc_exp_yr'],
+                'cvv': form.cleaned_data['cc_cvv'],
+            }
+            card_changed = adhoc_payment.card and adhoc_payment.card.card_is_changed(**card_data)
+            card = adhoc_payment.card
+            if card_changed or not adhoc_payment.card:
+                card_form = CardForm(data=card_data, instance=adhoc_payment.card)
+                card = card_form.save()
+
+                card_token = stripe.get_card_token(card.number, card.exp_month, card.exp_year, card.cvv)
+
+                stripe_customer = stripe.add_stripe_customer(
+                    full_name=form.cleaned_data['full_name'],
+                    email=form.cleaned_data['email'],
+                    phone=form.cleaned_data['phone'],
+                )
+                card = stripe.add_card_to_stripe_customer(stripe_customer, card_token, card)
+                adhoc_payment.card = card
+                adhoc_payment.save()
+
+            if card:
+                card.name = adhoc_payment.full_name
+                card.address = form.cleaned_data['cc_address']
+                card.city = form.cleaned_data['cc_city']
+                card.state = form.cleaned_data['cc_state']
+                card.zip = form.cleaned_data['cc_zip']
+                card.save()
+
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
         return reverse('backoffice:adhocpayment-detail', kwargs={'pk': self.object.id})
