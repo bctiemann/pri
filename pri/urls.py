@@ -103,6 +103,7 @@ urlpatterns = [
     path('api/validate/rental/details/', api_views.ValidateRentalDetailsView.as_view(), name='validate-rental-details'),
     path('api/validate/rental/payment/', api_views.ValidateRentalPaymentView.as_view(form_type='payment'), name='validate-rental-payment'),
     path('api/validate/rental/login/', api_views.ValidateRentalPaymentView.as_view(form_type='login'), name='validate-rental-login'),
+    path('api/validate/joyride/details/', api_views.ValidateJoyRideDetailsView.as_view(), name='validate-joyride-details'),
     path('api/validate/newsletter/subscribe/', api_views.ValidateNewsletterSubscriptionView.as_view(), name='validate-newsletter-subscription'),
 
     path('api/customers/search/', api_views.SearchCustomersView.as_view(), name='search-customers'),

@@ -70,16 +70,16 @@ var reserveValidateForm = function(reservationType, section) {
                     } else {
                         $('.price-delivery-smallprint').css('visibility', 'visible');
                     }
-                } else if (reservationType === 'joyperf') {
-                    $('.price-nodrv').html(data.nodrv + ' driver' + (data.nodrv != 1 ? 's' : ''));
-                    $('.price-drvcost').html(data.drvcost.toFixed(2));
-                    $('.price-nopax').html(data.nopax + ' passenger' + (data.nopax != 1 ? 's' : ''));
-                    $('.price-paxcost').html(data.paxcost.toFixed(2));
-                    $('.price-event-total').html(data.trate.toFixed(2));
-                    $('.price-customer-discount').html(data.customer_discount.toFixed(2));
-                    $('.price-subtotal').html(data.subtotal.toFixed(2));
-                    $('.price-tax').html(data.tax_amt.toFixed(2));
-                    $('.price-total').html(data.total_w_tax.toFixed(2));
+                } else if (reservationType === 'joyride' || reservationType === 'perfexp') {
+                    // $('.price-nodrv').html(data.nodrv + ' driver' + (data.nodrv != 1 ? 's' : ''));
+                    // $('.price-drvcost').html(data.drvcost.toFixed(2));
+                    // $('.price-nopax').html(data.nopax + ' passenger' + (data.nopax != 1 ? 's' : ''));
+                    // $('.price-paxcost').html(data.paxcost.toFixed(2));
+                    // $('.price-event-total').html(data.trate.toFixed(2));
+                    // $('.price-customer-discount').html(data.customer_discount.toFixed(2));
+                    // $('.price-subtotal').html(data.subtotal.toFixed(2));
+                    // $('.price-tax').html(data.tax_amt.toFixed(2));
+                    // $('.price-total').html(data.total_w_tax.toFixed(2));
                 }
                 if (data.price_data.customer_discount) {
                     $('.customer-discount').show();
@@ -186,9 +186,9 @@ var sendResetPassword = function() {
 };
 
 var setVehicles = function() {
-    $('#choice1').val($($('.vehicle-picker-pick.picked')[0]).attr('vehicleid') || 0);
-    $('#choice2').val($($('.vehicle-picker-pick.picked')[1]).attr('vehicleid') || 0);
-    $('#choice3').val($($('.vehicle-picker-pick.picked')[2]).attr('vehicleid') || 0);
+    $('#id_vehicle_choice_1').val($($('.vehicle-picker-pick.picked')[0]).attr('vehicleid') || 0);
+    $('#id_vehicle_choice_2').val($($('.vehicle-picker-pick.picked')[1]).attr('vehicleid') || 0);
+    $('#id_vehicle_choice_3').val($($('.vehicle-picker-pick.picked')[2]).attr('vehicleid') || 0);
     $('#dialog_pick_vehicles').dialog('close');
 };
 
@@ -297,8 +297,11 @@ $('document').ready(function() {
     $('.reserve-rental-details-btn').click(function() {
         reserveValidateForm('rental', 'details');
     });
-    $('.reserve-joyperf-identity-btn').click(function() {
-        reserveValidateForm('validateJoyPerfIdentity', 'identity');
+    $('.reserve-joyride-details-btn').click(function() {
+        reserveValidateForm('joyride', 'details');
+    });
+    $('.reserve-perfexp-details-btn').click(function() {
+        reserveValidateForm('perfexp', 'details');
     });
     $('.reserve-createpass-btn').click(function() {
         reserveValidateForm('validatePassword', 'password');
@@ -332,9 +335,9 @@ $('document').ready(function() {
         var vehicle_type = $(this).attr('type');
         $('.vehicle-picker-pick').hide().removeClass('picked');
         var current_picks = [
-            $('#choice1').val(),
-            $('#choice2').val(),
-            $('#choice3').val(),
+            $('#id_vehicle_choice_1').val(),
+            $('#id_vehicle_choice_2').val(),
+            $('#id_vehicle_choice_3').val(),
         ];
         $('.vehicle-picker-pick[type=' + vehicle_type + ']').show().each(function() {
             if (current_picks.indexOf($(this).attr('vehicleid')) > -1) {

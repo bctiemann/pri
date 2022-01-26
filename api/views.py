@@ -20,7 +20,10 @@ from django.contrib.auth import authenticate, login
 from django.http import Http404, HttpResponseRedirect
 from django.forms.models import model_to_dict
 
-from sales.forms import ReservationRentalDetailsForm, ReservationRentalPaymentForm, ReservationRentalLoginForm
+from sales.forms import (
+    ReservationRentalDetailsForm, ReservationRentalPaymentForm, ReservationRentalLoginForm,
+    JoyRideDetailsForm, JoyRidePaymentForm, JoyRideLoginForm,
+)
 from marketing.forms import NewsletterSubscribeForm
 from sales.models import BaseReservation, Reservation, Rental, TaxRate, generate_code
 from sales.enums import ReservationType
@@ -176,6 +179,27 @@ class ValidateRentalPaymentView(APIView):
             'errors_html': form.errors.as_ul(),
             'reservation_type': 'rental',
             'customer_site_url': reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': confirmation_code}),
+        }
+        return Response(response)
+
+
+class ValidateJoyRideDetailsView(APIView):
+
+    # authentication_classes = ()
+    # permission_classes = ()
+
+    def post(self, request):
+        form = JoyRideDetailsForm(request.POST)
+        print(form.data)
+        print(form.is_valid())
+        print(form.errors.as_json())
+        response = {
+            'success': form.is_valid(),
+            'errors': form.errors,
+            'errors_html': form.errors.as_ul(),
+            'customer_id': form.customer.id if form.customer else None,
+            'price_data': form.price_data,
+            # 'delivery_required': form.cleaned_data['delivery_required'],
         }
         return Response(response)
 

@@ -11,9 +11,9 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleStatus
-from sales.models import Reservation, Coupon
+from sales.models import Reservation, Coupon, PerformanceExperience, JoyRide
 from users.models import Customer
-from sales.calculators import RentalPriceCalculator
+from sales.calculators import RentalPriceCalculator, PerformanceExperiencePriceCalculator, JoyRidePriceCalculator
 from sales.enums import get_service_hours, TRUE_FALSE_CHOICES, get_exp_year_choices, get_exp_month_choices
 
 current_year = timezone.now().year
@@ -322,5 +322,63 @@ class ReservationRentalPaymentForm(ReservationRentalDetailsForm):
 
 # If the customer already exists, this form will be shown and processed instead of ReservationRentalPaymentForm
 class ReservationRentalLoginForm(ReservationRentalDetailsForm):
+
+    password = forms.CharField(widget=forms.PasswordInput(), required=False)
+
+
+class JoyRideDetailsForm(forms.ModelForm):
+
+    error_css_class = 'field-error'
+    discount = None
+    customer = None
+
+    email = forms.EmailField()
+    coupon_code = forms.CharField(required=False)
+
+    def clean(self):
+        print('cleaned:')
+        print(self.cleaned_data)
+        try:
+            self.customer = Customer.objects.get(user__email=self.cleaned_data['email'])
+        except (Customer.DoesNotExist, KeyError):
+            pass
+        return super().clean()
+
+    @property
+    def tax_zip(self):
+        return settings.DEFAULT_TAX_ZIP
+
+    @property
+    def price_data(self):
+        price_calculator = JoyRidePriceCalculator(
+            # vehicle_marketing=self.cleaned_data['vehicle_marketing'],
+            # num_days=self.num_days,
+            # extra_miles=self.cleaned_data['extra_miles'],
+            num_passengers=self.cleaned_data.get('num_passengers'),
+            coupon_code=self.cleaned_data.get('coupon_code'),
+            email=self.cleaned_data.get('email'),
+            tax_zip=self.tax_zip,
+            effective_date=self.cleaned_data.get('out_date'),
+            is_military=self.cleaned_data.get('is_military'),
+        )
+        return price_calculator.get_price_data()
+
+    class Meta:
+        model = JoyRide
+        exclude = ('confirmation_code', 'status',)
+
+
+class JoyRidePaymentForm(JoyRideDetailsForm):
+    customer_fields = (
+        'first_name', 'last_name', 'mobile_phone', 'home_phone', 'work_phone', 'fax', 'cc_number', 'cc_exp_yr',
+        'cc_exp_mo', 'cc_cvv', 'cc_phone', 'address_line_1', 'address_line_2', 'city', 'state', 'zip'
+    )
+
+    class Meta:
+        model = Customer
+        fields = '__all__'
+
+
+class JoyRideLoginForm(JoyRideDetailsForm):
 
     password = forms.CharField(widget=forms.PasswordInput(), required=False)

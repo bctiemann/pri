@@ -105,7 +105,7 @@
         <img src="{% static "images/joyride.png" %}" />
     </div>
 
-    <cfform method="POST" name="reservation_form" action="perfexp.cfm" onsubmit="return false;" autocomplete="on">
+    <form method="POST" name="reservation_form" id="reservation_form" action="perfexp.cfm" onsubmit="return false;" autocomplete="on">
     <cfoutput>
 
     <div class="reservation-form-sidebar">
@@ -143,6 +143,7 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
             <tr class="vehicle-choice">
                 <td>Vehicle Choice ##1</td>
                 <td>
+                    {{ form.vehicle_choice_1 }}
                     <cfselect name="choice1">
                         <option value="0">(Choose Vehicle)</option>
                         <optgroup label="Cars">
@@ -158,6 +159,7 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
             <tr class="vehicle-choice">
                 <td>Vehicle Choice ##2</td>
                 <td>
+                    {{ form.vehicle_choice_2 }}
                     <cfselect name="choice2">
                         <option value="0">(Choose Vehicle)</option>
                         <optgroup label="Cars">
@@ -180,6 +182,7 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
             <tr class="vehicle-choice">
                 <td>Vehicle Choice ##3</td>
                 <td>
+                    {{ form.vehicle_choice_3 }}
                     <cfselect name="choice3">
                         <option value="0">(Choose Vehicle)</option>
                         <optgroup label="Cars">
@@ -202,6 +205,7 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
             <tr>
                 <td>Number of Passengers</td>
                 <td>
+                    {{ form.num_passengers }}
                     <cfselect name="nopax" class="#StructKeyExists(fieldErrors,"nopax") ? 'field-error' : ''#">
                         <option value="1" <cfif JoyPerf.nopax IS 1>selected</cfif>>1</option>
                         <option value="2" <cfif JoyPerf.nopax IS 2>selected</cfif>>2</option>
@@ -213,6 +217,7 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
             <tr>
                 <td>Number of Minors</td>
                 <td>
+                    {{ form.num_minors }}
                     <cfselect name="nominors" class="#StructKeyExists(fieldErrors,"nominors") ? 'field-error' : ''#">
                         <option value="0" <cfif JoyPerf.nominors IS 0>selected</cfif>>0</option>
                         <option value="1" <cfif JoyPerf.nominors IS 1>selected</cfif>>1</option>
@@ -225,27 +230,36 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
             <tr>
                 <td>Requested Date</td>
                 <td>
+                    {{ form.requested_date }}
                     <cfinput name="reqdate" value="#JoyPerf.reqdate#" style="width: 120px;" placeholder="MM/DD/YYYY" class="#StructKeyExists(fieldErrors,"reqdate") ? 'field-error' : ''#" />
                 </td>
             </tr>
             <tr>
                 <td>Alternate Date</td>
                 <td>
+                    {{ form.backup_date }}
                     <cfinput name="bupdate" value="#JoyPerf.bupdate#" style="width: 120px;" placeholder="MM/DD/YYYY" class="#StructKeyExists(fieldErrors,"bupdate") ? 'field-error' : ''#" />
                     <small class="tooltip" title="We'll do our best to accommodate your first choice of date, but please pick an alternate just in case."><span class="ui-icon ui-icon-info"></span></small>
                 </td>
             </tr>
             <tr>
                 <td>Email</td>
-                <td><cfinput name="email" value="#JoyPerf.email#" maxlength="255" class="#StructKeyExists(fieldErrors,"email") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ form.email }}
+                    <cfinput name="email" value="#JoyPerf.email#" maxlength="255" class="#StructKeyExists(fieldErrors,"email") ? 'field-error' : ''#" />
+                </td>
             </tr>
             <tr class="inline-password">
                 <td>Password</td>
-                <td><cfinput name="inline_pass" type="password" value="#JoyPerf.inline_pass#" placeholder="(If returning customer)" class="#StructKeyExists(fieldErrors,"login_pass") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ form.password }}
+                    <cfinput name="inline_pass" type="password" value="#JoyPerf.inline_pass#" placeholder="(If returning customer)" class="#StructKeyExists(fieldErrors,"login_pass") ? 'field-error' : ''#" />
+                </td>
             </tr>
             <tr>
                 <td>Big and Tall</td>
                 <td>
+                    {{ form.big_and_tall }}
                     <cfselect name="bigtall">
                         <option value="0" <cfif JoyPerf.bigtall IS 0>selected</cfif>>No</option>
                         <option value="1" <cfif JoyPerf.bigtall IS 1>selected</cfif>>Yes</option>
@@ -255,18 +269,24 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
             </tr>
             <tr>
                 <td>Discount/Coupon Code</td>
-                <td><cfinput name="coupon" value="#JoyPerf.coupon#" maxlength="20" placeholder="(Optional)" class="#StructKeyExists(fieldErrors,"coupon") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ form.coupon_code }}
+                    <cfinput name="coupon" value="#JoyPerf.coupon#" maxlength="20" placeholder="(Optional)" class="#StructKeyExists(fieldErrors,"coupon") ? 'field-error' : ''#" />
+                </td>
             </tr>
             <tr>
                 <td class="align-top">Notes/Requests</td>
-                <td><cftextarea name="notes" class="#StructKeyExists(fieldErrors,"notes") ? 'field-error' : ''#">#JoyPerf.notes#</cftextarea></td>
+                <td>
+                    {{ form.customer_notes }}
+                    <cftextarea name="notes" class="#StructKeyExists(fieldErrors,"notes") ? 'field-error' : ''#">#JoyPerf.notes#</cftextarea>
+                </td>
             </tr>
 
             <cfif NOT IsDefined("IdentityResult") OR NOT IdentityResult.success OR (IsDefined("LoginResult") AND NOT LoginResult.success)>
             <tr class="buttons">
                 <td></td>
                 <td>
-                    <button type="submit" name="identity_btn" class="btn reserve-joyperf-identity-btn">Continue</button>
+                    <button type="submit" name="details_btn" class="btn reserve-joyride-details-btn">Continue</button>
                     <div class="spinner next-form-spinner identity-spinner"></div>
                 </td>
             </tr>
@@ -492,7 +512,7 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
     <cfinput name="nodrv" type="hidden" value="0" />
     <cfinput name="reservation_type" type="hidden" value="joyride" />
     <cfinput name="customerid" type="hidden" value="" />
-    </cfform>
+    </form>
 
 </div>
 </div>
