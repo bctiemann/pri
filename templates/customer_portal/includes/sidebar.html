@@ -94,15 +94,15 @@
 
 <ul class="sidebar-nav">
     <cfoutput>
-    <li class="<cfif selectedPage IS "reservations">selected-page</cfif>">
-        <a href="index.cfm">
+    <li class="{% if selected_page == "upcoming_reservations" %}selected-page{% endif %}">
+        <a href="{% url "customer_portal:upcoming-reservations" %}">
             <cfif RentalsUpcoming.recordCount GT 0>
                 <div class="badge">{{ upcoming_reservations.count }}</div>
             </cfif>
             Reservations
         </a>
     </li>
-    <li class="<cfif selectedPage IS "joyride">selected-page</cfif>">
+    <li class="{% if selected_page == "joy_ride" %}selected-page{% endif %}">
         <a href="joyride.cfm">
             <cfif JoyRideUpcoming.recordCount GT 0>
                 <div class="badge">#JoyRideUpcoming.recordCount#</div>
@@ -110,7 +110,7 @@
             Joy Ride
         </a>
     </li>
-    <li class="<cfif selectedPage IS "perfexp">selected-page</cfif>">
+    <li class="{% if selected_page == "performance_experience" %}selected-page{% endif %}">
         <a href="perfexp.cfm">
             <cfif PerfExpUpcoming.recordCount GT 0>
                 <div class="badge">#PerfExpUpcoming.recordCount#</div>

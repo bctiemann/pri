@@ -1,4 +1,5 @@
 {% extends "customer_portal/home.html" %}
+{% load bbcode_tags %}
 
 {% block nav_upcoming_reservations_class %}selected{% endblock %}
 
@@ -6,36 +7,44 @@
 
     {% for reservation in upcoming_reservations %}
     <cfoutput query="RentalsUpcoming">
-        <a href="reserve_confirm.cfm?confcode=#confcode#">
+        <a href="{% url "customer_portal:confirm-reservation" confirmation_code=reservation.confirmation_code %}">
         <div class="reservation <cfif NOT InfoComplete>incomplete-info</cfif>">
-            <div class="confcode">#confcode#</div>
+            <div class="confcode">{{ reservation.confirmation_code }}</div>
             <table class="small-item-data">
                 <tr>
                     <td>
+                        {% if reservation.delivery_required %}
                         <cfif delivery IS 1>
                             PRI Delivers Vehicle:
+                        {% else %}
                         <cfelse>
                             Pick Up at PRI:
                         </cfif>
+                        {% endif %}
                     </td>
-                    <td>#TimeFormat(dateout, "h:MM tt")# #DateFormat(dateout,"ddd MM/DD/YYYY")#</td>
+                    <td>{{ reservation.out_at|date:"g:i A m/d/Y" }}{# #TimeFormat(dateout, "h:MM tt")# #DateFormat(dateout,"ddd MM/DD/YYYY")# #}</td>
                 </tr>
                 <tr>
                     <td>
+                        {% if reservation.delivery_required %}
                         <cfif delivery IS 1>
                             PRI Collects Vehicle:
+                        {% else %}
                         <cfelse>
                             Due Back at PRI:
                         </cfif>
+                        {% endif %}
                     </td>
-                    <td>#TimeFormat(dateback, "h:MM tt")# #DateFormat(dateback,"ddd MM/DD/YYYY")#</td>
+                    <td>{{ reservation.back_at|date:"g:i A m/d/Y" }}{# #TimeFormat(dateback, "h:MM tt")# #DateFormat(dateback,"ddd MM/DD/YYYY")# #}</td>
                 </tr>
                 <tr>
                     <td></td>
-                    <td>#numdays# day<cfif numdays IS NOT 1>s</cfif></td>
+                    <td>{{ reservation.num_days }} day{{ reservation.num_days|pluralize }}</td>
                 </tr>
             </table>
             <p class="reservation-status">
+                {{ reservation.reservation.get_status_display }}
+                {% comment %}
                 <cfif reservationid GT 0 AND status IS 0>
                     Unconfirmed
                 <cfelseif (reservationid GT 0 AND status IS 1) OR (rentalid GT 0 AND status IS 1)>
@@ -45,17 +54,20 @@
                 <cfelseif rentalid GT 0 AND status IS 3>
                     Complete
                 </cfif>
+                {% endcomment %}
             </p>
             <div class="vehiclepic-box">
-                <img class="vehiclepic" src="#OnSite#images/#vehicleid#-thumb.jpg" />
-                <span class="offer-title overlay-text bottom">#make# #model#</span>
+                <img class="vehiclepic" src="{{ reservation.vehicle.vehicle_marketing.thumbnail_image.url }}" />
+                <span class="offer-title overlay-text bottom">{{ reservation.vehicle.make }} {{ reservation.vehicle.model }}</span>
             </div>
             <cfif InfoComplete>
+                {% if reservation.customer_nodes %}
                 <cfif notes IS NOT "">
                     <div class="customer-notes">
-                        #parseNewlines(notes)#
+                        {{ reservation.customer_notes|bbcode }}
                     </div>
                 </cfif>
+                {% endif %}
             <cfelse>
                 <div class="exception complete-info-prompt">
                     <h3>Action Required</h3>
@@ -67,8 +79,10 @@
     </cfoutput>
     {% endfor %}
 
+    {% if not upcoming_reservations.exists %}
     <cfif RentalsUpcoming.recordCount IS 0>
         <div class="no-records">No upcoming rentals</div>
     </cfif>
+    {% endif %}
 
 {% endblock %}

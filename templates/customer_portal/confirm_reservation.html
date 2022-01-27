@@ -145,37 +145,43 @@
 
             <div class="confcode-container">
                 <p>Confirmation code:</p>
-                <div class="confcode">#confcode#</div>
+                <div class="confcode">{{ reservation.confirmation_code }}</div>
             </div>
 
             <table class="reservation-details small-item-data">
                 <tr>
                     <td>Vehicle</td>
-                    <td>#make# #model#</td>
+                    <td>{{ reservation.vehicle.make }} {{ reservation.vehicle.model }}</td>
                 </tr>
                 <tr>
                     <td>
+                        {% if reservation.delivery_required %}
                         <cfif delivery IS 1>
                             PRI Delivers Vehicle:
+                        {% else %}
                         <cfelse>
                             Pick Up at PRI:
                         </cfif>
+                        {% endif %}
                     </td>
                     <td>#TimeFormat(dateout, "h:MM tt")# #DateFormat(dateout,"ddd MM/DD/YYYY")#</td>
                 </tr>
                 <tr>
                     <td>
+                        {% if reservation.delivery_required %}
                         <cfif delivery IS 1>
                             PRI Collects Vehicle:
+                        {% else %}
                         <cfelse>
                             Due Back at PRI:
                         </cfif>
+                        {% endif %}
                     </td>
                     <td>#TimeFormat(dateback, "h:MM tt")# #DateFormat(dateback,"ddd MM/DD/YYYY")#</td>
                 </tr>
                 <tr>
                     <td>Number of Days</td>
-                    <td>#numdays#</td>
+                    <td>{{ reservation.num_days }}</td>
                 </tr>
             </table>
             </cfoutput>

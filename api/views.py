@@ -161,12 +161,17 @@ class ValidateRentalPaymentView(APIView):
         while not reservation and retries_left > 0:
             confirmation_code = generate_code(ReservationType.RENTAL.value)
             try:
-                reservation = Reservation.objects.create(
-                    confirmation_code=confirmation_code,
-                    customer=customer,
-                    vehicle=form.vehicle_marketing.vehicle,
-
-                )
+                reservation = form.save(commit=False)
+                reservation.confirmation_code = confirmation_code
+                reservation.customer = customer
+                reservation.vehicle = form.cleaned_data['vehicle_marketing'].vehicle
+                reservation.save()
+                # reservation = Reservation.objects.create(
+                #     confirmation_code=confirmation_code,
+                #     customer=customer,
+                #     vehicle=form.cleaned_data['vehicle_marketing'].vehicle,
+                #     extra_miles=form.cl
+                # )
             except IntegrityError:
                 logger.warning(f'Confirmation code collision: {confirmation_code}')
                 retries_left -= 1

@@ -44,6 +44,7 @@ var reserveValidateForm = function(reservationType, section) {
     $('#reservation_' + section + '_error').hide();
 //    $.post('ajax_post.cfm',params,function(data) {
     console.log(method);
+    console.log(section);
     $('#reservation_payment').hide();
     $('#reservation_existing_user').hide();
     $.post(`/api/validate/${reservationType}/${section}/`, params, function(data) {
@@ -110,7 +111,7 @@ var reserveValidateForm = function(reservationType, section) {
                 } else if (method == 'validatePassword') {
                     $('#reservation_payment').show();
                 }
-            } else if (section === 'payment') {
+            } else if (section === 'payment' || section === 'login') {
                 $('#customerid').val(data.customerid);
                 $('#login_pass').val(data.create_pass);
                 if (data.reservation_type == 'perfexp') {
@@ -190,6 +191,9 @@ var setVehicles = function() {
     $('#id_vehicle_choice_2').val($($('.vehicle-picker-pick.picked')[1]).attr('vehicleid') || 0);
     $('#id_vehicle_choice_3').val($($('.vehicle-picker-pick.picked')[2]).attr('vehicleid') || 0);
     $('#dialog_pick_vehicles').dialog('close');
+    var picktype = $('.vehicle-picker-pick.picked').attr('type');
+    var numpicked = $('.vehicle-picker-pick.picked').length;
+    $('.vehicles-picked').html(numpicked + ' ' + picktype + (numpicked == 1 ? '' : 's') + ' picked');
 };
 
 var pickVehicle = function(vehicleid) {
