@@ -276,10 +276,18 @@ class ReservationRentalDetailsForm(forms.ModelForm):
 
 # 2nd-phase form; extends ReservationRentalDetailsForm with Customer fields so it inherits all the first form's validations
 class ReservationRentalPaymentForm(ReservationRentalDetailsForm):
+
+    # TODO: Add these fields and let this be a Reservation form to avoid confusion
     customer_fields = (
         'first_name', 'last_name', 'mobile_phone', 'home_phone', 'work_phone', 'fax', 'cc_number', 'cc_exp_yr',
         'cc_exp_mo', 'cc_cvv', 'cc_phone', 'address_line_1', 'address_line_2', 'city', 'state', 'zip'
     )
+    first_name = forms.CharField()
+    last_name = forms.CharField()
+    mobile_phone = PhoneNumberField(required=False)
+    work_phone = PhoneNumberField(required=False)
+    home_phone = PhoneNumberField(required=False)
+    fax = PhoneNumberField(required=False)
     # EXP_MONTH_CHOICES = (
     #     ('01', 'January (01)'),
     #     ('02', 'February (02)'),
@@ -315,9 +323,9 @@ class ReservationRentalPaymentForm(ReservationRentalDetailsForm):
         # self.fields['cc_exp_yr'].choices = get_exp_year_choices()
         # self.fields['extra_miles'].choices = ((k, v['label']) for k, v in settings.EXTRA_MILES_PRICES.items())
 
-    class Meta:
-        model = Customer
-        fields = '__all__'
+    # class Meta:
+    #     model = Customer
+    #     fields = '__all__'
 
 
 # If the customer already exists, this form will be shown and processed instead of ReservationRentalPaymentForm

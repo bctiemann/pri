@@ -96,9 +96,11 @@
     <cfoutput>
     <li class="{% if selected_page == "upcoming_reservations" %}selected-page{% endif %}">
         <a href="{% url "customer_portal:upcoming-reservations" %}">
+            {% if upcoming_reservations.exists %}
             <cfif RentalsUpcoming.recordCount GT 0>
                 <div class="badge">{{ upcoming_reservations.count }}</div>
             </cfif>
+            {% endif %}
             Reservations
         </a>
     </li>
@@ -118,22 +120,22 @@
             Performance Experience
         </a>
     </li>
-    <li class="<cfif selectedPage IS "rates">selected-page</cfif>">
+    <li class="{% if selected_page == "rates" %}selected-page{% endif %}">
         <a href="index.cfm?page=reserve">Rental Rates</a>
     </li>
-    <li class="<cfif selectedPage IS "findus">selected-page</cfif>">
+    <li class="{% if selected_page == "find_us" %}selected-page{% endif %}">
         <a href="findus.cfm">Find Us</a>
     </li>
     </cfoutput>
 </ul>
 <ul class="sidebar-nav">
-    <li class="account-info <cfif selectedPage IS "account">selected-page</cfif>">
+    <li class="account-info {% if selected_page == "account" %}selected-page{% endif %}">
         <a href="account.cfm">Account Info</a>
     </li>
-    <li class="account-info <cfif selectedPage IS "payment">selected-page</cfif>">
+    <li class="account-info {% if selected_page == "payment" %}selected-page{% endif %}">
         <a href="payment.cfm">Payment Info</a>
     </li>
-    <li class="account-info <cfif selectedPage IS "password">selected-page</cfif>">
+    <li class="account-info {% if selected_page == "password" %}selected-page{% endif %}">
         <a href="password.cfm">Change Password</a>
     </li>
 </ul>

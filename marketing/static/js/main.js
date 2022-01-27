@@ -141,6 +141,7 @@ var reserveValidateForm = function(reservationType, section) {
             console.log(data.errors);
            // $('#reservation_' + section + '_error .alert-message').html(data.errors_html);
             $('#reservation_' + section + '_error').show();
+            $('#reservation_' + section).show();
             let selectedFirst = false;
             for (var field in data.errors) {
                 const input = $('#id_' + field.toLowerCase());
@@ -159,6 +160,7 @@ var reserveValidateForm = function(reservationType, section) {
         $('#reserve-' + section + '-btn').prop('disabled', false);
         $('#reservation_' + section + '_error .alert-message').html(error);
         $('#reservation_' + section + '_error').show();
+        $('#reservation_' + section).show();
     });
 };
 
