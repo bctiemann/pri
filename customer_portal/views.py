@@ -5,7 +5,7 @@ from django.utils.timezone import now
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
 from sales.models import Reservation, Rental, GuidedDrive
-from users.views import LoginView
+from users.views import LoginView, LogoutView
 
 
 class SidebarMixin:
@@ -54,6 +54,10 @@ class MakeReservationView(SidebarMixin, TemplateView):
 class LoginView(LoginView):
     template_name = 'customer_portal/login.html'
     home_url = reverse_lazy('customer_portal:home')
+
+
+class LogoutView(LogoutView):
+    pass
 
 
 class ConfirmReservationView(SidebarMixin, TemplateView):
