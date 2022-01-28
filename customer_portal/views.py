@@ -17,6 +17,15 @@ class SidebarMixin:
         return context
 
 
+class LoginView(LoginView):
+    template_name = 'customer_portal/login.html'
+    home_url = reverse_lazy('customer_portal:home')
+
+
+class LogoutView(LogoutView):
+    pass
+
+
 # class HomeView(SidebarMixin, TemplateView):
 #     template_name = 'customer_portal/reservations/upcoming.html'
 #     selected_page = 'home'
@@ -35,15 +44,6 @@ class PastRentalsView(SidebarMixin, TemplateView):
 class MakeReservationView(SidebarMixin, TemplateView):
     template_name = 'customer_portal/reservations/new.html'
     selected_page = 'reservations'
-
-
-class LoginView(LoginView):
-    template_name = 'customer_portal/login.html'
-    home_url = reverse_lazy('customer_portal:home')
-
-
-class LogoutView(LogoutView):
-    pass
 
 
 class ConfirmReservationView(SidebarMixin, TemplateView):
