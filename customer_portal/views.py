@@ -17,23 +17,23 @@ class SidebarMixin:
         return context
 
 
-class HomeView(SidebarMixin, TemplateView):
-    template_name = 'customer_portal/home.html'
-    selected_page = 'home'
+# class HomeView(SidebarMixin, TemplateView):
+#     template_name = 'customer_portal/reservations/upcoming.html'
+#     selected_page = 'home'
 
 
 class UpcomingReservationsView(SidebarMixin, TemplateView):
-    template_name = 'customer_portal/upcoming_reservations.html'
+    template_name = 'customer_portal/reservations/upcoming.html'
     selected_page = 'reservations'
 
 
 class PastRentalsView(SidebarMixin, TemplateView):
-    template_name = 'customer_portal/past_rentals.html'
+    template_name = 'customer_portal/reservations/past.html'
     selected_page = 'reservations'
 
 
 class MakeReservationView(SidebarMixin, TemplateView):
-    template_name = 'customer_portal/make_reservation.html'
+    template_name = 'customer_portal/reservations/new.html'
     selected_page = 'reservations'
 
 
