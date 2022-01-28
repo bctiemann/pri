@@ -1,0 +1,263 @@
+{% extends "customer_portal/base.html" %}
+
+{% block page_title %}Account Info{% endblock %}
+
+{% block content %}
+
+    <p class="reservation-info">
+    <p>
+    Please keep your personal information updated! We'll need to verify your insurance coverage for each rental, so it will save
+    both your time and ours if you ensure your information is up-to-date in our system prior to placing a reservation.
+    </p>
+    <p>
+    We take the utmost care to preserve your privacy and security. All information you submit is held in our encrypted
+    data store and is not shared with anyone except the relevant agencies for verification purposes.
+    </p>
+    </p>
+
+    <div class="form-page-container">
+
+        <ul class="form-page-nav">
+            <li page="driverinfo" <cfif page IS "driverinfo">class="selected"</cfif>><a href="account.cfm?page=driverinfo">Driver Information</a></li>
+            <li page="insurance" <cfif page IS "insurance">class="selected"</cfif>><a href="account.cfm?page=insurance">Insurance</a></li>
+            <li page="music" <cfif page IS "music">class="selected"</cfif>><a href="account.cfm?page=music">Music Prefs</a></li>
+        </ul>
+
+        <cfoutput>
+        <cfif Len(formError) GT 0>
+        <div class="exception" id="customer_form_error">
+            <h3>An error occurred</h3>
+            <p class="alert-message">#formError#</p>
+        </div>
+        </cfif>
+        </cfoutput>
+
+        <cfif page IS "driverinfo">
+
+            <div class="form-page" page="driverinfo">
+
+                <cfform method="POST" name="account_form" action="account.cfm" autocomplete="on">
+
+                    <cfoutput>
+                    <table class="inputform rentalinfo">
+
+                    <tr>
+                    <td>Name</td>
+                        <td>
+                            #Customer.fname# #Customer.lname#
+                            <cfinput name="fname" type="hidden" value="#Customer.fname#" />
+                            <cfinput name="lname" type="hidden" value="#Customer.lname#" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td>
+                            #Customer.email#
+                            <cfinput name="email" type="hidden" value="#Customer.email#" />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>Date Of Birth</td>
+                        <cftry>
+                            <cfset dob = DateFormat(Customer.dob,"MM/DD/YYYY")>
+                            <cfcatch type="Any">
+                                <cfset dob = "">
+                            </cfcatch>
+                        </cftry>
+                        <cfif dob IS "">
+                            <td><cfinput name="dob" value="#dob#" class="#StructKeyExists(fieldErrors,"dob") ? 'field-error' : ''#" placeholder="MM/DD/YYYY" /></td>
+                        <cfelse>
+                            <td>
+                                #dob#
+                                <cfinput name="dob" type="hidden" value="#Customer.dob#" />
+                            </td>
+                        </cfif>
+                    </tr>
+
+                    <cfif Customer.licenseno IS "">
+                    <tr>
+                        <td>License Number</td>
+                        <td><cfinput name="licenseno" maxlength="30" value="#Customer.licenseno#" class="#StructKeyExists(fieldErrors,"licenseno") ? 'field-error' : ''#" /></td>
+                    </tr>
+                    <tr>
+                        <td>License State</td>
+                        <td>
+                            <cfselect name="licensestate" class="#StructKeyExists(fieldErrors,"licensestate") ? 'field-error' : ''#">
+                                <option value="">(Select state)</option>
+                                <cfloop array="#states#" index="state">
+                                    <option value="#state.abbr#" <CFIF Customer.licensestate IS state.abbr>selected</CFIF>>#state.name#</option>
+                                </cfloop>
+                            </cfselect>
+                        </td>
+                    </tr>
+                    <cfelse>
+                    <tr>
+                        <td>License Number</td>
+                        <td>
+                            #Customer.licenseno# (#Customer.licensestate#)
+                            <cfinput name="licenseno" type="hidden" value="#Customer.licenseno#" />
+                            <cfinput name="licensestate" type="hidden" value="#Customer.licensestate#" />
+                        </td>
+                    </tr>
+                    </cfif>
+
+                    <tr>
+                        <td class="align-top">Address</td>
+                        <td><cftextarea name="addr" id="addr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#addr_dec#</cftextarea></td>
+                    </tr>
+                    <tr>
+                        <td>City</td>
+                        <td><cfinput name="city" value="#Customer.city#" maxlength="255" class="#StructKeyExists(fieldErrors,"city") ? 'field-error' : ''#" /></td>
+                    </tr>
+                    <tr>
+                        <td>State</td>
+                        <td>
+                            <cfselect name="state" class="#StructKeyExists(fieldErrors,"state") ? 'field-error' : ''#">
+                                <option value="">(Select state)</option>
+                                <cfloop array="#states#" index="state">
+                                    <option value="#state.abbr#" <CFIF Customer.state IS state.abbr>selected</CFIF>>#state.name#</option>
+                                </cfloop>
+                            </cfselect>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>ZIP</td>
+                        <td><cfinput name="zip" value="#Customer.zip#" maxlength="10" class="#StructKeyExists(fieldErrors,"zip") ? 'field-error' : ''#" /></td>
+                    </tr>
+                    <tr>
+                        <td>Mobile Phone</td>
+                        <td><cfinput name="mphone" value="#Customer.mphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"mphone") ? 'field-error' : ''#" /></td>
+                    </tr>
+                    <tr>
+                        <td>Home Phone</td>
+                        <td><cfinput name="hphone" value="#Customer.hphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"hphone") ? 'field-error' : ''#" /></td>
+                    </tr>
+                    <tr>
+                        <td>Work Phone</td>
+                        <td><cfinput name="wphone" value="#Customer.wphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"wphone") ? 'field-error' : ''#" /></td>
+                    </tr>
+                    <tr>
+                        <td>Fax</td>
+                        <td><cfinput name="fax" value="#Customer.fax#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"fax") ? 'field-error' : ''#" /></td>
+                    </tr>
+
+                    <tr class="buttons">
+                        <td></td>
+                        <td><button type="submit" class="btn">Submit</button></td>
+                    </tr>
+
+                    </table>
+                    </cfoutput>
+
+                <cfinput name="page" type="hidden" value="#page#" />
+                <cfinput name="method" type="hidden" value="updateDriverInfo" />
+                </cfform>
+
+                </div>
+
+            <cfelseif page IS "insurance">
+
+                <div class="form-page" page="insurance">
+
+                <cfform method="POST" name="account_form" action="account.cfm" autocomplete="on">
+
+                    <cfoutput>
+                    <table class="inputform rentalinfo">
+
+                    <tr>
+                        <td>Insurance Company</td>
+                        <td><cfinput name="insco" size="40" maxlength="250" value="#Customer.insco#" class="#StructKeyExists(fieldErrors,"insco") ? 'field-error' : ''#" /></td>
+                    </tr>
+                    <tr>
+                        <td>Insurance Policy Number</td>
+                        <td><cfinput name="inspolnum" maxlength="250" value="#Customer.inspolnum#" class="#StructKeyExists(fieldErrors,"inspolnum") ? 'field-error' : ''#" /></td>
+                    </tr>
+                    <tr>
+                        <td>Insurance Co. Telephone</td>
+                        <td><cfinput name="inscotel" type="tel" maxlength="20" value="#Customer.inscotel#" class="phone #StructKeyExists(fieldErrors,"inscotel") ? 'field-error' : ''#" /></td>
+                    </tr>
+
+                    <tr class="buttons">
+                        <td></td>
+                        <td><button type="submit" class="btn">Submit</button></td>
+                    </tr>
+
+                    </table>
+                    </cfoutput>
+
+                <cfinput name="page" type="hidden" value="#page#" />
+                <cfinput name="method" type="hidden" value="updateInsurance" />
+                </cfform>
+
+                </div>
+
+            <cfelseif page IS "music">
+
+                <div class="form-page" page="music">
+
+                <cfform method="POST" name="account_form" action="account.cfm" autocomplete="on">
+
+                    <cfoutput>
+                    <table class="inputform rentalinfo">
+
+                    <tr>
+                        <td>Favorite Genre</td>
+                        <td>
+                            <cfselect name="musicgenre" class="#StructKeyExists(fieldErrors,"musicgenre") ? 'field-error' : ''#">
+                                <option value="0" <cfif Customer.musicgenre IS 0>selected</cfif>>None</option>
+                                <option value="1" <cfif Customer.musicgenre IS 1>selected</cfif>>50's</option>
+                                <option value="2" <cfif Customer.musicgenre IS 2>selected</cfif>>60's</option>
+                                <option value="3" <cfif Customer.musicgenre IS 3>selected</cfif>>70's</option>
+                                <option value="4" <cfif Customer.musicgenre IS 4>selected</cfif>>80's</option>
+                                <option value="5" <cfif Customer.musicgenre IS 5>selected</cfif>>90's</option>
+                                <option value="6" <cfif Customer.musicgenre IS 6>selected</cfif>>Alternative</option>
+                                <option value="7" <cfif Customer.musicgenre IS 7>selected</cfif>>Big Band / Swing</option>
+                                <option value="8" <cfif Customer.musicgenre IS 8>selected</cfif>>Classical</option>
+                                <option value="9" <cfif Customer.musicgenre IS 9>selected</cfif>>Country</option>
+                                <option value="10" <cfif Customer.musicgenre IS 10>selected</cfif>>Dance</option>
+                                <option value="11" <cfif Customer.musicgenre IS 11>selected</cfif>>Electronic</option>
+                                <option value="12" <cfif Customer.musicgenre IS 12>selected</cfif>>Everything!</option>
+                                <option value="13" <cfif Customer.musicgenre IS 13>selected</cfif>>Heavy Metal</option>
+                                <option value="14" <cfif Customer.musicgenre IS 14>selected</cfif>>Instrumental</option>
+                                <option value="15" <cfif Customer.musicgenre IS 15>selected</cfif>>Jazz</option>
+                                <option value="16" <cfif Customer.musicgenre IS 16>selected</cfif>>Mellow</option>
+                                <option value="17" <cfif Customer.musicgenre IS 17>selected</cfif>>Musicals/Broadway</option>
+                                <option value="18" <cfif Customer.musicgenre IS 18>selected</cfif>>Pop</option>
+                                <option value="19" <cfif Customer.musicgenre IS 19>selected</cfif>>Punk</option>
+                                <option value="20" <cfif Customer.musicgenre IS 20>selected</cfif>>Rap</option>
+                                <option value="21" <cfif Customer.musicgenre IS 21>selected</cfif>>R&B</option>
+                                <option value="22" <cfif Customer.musicgenre IS 22>selected</cfif>>Reggae</option>
+                                <option value="23" <cfif Customer.musicgenre IS 23>selected</cfif>>Rock</option>
+                                <option value="24" <cfif Customer.musicgenre IS 24>selected</cfif>>Soul</option>
+                                <option value="25" <cfif Customer.musicgenre IS 25>selected</cfif>>Soundtracks</option>
+                                <option value="26" <cfif Customer.musicgenre IS 26>selected</cfif>>Top 40</option>
+                                <option value="27" <cfif Customer.musicgenre IS 27>selected</cfif>>World</option>
+                            </cfselect>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Favorite Artist / Composer</td>
+                        <td><cfinput name="musicfav" maxlength="250" value="#Customer.musicfav#" class="#StructKeyExists(fieldErrors,"musicfav") ? 'field-error' : ''#" /></td>
+                    </tr>
+
+                    <tr class="buttons">
+                        <td></td>
+                        <td><button type="submit" class="btn">Submit</button></td>
+                    </tr>
+                    </tbody>
+
+                    </table>
+                    </cfoutput>
+
+                <cfinput name="page" type="hidden" value="#page#" />
+                <cfinput name="method" type="hidden" value="updateMusicPrefs" />
+                </cfform>
+
+            </div>
+
+        </cfif>
+
+    </div>
+
+{% endblock %}

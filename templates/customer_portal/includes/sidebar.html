@@ -94,7 +94,7 @@
 
 <ul class="sidebar-nav">
     <cfoutput>
-    <li class="{% if selected_page == "upcoming_reservations" %}selected-page{% endif %}">
+    <li class="{% if selected_page == "reservations" %}selected-page{% endif %}">
         <a href="{% url "customer_portal:upcoming-reservations" %}">
             {% if upcoming_reservations.exists %}
             <cfif RentalsUpcoming.recordCount GT 0>
@@ -129,11 +129,11 @@
     </cfoutput>
 </ul>
 <ul class="sidebar-nav">
-    <li class="account-info {% if selected_page == "account" %}selected-page{% endif %}">
-        <a href="account.cfm">Account Info</a>
+    <li class="account-info {% if selected_page == "account_info" %}selected-page{% endif %}">
+        <a href="{% url "customer_portal:account-info" %}">Account Info</a>
     </li>
-    <li class="account-info {% if selected_page == "payment" %}selected-page{% endif %}">
-        <a href="payment.cfm">Payment Info</a>
+    <li class="account-info {% if selected_page == "payment_info" %}selected-page{% endif %}">
+        <a href="{% url "customer_portal:payment-info" %}">Payment Info</a>
     </li>
     <li class="account-info {% if selected_page == "password" %}selected-page{% endif %}">
         <a href="{% url "customer_portal:password" %}">Change Password</a>

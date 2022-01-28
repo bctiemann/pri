@@ -24,17 +24,17 @@ class HomeView(SidebarMixin, TemplateView):
 
 class UpcomingReservationsView(SidebarMixin, TemplateView):
     template_name = 'customer_portal/upcoming_reservations.html'
-    selected_page = 'upcoming_reservations'
+    selected_page = 'reservations'
 
 
 class PastRentalsView(SidebarMixin, TemplateView):
     template_name = 'customer_portal/past_rentals.html'
-    selected_page = 'past_rentals'
+    selected_page = 'reservations'
 
 
 class MakeReservationView(SidebarMixin, TemplateView):
     template_name = 'customer_portal/make_reservation.html'
-    selected_page = 'make_reservation'
+    selected_page = 'reservations'
 
 
 class LoginView(LoginView):
@@ -48,6 +48,7 @@ class LogoutView(LogoutView):
 
 class ConfirmReservationView(SidebarMixin, TemplateView):
     template_name = 'customer_portal/confirm_reservation.html'
+    selected_page = 'reservations'
 
     def get_context_data(self, confirmation_code=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -56,6 +57,18 @@ class ConfirmReservationView(SidebarMixin, TemplateView):
         except Reservation.DoesNotExist:
             raise Http404
         return context
+
+
+class AccountInfoView(SidebarMixin, FormView):
+    template_name = 'customer_portal/account_info.html'
+    selected_page = 'account_info'
+    form_class = PasswordForm
+
+
+class PaymentInfoView(SidebarMixin, FormView):
+    template_name = 'customer_portal/payment_info.html'
+    selected_page = 'payment_info'
+    form_class = PasswordForm
 
 
 class PasswordView(SidebarMixin, FormView):
