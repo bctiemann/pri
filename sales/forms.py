@@ -1,7 +1,8 @@
 import datetime
 import pytz
 import math
-from localflavor.us.forms import USZipCodeField
+from localflavor.us.forms import USZipCodeField, USStateField, USStateSelect
+
 from phonenumber_field.formfields import PhoneNumberField
 from creditcards.models import CardNumberField, CardExpiryField, SecurityCodeField
 
@@ -288,6 +289,12 @@ class ReservationRentalPaymentForm(ReservationRentalDetailsForm):
     work_phone = PhoneNumberField(required=False)
     home_phone = PhoneNumberField(required=False)
     fax = PhoneNumberField(required=False)
+    address_line_1 = forms.CharField()
+    address_line_2 = forms.CharField(required=False)
+    city = forms.CharField()
+    state = USStateField(widget=USStateSelect())
+    zip = USZipCodeField()
+
     # EXP_MONTH_CHOICES = (
     #     ('01', 'January (01)'),
     #     ('02', 'February (02)'),
