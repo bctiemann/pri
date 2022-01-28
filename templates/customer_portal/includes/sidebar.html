@@ -136,7 +136,7 @@
         <a href="payment.cfm">Payment Info</a>
     </li>
     <li class="account-info {% if selected_page == "password" %}selected-page{% endif %}">
-        <a href="password.cfm">Change Password</a>
+        <a href="{% url "customer_portal:password" %}">Change Password</a>
     </li>
 </ul>
 <ul class="sidebar-nav">

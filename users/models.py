@@ -382,6 +382,10 @@ class Customer(models.Model):
         return f'{self.address_line_1}, {self.zip}'
 
     @property
+    def info_is_complete(self):
+        return bool(self.license_number and self.insurance_company)
+
+    @property
     def past_rentals(self):
         return self.basereservation_set.filter(rental__isnull=False)
 

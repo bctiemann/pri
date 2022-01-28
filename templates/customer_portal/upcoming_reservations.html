@@ -60,6 +60,7 @@
                 <img class="vehiclepic" src="{{ reservation.vehicle.vehicle_marketing.thumbnail_image.url }}" />
                 <span class="offer-title overlay-text bottom">{{ reservation.vehicle.make }} {{ reservation.vehicle.model }}</span>
             </div>
+            {% if user.customer.info_is_complete %}
             <cfif InfoComplete>
                 {% if reservation.customer_nodes %}
                 <cfif notes IS NOT "">
@@ -68,12 +69,14 @@
                     </div>
                 </cfif>
                 {% endif %}
+            {% else %}
             <cfelse>
                 <div class="exception complete-info-prompt">
                     <h3>Action Required</h3>
                     <p>Please complete your information.</p>
                 </div>
             </cfif>
+            {% endif %}
         </div>
         </a>
     </cfoutput>

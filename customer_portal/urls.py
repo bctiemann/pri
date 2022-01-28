@@ -18,4 +18,5 @@ urlpatterns = [
     path('past_rentals/', views.PastRentalsView.as_view(), name='past-rentals'),
     path('make_reservation/', views.MakeReservationView.as_view(), name='make-reservation'),
     path('confirm_reservation/<str:confirmation_code>/', views.ConfirmReservationView.as_view(), name='confirm-reservation'),
+    path('password/', views.PasswordView.as_view(), name='password'),
 ]
