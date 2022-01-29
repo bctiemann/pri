@@ -43,7 +43,7 @@ def get_service_hours():
 def get_exp_month_choices(allow_null=False):
     month_choices = []
     for month in range(1, 13):
-        iter_dt = timezone.now().replace(month=month)
+        iter_dt = timezone.now().replace(month=month, day=1)
         label = iter_dt.strftime('%B (%m)')
         month_choices.append((iter_dt.strftime('%m'), label))
     if allow_null:

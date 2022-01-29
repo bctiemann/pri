@@ -125,19 +125,29 @@
 
             <p class="reservation-info">
             Thank you for your reservation!
+            {% if user.customer.info_is_complete %}
             <cfif InfoComplete>
+                {% if reservation.is_reservation and reservation.reservation.status == reservation.reservation.Status.UNCONFIRMED %}
                 <cfif Reservation.reservationid GT 0 AND Reservation.status IS 0>
                     We may need to contact you for more details before your vehicle is confirmed. We will not charge your card until the reservation is confirmed.
+                {% elif reservation.is_reservation and reservation.reservation.status == reservation.reservation.Status.CONFIRMED %}
                 <cfelseif (Reservation.reservationid GT 0 AND Reservation.status IS 1) OR (Reservation.rentalid GT 0 AND Reservation.status IS 1)>
-                    Your vehicle is now secured for the dates you've selected.
+                    Your vehicle is now secured for the dates you've selected. Your card has not yet been billed.
+                {% elif reservation.is_rental and reservation.rental.status == reservation.rental.Status.CONFIRMED %}
+                    Your vehicle is now secured for the dates you've selected. Your card has been billed.
+                {% elif reservation.is_rental and reservation.rental.status == reservation.rental.Status.IN_PROGRESS %}
                 <cfelseif Reservation.status IS 2>
                     This rental is in progress.
+                {% elif reservation.is_rental and reservation.rental.status == reservation.rental.Status.COMPLETE %}
                 <cfelseif Reservation.status IS 3>
                     This rental is complete.
                 </cfif>
+                {% endif %}
+            {% else %}
             <cfelse>
                 We're not quite done, however...
             </cfif>
+            {% endif %}
 
             </p>
 

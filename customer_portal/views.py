@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 from django.utils.timezone import now
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
-from sales.models import Reservation, Rental, GuidedDrive
+from sales.models import BaseReservation, Reservation, Rental, GuidedDrive
 from users.views import LoginView, LogoutView
 from customer_portal.forms import PasswordForm
 
@@ -53,7 +53,7 @@ class ConfirmReservationView(SidebarMixin, TemplateView):
     def get_context_data(self, confirmation_code=None, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
-            context['reservation'] = Reservation.objects.get(confirmation_code=confirmation_code, customer=self.request.user.customer)
+            context['reservation'] = BaseReservation.objects.get(confirmation_code=confirmation_code, customer=self.request.user.customer)
         except Reservation.DoesNotExist:
             raise Http404
         return context

@@ -8,7 +8,7 @@
     {% for reservation in upcoming_reservations %}
     <cfoutput query="RentalsUpcoming">
         <a href="{% url "customer_portal:confirm-reservation" confirmation_code=reservation.confirmation_code %}">
-        <div class="reservation <cfif NOT InfoComplete>incomplete-info</cfif>">
+        <div class="reservation {% if not user.customer.info_is_complete %}incomplete-info{% endif %}">
             <div class="confcode">{{ reservation.confirmation_code }}</div>
             <table class="small-item-data">
                 <tr>
@@ -43,7 +43,7 @@
                 </tr>
             </table>
             <p class="reservation-status">
-                {{ reservation.reservation.get_status_display }}
+                {{ reservation.reservation.get_status_display }}{{ reservation.rental.get_status_display }}
                 {% comment %}
                 <cfif reservationid GT 0 AND status IS 0>
                     Unconfirmed
