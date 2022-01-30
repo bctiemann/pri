@@ -22,6 +22,8 @@
             </li>
         </ul>
 
+        {% block subpage_pane %}{% endblock %}
+
         <cfoutput>
         <cfif Len(formError) GT 0>
         <div class="exception" id="customer_form_error">
