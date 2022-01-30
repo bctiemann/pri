@@ -121,3 +121,8 @@ class PasswordView(SidebarMixin, FormView):
     template_name = 'customer_portal/password.html'
     selected_page = 'password'
     form_class = PasswordForm
+
+
+class FindUsView(SidebarMixin, TemplateView):
+    template_name = 'customer_portal/find_us.html'
+    selected_page = 'find_us'

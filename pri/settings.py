@@ -267,6 +267,8 @@ SERVER_BASE_URL = 'https://performance.rentals'
 
 COMPANY_NAME = 'Performance Rentals'
 COMPANY_PHONE = '(866) 607-0084'
+# COMPANY_ADDRESS = '373 Margaret King Ave, Ringwood NJ 07430'
+COMPANY_ADDRESS = '1821 2nd Ave, Tampa FL 33605'
 COMPANY_FOUNDING_YEAR = 2008
 SUPPORT_EMAIL = 'support@performance.rentals'
 SITE_EMAIL = 'info@performancerentals.us'

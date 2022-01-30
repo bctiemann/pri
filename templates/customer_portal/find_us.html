@@ -1,0 +1,15 @@
+{% extends "customer_portal/base.html" %}
+
+{% block page_title %}Find Us{% endblock %}
+
+{% block content %}
+    <iframe
+        id="map"
+        loading="lazy"
+        allowfullscreen
+        width="800"
+        height="600"
+        src="https://www.google.com/maps/embed/v1/place?key={{ google_maps_api_key }}
+        &q={{ company_address|urlencode }}">
+    </iframe>
+{% endblock %}

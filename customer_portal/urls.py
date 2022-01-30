@@ -31,4 +31,6 @@ urlpatterns = [
     path('payment/secondary/', views.PaymentCardSecondaryView.as_view(), name='payment-card-secondary'),
 
     path('password/', views.PasswordView.as_view(), name='password'),
+
+    path('find_us/', views.FindUsView.as_view(), name='find-us'),
 ]
