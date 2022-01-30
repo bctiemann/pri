@@ -1,0 +1,39 @@
+{% extends "customer_portal/account/base.html" %}
+
+{% block nav_insurance_class %}selected{% endblock %}
+
+{% block subpage_pane %}
+    <div class="form-page" page="insurance">
+
+    <cfform method="POST" name="account_form" action="account.cfm" autocomplete="on">
+
+        <cfoutput>
+        <table class="inputform rentalinfo">
+
+        <tr>
+            <td>Insurance Company</td>
+            <td><cfinput name="insco" size="40" maxlength="250" value="#Customer.insco#" class="#StructKeyExists(fieldErrors,"insco") ? 'field-error' : ''#" /></td>
+        </tr>
+        <tr>
+            <td>Insurance Policy Number</td>
+            <td><cfinput name="inspolnum" maxlength="250" value="#Customer.inspolnum#" class="#StructKeyExists(fieldErrors,"inspolnum") ? 'field-error' : ''#" /></td>
+        </tr>
+        <tr>
+            <td>Insurance Co. Telephone</td>
+            <td><cfinput name="inscotel" type="tel" maxlength="20" value="#Customer.inscotel#" class="phone #StructKeyExists(fieldErrors,"inscotel") ? 'field-error' : ''#" /></td>
+        </tr>
+
+        <tr class="buttons">
+            <td></td>
+            <td><button type="submit" class="btn">Submit</button></td>
+        </tr>
+
+        </table>
+        </cfoutput>
+
+    <cfinput name="page" type="hidden" value="#page#" />
+    <cfinput name="method" type="hidden" value="updateInsurance" />
+    </cfform>
+
+    </div>
+{% endblock %}

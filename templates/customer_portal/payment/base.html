@@ -14,8 +14,12 @@
     <div class="form-page-container">
 
         <ul class="form-page-nav two-col">
-            <li page="card1" <cfif page IS "card1">class="selected"</cfif>><a href="payment.cfm?page=card1">Card #1</a></li>
-            <li page="card2" <cfif page IS "card2">class="selected"</cfif>><a href="payment.cfm?page=card2">Card #2</a></li>
+            <li page="card1" class="{% block nav_card_primary_class %}{% endblock %}">
+                <a href="{% url "customer_portal:payment-card-primary" %}">Card #1</a>
+            </li>
+            <li page="card2" class="{% block nav_card_secondary_class %}{% endblock %}">
+                <a href="{% url "customer_portal:payment-card-secondary" %}">Card #2</a>
+            </li>
         </ul>
 
         <cfoutput>
@@ -27,6 +31,7 @@
         </cfif>
         </cfoutput>
 
+        {% comment %}
         <cfif page IS "card1">
 
             <div class="form-page" page="card1">
@@ -246,6 +251,7 @@
             </div>
 
         </cfif>
+        {% endcomment %}
 
     </div>
 {% endblock %}

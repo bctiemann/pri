@@ -1,0 +1,127 @@
+{% extends "customer_portal/account/base.html" %}
+
+{% block nav_driver_info_class %}selected{% endblock %}
+
+{% block subpage_pane %}
+    <div class="form-page" page="driverinfo">
+
+        <cfform method="POST" name="account_form" action="account.cfm" autocomplete="on">
+
+            <cfoutput>
+            <table class="inputform rentalinfo">
+
+            <tr>
+            <td>Name</td>
+                <td>
+                    #Customer.fname# #Customer.lname#
+                    <cfinput name="fname" type="hidden" value="#Customer.fname#" />
+                    <cfinput name="lname" type="hidden" value="#Customer.lname#" />
+                </td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td>
+                    #Customer.email#
+                    <cfinput name="email" type="hidden" value="#Customer.email#" />
+                </td>
+            </tr>
+
+            <tr>
+                <td>Date Of Birth</td>
+                <cftry>
+                    <cfset dob = DateFormat(Customer.dob,"MM/DD/YYYY")>
+                    <cfcatch type="Any">
+                        <cfset dob = "">
+                    </cfcatch>
+                </cftry>
+                <cfif dob IS "">
+                    <td><cfinput name="dob" value="#dob#" class="#StructKeyExists(fieldErrors,"dob") ? 'field-error' : ''#" placeholder="MM/DD/YYYY" /></td>
+                <cfelse>
+                    <td>
+                        #dob#
+                        <cfinput name="dob" type="hidden" value="#Customer.dob#" />
+                    </td>
+                </cfif>
+            </tr>
+
+            <cfif Customer.licenseno IS "">
+            <tr>
+                <td>License Number</td>
+                <td><cfinput name="licenseno" maxlength="30" value="#Customer.licenseno#" class="#StructKeyExists(fieldErrors,"licenseno") ? 'field-error' : ''#" /></td>
+            </tr>
+            <tr>
+                <td>License State</td>
+                <td>
+                    <cfselect name="licensestate" class="#StructKeyExists(fieldErrors,"licensestate") ? 'field-error' : ''#">
+                        <option value="">(Select state)</option>
+                        <cfloop array="#states#" index="state">
+                            <option value="#state.abbr#" <CFIF Customer.licensestate IS state.abbr>selected</CFIF>>#state.name#</option>
+                        </cfloop>
+                    </cfselect>
+                </td>
+            </tr>
+            <cfelse>
+            <tr>
+                <td>License Number</td>
+                <td>
+                    #Customer.licenseno# (#Customer.licensestate#)
+                    <cfinput name="licenseno" type="hidden" value="#Customer.licenseno#" />
+                    <cfinput name="licensestate" type="hidden" value="#Customer.licensestate#" />
+                </td>
+            </tr>
+            </cfif>
+
+            <tr>
+                <td class="align-top">Address</td>
+                <td><cftextarea name="addr" id="addr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#addr_dec#</cftextarea></td>
+            </tr>
+            <tr>
+                <td>City</td>
+                <td><cfinput name="city" value="#Customer.city#" maxlength="255" class="#StructKeyExists(fieldErrors,"city") ? 'field-error' : ''#" /></td>
+            </tr>
+            <tr>
+                <td>State</td>
+                <td>
+                    <cfselect name="state" class="#StructKeyExists(fieldErrors,"state") ? 'field-error' : ''#">
+                        <option value="">(Select state)</option>
+                        <cfloop array="#states#" index="state">
+                            <option value="#state.abbr#" <CFIF Customer.state IS state.abbr>selected</CFIF>>#state.name#</option>
+                        </cfloop>
+                    </cfselect>
+                </td>
+            </tr>
+            <tr>
+                <td>ZIP</td>
+                <td><cfinput name="zip" value="#Customer.zip#" maxlength="10" class="#StructKeyExists(fieldErrors,"zip") ? 'field-error' : ''#" /></td>
+            </tr>
+            <tr>
+                <td>Mobile Phone</td>
+                <td><cfinput name="mphone" value="#Customer.mphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"mphone") ? 'field-error' : ''#" /></td>
+            </tr>
+            <tr>
+                <td>Home Phone</td>
+                <td><cfinput name="hphone" value="#Customer.hphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"hphone") ? 'field-error' : ''#" /></td>
+            </tr>
+            <tr>
+                <td>Work Phone</td>
+                <td><cfinput name="wphone" value="#Customer.wphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"wphone") ? 'field-error' : ''#" /></td>
+            </tr>
+            <tr>
+                <td>Fax</td>
+                <td><cfinput name="fax" value="#Customer.fax#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"fax") ? 'field-error' : ''#" /></td>
+            </tr>
+
+            <tr class="buttons">
+                <td></td>
+                <td><button type="submit" class="btn">Submit</button></td>
+            </tr>
+
+            </table>
+            </cfoutput>
+
+        <cfinput name="page" type="hidden" value="#page#" />
+        <cfinput name="method" type="hidden" value="updateDriverInfo" />
+        </cfform>
+
+        </div>
+{% endblock %}

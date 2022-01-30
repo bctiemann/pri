@@ -18,10 +18,18 @@
     <div class="form-page-container">
 
         <ul class="form-page-nav">
-            <li page="driverinfo" <cfif page IS "driverinfo">class="selected"</cfif>><a href="account.cfm?page=driverinfo">Driver Information</a></li>
-            <li page="insurance" <cfif page IS "insurance">class="selected"</cfif>><a href="account.cfm?page=insurance">Insurance</a></li>
-            <li page="music" <cfif page IS "music">class="selected"</cfif>><a href="account.cfm?page=music">Music Prefs</a></li>
+            <li page="driverinfo" class="{% block nav_driver_info_class %}{% endblock %}">
+                <a href="{% url "customer_portal:account-driver-info" %}">Driver Information</a>
+            </li>
+            <li page="insurance" class="{% block nav_insurance_class %}{% endblock %}">
+                <a href="{% url "customer_portal:account-insurance" %}">Insurance</a>
+            </li>
+            <li page="music" class="{% block nav_music_class %}{% endblock %}">
+                <a href="{% url "customer_portal:account-music" %}">Music Prefs</a>
+            </li>
         </ul>
+
+        {% block subpage_pane %}{% endblock %}
 
         <cfoutput>
         <cfif Len(formError) GT 0>
@@ -32,6 +40,7 @@
         </cfif>
         </cfoutput>
 
+        {% comment %}
         <cfif page IS "driverinfo">
 
             <div class="form-page" page="driverinfo">
@@ -257,6 +266,7 @@
             </div>
 
         </cfif>
+        {% endcomment %}
 
     </div>
 

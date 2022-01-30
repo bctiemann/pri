@@ -47,7 +47,7 @@ class MakeReservationView(SidebarMixin, TemplateView):
 
 
 class ConfirmReservationView(SidebarMixin, TemplateView):
-    template_name = 'customer_portal/confirm_reservation.html'
+    template_name = 'customer_portal/reservations/confirm.html'
     selected_page = 'reservations'
 
     def get_context_data(self, confirmation_code=None, **kwargs):
@@ -60,13 +60,43 @@ class ConfirmReservationView(SidebarMixin, TemplateView):
 
 
 class AccountInfoView(SidebarMixin, FormView):
-    template_name = 'customer_portal/account_info.html'
+    template_name = 'customer_portal/account/base.html'
+    selected_page = 'account_info'
+    form_class = PasswordForm
+
+
+class AccountDriverInfoView(SidebarMixin, FormView):
+    template_name = 'customer_portal/account/driver_info.html'
+    selected_page = 'account_info'
+    form_class = PasswordForm
+
+
+class AccountInsuranceView(SidebarMixin, FormView):
+    template_name = 'customer_portal/account/insurance.html'
+    selected_page = 'account_info'
+    form_class = PasswordForm
+
+
+class AccountMusicView(SidebarMixin, FormView):
+    template_name = 'customer_portal/account/music.html'
     selected_page = 'account_info'
     form_class = PasswordForm
 
 
 class PaymentInfoView(SidebarMixin, FormView):
-    template_name = 'customer_portal/payment_info.html'
+    template_name = 'customer_portal/payment/base.html'
+    selected_page = 'payment_info'
+    form_class = PasswordForm
+
+
+class PaymentCardPrimaryView(SidebarMixin, FormView):
+    template_name = 'customer_portal/payment/card_primary.html'
+    selected_page = 'payment_info'
+    form_class = PasswordForm
+
+
+class PaymentCardSecondaryView(SidebarMixin, FormView):
+    template_name = 'customer_portal/payment/card_secondary.html'
     selected_page = 'payment_info'
     form_class = PasswordForm
 

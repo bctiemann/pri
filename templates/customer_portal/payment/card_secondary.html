@@ -1,0 +1,112 @@
+{% extends "customer_portal/payment/base.html" %}
+
+{% block nav_card_secondary_class %}selected{% endblock %}
+
+{% block subpage_pane %}
+    <div class="form-page" page="card1">
+
+    <cfform method="POST" name="payment_form" action="payment.cfm" autocomplete="on">
+
+        <cfoutput>
+        <table class="inputform rentalinfo">
+
+        <tr>
+            <td>Secondary Credit Card Number</td>
+            <cfif cc2num_dec IS "" OR IsDefined("Form.cc2num")>
+                <td><cfinput name="cc2num" maxlength="30" value="#formatCCNumber(cc2num_dec)#" class="cc-field #StructKeyExists(fieldErrors,"cc2num") ? 'field-error' : ''#" autocomplete="cc-number" /></td>
+            <cfelse>
+                <td>
+                    #formatCCNumber(maskCCNumber(cc2num_dec))#
+                    <cfinput name="cc2num" type="hidden" value="#formatCCNumber(cc2num_dec)#" />
+                </td>
+            </cfif>
+        </tr>
+        <tr>
+            <td>Expiration</td>
+            <cfif Customer.cc2expmo IS "" OR IsDefined("Form.cc2expmo")>
+                <td>
+                    <cfselect name="cc2expmo" class="#StructKeyExists(fieldErrors,"cc2expmo") ? 'field-error' : ''#">
+                        <option value="01" <cfif Customer.cc2expmo IS "01">selected</cfif>>January (01)</option>
+                        <option value="02" <cfif Customer.cc2expmo IS "02">selected</cfif>>February (02)</option>
+                        <option value="03" <cfif Customer.cc2expmo IS "03">selected</cfif>>March (03)</option>
+                        <option value="04" <cfif Customer.cc2expmo IS "04">selected</cfif>>April (04)</option>
+                        <option value="05" <cfif Customer.cc2expmo IS "05">selected</cfif>>May (05)</option>
+                        <option value="06" <cfif Customer.cc2expmo IS "06">selected</cfif>>June (06)</option>
+                        <option value="07" <cfif Customer.cc2expmo IS "07">selected</cfif>>July (07)</option>
+                        <option value="08" <cfif Customer.cc2expmo IS "08">selected</cfif>>August (08)</option>
+                        <option value="09" <cfif Customer.cc2expmo IS "09">selected</cfif>>September (09)</option>
+                        <option value="10" <cfif Customer.cc2expmo IS "10">selected</cfif>>October (10)</option>
+                        <option value="11" <cfif Customer.cc2expmo IS "11">selected</cfif>>November (11)</option>
+                        <option value="12" <cfif Customer.cc2expmo IS "12">selected</cfif>>December (12)</option>
+                    </cfselect> /
+
+                    <cfset tyear = #Dateformat(Now(),"yyyy")#>
+                    <cfset fyear = tyear+15>
+                    <cfset ynow=#LSDateFormat(Now(),"yyyy")#>
+                    <cfset ythen=(#ynow# + 11)>
+                    <cfset mnow=#LSDateFormat(Now(),"mm")#>
+                    <cfset dyear=ynow>
+                    <cfselect name="cc2expyr" class="#StructKeyExists(fieldErrors,"cc2expyr") ? 'field-error' : ''#">
+                        <cfoutput>
+                        <cfloop index="year" from="#ynow#" to="#ythen#">
+                            <option value="#dyear#" <cfif Customer.cc2expyr IS dyear>selected</cfif>>#dyear#</option>
+                            <cfset dyear = dyear + 1>
+                        </cfloop>
+                        </cfoutput>
+                    </cfselect>
+                </td>
+            <cfelse>
+                <td>
+                    #Customer.cc2expmo# / #Customer.cc2expyr#
+                    <cfinput name="cc2expmo" type="hidden" value="#Customer.cc2expmo#" />
+                    <cfinput name="cc2expyr" type="hidden" value="#Customer.cc2expyr#" />
+                </td>
+            </cfif>
+        </tr>
+        <tr>
+            <td>Security Code (CVV)</td>
+            <cfif Customer.cc2cvv IS "" OR IsDefined("Form.cc2cvv")>
+                <td><cfinput name="cc2cvv" maxlength="5" value="#Customer.cc2cvv#" class="#StructKeyExists(fieldErrors,"cc2cvv") ? 'field-error' : ''#" /></td>
+            <cfelse>
+                <td>
+                    #Customer.cc2cvv#
+                    <cfinput name="cc2cvv" type="hidden" value="#Customer.cc2cvv#" />
+                </td>
+            </cfif>
+        </tr>
+        <tr>
+            <td>Bank Telephone</td>
+            <cfif Customer.cc2tel IS "" OR IsDefined("Form.cc2tel")>
+                <td>
+                    <cfinput name="cc2tel" maxlength="20" value="#Customer.cc2tel#" class="phone #StructKeyExists(fieldErrors,"cc2tel") ? 'field-error' : ''#" />
+                    <span class="inline-text ui-icon ui-icon-info tooltip" title="We need the customer service contact phone number shown on the back of your card so that we can verify the card if necessary, and to refund the security deposit after the rental is over."></span>
+                </td>
+            <cfelse>
+                <td>
+                    #Customer.cc2tel#
+                    <cfinput name="cc2tel" type="hidden" value="#Customer.cc2tel#" />
+                </td>
+            </cfif>
+        </tr>
+
+        <tr class="buttons">
+            <td></td>
+            <td>
+                <cfif cc2num_dec IS "" OR IsDefined("Form.cc2num")>
+                    <cfinput name="fnc" type="hidden" value="update" />
+                    <button name="submit" type="submit" class="btn">Submit</button>
+                <cfelse>
+                    <cfinput name="fnc" type="hidden" value="clear" />
+                    <button type="button" class="btn delete" onclick="return confirmDeleteCard(this.form)">Clear Card</button>
+                </cfif>
+            </td>
+        </tr>
+
+        </table>
+        </cfoutput>
+
+    <cfinput name="page" type="hidden" value="#page#" />
+    </cfform>
+
+    </div>
+{% endblock %}
