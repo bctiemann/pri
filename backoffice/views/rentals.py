@@ -137,7 +137,7 @@ class RentalDriverPromoteView(PermissionRequiredMixin, RentalViewMixin, APIView)
 
 class RentalGenerateContractView(PermissionRequiredMixin, PDFView):
     permission_required = ('users.view_rental',)
-    template_name = 'backoffice/pdf/contract.html'
+    template_name = 'pdf/contract.html'
 
     def dispatch(self, request, *args, **kwargs):
         try:

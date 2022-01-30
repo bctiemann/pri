@@ -94,6 +94,7 @@ urlpatterns = [
     path('gift_certificates/', gift_certificates.GiftCertificateListView.as_view(), name='giftcert-list'),
     path('gift_certificates/create/', gift_certificates.GiftCertificateCreateView.as_view(is_create_view=True), name='giftcert-create'),
     path('gift_certificates/<int:pk>/', gift_certificates.GiftCertificateDetailView.as_view(), name='giftcert-detail'),
+    path('gift_certificates/<str:tag>/pdf/', gift_certificates.GiftCertificatePDFView.as_view(), name='giftcert-pdf'),
     path('gift_certificates/<int:pk>/delete/', gift_certificates.GiftCertificateDeleteView.as_view(), name='giftcert-delete'),
 
     path('adhoc_payments/', adhoc_payments.AdHocPaymentListView.as_view(), name='adhocpayment-list'),

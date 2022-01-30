@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from django.conf import settings
 from django.shortcuts import render, reverse
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -11,6 +12,7 @@ from . import ListViewMixin
 from backoffice.forms import GiftCertificateForm, CardForm
 from sales.models import GiftCertificate
 from sales.stripe import Stripe
+from pri.pdf import PDFView
 
 
 # Template generics-based CRUD views
@@ -91,3 +93,20 @@ class GiftCertificateDeleteView(DeleteView):
 
     def get_success_url(self):
         return reverse('backoffice:giftcert-list')
+
+
+class GiftCertificatePDFView(PDFView):
+    # model = GiftCertificate
+    template_name = 'pdf/gift_certificate.html'
+
+    # def get_success_url(self):
+    #     return reverse('backoffice:giftcert-list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            context['gift_certificate'] = GiftCertificate.objects.get(tag=self.kwargs['tag'])
+        except GiftCertificate.DoesNotExist:
+            raise Http404
+        context['company_phone'] = settings.COMPANY_PHONE
+        return context

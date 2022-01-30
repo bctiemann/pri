@@ -385,6 +385,12 @@ class GiftCertificate(models.Model):
         self.cc_number = format_cc_number(self.cc_number)
         super().save(*args, **kwargs)
 
+    @property
+    def expires_at(self):
+        if self.issued_at:
+            return self.issued_at + datetime.timedelta(days=365)
+        return None
+
 
 class TaxRate(models.Model):
     MAX_AGE_DAYS = 30

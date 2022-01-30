@@ -1,0 +1,176 @@
+{% load static humanize %}
+
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+    <title>Track Fleet Gift Certificate</title>
+    <style type="text/css">
+body {
+	font-size: 16px;
+	font-family: sans-serif;
+}
+
+#cert {
+	border: 1px solid #000000;
+	background-color: #D5F1E0;
+	width: 90%;
+	margin: 5%;
+	position: relative;
+	z-index: 0;
+}
+
+#certbox {
+	border: 1px dashed #888888;
+	width: 100%;
+	margin-top: 2em;
+	position: relative;
+    top: 2em;
+	background-color: #FFFFFF;
+}
+
+#img_chainsaw {
+	position: absolute;
+	right: 0em;
+	top: -1em;
+	width: 4em;
+	z-index: 1;
+}
+
+#img_logo {
+	position: absolute;
+	left: -2em;
+	top: -1.75em;
+	width: 15em;
+}
+
+#img_header {
+	position: relative;
+	right: -14em;
+	width: 25em;
+	margin: 0.5em;
+}
+
+#bodytext {
+	text-align: left;
+}
+#bodytextbox {
+	text-align: center;
+	margin: 1em 4em 0.75em 4em;
+}
+
+#infoboxes {
+	width: 100%;
+}
+
+#infoboxes tr {
+	vertical-align: top;
+}
+
+#infoboxes td {
+	width: 33%;
+	font-size: 0.99em;
+	padding: 1em;
+}
+
+#infoboxes td div {
+	background-color: #FFFFFF;
+	padding: 0.5em;
+//	border-width: 0px 1px 1px 0px;
+	border-color: #888888;
+	border-style: solid;
+}
+
+#infoboxes h4 {
+	background-color: #444444;
+	font-family: sans-serif,Verdana;
+	font-weight: bold;
+	color: #FFFFFF;
+	margin: 0em;
+	padding: 0.25em;
+//	border-bottom: 1px solid #111111;
+}
+
+#fineprint {
+	text-align: left;
+	font-size: 11px;
+}
+#fineprintbox {
+	text-align: center;
+	margin: 1em 7em 0.25em 7em;
+	font-size: 11px;
+}
+</style>
+</head>
+
+<body>
+
+    <div id="certbox">
+
+        <img id="img_chainsaw" src="{% static "images/chainsaw.png" %}"/>
+
+        <div id="cert">
+
+            <img id="img_logo" src="{% static "images/PRI_logo.png" %}">
+            <img id="img_header" src="{% static "images/gift_cert_header.png" %}">
+
+            <div id="bodytextbox">
+            <div id="bodytext">
+                <cfoutput>
+                This certificate entitles <b>{{ gift_certificate.beneficiary_name }}</b> to
+
+                {% if gift_certificate.value_message %}
+                    {{ gift_certificate.value_message }}
+                {% else %}
+                    <b>${{ gift_certificate.amount|floatformat:0|intcomma }}</b> toward any vehicle rental from PRI's
+                    sports car or bike fleet, or any service including the PRI Performance Experience or Joy Ride.
+                </cfif>
+                {% endif %}
+                </cfoutput>
+            </div>
+            </div>
+
+            <table id="infoboxes">
+                <tr>
+
+                    <td>
+                        <h4>To Redeem:</h4>
+                        <div>
+                        Visit www.PerformanceRentals.us<br />
+                        Or call <CFOUTPUT>{{ company_phone }}</CFOUTPUT>
+                        </div>
+                    </td>
+
+                    <td>
+                        <div><CFOUTPUT>
+                        <b>From:</b> {{ gift_certificate.cc_name }}<br />
+                        <b>Date:</b> {{ gift_certificate.issued_at|date:"m-d-Y" }}<br />
+                        <b>Expires:</b> {{ gift_certificate.expires_at|date:"m-d-Y" }}<br />
+                        <b>Code:</b> {{ gift_certificate.tag }}<br />
+                        </CFOUTPUT>
+                        </div>
+                    </td>
+
+                    <td>
+                        <h4>Message:</h4>
+                        <div>
+                        <CFOUTPUT>{{ gift_certificate.message }}</CFOUTPUT>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <div id="fineprintbox">
+            <div id="fineprint">
+            Not redeemable for cash. Cannot be combined with any other offer or discount.
+            </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

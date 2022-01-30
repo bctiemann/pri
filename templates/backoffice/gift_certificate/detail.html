@@ -25,7 +25,7 @@
         <tr>
             <td>Tag</td>
             <td>
-                <a href="previewgiftcert.cfm?tag=#GiftCert.tag#" target="_blank">{{ giftcertificate.tag }}</a>
+                <a href="{% url "backoffice:giftcert-pdf" tag=giftcertificate.tag %}?inline" target="_blank">{{ giftcertificate.tag }}</a>
                 <cfinput type="hidden" name="tag" value="#GiftCert.tag#" />
             </td>
         </tr>
