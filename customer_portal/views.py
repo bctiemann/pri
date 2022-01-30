@@ -41,10 +41,26 @@ class PastRentalsView(SidebarMixin, TemplateView):
     selected_page = 'reservations'
 
 
+class SelectVehicleView(SidebarMixin, TemplateView):
+    template_name = 'customer_portal/reservations/select_vehicle.html'
+    selected_page = 'reservations'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['ready_vehicles'] = VehicleMarketing.objects.filter(status=VehicleStatus.READY).order_by('-weighting')
+        context['cars'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.CAR)
+        context['bikes'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.BIKE)
+        return context
+
+
 class MakeReservationView(SidebarMixin, TemplateView):
     template_name = 'customer_portal/reservations/new.html'
     selected_page = 'reservations'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['vehicle'] = VehicleMarketing.objects.get(slug=self.kwargs['slug'])
+        return context
 
 class ConfirmReservationView(SidebarMixin, TemplateView):
     template_name = 'customer_portal/reservations/confirm.html'

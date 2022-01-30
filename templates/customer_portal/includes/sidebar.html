@@ -121,7 +121,7 @@
         </a>
     </li>
     <li class="{% if selected_page == "rates" %}selected-page{% endif %}">
-        <a href="index.cfm?page=reserve">Rental Rates</a>
+        <a href="{% url "customer_portal:select-vehicle" %}">Rental Rates</a>
     </li>
     <li class="{% if selected_page == "find_us" %}selected-page{% endif %}">
         <a href="findus.cfm">Find Us</a>

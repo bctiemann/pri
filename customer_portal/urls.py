@@ -17,7 +17,8 @@ urlpatterns = [
 
     path('reservations/upcoming/', views.UpcomingReservationsView.as_view(), name='upcoming-reservations'),
     path('reservations/past/', views.PastRentalsView.as_view(), name='past-rentals'),
-    path('reservations/new/', views.MakeReservationView.as_view(), name='make-reservation'),
+    path('reservations/new/', views.SelectVehicleView.as_view(), name='select-vehicle'),
+    path('reservations/new/<str:slug>/', views.MakeReservationView.as_view(), name='make-reservation'),
     path('reservations/<str:confirmation_code>/', views.ConfirmReservationView.as_view(), name='confirm-reservation'),
 
     path('account/', RedirectView.as_view(url=reverse_lazy('customer_portal:account-driver-info')), name='account-info'),
