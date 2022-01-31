@@ -1,7 +1,7 @@
 {% load static %}
 
 <cfoutput>
-<a class="header-logo" href="#OnCustSite#"><img src='{% static "customer/images/PRI_logo.png" %}' alt='Performance Rentals' width="255px"></a>
+<a class="header-logo" href="{% url "customer_portal:home" %}"><img src='{% static "customer/images/PRI_logo.png" %}' alt='Performance Rentals' width="255px"></a>
 </cfoutput>
 
 <cfif IsValidUser>
