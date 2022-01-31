@@ -1,0 +1,23 @@
+{% extends "customer_portal/base.html" %}
+
+{% block page_title %}Joy Ride{% endblock %}
+
+{% block content %}
+    <div class="form-page-container">
+
+        <ul class="form-page-nav">
+            <li page="upcoming" class="{% block nav_upcoming_class %}{% endblock %}">
+                <a href="{% url "customer_portal:joyride-upcoming" %}">Upcoming Events</a>
+            </li>
+            <li page="past" class="{% block nav_past_class %}{% endblock %}">
+                <a href="{% url "customer_portal:joyride-past" %}">Past Events</a>
+            </li>
+            <li page="reserve" class="{% block nav_reserve_class %}{% endblock %}">
+                <a href="{% url "customer_portal:joyride-reserve" %}">Book Event</a>
+            </li>
+        </ul>
+
+        {% block subpage_pane %}{% endblock %}
+
+    </div>
+{% endblock %}

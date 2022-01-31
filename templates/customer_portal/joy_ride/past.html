@@ -1,0 +1,50 @@
+{% extends "customer_portal/joy_ride/base.html" %}
+
+{% block nav_past_class %}selected{% endblock %}
+
+{% block subpage_pane %}
+    <cfoutput query="JoyRidePast">
+        <div class="reservation">
+            <div class="confcode">#confcode#</div>
+            <table class="small-item-data">
+                <tr>
+                    <td>Requested Date:</td>
+                    <td>#DateFormat(reqdate,"ddd MM/DD/YYYY")#</td>
+                </tr>
+                <tr>
+                    <td>Alternate Date:</td>
+                    <td>#DateFormat(bupdate,"ddd MM/DD/YYYY")#</td>
+                </tr>
+            </table>
+
+            <cfif choice1 GT 0>
+                <div class="vehiclepic-box joyperf choice1">
+                    <img class="vehiclepic" src="#OnSite#images/#choice1#-thumb.jpg" />
+                    <span class="offer-title overlay-text bottom">#v1_make# #v1_model#</span>
+                </div>
+            </cfif>
+            <cfif choice2 GT 0>
+                <div class="vehiclepic-box joyperf choice2">
+                    <img class="vehiclepic" src="#OnSite#images/#choice2#-thumb.jpg" />
+                    <span class="offer-title overlay-text bottom">#v2_make# #v2_model#</span>
+                </div>
+            </cfif>
+            <cfif choice3 GT 0>
+                <div class="vehiclepic-box joyperf choice3">
+                    <img class="vehiclepic" src="#OnSite#images/#choice3#-thumb.jpg" />
+                    <span class="offer-title overlay-text bottom">#v3_make# #v3_model#</span>
+                </div>
+            </cfif>
+
+            <cfif notes IS NOT "">
+                <div class="customer-notes">
+                    #parseNewlines(notes)#
+                </div>
+            </cfif>
+        </div>
+    </cfoutput>
+
+    <cfif JoyRidePast.recordCount IS 0>
+        <div class="no-records">No past Joy Ride events</div>
+    </cfif>
+{% endblock %}

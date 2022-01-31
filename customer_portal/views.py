@@ -13,6 +13,8 @@ class SidebarMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['upcoming_reservations'] = self.request.user.customer.basereservation_set.filter(out_at__gt=now())
+        context['upcoming_joy_rides'] = self.request.user.customer.joyride_set.filter(requested_date__gt=now())
+        context['upcoming_performance_experiences'] = self.request.user.customer.performanceexperience_set.filter(requested_date__gt=now())
         context['selected_page'] = getattr(self, 'selected_page', None)
         return context
 
@@ -62,6 +64,7 @@ class MakeReservationView(SidebarMixin, TemplateView):
         context['vehicle'] = VehicleMarketing.objects.get(slug=self.kwargs['slug'])
         return context
 
+
 class ConfirmReservationView(SidebarMixin, TemplateView):
     template_name = 'customer_portal/reservations/confirm.html'
     selected_page = 'reservations'
@@ -73,6 +76,21 @@ class ConfirmReservationView(SidebarMixin, TemplateView):
         except Reservation.DoesNotExist:
             raise Http404
         return context
+
+
+class JoyRideUpcomingView(SidebarMixin, TemplateView):
+    template_name = 'customer_portal/joy_ride/upcoming.html'
+    selected_page = 'joy_ride'
+
+
+class JoyRidePastView(SidebarMixin, TemplateView):
+    template_name = 'customer_portal/joy_ride/past.html'
+    selected_page = 'joy_ride'
+
+
+class JoyRideReserveView(SidebarMixin, TemplateView):
+    template_name = 'customer_portal/joy_ride/reserve.html'
+    selected_page = 'joy_ride'
 
 
 class AccountInfoView(SidebarMixin, FormView):

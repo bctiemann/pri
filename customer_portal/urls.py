@@ -21,6 +21,11 @@ urlpatterns = [
     path('reservations/new/<str:slug>/', views.MakeReservationView.as_view(), name='make-reservation'),
     path('reservations/<str:confirmation_code>/', views.ConfirmReservationView.as_view(), name='confirm-reservation'),
 
+    path('joy_ride/', RedirectView.as_view(url=reverse_lazy('customer_portal:joyride-upcoming')), name='joyride'),
+    path('joy_ride/upcoming/', views.JoyRideUpcomingView.as_view(), name='joyride-upcoming'),
+    path('joy_ride/past/', views.JoyRidePastView.as_view(), name='joyride-past'),
+    path('joy_ride/reserve/', views.JoyRideReserveView.as_view(), name='joyride-reserve'),
+
     path('account/', RedirectView.as_view(url=reverse_lazy('customer_portal:account-driver-info')), name='account-info'),
     path('account/driver/', views.AccountDriverInfoView.as_view(), name='account-driver-info'),
     path('account/insurance/', views.AccountInsuranceView.as_view(), name='account-insurance'),

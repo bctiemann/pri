@@ -105,10 +105,12 @@
         </a>
     </li>
     <li class="{% if selected_page == "joy_ride" %}selected-page{% endif %}">
-        <a href="joyride.cfm">
+        <a href="{% url "customer_portal:joyride-upcoming" %}">
+            {% if upcoming_joy_rides.exists %}
             <cfif JoyRideUpcoming.recordCount GT 0>
-                <div class="badge">#JoyRideUpcoming.recordCount#</div>
+                <div class="badge">{{ upcoming_joy_rides.count }}</div>
             </cfif>
+            {% endif %}
             Joy Ride
         </a>
     </li>
