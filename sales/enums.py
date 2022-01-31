@@ -74,6 +74,10 @@ def get_extra_miles_choices():
     return ((k, v['label']) for k, v in settings.EXTRA_MILES_PRICES.items())
 
 
+def get_numeric_choices(min_val, max_val):
+    return ((v, v) for v in range(min_val, max_val + 1))
+
+
 class ReservationType(Enum):
     RENTAL = 'rental'
     PERFORMANCE_EXPERIENCE = 'perfexp'

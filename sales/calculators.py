@@ -409,6 +409,9 @@ class JoyRidePriceCalculator(PriceCalculator):
 
     def get_price_data(self):
         return dict(
+            num_drivers=0,
+            num_passengers=self.num_passengers,
+
             tax_zip=self.tax_zip,
             tax_rate=self.tax_rate.total_rate,
             tax_rate_as_percent=self.tax_rate.total_rate * 100,

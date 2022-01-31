@@ -72,15 +72,17 @@ var reserveValidateForm = function(reservationType, section) {
                         $('.price-delivery-smallprint').css('visibility', 'visible');
                     }
                 } else if (reservationType === 'joyride' || reservationType === 'perfexp') {
-                    // $('.price-nodrv').html(data.nodrv + ' driver' + (data.nodrv != 1 ? 's' : ''));
-                    // $('.price-drvcost').html(data.drvcost.toFixed(2));
-                    // $('.price-nopax').html(data.nopax + ' passenger' + (data.nopax != 1 ? 's' : ''));
-                    // $('.price-paxcost').html(data.paxcost.toFixed(2));
-                    // $('.price-event-total').html(data.trate.toFixed(2));
-                    // $('.price-customer-discount').html(data.customer_discount.toFixed(2));
-                    // $('.price-subtotal').html(data.subtotal.toFixed(2));
-                    // $('.price-tax').html(data.tax_amt.toFixed(2));
-                    // $('.price-total').html(data.total_w_tax.toFixed(2));
+                    $('.price-nodrv').html(data.price_data.num_drivers + ' driver' + (data.price_data.num_drivers != 1 ? 's' : ''));
+                    $('.price-drvcost').html(data.price_data.base_price.toFixed(2));
+                    $('.price-nopax').html(data.price_data.num_passengers + ' passenger' + (data.price_data.num_passengers != 1 ? 's' : ''));
+                    $('.price-paxcost').html(data.price_data.base_price.toFixed(2));
+                    // $('.price-event-total').html(data.price_data.subtotal.toFixed(2));
+                    $('.price-customer-discount').html(data.price_data.customer_discount.toFixed(2));
+                    $('.price-specific-discount').html(data.price_data.specific_discount.toFixed(2));
+                    $('.price-specific-discount-label').html(data.price_data.specific_discount_label);
+                    $('.price-subtotal').html(data.price_data.subtotal.toFixed(2));
+                    $('.price-tax').html(data.price_data.tax_amount.toFixed(2));
+                    $('.price-total').html(data.price_data.total_with_tax.toFixed(2));
                 }
                 if (data.price_data.customer_discount) {
                     $('.customer-discount').show();

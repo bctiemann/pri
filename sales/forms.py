@@ -15,7 +15,7 @@ from fleet.models import Vehicle, VehicleMarketing, VehicleStatus
 from sales.models import Reservation, Coupon, PerformanceExperience, JoyRide
 from users.models import Customer
 from sales.calculators import RentalPriceCalculator, PerformanceExperiencePriceCalculator, JoyRidePriceCalculator
-from sales.enums import get_service_hours, TRUE_FALSE_CHOICES, get_exp_year_choices, get_exp_month_choices
+from sales.enums import get_service_hours, TRUE_FALSE_CHOICES, get_exp_year_choices, get_exp_month_choices, get_numeric_choices
 
 current_year = timezone.now().year
 
@@ -341,12 +341,16 @@ class ReservationRentalLoginForm(ReservationRentalDetailsForm):
     password = forms.CharField(widget=forms.PasswordInput(), required=False)
 
 
+# Joy Ride
+
 class JoyRideDetailsForm(forms.ModelForm):
 
     error_css_class = 'field-error'
     discount = None
     customer = None
 
+    num_passengers = forms.TypedChoiceField(coerce=lambda x: int(x), choices=get_numeric_choices(min_val=1, max_val=4))
+    num_minors = forms.TypedChoiceField(coerce=lambda x: int(x), choices=get_numeric_choices(min_val=0, max_val=4))
     email = forms.EmailField()
     coupon_code = forms.CharField(required=False)
 
