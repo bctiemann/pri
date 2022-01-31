@@ -26,6 +26,11 @@ urlpatterns = [
     path('joy_ride/past/', views.JoyRidePastView.as_view(), name='joyride-past'),
     path('joy_ride/reserve/', views.JoyRideReserveView.as_view(), name='joyride-reserve'),
 
+    path('performance_experience/', RedirectView.as_view(url=reverse_lazy('customer_portal:perfexp-upcoming')), name='perfexp'),
+    path('performance_experience/upcoming/', views.PerformanceExperienceUpcomingView.as_view(), name='perfexp-upcoming'),
+    path('performance_experience/past/', views.PerformanceExperiencePastView.as_view(), name='perfexp-past'),
+    path('performance_experience/reserve/', views.PerformanceExperienceReserveView.as_view(), name='perfexp-reserve'),
+
     path('account/', RedirectView.as_view(url=reverse_lazy('customer_portal:account-driver-info')), name='account-info'),
     path('account/driver/', views.AccountDriverInfoView.as_view(), name='account-driver-info'),
     path('account/insurance/', views.AccountInsuranceView.as_view(), name='account-insurance'),

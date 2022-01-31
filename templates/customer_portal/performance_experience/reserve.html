@@ -1,0 +1,253 @@
+{% extends "customer_portal/performance_experience/base.html" %}
+
+{% block nav_reserve_class %}selected{% endblock %}
+
+{% block subpage_pane %}
+    <cfquery name="Vehicles" datasource="#DSN#">
+        SELECT vehicleid,make,model,type FROM Vehicles
+        WHERE status = 1
+        ORDER BY weighting DESC
+    </cfquery>
+
+    <cfform method="POST" name="reservation_form" action="perfexp.cfm" onsubmit="return false;" autocomplete="on">
+    <cfoutput>
+
+        <cfif Len(formError) GT 0>
+        <div class="exception" id="reservation_form_error">
+            <h3>An error occurred</h3>
+            <p class="alert-message">#formError#</p>
+        </div>
+        </cfif>
+
+        <div id="reservation_price">
+
+            <table class="inputform price">
+                <tr class="vehicle-pick-buttons hidden">
+                    <td class="align-top">Pick Your Vehicles</td>
+                    <td>
+                        <button class="btn pick-vehicles-btn" type="car" style="margin-right: 16px;">Cars</button>
+                        <button class="btn pick-vehicles-btn" type="bike">Bikes</button>
+                        <span class="vehicles-picked" style="margin-left: 20px;"></span>
+                    </td>
+                </tr>
+                <tr class="vehicle-choice">
+                    <td>Vehicle Choice ##1</td>
+                <td>
+                    <cfselect name="choice1">
+                        <option value="0">(Choose Vehicle)</option>
+                        <optgroup label="Cars">
+                            <cfloop query="Vehicles">
+                                <cfif type IS 1>
+                                    <option value="#vehicleid#" <cfif JoyPerf.choice1 IS vehicleid>selected</cfif>>#make# #model#</option>
+                                </cfif>
+                            </cfloop>
+                        </optgroup>
+                        <optgroup label="Motorcycles">
+                            <cfloop query="Vehicles">
+                                <cfif type IS 2>
+                                    <option value="#vehicleid#" <cfif JoyPerf.choice1 IS vehicleid>selected</cfif>>#make# #model#</option>
+                                </cfif>
+                            </cfloop>
+                        </optgroup>
+                    </cfselect>
+                </td>
+            </tr>
+            <tr class="vehicle-choice">
+                <td>Vehicle Choice ##2</td>
+                <td>
+                    <cfselect name="choice2">
+                        <option value="0">(Choose Vehicle)</option>
+                        <optgroup label="Cars">
+                            <cfloop query="Vehicles">
+                                <cfif type IS 1>
+                                    <option value="#vehicleid#" <cfif JoyPerf.choice2 IS vehicleid>selected</cfif>>#make# #model#</option>
+                                </cfif>
+                            </cfloop>
+                        </optgroup>
+                        <optgroup label="Motorcycles">
+                            <cfloop query="Vehicles">
+                                <cfif type IS 2>
+                                    <option value="#vehicleid#" <cfif JoyPerf.choice2 IS vehicleid>selected</cfif>>#make# #model#</option>
+                                </cfif>
+                            </cfloop>
+                        </optgroup>
+                    </cfselect>
+                </td>
+            </tr>
+            <tr class="vehicle-choice">
+                <td>Vehicle Choice ##3</td>
+                <td>
+                    <cfselect name="choice3">
+                        <option value="0">(Choose Vehicle)</option>
+                        <optgroup label="Cars">
+                            <cfloop query="Vehicles">
+                                <cfif type IS 1>
+                                    <option value="#vehicleid#" <cfif JoyPerf.choice3 IS vehicleid>selected</cfif>>#make# #model#</option>
+                                </cfif>
+                            </cfloop>
+                        </optgroup>
+                        <optgroup label="Motorcycles">
+                            <cfloop query="Vehicles">
+                                <cfif type IS 2>
+                                    <option value="#vehicleid#" <cfif JoyPerf.choice3 IS vehicleid>selected</cfif>>#make# #model#</option>
+                                </cfif>
+                            </cfloop>
+                        </optgroup>
+                    </cfselect>
+                </td>
+            </tr>
+            <tr>
+                <td>Number of Drivers</td>
+                <td>
+                    <cfselect name="nodrv" class="#StructKeyExists(fieldErrors,"nodrv") ? 'field-error' : ''#">
+                        <option value="1" <cfif JoyPerf.nodrv IS 1>selected</cfif>>1</option>
+                        <option value="2" <cfif JoyPerf.nodrv IS 2>selected</cfif>>2</option>
+                        <option value="3" <cfif JoyPerf.nodrv IS 3>selected</cfif>>3</option>
+                        <option value="4" <cfif JoyPerf.nodrv IS 4>selected</cfif>>4</option>
+                        <option value="5" <cfif JoyPerf.nodrv IS 5>selected</cfif>>More than 4 (will call)</option>
+                    </cfselect>
+                </td>
+            </tr>
+            <tr>
+                <td>Number of Passengers</td>
+                <td>
+                    <cfselect name="nopax" class="#StructKeyExists(fieldErrors,"nopax") ? 'field-error' : ''#">
+                        <option value="0" <cfif JoyPerf.nopax IS 0>selected</cfif>>0</option>
+                        <option value="1" <cfif JoyPerf.nopax IS 1>selected</cfif>>1</option>
+                        <option value="2" <cfif JoyPerf.nopax IS 2>selected</cfif>>2</option>
+                        <option value="3" <cfif JoyPerf.nopax IS 3>selected</cfif>>3</option>
+                        <option value="4" <cfif JoyPerf.nopax IS 4>selected</cfif>>4</option>
+                        <option value="5" <cfif JoyPerf.nopax IS 5>selected</cfif>>More than 4 (will call)</option>
+                    </cfselect>
+                </td>
+            </tr>
+            <tr>
+                <td>Requested Date</td>
+                <td>
+                    <cfinput name="reqdate" value="#JoyPerf.reqdate#" style="width: 120px;" placeholder="MM/DD/YYYY" class="#StructKeyExists(fieldErrors,"reqdate") ? 'field-error' : ''#" />
+                </td>
+            </tr>
+            <tr>
+                <td>Alternate Date</td>
+                <td>
+                    <cfinput name="bupdate" value="#JoyPerf.bupdate#" style="width: 120px;" placeholder="MM/DD/YYYY" class="#StructKeyExists(fieldErrors,"bupdate") ? 'field-error' : ''#" />
+                    <small class="tooltip" title="We'll do our best to accommodate your first choice of date, but please pick an alternate just in case."><span class="ui-icon ui-icon-info"></span></small>
+                </td>
+            </tr>
+            <tr>
+                <td>Big and Tall</td>
+                <td>
+                    <cfselect name="bigtall">
+                        <option value="0" <cfif JoyPerf.bigtall IS 0>selected</cfif>>No</option>
+                        <option value="1" <cfif JoyPerf.bigtall IS 1>selected</cfif>>Yes</option>
+                    </cfselect>
+                    <small class="tooltip" title="If anyone in your party is especially big or tall, please let us know so we can make sure everyone is comfortable."><span class="ui-icon ui-icon-info"></span></small>
+                </td>
+            </tr>
+            <tr>
+                <td>Discount/Coupon Code</td>
+                <td><cfinput name="coupon" value="#JoyPerf.coupon#" maxlength="20" placeholder="(Optional)" class="#StructKeyExists(fieldErrors,"coupon") ? 'field-error' : ''#" /></td>
+            </tr>
+            <tr>
+                <td class="align-top">Notes/Requests</td>
+                <td><cftextarea name="notes" class="#StructKeyExists(fieldErrors,"notes") ? 'field-error' : ''#">#JoyPerf.notes#</cftextarea></td>
+            </tr>
+
+            <cfif NOT IsDefined("IdentityResult") OR NOT IdentityResult.success OR (IsDefined("LoginResult") AND NOT LoginResult.success)>
+            <tr class="buttons">
+                <td></td>
+                <td>
+                    <button type="submit" name="price_btn" class="btn reserve-joyperf-price-btn">Continue</button>
+                    <div class="spinner next-form-spinner price-spinner"></div>
+                </td>
+            </tr>
+            </cfif>
+        </table>
+
+    </div>
+
+    <div class="exception hidden" id="reservation_price_error">
+        <h3>An error occurred</h3>
+        <p class="alert-message"></p>
+    </div>
+
+    <div id="reservation_confirm" class="hidden">
+
+        <div id="price_breakdown">
+        <table class="price-breakdown small-item-data">
+            <tr>
+                <td><span class="price-nodrv"></span></td>
+                <td>$<span class="price-drvcost"></span></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><span class="price-nopax"></span></td>
+                <td>$<span class="price-paxcost"></span></td>
+                <td></td>
+            </tr>
+            <tr class="customer-discount">
+                <td>Promotional Discount</td>
+                <td>- $<span class="price-customer-discount"></span></td>
+                <td></td>
+            </tr>
+            <tr class="coupon-discount">
+                <td>Coupon Discount</td>
+                <td>- $<span class="price-coupon-discount"></span></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Subtotal</td>
+                <td>$<span class="price-subtotal"></span></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Tax (<span class="price-tax-rate"></span>%)</td>
+                <td>$<span class="price-tax"></span></td>
+                <td></td>
+            </tr>
+            <tr class="total">
+                <td>Total</td>
+                <td>$<span class="price-total"></span></td>
+                <td></td>
+            </tr>
+        </table>
+        </div>
+
+        <table class="inputform confirm">
+            <tr class="buttons">
+                <td></td>
+                <td>
+                    <button type="submit" name="confirm_btn" class="btn reserve-joyperf-confirm-btn">Complete Reservation</button>
+                    <div class="spinner next-form-spinner confirm-spinner"></div>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+
+    <div class="exception hidden" id="reservation_confirm_error">
+    <h3>An error occurred</h3>
+    <p class="alert-message"></p>
+    </div>
+
+    </div>
+
+
+    </cfoutput>
+    <cfinput name="page" type="hidden" value="reserve" />
+    <cfinput name="method" type="hidden" value="validateJoyPerf" />
+    <cfinput name="type" type="hidden" value="2" />
+    <cfinput name="nominors" type="hidden" value="0" />
+    <cfinput name="reservation_type" type="hidden" value="perfexp" />
+    <cfinput name="customerid" type="hidden" value="" />
+    </cfform>
+
+    <div class="dialog vehicle-picker" id="dialog_pick_vehicles" title="Choose Up to Three Vehicles">
+        <cfoutput query="Vehicles">
+            <div class="vehicle-picker-pick" vehicleid="#vehicleid#" type="<cfif type IS 1>car<cfelseif type IS 2>bike</cfif>">
+                <img src="#OnSite#images/#vehicleid#-thumb.jpg" />
+                <span class="offer-title overlay-text bottom">#make# #model#</span>
+            </div>
+        </cfoutput>
+    </div>
+{% endblock %}

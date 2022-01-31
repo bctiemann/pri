@@ -33,6 +33,8 @@ class LogoutView(LogoutView):
 #     selected_page = 'home'
 
 
+# Reservations/Rentals
+
 class UpcomingReservationsView(SidebarMixin, TemplateView):
     template_name = 'customer_portal/reservations/upcoming.html'
     selected_page = 'reservations'
@@ -78,6 +80,8 @@ class ConfirmReservationView(SidebarMixin, TemplateView):
         return context
 
 
+# Joy Ride
+
 class JoyRideUpcomingView(SidebarMixin, TemplateView):
     template_name = 'customer_portal/joy_ride/upcoming.html'
     selected_page = 'joy_ride'
@@ -92,6 +96,25 @@ class JoyRideReserveView(SidebarMixin, TemplateView):
     template_name = 'customer_portal/joy_ride/reserve.html'
     selected_page = 'joy_ride'
 
+
+# Performance Experience
+
+class PerformanceExperienceUpcomingView(SidebarMixin, TemplateView):
+    template_name = 'customer_portal/performance_experience/upcoming.html'
+    selected_page = 'performance_experience'
+
+
+class PerformanceExperiencePastView(SidebarMixin, TemplateView):
+    template_name = 'customer_portal/performance_experience/past.html'
+    selected_page = 'performance_experience'
+
+
+class PerformanceExperienceReserveView(SidebarMixin, TemplateView):
+    template_name = 'customer_portal/performance_experience/reserve.html'
+    selected_page = 'performance_experience'
+
+
+# Account Info
 
 class AccountInfoView(SidebarMixin, FormView):
     template_name = 'customer_portal/account/base.html'
@@ -117,6 +140,8 @@ class AccountMusicView(SidebarMixin, FormView):
     form_class = PasswordForm
 
 
+# Payment Methods
+
 class PaymentInfoView(SidebarMixin, FormView):
     template_name = 'customer_portal/payment/base.html'
     selected_page = 'payment_info'
@@ -134,6 +159,8 @@ class PaymentCardSecondaryView(SidebarMixin, FormView):
     selected_page = 'payment_info'
     form_class = PasswordForm
 
+
+# Other pages/functions
 
 class PasswordView(SidebarMixin, FormView):
     template_name = 'customer_portal/password.html'

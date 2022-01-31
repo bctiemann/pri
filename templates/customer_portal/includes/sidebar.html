@@ -115,10 +115,12 @@
         </a>
     </li>
     <li class="{% if selected_page == "performance_experience" %}selected-page{% endif %}">
-        <a href="perfexp.cfm">
+        <a href="{% url "customer_portal:perfexp-upcoming" %}">
+            {% if upcoming_performance_experiences.exists %}
             <cfif PerfExpUpcoming.recordCount GT 0>
-                <div class="badge">#PerfExpUpcoming.recordCount#</div>
+                <div class="badge">{{ upcoming_performance_experiences.count }}</div>
             </cfif>
+            {% endif %}
             Performance Experience
         </a>
     </li>
