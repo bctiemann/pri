@@ -351,12 +351,11 @@ class JoyRideDetailsForm(forms.ModelForm):
 
     num_passengers = forms.TypedChoiceField(coerce=lambda x: int(x), choices=get_numeric_choices(min_val=1, max_val=4))
     num_minors = forms.TypedChoiceField(coerce=lambda x: int(x), choices=get_numeric_choices(min_val=0, max_val=4))
-    requested_date = forms.DateField(widget=forms.DateInput(attrs={'placeholder': 'MM/DD/YYYY'}))
-    backup_date = forms.DateField(widget=forms.DateInput(attrs={'placeholder': 'MM/DD/YYYY'}))
+    requested_date = forms.DateField(widget=forms.DateInput(attrs={'placeholder': 'MM/DD/YYYY', 'class': 'short'}))
+    backup_date = forms.DateField(widget=forms.DateInput(attrs={'placeholder': 'MM/DD/YYYY', 'class': 'short'}))
     email = forms.EmailField()
     big_and_tall = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
-
-    coupon_code = forms.CharField(required=False)
+    coupon_code = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': '(Optional)'}))
 
     def clean(self):
         print('cleaned:')
