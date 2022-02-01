@@ -118,8 +118,9 @@ var reserveValidateForm = function(reservationType, section) {
                 $('#login_pass').val(data.create_pass);
                 if (data.reservation_type == 'perfexp') {
                     window.location.href = data.custsite + 'perfexp_confirm.cfm?confcode=' + data.confcode;
-                } else if (data.reservation_type == 'joyride') {
-                    window.location.href = data.custsite + 'joyride_confirm.cfm?confcode=' + data.confcode;
+                } else if (data.reservation_type === 'joyride') {
+                    window.location.href = data.customer_site_url;
+                    // window.location.href = data.custsite + 'joyride_confirm.cfm?confcode=' + data.confcode;
                 } else if (data.reservation_type === 'rental') {
                     window.location.href = data.customer_site_url;
                 } else if (data.reservation_type == 'gift') {
@@ -268,8 +269,8 @@ $('document').ready(function() {
     // Date pickers
     $('#id_out_date').datepicker({});
     $('#id_back_date').datepicker({});
-    $('#reqdate').datepicker({});
-    $('#bupdate').datepicker({});
+    $('#id_requested_date').datepicker({});
+    $('#id_backup_date').datepicker({});
 
     // Tooltips
     $('.tooltip').tooltip();
@@ -314,8 +315,14 @@ $('document').ready(function() {
     $('.reserve-createpass-btn').click(function() {
         reserveValidateForm('validatePassword', 'password');
     });
-    $('.reserve-login-btn').click(function() {
+    $('.reserve-rental-login-btn').click(function() {
         reserveValidateForm('rental', 'login');
+    });
+    $('.reserve-joyride-login-btn').click(function() {
+        reserveValidateForm('joyride', 'login');
+    });
+    $('.reserve-perfexp-login-btn').click(function() {
+        reserveValidateForm('perfexp', 'login');
     });
     $('.reserve-rental-complete-btn').click(function() {
         reserveValidateForm('rental', 'payment');

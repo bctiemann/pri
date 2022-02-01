@@ -278,7 +278,7 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
                 <td class="align-top">Notes/Requests</td>
                 <td>
                     {{ form.customer_notes }}
-                    <cftextarea name="notes" class="#StructKeyExists(fieldErrors,"notes") ? 'field-error' : ''#">#JoyPerf.notes#</cftextarea>
+{#                    <cftextarea name="notes" class="#StructKeyExists(fieldErrors,"notes") ? 'field-error' : ''#">#JoyPerf.notes#</cftextarea>#}
                 </td>
             </tr>
 
@@ -362,6 +362,7 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
             <tr>
                 <td>Password</td>
                 <td>
+                    {{ login_form.password }}
                     <cfinput name="login_pass" type="password" value="">
                     <small class="forgot-password dialog-trigger">Forgot?</small>
                 </td>
@@ -369,7 +370,7 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
             <tr class="buttons">
                 <td></td>
                 <td>
-                    <button type="button" class="btn reserve-login-btn">Complete Reservation</button>
+                    <button type="button" class="btn reserve-joyride-login-btn">Complete Reservation</button>
                     <div class="spinner next-form-spinner password-spinner"></div>
                 </td>
             </tr>

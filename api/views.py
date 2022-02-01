@@ -188,6 +188,18 @@ class ValidateRentalPaymentView(APIView):
         return Response(response)
 
 
+class ValidateRentalLoginView(APIView):
+
+    # authentication_classes = ()
+    # permission_classes = ()
+    form_type = None
+
+    def post(self, request):
+        response = {
+        }
+        return Response(response)
+
+
 class ValidateJoyRideDetailsView(APIView):
 
     # authentication_classes = ()
@@ -205,6 +217,43 @@ class ValidateJoyRideDetailsView(APIView):
             'customer_id': form.customer.id if form.customer else None,
             'price_data': form.price_data,
             # 'delivery_required': form.cleaned_data['delivery_required'],
+        }
+        return Response(response)
+
+
+class ValidateJoyRidePaymentView(APIView):
+
+    # authentication_classes = ()
+    # permission_classes = ()
+    form_type = None
+
+    def post(self, request):
+        # form = JoyRideDetailsForm(request.POST)
+        print(form.data)
+        print(form.is_valid())
+        print(form.errors.as_json())
+        response = {
+            # 'success': form.is_valid(),
+            # 'errors': form.errors,
+            # 'errors_html': form.errors.as_ul(),
+            # 'customer_id': form.customer.id if form.customer else None,
+            # 'price_data': form.price_data,
+            # # 'delivery_required': form.cleaned_data['delivery_required'],
+        }
+        return Response(response)
+
+
+class ValidateJoyRideLoginView(APIView):
+
+    # authentication_classes = ()
+    # permission_classes = ()
+    form_type = None
+
+    def post(self, request):
+        response = {
+            'success': True,
+            'reservation_type': 'joyride',
+            'customer_site_url': reverse('customer_portal:joyride'),
         }
         return Response(response)
 
