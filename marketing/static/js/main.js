@@ -79,6 +79,11 @@ var reserveValidateForm = function(reservationType, section) {
                     // $('.price-event-total').html(data.price_data.subtotal.toFixed(2));
                     $('.price-customer-discount').html(data.price_data.customer_discount.toFixed(2));
                     $('.price-specific-discount').html(data.price_data.specific_discount.toFixed(2));
+                    if (data.price_data.specific_discount) {
+                        $('.specific-discount').show();
+                    } else {
+                        $('.specific-discount').hide();
+                    }
                     $('.price-specific-discount-label').html(data.price_data.specific_discount_label);
                     $('.price-subtotal').html(data.price_data.subtotal.toFixed(2));
                     $('.price-tax').html(data.price_data.tax_amount.toFixed(2));

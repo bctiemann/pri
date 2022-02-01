@@ -77,7 +77,7 @@ class PriceCalculator(ABC):
         return effective_promotions.first()
 
     def get_coupon(self, coupon_code):
-        return Coupon.objects.filter(code=coupon_code).first()
+        return Coupon.objects.filter(code__iexact=coupon_code).first()
 
     def get_customer(self, email):
         return Customer.objects.filter(user__email=email).first()
