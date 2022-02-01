@@ -1803,6 +1803,9 @@ table.inputform input[type=tel],
 table.inputform input[type=email] {
         width: 240px;
 }
+table.inputform input.short {
+        width: 120px;
+}
 table.inputform textarea {
         width: 240px;
         height: 120px;

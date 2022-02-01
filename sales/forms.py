@@ -45,10 +45,10 @@ class ReservationRentalDetailsForm(forms.ModelForm):
     # additional fields here if they do not exist in the model referenced in Meta (Reservation).
 
     vehicle_marketing = forms.ModelChoiceField(widget=forms.HiddenInput(), queryset=VehicleMarketing.objects.filter(status=VehicleStatus.READY))
-    out_date = forms.DateField(widget=forms.DateInput(attrs={'placeholder': 'MM/DD/YYYY'}))
+    out_date = forms.DateField(widget=forms.DateInput(attrs={'placeholder': 'MM/DD/YYYY', 'class': 'short'}))
     out_time = forms.TimeField(widget=forms.Select(choices=get_service_hours()))
     out_at = forms.DateTimeField(required=False)
-    back_date = forms.DateField(widget=forms.DateInput(attrs={'placeholder': 'MM/DD/YYYY'}))
+    back_date = forms.DateField(widget=forms.DateInput(attrs={'placeholder': 'MM/DD/YYYY', 'class': 'short'}))
     back_time = forms.TimeField(widget=forms.Select(choices=get_service_hours()))
     back_at = forms.DateTimeField(required=False)
     drivers = forms.ChoiceField(choices=DRIVERS_CHOICES)
@@ -56,7 +56,7 @@ class ReservationRentalDetailsForm(forms.ModelForm):
     delivery_zip = USZipCodeField(required=False)
     extra_miles = forms.ChoiceField()
     email = forms.EmailField()
-    coupon_code = forms.CharField(required=False)
+    coupon_code = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': '(Optional)'}))
     # TypedChoiceField is necessary when the form is being serialized via FE/JS and values are sent as 'True'/'False'
     # is_military = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
     is_military = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
