@@ -295,6 +295,9 @@ class ReservationRentalPaymentForm(ReservationRentalDetailsForm):
     state = USStateField(widget=USStateSelect())
     zip = USZipCodeField()
 
+    password = forms.CharField(widget=forms.PasswordInput())
+    password_repeat = forms.CharField(widget=forms.PasswordInput())
+
     # EXP_MONTH_CHOICES = (
     #     ('01', 'January (01)'),
     #     ('02', 'February (02)'),

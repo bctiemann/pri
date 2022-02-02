@@ -167,14 +167,15 @@ Use `./manage.py dbshell` to get a native CLI shell into the local database inst
 
 ### A note about multiple datasources
 
-If you want to continue with the pattern of segregated "front" and "back" databases for low- and high-value data, it's 
-possible to do that (https://docs.djangoproject.com/en/3.1/topics/db/multi-db/). However, I feel that this adds 
-unnecessary complexity for dubious benefit. Especially if, as I would prefer and recommend, we aren't storing any real 
-PII such as decryptable credit cards or passwords (these should just be handled via Stripe to avoid all PCI compliance
-issues), and with the datasourcees kept in the same infrastructure so a breach would expose both, there doesn't really 
-seem to be any value to keeping the data segregated in this way. The whole site should be SSL-only anyway, and individual
-views and apps can be protected as needed via authentication classes or middleware, so the conceptual division between
-"www" and "secure" seems moot, unless there's something I'm overlooking.
+The segregation between "front" and "back" databases is preserved in this project. The "back" ("default") database
+contains all the models that have encrypted fields, which include any potential PII or otherwise sensitive data.
+
+See `pri/db_routers.py` for how this is configured. Only those models listed in `FRONT_MODELS` are routed via "front".
+However, all models are present in both databases; they are empty in the database where that model is not used in
+the routing.
+
+Note that in this project, there is no distinction between "secure" and "non-secure" areas of the site. The entire
+site should be SSL-protected.
 
 ### Authentication and Permissions
 

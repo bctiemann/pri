@@ -59,6 +59,11 @@ var reserveValidateForm = function(reservationType, section) {
                     $('.price-multi-day-discount-pct').html(data.price_data.multi_day_discount_pct);
                     $('.price-specific-discount').html(data.price_data.specific_discount.toFixed(2));
                     $('.price-specific-discount-label').html(data.price_data.specific_discount_label);
+                    if (data.price_data.specific_discount) {
+                        $('.specific-discount').show();
+                    } else {
+                        $('.specific-discount').hide();
+                    }
                     $('.price-extra-miles').html(data.price_data.extra_miles);
                     $('.price-extra-miles-cost').html(data.price_data.extra_miles_cost.toFixed(2));
                     $('.price-subtotal').html(data.price_data.subtotal.toFixed(2));
