@@ -10,6 +10,7 @@ from django.conf import settings
 from django import forms
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
+from django.contrib.auth import password_validation
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleStatus
 from sales.models import Reservation, Coupon, PerformanceExperience, JoyRide
@@ -278,6 +279,10 @@ class ReservationRentalDetailsForm(forms.ModelForm):
 # 2nd-phase form; extends ReservationRentalDetailsForm with Customer fields so it inherits all the first form's validations
 class ReservationRentalPaymentForm(ReservationRentalDetailsForm):
 
+    error_messages = {
+        'password_mismatch': _('The two password fields didn’t match.'),
+    }
+
     # TODO: Add these fields and let this be a Reservation form to avoid confusion
     customer_fields = (
         'first_name', 'last_name', 'mobile_phone', 'home_phone', 'work_phone', 'fax', 'cc_number', 'cc_exp_yr',
@@ -295,7 +300,7 @@ class ReservationRentalPaymentForm(ReservationRentalDetailsForm):
     state = USStateField(widget=USStateSelect())
     zip = USZipCodeField()
 
-    password = forms.CharField(widget=forms.PasswordInput())
+    password_new = forms.CharField(widget=forms.PasswordInput())
     password_repeat = forms.CharField(widget=forms.PasswordInput())
 
     # EXP_MONTH_CHOICES = (
@@ -336,6 +341,18 @@ class ReservationRentalPaymentForm(ReservationRentalDetailsForm):
     # class Meta:
     #     model = Customer
     #     fields = '__all__'
+
+    def clean_password_repeat(self):
+        password1 = self.cleaned_data.get('password_new')
+        password2 = self.cleaned_data.get('password_repeat')
+        if password1 and password2:
+            if password1 != password2:
+                raise forms.ValidationError(
+                    self.error_messages['password_mismatch'],
+                    code='password_mismatch',
+                )
+        password_validation.validate_password(password2, user=None)
+        return password2
 
 
 # If the customer already exists, this form will be shown and processed instead of ReservationRentalPaymentForm

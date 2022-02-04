@@ -115,7 +115,8 @@ class ValidateRentalPaymentView(APIView):
             # Create Customer object and login
             # TODO: Ensure that every User has a Customer attached, as providing an email of an unattached user will
             # try to create a new user which will fail the uniqueness constraint. Alternatively, do a get_or_create
-            user = User.objects.create_user(form.cleaned_data['email'], password=generate_password())
+            # user = User.objects.create_user(form.cleaned_data['email'], password=generate_password())
+            user = User.objects.create_user(form.cleaned_data['email'], password=form.cleaned_data['password_new'])
             customer_kwargs = {key: form.cleaned_data.get(key) for key in form.customer_fields}
             customer = Customer.objects.create(
                 user=user,
