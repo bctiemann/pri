@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView, FormView, CreateView
+from django.views.generic import TemplateView, FormView, CreateView, UpdateView
 from django.http import Http404
 from django.urls import reverse_lazy
 from django.utils.timezone import now
@@ -6,7 +6,7 @@ from django.utils.timezone import now
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
 from sales.models import BaseReservation, Reservation, Rental, GuidedDrive
 from users.views import LoginView, LogoutView
-from customer_portal.forms import PasswordForm
+from customer_portal.forms import PasswordForm, ReservationCustomerInfoForm
 
 
 class SidebarMixin:
@@ -67,17 +67,32 @@ class MakeReservationView(SidebarMixin, TemplateView):
         return context
 
 
-class ConfirmReservationView(SidebarMixin, TemplateView):
+class ConfirmReservationView(SidebarMixin, UpdateView):
     template_name = 'customer_portal/reservations/confirm.html'
     selected_page = 'reservations'
+    model = BaseReservation
+    form_class = ReservationCustomerInfoForm
 
-    def get_context_data(self, confirmation_code=None, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_object(self, queryset=None):
         try:
-            context['reservation'] = BaseReservation.objects.get(confirmation_code=confirmation_code, customer=self.request.user.customer)
-        except Reservation.DoesNotExist:
+            return BaseReservation.objects.get(confirmation_code=self.kwargs['confirmation_code'], customer=self.request.user.customer)
+        except BaseReservation.DoesNotExist:
             raise Http404
-        return context
+
+    def get_form_kwargs(self):
+        """Return the keyword arguments for instantiating the form."""
+        kwargs = super().get_form_kwargs()
+        if hasattr(self, 'object'):
+            kwargs.update({'instance': self.object.customer})
+        return kwargs
+
+    # def get_context_data(self, confirmation_code=None, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     try:
+    #         context['reservation'] = BaseReservation.objects.get(confirmation_code=confirmation_code, customer=self.request.user.customer)
+    #     except Reservation.DoesNotExist:
+    #         raise Http404
+    #     return context
 
 
 # Joy Ride

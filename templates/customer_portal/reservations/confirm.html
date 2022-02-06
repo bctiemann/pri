@@ -1,5 +1,6 @@
 {% extends "customer_portal/base.html" %}
 
+{% comment %}
 <!--- If a form was submitted, the user had JS turned off, so we have to process the sequential logic. --->
 <cfset fieldErrors = StructNew()>
 <cfset formError = "">
@@ -95,12 +96,14 @@
 
     <div class="well">
         <div class='section-header'>Reservation Information</div>
+    {% endcomment %}
 
         {% block page_title %}Reservation Information{% endblock %}
 
         {% block content %}
         <cftry>
 
+            {% comment %}
             <cfif confcode IS "">
                 <cfthrow message="Invalid confirmation code.">
             </cfif>
@@ -122,6 +125,7 @@
                     <cfthrow message="Confirmation code not found.">
                 </cfif>
             </cfif>
+            {% endcomment %}
 
             <p class="reservation-info">
             Thank you for your reservation!
@@ -155,17 +159,17 @@
 
             <div class="confcode-container">
                 <p>Confirmation code:</p>
-                <div class="confcode">{{ reservation.confirmation_code }}</div>
+                <div class="confcode">{{ basereservation.confirmation_code }}</div>
             </div>
 
             <table class="reservation-details small-item-data">
                 <tr>
                     <td>Vehicle</td>
-                    <td>{{ reservation.vehicle.make }} {{ reservation.vehicle.model }}</td>
+                    <td>{{ basereservation.vehicle.make }} {{ basereservation.vehicle.model }}</td>
                 </tr>
                 <tr>
                     <td>
-                        {% if reservation.delivery_required %}
+                        {% if basereservation.delivery_required %}
                         <cfif delivery IS 1>
                             PRI Delivers Vehicle:
                         {% else %}
@@ -174,11 +178,11 @@
                         </cfif>
                         {% endif %}
                     </td>
-                    <td>#TimeFormat(dateout, "h:MM tt")# #DateFormat(dateout,"ddd MM/DD/YYYY")#</td>
+                    <td>{{ basereservation.out_at|date:"g:i A m/d/Y" }}{# #TimeFormat(dateout, "h:MM tt")# #DateFormat(dateout,"ddd MM/DD/YYYY")# #}</td>
                 </tr>
                 <tr>
                     <td>
-                        {% if reservation.delivery_required %}
+                        {% if basereservation.delivery_required %}
                         <cfif delivery IS 1>
                             PRI Collects Vehicle:
                         {% else %}
@@ -187,15 +191,16 @@
                         </cfif>
                         {% endif %}
                     </td>
-                    <td>#TimeFormat(dateback, "h:MM tt")# #DateFormat(dateback,"ddd MM/DD/YYYY")#</td>
+                    <td>{{ basereservation.back_at|date:"g:i A m/d/Y" }}{# #TimeFormat(dateback, "h:MM tt")# #DateFormat(dateback,"ddd MM/DD/YYYY")# #}</td>
                 </tr>
                 <tr>
                     <td>Number of Days</td>
-                    <td>{{ reservation.num_days }}</td>
+                    <td>{{ basereservation.num_days }}</td>
                 </tr>
             </table>
             </cfoutput>
 
+            {% comment %}
             <cfif YourID.firsttime IS 1>
                 <cftry>
                     <cfset pass_dec = Decrypt(CustFront.password,globalkey,"AES","hex")>
@@ -210,10 +215,12 @@
                 </div>
                 </cfoutput>
             </cfif>
+            {% endcomment %}
 
+            {% if not user.info_is_complete %}
             <cfif NOT InfoComplete OR Len(formError) GT 0>
 
-                <cfform method="POST" name="reservation_form" action="reserve_confirm.cfm" autocomplete="on" onsubmit="return false;">
+                <form method="POST" name="reservation_form" action="reserve_confirm.cfm" autocomplete="on" onsubmit="return false;">
 
                 <p class="reservation-info">
                 <p>
@@ -257,23 +264,36 @@
 
                 <tr>
                     <td>First Name</td>
-                    <td><cfinput name="fname" value="#Customer.fname#" maxlength="255" class="#StructKeyExists(fieldErrors,"fname") ? 'field-error' : ''#" /></td>
+                    <td>
+                        {{ form.first_name }}
+                        <cfinput name="fname" value="#Customer.fname#" maxlength="255" class="#StructKeyExists(fieldErrors,"fname") ? 'field-error' : ''#" />
+                    </td>
                 </tr>
                 <tr>
                     <td>Last Name</td>
-                    <td><cfinput name="lname" value="#Customer.lname#" maxlength="255" class="#StructKeyExists(fieldErrors,"lname") ? 'field-error' : ''#" /></td>
+                    <td>
+                        {{ form.last_name }}
+                        <cfinput name="lname" value="#Customer.lname#" maxlength="255" class="#StructKeyExists(fieldErrors,"lname") ? 'field-error' : ''#" />
+                    </td>
                 </tr>
                 <tr>
                     <td class="align-top">Address</td>
-                    <td><cftextarea name="addr" id="addr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#addr_dec#</cftextarea></td>
+                    <td>
+                        {{ form.address_line_1 }}
+                        <cftextarea name="addr" id="addr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#addr_dec#</cftextarea>
+                    </td>
                 </tr>
                 <tr>
                     <td>City</td>
-                    <td><cfinput name="city" value="#Customer.city#" maxlength="255" class="#StructKeyExists(fieldErrors,"city") ? 'field-error' : ''#" /></td>
+                    <td>
+                        {{ form.city }}
+                        <cfinput name="city" value="#Customer.city#" maxlength="255" class="#StructKeyExists(fieldErrors,"city") ? 'field-error' : ''#" />
+                    </td>
                 </tr>
                 <tr>
                    <td>State</td>
                    <td>
+                       {{ form.state }}
                         <cfselect name="state" class="#StructKeyExists(fieldErrors,"state") ? 'field-error' : ''#">
                             <option value="">(Select state)</option>
                             <cfloop array="#states#" index="state">
@@ -284,24 +304,39 @@
                 </tr>
                 <tr>
                     <td>ZIP</td>
-                    <td><cfinput name="zip" value="#Customer.zip#" maxlength="10" class="#StructKeyExists(fieldErrors,"zip") ? 'field-error' : ''#" /></td>
+                    <td>
+                        {{ form.zip }}
+                        <cfinput name="zip" value="#Customer.zip#" maxlength="10" class="#StructKeyExists(fieldErrors,"zip") ? 'field-error' : ''#" />
+                    </td>
                 </tr>
 
                 <tr>
                     <td>Mobile Phone</td>
-                    <td><cfinput name="mphone" value="#Customer.mphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"mphone") ? 'field-error' : ''#" /></td>
+                    <td>
+                        {{ form.mobile_phone }}
+                        <cfinput name="mphone" value="#Customer.mphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"mphone") ? 'field-error' : ''#" />
+                    </td>
                 </tr>
                 <tr>
                     <td>Home Phone</td>
-                    <td><cfinput name="hphone" value="#Customer.hphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"hphone") ? 'field-error' : ''#" /></td>
+                    <td>
+                        {{ form.home_phone }}
+                        <cfinput name="hphone" value="#Customer.hphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"hphone") ? 'field-error' : ''#" />
+                    </td>
                 </tr>
                 <tr>
                     <td>Work Phone</td>
-                    <td><cfinput name="wphone" value="#Customer.wphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"wphone") ? 'field-error' : ''#" /></td>
+                    <td>
+                        {{ form.work_phone }}
+                        <cfinput name="wphone" value="#Customer.wphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"wphone") ? 'field-error' : ''#" />
+                    </td>
                 </tr>
                 <tr>
                     <td>Fax</td>
-                    <td><cfinput name="fax" value="#Customer.fax#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"fax") ? 'field-error' : ''#" /></td>
+                    <td>
+                        {{ form.fax }}
+                        <cfinput name="fax" value="#Customer.fax#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"fax") ? 'field-error' : ''#" />
+                    </td>
                 </tr>
 
                 <tr>
@@ -573,8 +608,9 @@
                 <cfinput name="reservation_type" type="hidden" value="rental" />
                 <cfinput name="reservationid" type="hidden" value="#Reservation.reservationid#" />
                 <cfinput name="rentalid" type="hidden" value="#Reservation.rentalid#" />
-                </cfform>
+                </form>
 
+            {% else %}
             <cfelse>
 
                 <cfform method="POST" name="reservation_form" action="reserve_confirm.cfm" autocomplete="on">
@@ -622,6 +658,7 @@
                 </cfform>
 
             </cfif>
+            {% endif %}
 
             <cfcatch type="Any">
                 <cfoutput>
