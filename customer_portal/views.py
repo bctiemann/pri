@@ -83,7 +83,7 @@ class ConfirmReservationView(SidebarMixin, UpdateView):
         """Return the keyword arguments for instantiating the form."""
         kwargs = super().get_form_kwargs()
         if hasattr(self, 'object'):
-            kwargs.update({'instance': self.object.customer})
+            kwargs.update({'instance': self.object.customer, 'reservation': self.object})
         return kwargs
 
     # def get_context_data(self, confirmation_code=None, **kwargs):

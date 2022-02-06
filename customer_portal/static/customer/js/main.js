@@ -1,13 +1,13 @@
 var maxphonelength = 14;
 
-var reserveValidateForm = function(method, section) {
+var reserveValidateForm = function(reservationType, section) {
     var params = {};
     var formArray = $('#reservation_form').serializeArray();
     for (var elem in formArray) {
         params[formArray[elem].name] = formArray[elem].value;
     }
-    params.component = 'cassidy';
-    params.method = method;
+    // params.component = 'cassidy';
+    // params.method = method;
     params.createReservation = section == 'confirm';
     console.log(params);
 
@@ -15,7 +15,8 @@ var reserveValidateForm = function(method, section) {
     $('.next-form-spinner.' + section + '-spinner').show();
 
     $('#reservation_' + section + '_error').hide();
-    $.post('ajax_post.cfm',params,function(data) {
+    // $.post('ajax_post.cfm',params,function(data) {
+    $.post(`/api/validate/${reservationType}/${section}/`, params, function(data) {
 
         $('.next-form-spinner').hide();
 
@@ -60,7 +61,8 @@ var reserveValidateForm = function(method, section) {
                 $('#reservation_confirm').show();
             } else {
                 if (data.reservation_type == 'rental') {
-                    window.location.href = data.custsite + 'reserve_confirm.cfm?confcode=' + data.confcode;
+                    window.location.href = data.customer_site_url;
+                    // window.location.href = data.custsite + 'reserve_confirm.cfm?confcode=' + data.confcode;
                 } else if (data.reservation_type == 'perfexp') {
                     window.location.href = data.custsite + 'perfexp_confirm.cfm?confcode=' + data.confcode;
                 } else if (data.reservation_type == 'joyride') {
@@ -261,7 +263,7 @@ $(document).ready(function() {
         $('#button_vehicle_picker_done').button({'disabled': num_picked == 0});
     });
     $('.reserve-submit-info-btn').click(function() {
-        reserveValidateForm('updateReservationCustomerInfo', 'confirm');
+        reserveValidateForm('rental', 'confirm');
     });
     $('.vehicle-picker-pick').click(function() {
         pickVehicle($(this).attr('vehicleid'));

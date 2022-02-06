@@ -201,6 +201,22 @@ class ValidateRentalLoginView(APIView):
         return Response(response)
 
 
+class ValidateRentalConfirmView(APIView):
+
+    # authentication_classes = ()
+    # permission_classes = ()
+    form_type = None
+
+    def post(self, request):
+        confirmation_code = request.POST.get('confirmation_code')
+        response = {
+            'success': True,
+            'reservation_type': 'rental',
+            'customer_site_url': reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': confirmation_code}),
+        }
+        return Response(response)
+
+
 class ValidateJoyRideDetailsView(APIView):
 
     # authentication_classes = ()

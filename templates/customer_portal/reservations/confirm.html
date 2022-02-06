@@ -220,7 +220,7 @@
             {% if not user.info_is_complete %}
             <cfif NOT InfoComplete OR Len(formError) GT 0>
 
-                <form method="POST" name="reservation_form" action="reserve_confirm.cfm" autocomplete="on" onsubmit="return false;">
+                <form method="POST" name="reservation_form" id="reservation_form" action="{% url "customer_portal:confirm-reservation" confirmation_code=basereservation.confirmation_code %}" autocomplete="on" onsubmit="return false;">
 
                 <p class="reservation-info">
                 <p>
@@ -347,15 +347,22 @@
                             <cfset dob = "">
                         </cfcatch>
                     </cftry>
-                    <td><cfinput name="dob" value="#dob#" class="#StructKeyExists(fieldErrors,"dob") ? 'field-error' : ''#" /></td>
+                    <td>
+                        {{ form.date_of_birth }}
+                        <cfinput name="dob" value="#dob#" class="#StructKeyExists(fieldErrors,"dob") ? 'field-error' : ''#" />
+                    </td>
                 </tr>
                 <tr>
                     <td>License Number</td>
-                    <td><cfinput name="licenseno" maxlength="30" value="#Customer.licenseno#" class="#StructKeyExists(fieldErrors,"licenseno") ? 'field-error' : ''#" /></td>
+                    <td>
+                        {{ form.license_number }}
+                        <cfinput name="licenseno" maxlength="30" value="#Customer.licenseno#" class="#StructKeyExists(fieldErrors,"licenseno") ? 'field-error' : ''#" />
+                    </td>
                 </tr>
                 <tr>
                     <td>License State</td>
                     <td>
+                        {{ form.license_state }}
                         <cfselect name="licensestate" class="#StructKeyExists(fieldErrors,"licensestate") ? 'field-error' : ''#">
                             <option value="">(Select state)</option>
                             <cfloop array="#states#" index="state">
@@ -382,15 +389,24 @@
                 <tbody>
                 <tr>
                     <td>Insurance Company</td>
-                    <td><cfinput name="insco" size="40" maxlength="250" value="#Customer.insco#" class="#StructKeyExists(fieldErrors,"insco") ? 'field-error' : ''#" /></td>
+                    <td>
+                        {{ form.insurance_company }}
+                        <cfinput name="insco" size="40" maxlength="250" value="#Customer.insco#" class="#StructKeyExists(fieldErrors,"insco") ? 'field-error' : ''#" />
+                    </td>
                 </tr>
                 <tr>
                     <td>Insurance Policy Number</td>
-                    <td><cfinput name="inspolnum" maxlength="250" value="#Customer.inspolnum#" class="#StructKeyExists(fieldErrors,"inspolnum") ? 'field-error' : ''#" /></td>
+                    <td>
+                        {{ form.insurance_policy_number }}
+                        <cfinput name="inspolnum" maxlength="250" value="#Customer.inspolnum#" class="#StructKeyExists(fieldErrors,"inspolnum") ? 'field-error' : ''#" />
+                    </td>
                 </tr>
                 <tr>
                     <td>Insurance Co. Telephone</td>
-                    <td><cfinput name="inscotel" type="tel" maxlength="20" value="#Customer.inscotel#" class="phone #StructKeyExists(fieldErrors,"inscotel") ? 'field-error' : ''#" /></td>
+                    <td>
+                        {{ form.insurance_company_phone }}
+                        <cfinput name="inscotel" type="tel" maxlength="20" value="#Customer.inscotel#" class="phone #StructKeyExists(fieldErrors,"inscotel") ? 'field-error' : ''#" />
+                    </td>
                 </tr>
                 </tbody>
 
@@ -553,6 +569,7 @@
                 <tr>
                     <td>Favorite Genre</td>
                     <td>
+                        {{ form.music_genre }}
                         <cfselect name="musicgenre" class="#StructKeyExists(fieldErrors,"musicgenre") ? 'field-error' : ''#">
                             <option value="0" <cfif Customer.musicgenre IS 0>selected</cfif>>None</option>
                             <option value="1" <cfif Customer.musicgenre IS 1>selected</cfif>>50's</option>
@@ -587,7 +604,10 @@
                 </tr>
                 <tr>
                     <td>Favorite Artist / Composer</td>
-                    <td><cfinput name="musicfav" maxlength="250" value="#Customer.musicfav#" class="#StructKeyExists(fieldErrors,"musicfav") ? 'field-error' : ''#" /></td>
+                    <td>
+                        {{ form.music_favorite }}
+                        <cfinput name="musicfav" maxlength="250" value="#Customer.musicfav#" class="#StructKeyExists(fieldErrors,"musicfav") ? 'field-error' : ''#" />
+                    </td>
                 </tr>
 
                 <tr class="buttons">
@@ -602,6 +622,7 @@
                 </table>
                 </cfoutput>
 
+                {{ form.confirmation_code }}
 
                 <cfinput name="method" type="hidden" value="updateReservationCustomerInfo" />
                 <cfinput name="confcode" type="hidden" value="#confcode#" />
