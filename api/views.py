@@ -25,6 +25,7 @@ from sales.forms import (
     JoyRideDetailsForm, JoyRidePaymentForm, JoyRideLoginForm,
 )
 from marketing.forms import NewsletterSubscribeForm
+from customer_portal.forms import ReservationCustomerInfoForm
 from sales.models import BaseReservation, Reservation, Rental, TaxRate, generate_code
 from sales.enums import ReservationType
 from sales.tasks import send_email
@@ -204,11 +205,28 @@ class ValidateRentalLoginView(APIView):
 class ValidateRentalConfirmView(APIView):
 
     # authentication_classes = ()
+    authentication_classes = (SessionAuthentication,)
     # permission_classes = ()
     form_type = None
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         confirmation_code = request.POST.get('confirmation_code')
+        try:
+            reservation = BaseReservation.objects.get(confirmation_code=confirmation_code, customer=self.request.user.customer)
+        except BaseReservation.DoesNotExist:
+            raise Http404
+
+        form = ReservationCustomerInfoForm(request.POST, reservation=reservation)
+        print(form.data)
+        print(self.form_type)
+        print(form.is_valid())
+        print(form.errors.as_json())
+        if not form.is_valid():
+            return Response({
+                'success': False,
+                'errors': form.errors,
+            })
+
         response = {
             'success': True,
             'reservation_type': 'rental',

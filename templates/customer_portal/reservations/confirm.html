@@ -623,6 +623,7 @@
                 </cfoutput>
 
                 {{ form.confirmation_code }}
+                {% csrf_token %}
 
                 <cfinput name="method" type="hidden" value="updateReservationCustomerInfo" />
                 <cfinput name="confcode" type="hidden" value="#confcode#" />
