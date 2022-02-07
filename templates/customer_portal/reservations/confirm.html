@@ -217,7 +217,7 @@
             </cfif>
             {% endcomment %}
 
-            {% if not user.info_is_complete %}
+            {% if not user.customer.info_is_complete %}
             <cfif NOT InfoComplete OR Len(formError) GT 0>
 
                 <form method="POST" name="reservation_form" id="reservation_form" action="{% url "customer_portal:confirm-reservation" confirmation_code=basereservation.confirmation_code %}" autocomplete="on" onsubmit="return false;">
@@ -684,6 +684,7 @@
             </cfif>
             {% endif %}
 
+            {% comment %}
             <cfcatch type="Any">
                 <cfoutput>
                 <div class="exception">
@@ -692,6 +693,7 @@
                 </div>
                 </cfoutput>
             </cfcatch>
+            {% endcomment %}
         </cftry>
         {% endblock %}
     </div>

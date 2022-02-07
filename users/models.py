@@ -383,7 +383,13 @@ class Customer(models.Model):
 
     @property
     def info_is_complete(self):
-        return bool(self.license_number and self.insurance_company)
+        return all((
+            self.license_number,
+            self.license_state,
+            self.insurance_company,
+            self.insurance_policy_number,
+            self.insurance_company_phone,
+        ))
 
     @property
     def past_rentals(self):
