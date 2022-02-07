@@ -1828,7 +1828,7 @@ table.inputform tr.buttons td {
 	margin-left: 10px;
 }
 
-.exception p {
+.exception p, .exception ul {
 	font-size: 16px;
 	margin: 20px;
 }

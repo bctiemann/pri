@@ -223,25 +223,27 @@
                 <form method="POST" name="reservation_form" id="reservation_form" action="{% url "customer_portal:confirm-reservation" confirmation_code=basereservation.confirmation_code %}" autocomplete="on" onsubmit="return false;">
 
                 <p class="reservation-info">
-                <p>
                 Before you take the keys, we'll need some additional information from you. Specifically, we need to verify your
                 insurance, and also take a look at your driving record. You can fill out the required information now, or if you
                 need time to gather it, you can bookmark this site and come back later.
                 </p>
-                <p>
+
+                <p class="reservation-info">
                 We take the utmost care to preserve your privacy and security. All information you submit is held in our encrypted
                 data store and is not shared with anyone except the relevant agencies for verification purposes.
                 </p>
-                </p>
 
+                {% if form.errors %}
                 <cfoutput>
                 <cfif Len(formError) GT 0>
                 <div class="exception" id="customer_form_error">
                     <h3>An error occurred</h3>
-                    <p class="alert-message">#formError#</p>
+                    <p class="alert-message"></p>
+                    {{ form.errors }}
                 </div>
                 </cfif>
                 </cfoutput>
+                {% endif %}
 
                 <cfoutput>
                 <table class="inputform rentalinfo">

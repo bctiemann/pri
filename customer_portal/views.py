@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView, FormView, CreateView, UpdateView
 from django.http import Http404
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.utils.timezone import now
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
@@ -85,6 +85,9 @@ class ConfirmReservationView(SidebarMixin, UpdateView):
         if hasattr(self, 'object'):
             kwargs.update({'instance': self.object.customer, 'reservation': self.object})
         return kwargs
+
+    def get_success_url(self):
+        return reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': self.kwargs['confirmation_code']})
 
     # def get_context_data(self, confirmation_code=None, **kwargs):
     #     context = super().get_context_data(**kwargs)

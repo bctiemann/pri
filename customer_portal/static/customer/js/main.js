@@ -76,8 +76,16 @@ var reserveValidateForm = function(reservationType, section) {
             if (reservationType === 'rental') {
                 alert(data.error);
             }
-            for (var field in data.fieldErrors) {
-                $('#' + field.toLowerCase()).addClass('field-error').select();
+            let selectedFirst = false;
+            for (var field in data.errors) {
+                const input = $('#id_' + field.toLowerCase());
+                input.addClass('field-error');
+                if (!selectedFirst) {
+                    $('#reservation_' + section + '_error .alert-message').html(data.errors[field]);
+                    input.select();
+                    input[0].scrollIntoView();
+                    selectedFirst = true;
+                }
             } 
         }
     }, 'json')
