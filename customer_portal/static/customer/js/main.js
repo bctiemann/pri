@@ -60,7 +60,7 @@ var reserveValidateForm = function(reservationType, section) {
                 $('#reservation_price_error').hide();  
                 $('#reservation_confirm').show();
             } else {
-                if (data.reservation_type == 'rental') {
+                if (data.reservation_type === 'rental') {
                     window.location.href = data.customer_site_url;
                     // window.location.href = data.custsite + 'reserve_confirm.cfm?confcode=' + data.confcode;
                 } else if (data.reservation_type == 'perfexp') {
@@ -73,7 +73,7 @@ var reserveValidateForm = function(reservationType, section) {
             $('.' + section + ' .btn').prop('disabled', false);
             $('#reservation_' + section + '_error .alert-message').html(data.error);
             $('#reservation_' + section + '_error').show(); 
-            if (method == 'updateReservationCustomerInfo') {
+            if (reservationType === 'rental') {
                 alert(data.error);
             }
             for (var field in data.fieldErrors) {
