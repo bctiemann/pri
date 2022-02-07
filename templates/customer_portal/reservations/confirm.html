@@ -430,11 +430,16 @@
                 <tbody>
                 <tr>
                     <td>Primary Credit Card Number</td>
-                    <td><cfinput name="ccnum" maxlength="30" value="#ccnum_dec#" class="cc-field #StructKeyExists(fieldErrors,"ccnum") ? 'field-error' : ''#" autocomplete="cc-number" /></td>
+                    <td>
+                        {{ form.cc_number }}
+                        <cfinput name="ccnum" maxlength="30" value="#ccnum_dec#" class="cc-field #StructKeyExists(fieldErrors,"ccnum") ? 'field-error' : ''#" autocomplete="cc-number" />
+                    </td>
                 </tr>
                 <tr>
                     <td>Expiration</td>
                     <td>
+                        {{ form.cc_exp_mo }} / {{ form.cc_exp_yr }}
+                        {% comment %}
                         <cfselect name="ccexpmo" class="#StructKeyExists(fieldErrors,"ccexpmo") ? 'field-error' : ''#">
                             <option value="01" <cfif Customer.ccexpmo IS "01">selected</cfif>>January (01)</option>
                             <option value="02" <cfif Customer.ccexpmo IS "02">selected</cfif>>February (02)</option>
@@ -464,15 +469,20 @@
                             </cfloop>
                             </cfoutput>
                         </cfselect>
+                        {% endcomment %}
                     </td>
                 </tr>
                 <tr>
                     <td>Security Code (CVV)</td>
-                    <td><cfinput name="cccvv" maxlength="5" value="#Customer.cccvv#" class="#StructKeyExists(fieldErrors,"cccvv") ? 'field-error' : ''#" /></td>
+                    <td>
+                        {{ form.cc_cvv }}
+                        <cfinput name="cccvv" maxlength="5" value="#Customer.cccvv#" class="#StructKeyExists(fieldErrors,"cccvv") ? 'field-error' : ''#" />
+                    </td>
                 </tr>
                 <tr>
                     <td>Bank Telephone</td>
                     <td>
+                        {{ form.cc_phone }}
                         <cfinput name="cctel" maxlength="20" value="#Customer.cctel#" class="phone #StructKeyExists(fieldErrors,"cctel") ? 'field-error' : ''#" />
                         <span class="inline-text ui-icon ui-icon-info tooltip" title="We need the customer service contact phone number shown on the back of your card so that we can verify the card if necessary, and to refund the security deposit after the rental is over."></span>
                     </td>
@@ -498,11 +508,16 @@
                 <tbody>
                 <tr>
                     <td>Secondary Credit Card Number</td>
-                    <td><cfinput name="cc2num" maxlength="30" value="#formatCCNumber(cc2num_dec)#" class="cc-field #StructKeyExists(fieldErrors,"cc2num") ? 'field-error' : ''#" autocomplete="cc-number" /></td>
+                    <td>
+                        {{ form.cc2_number }}
+                        <cfinput name="cc2num" maxlength="30" value="#formatCCNumber(cc2num_dec)#" class="cc-field #StructKeyExists(fieldErrors,"cc2num") ? 'field-error' : ''#" autocomplete="cc-number" />
+                    </td>
                 </tr>
                 <tr>
                     <td>Expiration</td>
                     <td>
+                        {{ form.cc2_exp_mo }} / {{ form.cc2_exp_yr }}
+                        {% comment %}
                         <cfselect name="cc2expmo" class="#StructKeyExists(fieldErrors,"cc2expmo") ? 'field-error' : ''#">
                             <option value="01" <cfif Customer.cc2expmo IS "01">selected</cfif>>January (01)</option>
                             <option value="02" <cfif Customer.cc2expmo IS "02">selected</cfif>>February (02)</option>
@@ -532,15 +547,20 @@
                             </cfloop>
                             </cfoutput>
                         </cfselect>
+                        {% endcomment %}
                     </td>
                 </tr>
                 <tr>
                     <td>Security Code (CVV)</td>
-                    <td><cfinput name="cc2cvv" maxlength="5" value="#Customer.cc2cvv#" class="#StructKeyExists(fieldErrors,"cc2cvv") ? 'field-error' : ''#" /></td>
+                    <td>
+                        {{ form.cc2_cvv }}
+                        <cfinput name="cc2cvv" maxlength="5" value="#Customer.cc2cvv#" class="#StructKeyExists(fieldErrors,"cc2cvv") ? 'field-error' : ''#" />
+                    </td>
                 </tr>
                 <tr>
                     <td>Bank Telephone</td>
                     <td>
+                        {{ form.cc2_phone }}
                         <cfinput name="cc2tel" maxlength="20" value="#Customer.cc2tel#" class="phone #StructKeyExists(fieldErrors,"cc2tel") ? 'field-error' : ''#" />
                         <span class="inline-text ui-icon ui-icon-info tooltip" title="We need the customer service contact phone number shown on the back of your card so that we can verify the card if necessary, and to refund the security deposit after the rental is over."></span>
                     </td>
@@ -550,7 +570,10 @@
                         Secondary Card Instructions<br />
                         <p class="small">Want to use the secondary card for the security deposit? Split the rental amount across the two cards? Let us know!</p>
                     </td>
-                    <td><cftextarea name="cc2notes" class="#StructKeyExists(fieldErrors,"cc2notes") ? 'field-error' : ''#"></cftextarea></td>
+                    <td>
+                        {{ form.cc2_instructions }}
+                        <cftextarea name="cc2notes" class="#StructKeyExists(fieldErrors,"cc2notes") ? 'field-error' : ''#"></cftextarea>
+                    </td>
                 </tr>
                 </tbody>
 
