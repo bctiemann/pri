@@ -216,7 +216,7 @@ class ValidateRentalConfirmView(APIView):
         except BaseReservation.DoesNotExist:
             raise Http404
 
-        form = ReservationCustomerInfoForm(request.POST, reservation=reservation)
+        form = ReservationCustomerInfoForm(request.POST, instance=reservation.customer, reservation=reservation)
         print(form.data)
         print(self.form_type)
         print(form.is_valid())
@@ -226,6 +226,8 @@ class ValidateRentalConfirmView(APIView):
                 'success': False,
                 'errors': form.errors,
             })
+
+        form.save()
 
         response = {
             'success': True,
