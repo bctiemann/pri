@@ -5,6 +5,8 @@
 {% block subpage_pane %}
     <div class="form-page" page="driverinfo">
 
+        {{ form.errors }}
+
         <form method="POST" name="account_form" action="{% url "customer_portal:account-driver-info" %}" autocomplete="on">
 
             <cfoutput>

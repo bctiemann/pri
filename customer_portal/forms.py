@@ -55,6 +55,14 @@ class AccountDriverInfoForm(forms.ModelForm):
     def clean_date_of_birth(self):
         return self.instance.date_of_birth or self.cleaned_data['date_of_birth']
 
+    def clean(self):
+        if not any((
+            self.cleaned_data.get('mobile_phone'),
+            self.cleaned_data.get('work_phone'),
+            self.cleaned_data.get('home_phone'),
+        )):
+            raise forms.ValidationError('Please enter at least one phone number.')
+
     class Meta:
         model = Customer
         fields = (
