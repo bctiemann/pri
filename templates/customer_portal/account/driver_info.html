@@ -50,7 +50,7 @@
                 {% endif %}
             </tr>
 
-            {% if user.customer.license_number %}
+            {% if user.customer.license_number and user.customer.license_state %}
             <cfif Customer.licenseno IS "">
             <tr>
                 <td>License Number</td>

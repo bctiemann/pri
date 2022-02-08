@@ -46,6 +46,15 @@ class ReservationCustomerInfoForm(forms.ModelForm):
 
 class AccountDriverInfoForm(forms.ModelForm):
 
+    def clean_license_number(self):
+        return self.instance.license_number or self.cleaned_data['license_number']
+
+    def clean_license_state(self):
+        return self.instance.license_state or self.cleaned_data['license_state']
+
+    def clean_date_of_birth(self):
+        return self.instance.date_of_birth or self.cleaned_data['date_of_birth']
+
     class Meta:
         model = Customer
         fields = (

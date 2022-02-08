@@ -198,7 +198,7 @@ $(document).ready(function() {
     $('#dateback').datepicker();
     $('#reqdate').datepicker();
     $('#bupdate').datepicker();
-    $('#dob').datepicker({
+    $('#id_date_of_birth').datepicker({
         changeMonth: true,
         changeYear: true,
         yearRange: '1940:2000',
