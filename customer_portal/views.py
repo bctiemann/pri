@@ -5,8 +5,9 @@ from django.utils.timezone import now
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
 from sales.models import BaseReservation, Reservation, Rental, GuidedDrive
+from users.models import Customer
 from users.views import LoginView, LogoutView
-from customer_portal.forms import PasswordForm, ReservationCustomerInfoForm
+from customer_portal.forms import PasswordForm, ReservationCustomerInfoForm, AccountDriverInfoForm
 
 
 class SidebarMixin:
@@ -140,10 +141,17 @@ class AccountInfoView(SidebarMixin, FormView):
     form_class = PasswordForm
 
 
-class AccountDriverInfoView(SidebarMixin, FormView):
+class AccountDriverInfoView(SidebarMixin, UpdateView):
     template_name = 'customer_portal/account/driver_info.html'
     selected_page = 'account_info'
-    form_class = PasswordForm
+    form_class = AccountDriverInfoForm
+    model = Customer
+
+    def get_object(self, queryset=None):
+        return self.request.user.customer
+
+    def get_success_url(self):
+        return reverse('customer_portal:account-driver-info')
 
 
 class AccountInsuranceView(SidebarMixin, FormView):

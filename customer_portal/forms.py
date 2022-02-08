@@ -34,5 +34,21 @@ class ReservationCustomerInfoForm(forms.ModelForm):
 
     class Meta:
         model = Customer
-        exclude = ('user',)
+        fields = (
+            'first_name', 'last_name', 'date_of_birth', 'address_line_1', 'address_line_2', 'city', 'state', 'zip',
+            'mobile_phone', 'work_phone', 'home_phone', 'fax', 'license_number', 'license_state',
+            'cc_number', 'cc_exp_mo', 'cc_exp_yr', 'cc_cvv', 'cc_phone',
+            'cc2_number', 'cc2_exp_mo', 'cc2_exp_yr', 'cc2_cvv', 'cc2_phone', 'cc2_instructions',
+            'insurance_company', 'insurance_policy_number', 'insurance_company_phone', 'music_genre', 'music_favorite',
+        )
         # fields = '__all__'
+
+
+class AccountDriverInfoForm(forms.ModelForm):
+
+    class Meta:
+        model = Customer
+        fields = (
+            'date_of_birth', 'address_line_1', 'address_line_2', 'city', 'state', 'zip',
+            'mobile_phone', 'work_phone', 'home_phone', 'fax', 'license_number', 'license_state',
+        )

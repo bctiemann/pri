@@ -5,7 +5,7 @@
 {% block subpage_pane %}
     <div class="form-page" page="driverinfo">
 
-        <cfform method="POST" name="account_form" action="account.cfm" autocomplete="on">
+        <form method="POST" name="account_form" action="{% url "customer_portal:account-driver-info" %}" autocomplete="on">
 
             <cfoutput>
             <table class="inputform rentalinfo">
@@ -13,7 +13,7 @@
             <tr>
             <td>Name</td>
                 <td>
-                    #Customer.fname# #Customer.lname#
+                    {{ user.customer.full_name }}
                     <cfinput name="fname" type="hidden" value="#Customer.fname#" />
                     <cfinput name="lname" type="hidden" value="#Customer.lname#" />
                 </td>
@@ -21,7 +21,7 @@
             <tr>
                 <td>Email</td>
                 <td>
-                    #Customer.email#
+                    {{ user.email }}
                     <cfinput name="email" type="hidden" value="#Customer.email#" />
                 </td>
             </tr>
@@ -34,24 +34,45 @@
                         <cfset dob = "">
                     </cfcatch>
                 </cftry>
+                {% if user.customer.date_of_birth %}
                 <cfif dob IS "">
-                    <td><cfinput name="dob" value="#dob#" class="#StructKeyExists(fieldErrors,"dob") ? 'field-error' : ''#" placeholder="MM/DD/YYYY" /></td>
-                <cfelse>
                     <td>
-                        #dob#
+                        {{ user.customer.date_of_birth|date:"m/d/Y" }}
                         <cfinput name="dob" type="hidden" value="#Customer.dob#" />
                     </td>
+                {% else %}
+                <cfelse>
+                    <td>
+                        {{ form.date_of_birth }}
+                        <cfinput name="dob" value="#dob#" class="#StructKeyExists(fieldErrors,"dob") ? 'field-error' : ''#" placeholder="MM/DD/YYYY" />
+                    </td>
                 </cfif>
+                {% endif %}
             </tr>
 
+            {% if user.customer.license_number %}
             <cfif Customer.licenseno IS "">
             <tr>
                 <td>License Number</td>
-                <td><cfinput name="licenseno" maxlength="30" value="#Customer.licenseno#" class="#StructKeyExists(fieldErrors,"licenseno") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ user.customer.license_number }} ({{ user.customer.license_state }})
+                    <cfinput name="licenseno" type="hidden" value="#Customer.licenseno#" />
+                    <cfinput name="licensestate" type="hidden" value="#Customer.licensestate#" />
+                </td>
+            </tr>
+            {% else %}
+            <cfelse>
+            <tr>
+                <td>License Number</td>
+                <td>
+                    {{ form.license_number }}
+                    <cfinput name="licenseno" maxlength="30" value="#Customer.licenseno#" class="#StructKeyExists(fieldErrors,"licenseno") ? 'field-error' : ''#" />
+                </td>
             </tr>
             <tr>
                 <td>License State</td>
                 <td>
+                    {{ form.license_state }}
                     <cfselect name="licensestate" class="#StructKeyExists(fieldErrors,"licensestate") ? 'field-error' : ''#">
                         <option value="">(Select state)</option>
                         <cfloop array="#states#" index="state">
@@ -60,28 +81,27 @@
                     </cfselect>
                 </td>
             </tr>
-            <cfelse>
-            <tr>
-                <td>License Number</td>
-                <td>
-                    #Customer.licenseno# (#Customer.licensestate#)
-                    <cfinput name="licenseno" type="hidden" value="#Customer.licenseno#" />
-                    <cfinput name="licensestate" type="hidden" value="#Customer.licensestate#" />
-                </td>
-            </tr>
             </cfif>
+            {% endif %}
 
             <tr>
                 <td class="align-top">Address</td>
-                <td><cftextarea name="addr" id="addr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#addr_dec#</cftextarea></td>
+                <td>
+                    {{ form.address_line_1 }}
+                    <cftextarea name="addr" id="addr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#addr_dec#</cftextarea>
+                </td>
             </tr>
             <tr>
                 <td>City</td>
-                <td><cfinput name="city" value="#Customer.city#" maxlength="255" class="#StructKeyExists(fieldErrors,"city") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ form.city }}
+                    <cfinput name="city" value="#Customer.city#" maxlength="255" class="#StructKeyExists(fieldErrors,"city") ? 'field-error' : ''#" />
+                </td>
             </tr>
             <tr>
                 <td>State</td>
                 <td>
+                    {{ form.state }}
                     <cfselect name="state" class="#StructKeyExists(fieldErrors,"state") ? 'field-error' : ''#">
                         <option value="">(Select state)</option>
                         <cfloop array="#states#" index="state">
@@ -92,23 +112,38 @@
             </tr>
             <tr>
                 <td>ZIP</td>
-                <td><cfinput name="zip" value="#Customer.zip#" maxlength="10" class="#StructKeyExists(fieldErrors,"zip") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ form.zip }}
+                    <cfinput name="zip" value="#Customer.zip#" maxlength="10" class="#StructKeyExists(fieldErrors,"zip") ? 'field-error' : ''#" />
+                </td>
             </tr>
             <tr>
                 <td>Mobile Phone</td>
-                <td><cfinput name="mphone" value="#Customer.mphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"mphone") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ form.mobile_phone }}
+                    <cfinput name="mphone" value="#Customer.mphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"mphone") ? 'field-error' : ''#" />
+                </td>
             </tr>
             <tr>
                 <td>Home Phone</td>
-                <td><cfinput name="hphone" value="#Customer.hphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"hphone") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ form.home_phone }}
+                    <cfinput name="hphone" value="#Customer.hphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"hphone") ? 'field-error' : ''#" />
+                </td>
             </tr>
             <tr>
                 <td>Work Phone</td>
-                <td><cfinput name="wphone" value="#Customer.wphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"wphone") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ form.work_phone }}
+                    <cfinput name="wphone" value="#Customer.wphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"wphone") ? 'field-error' : ''#" />
+                </td>
             </tr>
             <tr>
                 <td>Fax</td>
-                <td><cfinput name="fax" value="#Customer.fax#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"fax") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ form.fax }}
+                    <cfinput name="fax" value="#Customer.fax#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"fax") ? 'field-error' : ''#" />
+                </td>
             </tr>
 
             <tr class="buttons">
@@ -119,9 +154,10 @@
             </table>
             </cfoutput>
 
+        {% csrf_token %}
         <cfinput name="page" type="hidden" value="#page#" />
         <cfinput name="method" type="hidden" value="updateDriverInfo" />
-        </cfform>
+        </form>
 
         </div>
 {% endblock %}
