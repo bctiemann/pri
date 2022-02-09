@@ -28,9 +28,9 @@ class ReservationCustomerInfoForm(forms.ModelForm):
     cc2_phone = PhoneNumberField(region='US', required=False)
     cc2_instructions = forms.CharField(widget=forms.Textarea(), required=False)
 
-    def __init__(self, *args, reservation=None, **kwargs):
+    def __init__(self, *args, confirmation_code=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['confirmation_code'].initial = reservation.confirmation_code
+        self.fields['confirmation_code'].initial = confirmation_code
 
     class Meta:
         model = Customer

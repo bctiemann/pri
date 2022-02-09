@@ -3,6 +3,7 @@
 {% block nav_upcoming_class %}selected{% endblock %}
 
 {% block subpage_pane %}
+    {% for event in upcoming_performance_experiences %}
     <cfoutput query="PerfExpUpcoming">
         <a href="perfexp_confirm.cfm?confcode=#confcode#">
         <div class="reservation">
@@ -45,8 +46,11 @@
         </div>
         </a>
     </cfoutput>
+    {% endfor %}
 
+    {% if not upcoming_performance_experiences.exists %}
     <cfif PerfExpUpcoming.recordCount IS 0>
         <div class="no-records">No upcoming Performance Experience events</div>
     </cfif>
+    {% endif %}
 {% endblock %}

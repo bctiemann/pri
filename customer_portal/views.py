@@ -4,7 +4,7 @@ from django.urls import reverse_lazy, reverse
 from django.utils.timezone import now
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
-from sales.models import BaseReservation, Reservation, Rental, GuidedDrive
+from sales.models import BaseReservation, Reservation, Rental, GuidedDrive, JoyRide, PerformanceExperience
 from users.models import Customer
 from users.views import LoginView, LogoutView
 from customer_portal.forms import PasswordForm, ReservationCustomerInfoForm, AccountDriverInfoForm
@@ -84,7 +84,7 @@ class ConfirmReservationView(SidebarMixin, UpdateView):
         """Return the keyword arguments for instantiating the form."""
         kwargs = super().get_form_kwargs()
         if hasattr(self, 'object'):
-            kwargs.update({'instance': self.object.customer, 'reservation': self.object})
+            kwargs.update({'instance': self.object.customer, 'confirmation_code': self.object.confirmation_code})
         return kwargs
 
     def get_success_url(self):
@@ -116,6 +116,29 @@ class JoyRideReserveView(SidebarMixin, TemplateView):
     selected_page = 'joy_ride'
 
 
+class JoyRideConfirmView(SidebarMixin, UpdateView):
+    template_name = 'customer_portal/joy_ride/confirm.html'
+    selected_page = 'joy_ride'
+    model = JoyRide
+    form_class = ReservationCustomerInfoForm
+
+    def get_object(self, queryset=None):
+        try:
+            return JoyRide.objects.get(confirmation_code=self.kwargs['confirmation_code'], customer=self.request.user.customer)
+        except JoyRide.DoesNotExist:
+            raise Http404
+
+    def get_form_kwargs(self):
+        """Return the keyword arguments for instantiating the form."""
+        kwargs = super().get_form_kwargs()
+        if hasattr(self, 'object'):
+            kwargs.update({'instance': self.object.customer, 'confirmation_code': self.object.confirmation_code})
+        return kwargs
+
+    def get_success_url(self):
+        return reverse('customer_portal:confirm-joyride', kwargs={'confirmation_code': self.kwargs['confirmation_code']})
+
+
 # Performance Experience
 
 class PerformanceExperienceUpcomingView(SidebarMixin, TemplateView):
@@ -131,6 +154,29 @@ class PerformanceExperiencePastView(SidebarMixin, TemplateView):
 class PerformanceExperienceReserveView(SidebarMixin, TemplateView):
     template_name = 'customer_portal/performance_experience/reserve.html'
     selected_page = 'performance_experience'
+
+
+class PerformanceExperienceConfirmView(SidebarMixin, UpdateView):
+    template_name = 'customer_portal/performance_experience/confirm.html'
+    selected_page = 'performance_experience'
+    model = PerformanceExperience
+    form_class = ReservationCustomerInfoForm
+
+    def get_object(self, queryset=None):
+        try:
+            return PerformanceExperience.objects.get(confirmation_code=self.kwargs['confirmation_code'], customer=self.request.user.customer)
+        except PerformanceExperience.DoesNotExist:
+            raise Http404
+
+    def get_form_kwargs(self):
+        """Return the keyword arguments for instantiating the form."""
+        kwargs = super().get_form_kwargs()
+        if hasattr(self, 'object'):
+            kwargs.update({'instance': self.object.customer, 'event': self.object})
+        return kwargs
+
+    def get_success_url(self):
+        return reverse('customer_portal:confirm-perfexp', kwargs={'confirmation_code': self.kwargs['confirmation_code']})
 
 
 # Account Info
