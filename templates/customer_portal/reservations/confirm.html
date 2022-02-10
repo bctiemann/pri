@@ -660,7 +660,7 @@
             {% else %}
             <cfelse>
 
-                <cfform method="POST" name="reservation_form" action="reserve_confirm.cfm" autocomplete="on">
+                <form method="POST" name="reservation_form" id="reservation_form" action="{% url "customer_portal:confirm-reservation" confirmation_code=basereservation.confirmation_code %}" autocomplete="on">
 
                 <cfoutput query="Reservation">
                 <table class="inputform rentalinfo">
@@ -682,7 +682,10 @@
                 <tbody>
                 <tr>
                     <td class="align-top">Notes/Requests</td>
-                    <td><cftextarea name="notes" id="notes" class="#StructKeyExists(fieldErrors,"notes") ? 'field-error' : ''#">#notes#</cftextarea></td>
+                    <td>
+                        {{ form.customer_notes }}
+                        <cftextarea name="notes" id="notes" class="#StructKeyExists(fieldErrors,"notes") ? 'field-error' : ''#">#notes#</cftextarea>
+                    </td>
                 </tr>
 
                 <tr class="buttons">
@@ -697,12 +700,13 @@
                 </table>
                 </cfoutput>
 
+                {% csrf_token %}
                 <cfinput name="method" type="hidden" value="updateReservationNotes" />
                 <cfinput name="confcode" type="hidden" value="#confcode#" />
                 <cfinput name="reservation_type" type="hidden" value="rental" />
                 <cfinput name="reservationid" type="hidden" value="#Reservation.reservationid#" />
                 <cfinput name="rentalid" type="hidden" value="#Reservation.rentalid#" />
-                </cfform>
+                </form>
 
             </cfif>
             {% endif %}

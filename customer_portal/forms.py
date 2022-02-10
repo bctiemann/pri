@@ -44,6 +44,30 @@ class ReservationCustomerInfoForm(forms.ModelForm):
         # fields = '__all__'
 
 
+class ReservationCustomerEmptyForm(forms.ModelForm):
+
+    def __init__(self, *args, confirmation_code=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    class Meta:
+        model = Customer
+        fields = ()
+
+
+class ReservationNotesForm(forms.ModelForm):
+
+    customer_notes = forms.CharField(widget=forms.Textarea())
+
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     print('foo')
+        # self.fields['confirmation_code'].initial = confirmation_code
+
+    class Meta:
+        model = BaseReservation
+        fields = ('customer_notes',)
+
+
 class AccountDriverInfoForm(forms.ModelForm):
 
     def clean_license_number(self):

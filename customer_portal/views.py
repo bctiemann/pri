@@ -7,7 +7,9 @@ from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
 from sales.models import BaseReservation, Reservation, Rental, GuidedDrive, JoyRide, PerformanceExperience
 from users.models import Customer
 from users.views import LoginView, LogoutView
-from customer_portal.forms import PasswordForm, ReservationCustomerInfoForm, AccountDriverInfoForm
+from customer_portal.forms import (
+    PasswordForm, ReservationCustomerInfoForm, ReservationNotesForm, AccountDriverInfoForm,
+)
 
 
 class SidebarMixin:
@@ -80,12 +82,24 @@ class ConfirmReservationView(SidebarMixin, UpdateView):
         except BaseReservation.DoesNotExist:
             raise Http404
 
+    def get_form_class(self):
+        if self.request.user.customer.info_is_complete:
+            return ReservationNotesForm
+        return ReservationCustomerInfoForm
+
     def get_form_kwargs(self):
         """Return the keyword arguments for instantiating the form."""
         kwargs = super().get_form_kwargs()
-        if hasattr(self, 'object'):
+        if not self.request.user.customer.info_is_complete and hasattr(self, 'object'):
             kwargs.update({'instance': self.object.customer, 'confirmation_code': self.object.confirmation_code})
         return kwargs
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if self.request.user.customer.info_is_complete:
+            reservation_form = ReservationNotesForm(instance=self.get_object(), data=form.data)
+            reservation_form.save()
+        return response
 
     def get_success_url(self):
         return reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': self.kwargs['confirmation_code']})
