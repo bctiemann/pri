@@ -93,3 +93,10 @@ class AccountDriverInfoForm(forms.ModelForm):
             'date_of_birth', 'address_line_1', 'address_line_2', 'city', 'state', 'zip',
             'mobile_phone', 'work_phone', 'home_phone', 'fax', 'license_number', 'license_state',
         )
+
+
+class AccountInsuranceForm(forms.ModelForm):
+
+    class Meta:
+        model = Customer
+        fields = ('insurance_company', 'insurance_policy_number', 'insurance_company_phone',)

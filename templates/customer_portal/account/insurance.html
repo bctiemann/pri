@@ -5,22 +5,31 @@
 {% block subpage_pane %}
     <div class="form-page" page="insurance">
 
-    <cfform method="POST" name="account_form" action="account.cfm" autocomplete="on">
+    <form method="POST" name="account_form" action="{% url "customer_portal:account-insurance" %}" autocomplete="on">
 
         <cfoutput>
         <table class="inputform rentalinfo">
 
         <tr>
             <td>Insurance Company</td>
-            <td><cfinput name="insco" size="40" maxlength="250" value="#Customer.insco#" class="#StructKeyExists(fieldErrors,"insco") ? 'field-error' : ''#" /></td>
+            <td>
+                {{ form.insurance_company }}
+                <cfinput name="insco" size="40" maxlength="250" value="#Customer.insco#" class="#StructKeyExists(fieldErrors,"insco") ? 'field-error' : ''#" />
+            </td>
         </tr>
         <tr>
             <td>Insurance Policy Number</td>
-            <td><cfinput name="inspolnum" maxlength="250" value="#Customer.inspolnum#" class="#StructKeyExists(fieldErrors,"inspolnum") ? 'field-error' : ''#" /></td>
+            <td>
+                {{ form.insurance_policy_number }}
+                <cfinput name="inspolnum" maxlength="250" value="#Customer.inspolnum#" class="#StructKeyExists(fieldErrors,"inspolnum") ? 'field-error' : ''#" />
+            </td>
         </tr>
         <tr>
             <td>Insurance Co. Telephone</td>
-            <td><cfinput name="inscotel" type="tel" maxlength="20" value="#Customer.inscotel#" class="phone #StructKeyExists(fieldErrors,"inscotel") ? 'field-error' : ''#" /></td>
+            <td>
+                {{ form.insurance_company_phone }}
+                <cfinput name="inscotel" type="tel" maxlength="20" value="#Customer.inscotel#" class="phone #StructKeyExists(fieldErrors,"inscotel") ? 'field-error' : ''#" />
+            </td>
         </tr>
 
         <tr class="buttons">
@@ -31,9 +40,10 @@
         </table>
         </cfoutput>
 
+        {% csrf_token %}
     <cfinput name="page" type="hidden" value="#page#" />
     <cfinput name="method" type="hidden" value="updateInsurance" />
-    </cfform>
+    </form>
 
     </div>
 {% endblock %}

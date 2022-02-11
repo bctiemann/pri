@@ -8,7 +8,7 @@ from sales.models import BaseReservation, Reservation, Rental, GuidedDrive, JoyR
 from users.models import Customer
 from users.views import LoginView, LogoutView
 from customer_portal.forms import (
-    PasswordForm, ReservationCustomerInfoForm, ReservationNotesForm, AccountDriverInfoForm,
+    PasswordForm, ReservationCustomerInfoForm, ReservationNotesForm, AccountDriverInfoForm, AccountInsuranceForm,
 )
 
 
@@ -214,10 +214,17 @@ class AccountDriverInfoView(SidebarMixin, UpdateView):
         return reverse('customer_portal:account-driver-info')
 
 
-class AccountInsuranceView(SidebarMixin, FormView):
+class AccountInsuranceView(SidebarMixin, UpdateView):
     template_name = 'customer_portal/account/insurance.html'
     selected_page = 'account_info'
-    form_class = PasswordForm
+    form_class = AccountInsuranceForm
+    model = Customer
+
+    def get_object(self, queryset=None):
+        return self.request.user.customer
+
+    def get_success_url(self):
+        return reverse('customer_portal:account-insurance')
 
 
 class AccountMusicView(SidebarMixin, FormView):
