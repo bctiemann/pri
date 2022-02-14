@@ -4,6 +4,7 @@ import pytz
 import decimal
 import random
 import uuid
+import logging
 from localflavor.us.models import USStateField, USZipCodeField
 from avalara import AvataxClient
 from requests import HTTPError
@@ -13,7 +14,7 @@ from django_countries.fields import CountryField
 from django_countries import Countries
 
 from django.conf import settings
-from django.db import models
+from django.db import models, IntegrityError
 from django.utils.timezone import now
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import reverse
@@ -21,11 +22,37 @@ from django.shortcuts import reverse
 from sales.enums import RESERVATION_TYPE_CODE_MAP, ReservationType, ServiceType
 from sales.utils import EncryptedUSSocialSecurityNumberField, format_cc_number
 
+logger = logging.getLogger(__name__)
+
 
 def generate_code(reservation_type):
     alpha_str = ''.join(random.choice('123456789ABCNPQDXEFGHJKMVZ') for _ in range(4))
     numeric_str = random.randrange(10, 100)
     return f'{RESERVATION_TYPE_CODE_MAP.get(reservation_type)}{alpha_str}{numeric_str}'
+
+
+class ConfirmationCodeMixin:
+
+    def save_with_unique_confirmation_code(self, *args, **kwargs):
+        retries_left = 5
+        is_successful = False
+        while not is_successful and retries_left > 0:
+            try:
+                if not self.confirmation_code:
+                    self.confirmation_code = self.get_confirmation_code()
+                super().save(*args, **kwargs)
+                is_successful = True
+            except IntegrityError:
+                logger.warning(f'Confirmation code collision: {self.confirmation_code}')
+                retries_left -= 1
+        if not is_successful:
+            raise IntegrityError('Failed to generate a unique confirmation code.')
+
+    def save(self, *args, **kwargs):
+        self.coupon_code = self.coupon_code.upper()
+        if self.id:
+            self.final_price_data = json.loads(json.dumps(self.get_price_data(), cls=DjangoJSONEncoder))
+        self.save_with_unique_confirmation_code(*args, **kwargs)
 
 
 class AllCountries(Countries):
@@ -96,7 +123,7 @@ class Coupon(Promotion):
 # Concrete base model class which is used to supply common fields to both the Reservation and Rental model classes.
 # Don't want to use an abstract model class because we want to be able to query both tables simultaneously in a union
 
-class BaseReservation(models.Model):
+class BaseReservation(ConfirmationCodeMixin, models.Model):
 
     class AppChannel(models.TextChoices):
         WEB = ('web', 'Web')
@@ -120,7 +147,7 @@ class BaseReservation(models.Model):
     coupon_code = models.CharField(max_length=30, blank=True)
     is_military = models.BooleanField(default=False)
     deposit_amount = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
-    confirmation_code = models.CharField(max_length=10, blank=True)
+    confirmation_code = models.CharField(max_length=10, blank=True, unique=True)
     app_channel = models.CharField(max_length=20, choices=AppChannel.choices, blank=True, default=AppChannel.WEB)
     delivery_required = models.BooleanField(default=False)
     delivery_zip = USZipCodeField(blank=True)
@@ -189,10 +216,8 @@ class BaseReservation(models.Model):
         )
         return price_calculator.get_price_data()
 
-    def save(self, *args, **kwargs):
-        self.coupon_code = self.coupon_code.upper()
-        self.final_price_data = json.loads(json.dumps(self.get_price_data(), cls=DjangoJSONEncoder))
-        super().save(*args, **kwargs)
+    def get_confirmation_code(self):
+        return generate_code(ReservationType.RENTAL.value)
 
     class Meta:
         abstract = False
@@ -245,7 +270,7 @@ class Driver(models.Model):
         ordering = ('-is_primary',)
 
 
-class GuidedDrive(models.Model):
+class GuidedDrive(ConfirmationCodeMixin, models.Model):
 
     class EventType(models.IntegerChoices):
         JOY_RIDE = (1, 'Joy Ride')
@@ -297,12 +322,6 @@ class GuidedDrive(models.Model):
         if self.coupon_code and self.requested_date:
             return Coupon.objects.filter(models.Q(end_date__isnull=True) | models.Q(end_date__gte=self.requested_date), code=self.coupon_code).first()
         return None
-
-    def save(self, *args, **kwargs):
-        self.coupon_code = self.coupon_code.upper()
-        if self.id:
-            self.final_price_data = json.loads(json.dumps(self.get_price_data(), cls=DjangoJSONEncoder))
-        super().save(*args, **kwargs)
 
     class Meta:
         abstract = True

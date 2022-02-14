@@ -57,13 +57,6 @@ class PerformanceExperienceListView(PerformanceExperienceViewMixin, GuidedEventL
 
 class GuidedDriveDetailView(GuidedDriveContextMixin, ListViewMixin, UpdateView):
 
-    def form_valid(self, form):
-        event = form.save(commit=False)
-        if not event.confirmation_code:
-            event.confirmation_code = event.get_confirmation_code()
-        event.save()
-        return HttpResponseRedirect(self.get_success_url())
-
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['event'] = self.get_object()

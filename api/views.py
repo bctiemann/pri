@@ -152,44 +152,25 @@ class ValidateRentalPaymentView(APIView):
 
         # Create Reservation
 
-        # Generate a unique confirmation code.
-        # Retry until successful or we run out of retries (increase retries_left if necessary)
-
-        # TODO: Vehicle should be Vehicle, but form selection is a VehicleMarketing. Resolve a Vehicle from form.vehicle
-        # before assigning it to the Reservation
-        confirmation_code = None
-        reservation = None
-        retries_left = 5
-        while not reservation and retries_left > 0:
-            confirmation_code = generate_code(ReservationType.RENTAL.value)
-            try:
-                reservation = form.save(commit=False)
-                reservation.confirmation_code = confirmation_code
-                reservation.customer = customer
-                reservation.vehicle = form.cleaned_data['vehicle_marketing'].vehicle
-                reservation.save()
-                # reservation = Reservation.objects.create(
-                #     confirmation_code=confirmation_code,
-                #     customer=customer,
-                #     vehicle=form.cleaned_data['vehicle_marketing'].vehicle,
-                #     # extra_miles=form.cl
-                # )
-            except IntegrityError:
-                logger.warning(f'Confirmation code collision: {confirmation_code}')
-                retries_left -= 1
-        if not reservation:
-            raise APIException(detail='Failed to generate a unique confirmation code.', code='collision')
+        reservation = form.save(commit=False)
+        reservation.customer = customer
+        reservation.vehicle = form.cleaned_data['vehicle_marketing'].vehicle
+        try:
+            reservation.save()
+        except IntegrityError as e:
+            raise APIException(detail=e, code='collision')
 
         response = {
             'success': form.is_valid(),
             'errors': form.errors,
             'errors_html': form.errors.as_ul(),
             'reservation_type': 'rental',
-            'customer_site_url': reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': confirmation_code}),
+            'customer_site_url': reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': reservation.confirmation_code}),
         }
         return Response(response)
 
 
+# Not needed; login pathway is handled in ValidateRentalPaymentView
 class ValidateRentalLoginView(APIView):
 
     # authentication_classes = ()
@@ -201,6 +182,8 @@ class ValidateRentalLoginView(APIView):
         }
         return Response(response)
 
+
+# Customer Portal view: phase 1 form
 
 class ValidateRentalConfirmView(APIView):
 
