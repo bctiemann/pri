@@ -27,7 +27,6 @@ from sales.forms import (
 from marketing.forms import NewsletterSubscribeForm
 from customer_portal.forms import ReservationCustomerInfoForm
 from sales.models import BaseReservation, Reservation, Rental, TaxRate, generate_code
-from sales.enums import ReservationType
 from sales.tasks import send_email
 from sales.calculators import PriceCalculator
 from sales.models import Card

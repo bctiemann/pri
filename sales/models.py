@@ -19,22 +19,22 @@ from django.utils.timezone import now
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import reverse
 
-from sales.enums import RESERVATION_TYPE_CODE_MAP, ReservationType, ServiceType
+from sales.enums import SERVICE_TYPE_CODE_MAP, ServiceType
 from sales.utils import EncryptedUSSocialSecurityNumberField, format_cc_number
 
 logger = logging.getLogger(__name__)
 
 
-def generate_code(reservation_type):
+def generate_code(service_type):
     alpha_str = ''.join(random.choice('123456789ABCNPQDXEFGHJKMVZ') for _ in range(4))
     numeric_str = random.randrange(10, 100)
-    return f'{RESERVATION_TYPE_CODE_MAP.get(reservation_type)}{alpha_str}{numeric_str}'
+    return f'{SERVICE_TYPE_CODE_MAP.get(service_type)}{alpha_str}{numeric_str}'
 
 
 class ConfirmationCodeMixin:
 
     def get_confirmation_code(self):
-        return generate_code(self.reservation_type)
+        return generate_code(self.service_type)
 
     def save_with_unique_confirmation_code(self, *args, **kwargs):
         retries_left = 5
@@ -127,7 +127,7 @@ class Coupon(Promotion):
 # Don't want to use an abstract model class because we want to be able to query both tables simultaneously in a union
 
 class BaseReservation(ConfirmationCodeMixin, models.Model):
-    reservation_type = ReservationType.RENTAL.value
+    service_type = ServiceType.RENTAL.value
 
     class AppChannel(models.TextChoices):
         WEB = ('web', 'Web')
@@ -329,7 +329,7 @@ class GuidedDrive(ConfirmationCodeMixin, models.Model):
 
 
 class JoyRide(GuidedDrive):
-    reservation_type = ReservationType.JOY_RIDE.value
+    service_type = ServiceType.JOY_RIDE.value
 
     def get_price_data(self):
         # TODO: Refactor sales.models classes to avoid this nested import
@@ -347,7 +347,7 @@ class JoyRide(GuidedDrive):
 
 
 class PerformanceExperience(GuidedDrive):
-    reservation_type = ReservationType.PERFORMANCE_EXPERIENCE.value
+    service_type = ServiceType.PERFORMANCE_EXPERIENCE.value
 
     num_drivers = models.IntegerField(null=True, blank=True)
 

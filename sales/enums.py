@@ -78,12 +78,6 @@ def get_numeric_choices(min_val, max_val):
     return ((v, v) for v in range(min_val, max_val + 1))
 
 
-class ReservationType(Enum):
-    RENTAL = 'rental'
-    PERFORMANCE_EXPERIENCE = 'perfexp'
-    JOY_RIDE = 'joyride'
-
-
 class ServiceType(models.TextChoices):
     RENTAL = ('rental', 'Rental')
     PERFORMANCE_EXPERIENCE = ('perfexp', 'Performance Experience')
@@ -91,8 +85,8 @@ class ServiceType(models.TextChoices):
     GIFT_CERTIFICATE = ('giftcert', 'Gift Certificate')
 
 
-RESERVATION_TYPE_CODE_MAP = {
-    ReservationType.RENTAL.value: 'P',
-    ReservationType.PERFORMANCE_EXPERIENCE.value: 'X',
-    ReservationType.JOY_RIDE.value: 'Y',
+SERVICE_TYPE_CODE_MAP = {
+    ServiceType.RENTAL.value: 'P',
+    ServiceType.PERFORMANCE_EXPERIENCE.value: 'X',
+    ServiceType.JOY_RIDE.value: 'Y',
 }
