@@ -33,6 +33,9 @@ def generate_code(reservation_type):
 
 class ConfirmationCodeMixin:
 
+    def get_confirmation_code(self):
+        return generate_code(self.reservation_type)
+
     def save_with_unique_confirmation_code(self, *args, **kwargs):
         retries_left = 5
         is_successful = False
@@ -124,6 +127,7 @@ class Coupon(Promotion):
 # Don't want to use an abstract model class because we want to be able to query both tables simultaneously in a union
 
 class BaseReservation(ConfirmationCodeMixin, models.Model):
+    reservation_type = ReservationType.RENTAL.value
 
     class AppChannel(models.TextChoices):
         WEB = ('web', 'Web')
@@ -215,9 +219,6 @@ class BaseReservation(ConfirmationCodeMixin, models.Model):
             one_time_discount_pct=getattr(self, 'rental_discount_pct', None),
         )
         return price_calculator.get_price_data()
-
-    def get_confirmation_code(self):
-        return generate_code(ReservationType.RENTAL.value)
 
     class Meta:
         abstract = False
@@ -328,6 +329,7 @@ class GuidedDrive(ConfirmationCodeMixin, models.Model):
 
 
 class JoyRide(GuidedDrive):
+    reservation_type = ReservationType.JOY_RIDE.value
 
     def get_price_data(self):
         # TODO: Refactor sales.models classes to avoid this nested import
@@ -343,12 +345,10 @@ class JoyRide(GuidedDrive):
         )
         return price_calculator.get_price_data()
 
-    def get_confirmation_code(self):
-        return generate_code(ReservationType.JOY_RIDE.value)
-
-
 
 class PerformanceExperience(GuidedDrive):
+    reservation_type = ReservationType.PERFORMANCE_EXPERIENCE.value
+
     num_drivers = models.IntegerField(null=True, blank=True)
 
     def get_price_data(self):
@@ -365,9 +365,6 @@ class PerformanceExperience(GuidedDrive):
             override_subtotal=self.override_subtotal,
         )
         return price_calculator.get_price_data()
-
-    def get_confirmation_code(self):
-        return generate_code(ReservationType.PERFORMANCE_EXPERIENCE.value)
 
 
 class GiftCertificate(models.Model):

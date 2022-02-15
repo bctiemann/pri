@@ -69,6 +69,8 @@ class GetVehicleView(APIView):
         return Response({'vehicle': serializer.data})
 
 
+# 1st phase form; gathers basic rental details (vehicle date in/out, extra miles, etc)
+
 class ValidateRentalDetailsView(APIView):
 
     # authentication_classes = ()
@@ -89,6 +91,8 @@ class ValidateRentalDetailsView(APIView):
         }
         return Response(response)
 
+
+# 2nd phase form; handles either new customers (with CC details) or returning (with login creds)
 
 class ValidateRentalPaymentView(APIView):
 
@@ -183,7 +187,7 @@ class ValidateRentalLoginView(APIView):
         return Response(response)
 
 
-# Customer Portal view: phase 1 form
+# Customer Portal confirmation of rental details (fill in insurance/license/2nd card/etc)
 
 class ValidateRentalConfirmView(APIView):
 
