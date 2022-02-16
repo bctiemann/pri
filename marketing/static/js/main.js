@@ -41,12 +41,14 @@ var reserveValidateForm = function(reservationType, section) {
     console.log(params);
 
 //    $('.' + section + ' .btn').prop('disabled', true);
-    $('#reservation_' + section + '_error').hide();
+//     $('#reservation_' + section + '_error').hide();
+    $('.exception').hide();
 //    $.post('ajax_post.cfm',params,function(data) {
     console.log(method);
     console.log(section);
     $('#reservation_payment').hide();
-    $('#reservation_existing_user').hide();
+    $('#reservation_login').hide();
+    // $('#reservation_existing_user').hide();
     $.post(`/api/validate/${reservationType}/${section}/`, params, function(data) {
         console.log(data);
         $('.' + section + ' .field-error').removeClass('field-error');
@@ -103,10 +105,10 @@ var reserveValidateForm = function(reservationType, section) {
                     $('.price-breakdown').appendTo($('#price_breakdown_existing_user'));
                     $('#reservation_payment').hide();
                     $('#reservation_payment_error').hide();
-                    $('#reservation_existing_user').show();
+                    $('#reservation_login').show();
                 } else {
                     $('.price-breakdown').appendTo($('#price_breakdown_new_user'));
-                    $('#reservation_existing_user').hide();
+                    $('#reservation_login').hide();
                     $('#reservation_password_error').hide();
                     $('#reservation_payment').show();
                 }
