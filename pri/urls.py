@@ -102,13 +102,13 @@ urlpatterns = [
     path('api/vehicles/<int:vehicle_id>/', api_views.GetVehicleView.as_view(), name='get-vehicle'),
 
     path('api/validate/rental/details/', api_views.ValidateRentalDetailsView.as_view(), name='validate-rental-details'),
-    path('api/validate/rental/payment/', api_views.ValidateRentalPaymentView.as_view(form_type='payment'), name='validate-rental-payment'),
-    path('api/validate/rental/login/', api_views.ValidateRentalPaymentView.as_view(form_type='login'), name='validate-rental-login'),
+    path('api/validate/rental/payment/', api_views.ValidateRentalPaymentView.as_view(), name='validate-rental-payment'),
+    path('api/validate/rental/login/', api_views.ValidateRentalLoginView.as_view(), name='validate-rental-login'),
     path('api/validate/rental/confirm/', api_views.ValidateRentalConfirmView.as_view(), name='validate-rental-confirm'),
 
     path('api/validate/joyride/details/', api_views.ValidateJoyRideDetailsView.as_view(), name='validate-joyride-details'),
-    path('api/validate/joyride/payment/', api_views.ValidateJoyRidePaymentView.as_view(form_type='payment'), name='validate-joyride-payment'),
-    path('api/validate/joyride/login/', api_views.ValidateJoyRideLoginView.as_view(form_type='login'), name='validate-joyride-login'),
+    path('api/validate/joyride/payment/', api_views.ValidateJoyRidePaymentView.as_view(), name='validate-joyride-payment'),
+    path('api/validate/joyride/login/', api_views.ValidateJoyRideLoginView.as_view(), name='validate-joyride-login'),
 
     path('api/validate/newsletter/subscribe/', api_views.ValidateNewsletterSubscriptionView.as_view(), name='validate-newsletter-subscription'),
 

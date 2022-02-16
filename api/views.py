@@ -68,6 +68,80 @@ class GetVehicleView(APIView):
         return Response({'vehicle': serializer.data})
 
 
+# Mixin to get the resolved and authenticated customer from the reservation form, creating it new if necessary;
+# also to provide a consolidated post() method which creates a reservation of any type attached to the customer
+class ReservationMixin:
+
+    @staticmethod
+    def _get_login_customer(request, form):
+        if form.customer:
+            if authenticate(request, username=form.customer.email, password=form.cleaned_data['password']):
+                login(request, form.customer.user)
+                return form.customer
+            # Only way to return None is if password is incorrect for an existing user's email
+            return None
+        else:
+            # Create Customer object and login
+            # TODO: Ensure that every User has a Customer attached, as providing an email of an unattached user will
+            # try to create a new user which will fail the uniqueness constraint. Alternatively, do a get_or_create
+            # user = User.objects.create_user(form.cleaned_data['email'], password=generate_password())
+            user = User.objects.create_user(form.cleaned_data['email'], password=form.cleaned_data['password_new'])
+            customer_kwargs = {key: form.cleaned_data.get(key) for key in form.customer_fields}
+            customer = Customer.objects.create(
+                user=user,
+                **customer_kwargs,
+            )
+            login(request, user)
+        return customer
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+        print(form.data)
+        print(form.is_valid())
+        print(form.errors.as_json())
+        if not form.is_valid():
+            return Response({
+                'success': False,
+                'errors': form.errors,
+            })
+
+        # Create Customer or login existing user
+        customer = self._get_login_customer(request, form)
+        if not customer:
+            return Response({
+                'success': False,
+                'errors': {
+                    'password': ['Incorrect password'],
+                },
+            })
+
+        # Create Reservation
+
+        reservation = form.save(commit=False)
+        reservation.customer = customer
+
+        # If rental, resolve vehicle
+        if 'vehicle_marketing' in form.cleaned_data:
+            reservation.vehicle = form.cleaned_data['vehicle_marketing'].vehicle
+
+        try:
+            reservation.save()
+        except IntegrityError as e:
+            raise APIException(detail=e, code='collision')
+
+        response = {
+            'success': form.is_valid(),
+            'errors': form.errors,
+            'errors_html': form.errors.as_ul(),
+            'reservation_type': self.reservation_type,
+            'customer_site_url': self.get_customer_site_url(confirmation_code=reservation.confirmation_code),
+        }
+        return Response(response)
+
+    def get_customer_site_url(self, **kwargs):
+        raise NotImplementedError
+
+
 # 1st phase form; gathers basic rental details (vehicle date in/out, extra miles, etc)
 
 class ValidateRentalDetailsView(APIView):
@@ -93,97 +167,16 @@ class ValidateRentalDetailsView(APIView):
 
 # 2nd phase form; handles either new customers (with CC details) or returning (with login creds)
 
-class ValidateRentalPaymentView(APIView):
+class ValidateRentalPaymentView(ReservationMixin, APIView):
+    form_class = ReservationRentalPaymentForm
+    reservation_type = 'rental'
 
-    # authentication_classes = ()
-    # permission_classes = ()
-
-    # form_type is passed in via the url pattern in urls.py as a kwarg to .as_view()
-    form_type = None
-
-    def _get_form_class(self):
-        if self.form_type == 'payment':
-            return ReservationRentalPaymentForm
-        elif self.form_type == 'login':
-            return ReservationRentalLoginForm
-
-    @staticmethod
-    def _get_login_customer(request, form):
-        if form.customer:
-            if authenticate(request, username=form.customer.email, password=form.cleaned_data['password']):
-                login(request, form.customer.user)
-                return form.customer
-            # Only way to return None is if password is incorrect for an existing user's email
-            return None
-        else:
-            # Create Customer object and login
-            # TODO: Ensure that every User has a Customer attached, as providing an email of an unattached user will
-            # try to create a new user which will fail the uniqueness constraint. Alternatively, do a get_or_create
-            # user = User.objects.create_user(form.cleaned_data['email'], password=generate_password())
-            user = User.objects.create_user(form.cleaned_data['email'], password=form.cleaned_data['password_new'])
-            customer_kwargs = {key: form.cleaned_data.get(key) for key in form.customer_fields}
-            customer = Customer.objects.create(
-                user=user,
-                **customer_kwargs,
-            )
-            login(request, user)
-        return customer
-
-    def post(self, request):
-        form_class = self._get_form_class()
-        # form = ReservationRentalDetailsForm(request.POST)
-        form = form_class(request.POST)
-        print(form.data)
-        print(self.form_type)
-        print(form.is_valid())
-        print(form.errors.as_json())
-        if not form.is_valid():
-            return Response({
-                'success': False,
-                'errors': form.errors,
-            })
-
-        # Create Customer or login existing user
-        customer = self._get_login_customer(request, form)
-        if not customer:
-            return Response({
-                'success': False,
-                'errors': {
-                    'password': ['Incorrect password'],
-                },
-            })
-
-        # Create Reservation
-
-        reservation = form.save(commit=False)
-        reservation.customer = customer
-        reservation.vehicle = form.cleaned_data['vehicle_marketing'].vehicle
-        try:
-            reservation.save()
-        except IntegrityError as e:
-            raise APIException(detail=e, code='collision')
-
-        response = {
-            'success': form.is_valid(),
-            'errors': form.errors,
-            'errors_html': form.errors.as_ul(),
-            'reservation_type': 'rental',
-            'customer_site_url': reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': reservation.confirmation_code}),
-        }
-        return Response(response)
+    def get_customer_site_url(self, confirmation_code):
+        return reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': confirmation_code}),
 
 
-# Not needed; login pathway is handled in ValidateRentalPaymentView
-class ValidateRentalLoginView(APIView):
-
-    # authentication_classes = ()
-    # permission_classes = ()
-    form_type = None
-
-    def post(self, request):
-        response = {
-        }
-        return Response(response)
+class ValidateRentalLoginView(ValidateRentalPaymentView):
+    form_class = ReservationRentalLoginForm
 
 
 # Customer Portal confirmation of rental details (fill in insurance/license/2nd card/etc)
@@ -223,6 +216,8 @@ class ValidateRentalConfirmView(APIView):
         return Response(response)
 
 
+# Joy Ride
+
 class ValidateJoyRideDetailsView(APIView):
 
     # authentication_classes = ()
@@ -244,42 +239,19 @@ class ValidateJoyRideDetailsView(APIView):
         return Response(response)
 
 
-class ValidateJoyRidePaymentView(APIView):
+class ValidateJoyRidePaymentView(ReservationMixin, APIView):
+    form_class = JoyRidePaymentForm
+    reservation_type = 'joyride'
 
-    # authentication_classes = ()
-    # permission_classes = ()
-    form_type = None
-
-    def post(self, request):
-        # form = JoyRideDetailsForm(request.POST)
-        print(form.data)
-        print(form.is_valid())
-        print(form.errors.as_json())
-        response = {
-            # 'success': form.is_valid(),
-            # 'errors': form.errors,
-            # 'errors_html': form.errors.as_ul(),
-            # 'customer_id': form.customer.id if form.customer else None,
-            # 'price_data': form.price_data,
-            # # 'delivery_required': form.cleaned_data['delivery_required'],
-        }
-        return Response(response)
+    def get_customer_site_url(self, confirmation_code):
+        return reverse('customer_portal:joyride-confirm', kwargs={'confirmation_code': confirmation_code}),
 
 
-class ValidateJoyRideLoginView(APIView):
+class ValidateJoyRideLoginView(ValidateJoyRidePaymentView):
+    form_class = JoyRideLoginForm
 
-    # authentication_classes = ()
-    # permission_classes = ()
-    form_type = None
 
-    def post(self, request):
-        response = {
-            'success': True,
-            'reservation_type': 'joyride',
-            'customer_site_url': reverse('customer_portal:joyride'),
-        }
-        return Response(response)
-
+# Newsletter
 
 class ValidateNewsletterSubscriptionView(APIView):
 
