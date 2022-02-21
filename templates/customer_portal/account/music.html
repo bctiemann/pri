@@ -5,7 +5,7 @@
 {% block subpage_pane %}
     <div class="form-page" page="music">
 
-    <cfform method="POST" name="account_form" action="account.cfm" autocomplete="on">
+    <form method="POST" name="account_form" action="{% url "customer_portal:account-music" %}" autocomplete="on">
 
         <cfoutput>
         <table class="inputform rentalinfo">
@@ -13,6 +13,7 @@
         <tr>
             <td>Favorite Genre</td>
             <td>
+                {{ form.music_genre }}
                 <cfselect name="musicgenre" class="#StructKeyExists(fieldErrors,"musicgenre") ? 'field-error' : ''#">
                     <option value="0" <cfif Customer.musicgenre IS 0>selected</cfif>>None</option>
                     <option value="1" <cfif Customer.musicgenre IS 1>selected</cfif>>50's</option>
@@ -47,7 +48,10 @@
         </tr>
         <tr>
             <td>Favorite Artist / Composer</td>
-            <td><cfinput name="musicfav" maxlength="250" value="#Customer.musicfav#" class="#StructKeyExists(fieldErrors,"musicfav") ? 'field-error' : ''#" /></td>
+            <td>
+                {{ form.music_favorite }}
+                <cfinput name="musicfav" maxlength="250" value="#Customer.musicfav#" class="#StructKeyExists(fieldErrors,"musicfav") ? 'field-error' : ''#" />
+            </td>
         </tr>
 
         <tr class="buttons">
@@ -59,9 +63,10 @@
         </table>
         </cfoutput>
 
+    {% csrf_token %}
     <cfinput name="page" type="hidden" value="#page#" />
     <cfinput name="method" type="hidden" value="updateMusicPrefs" />
-    </cfform>
+    </form>
 
 </div>
 {% endblock %}
