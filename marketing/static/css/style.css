@@ -1936,12 +1936,12 @@ input.cc-field.dinersclub {
 	background-image: url('../images/cards/diners.png');
 }
 
-table.inputform .field-error {
+table.inputform .field-error, table.inputform .field-error input {
 	border-color: #500;
 	border-width: 2px;
 	margin-top: 3px;
 }
-input.field-error {
+input.field-error, .field-error input {
 	background-image: url('../images/icon_alert.png');
 	background-repeat: no-repeat;
 	background-position: right center;

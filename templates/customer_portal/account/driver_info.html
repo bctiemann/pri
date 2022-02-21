@@ -119,7 +119,7 @@
             </tr>
             <tr>
                 <td>ZIP</td>
-                <td>
+                <td class="{% if form.zip.errors %}field-error{% endif %}">
                     {{ form.zip }}
                     <cfinput name="zip" value="#Customer.zip#" maxlength="10" class="#StructKeyExists(fieldErrors,"zip") ? 'field-error' : ''#" />
                 </td>
