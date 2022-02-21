@@ -178,7 +178,7 @@
                         </cfif>
                         {% endif %}
                     </td>
-                    <td>{{ basereservation.out_at|date:"g:i A m/d/Y" }}{# #TimeFormat(dateout, "h:MM tt")# #DateFormat(dateout,"ddd MM/DD/YYYY")# #}</td>
+                    <td>{{ basereservation.out_at|date:"g:i A D m/d/Y" }}{# #TimeFormat(dateout, "h:MM tt")# #DateFormat(dateout,"ddd MM/DD/YYYY")# #}</td>
                 </tr>
                 <tr>
                     <td>
@@ -191,7 +191,7 @@
                         </cfif>
                         {% endif %}
                     </td>
-                    <td>{{ basereservation.back_at|date:"g:i A m/d/Y" }}{# #TimeFormat(dateback, "h:MM tt")# #DateFormat(dateback,"ddd MM/DD/YYYY")# #}</td>
+                    <td>{{ basereservation.back_at|date:"g:i A D m/d/Y" }}{# #TimeFormat(dateback, "h:MM tt")# #DateFormat(dateback,"ddd MM/DD/YYYY")# #}</td>
                 </tr>
                 <tr>
                     <td>Number of Days</td>
@@ -222,16 +222,18 @@
 
                 <form method="POST" name="reservation_form" id="reservation_form" action="{% url "customer_portal:confirm-reservation" confirmation_code=basereservation.confirmation_code %}" autocomplete="on" onsubmit="return false;">
 
-                <p class="reservation-info">
-                Before you take the keys, we'll need some additional information from you. Specifically, we need to verify your
-                insurance, and also take a look at your driving record. You can fill out the required information now, or if you
-                need time to gather it, you can bookmark this site and come back later.
-                </p>
+                <div class="reservation-info">
+                    <p>
+                        Before you take the keys, we'll need some additional information from you. Specifically, we need to verify your
+                        insurance, and also take a look at your driving record. You can fill out the required information now, or if you
+                        need time to gather it, you can bookmark this site and come back later.
+                    </p>
 
-                <p class="reservation-info">
-                We take the utmost care to preserve your privacy and security. All information you submit is held in our encrypted
-                data store and is not shared with anyone except the relevant agencies for verification purposes.
-                </p>
+                    <p>
+                        We take the utmost care to preserve your privacy and security. All information you submit is held in our encrypted
+                        data store and is not shared with anyone except the relevant agencies for verification purposes.
+                    </p>
+                </div>
 
                 {% if form.errors %}
                 <cfoutput>

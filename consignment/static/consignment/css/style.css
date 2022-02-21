@@ -1889,7 +1889,7 @@ input.field-error, .field-error input {
 	background-size: 20px 20px;
 }
 
-p.reservation-info {
+p.reservation-info, div.reservation-info {
 	font-size: 16px;
 	margin: 40px;
 }

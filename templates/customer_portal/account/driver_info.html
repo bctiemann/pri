@@ -126,21 +126,21 @@
             </tr>
             <tr>
                 <td>Mobile Phone</td>
-                <td>
+                <td class="{% if form.mobile_phone.errors %}field-error{% endif %}">
                     {{ form.mobile_phone }}
                     <cfinput name="mphone" value="#Customer.mphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"mphone") ? 'field-error' : ''#" />
                 </td>
             </tr>
             <tr>
                 <td>Home Phone</td>
-                <td>
+                <td class="{% if form.home_phone.errors %}field-error{% endif %}">
                     {{ form.home_phone }}
                     <cfinput name="hphone" value="#Customer.hphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"hphone") ? 'field-error' : ''#" />
                 </td>
             </tr>
             <tr>
                 <td>Work Phone</td>
-                <td>
+                <td class="{% if form.work_phone.errors %}field-error{% endif %}">
                     {{ form.work_phone }}
                     <cfinput name="wphone" value="#Customer.wphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"wphone") ? 'field-error' : ''#" />
                 </td>

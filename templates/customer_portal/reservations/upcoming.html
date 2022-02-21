@@ -22,7 +22,7 @@
                         </cfif>
                         {% endif %}
                     </td>
-                    <td>{{ reservation.out_at|date:"g:i A m/d/Y" }}{# #TimeFormat(dateout, "h:MM tt")# #DateFormat(dateout,"ddd MM/DD/YYYY")# #}</td>
+                    <td>{{ reservation.out_at|date:"g:i A D m/d/Y" }}{# #TimeFormat(dateout, "h:MM tt")# #DateFormat(dateout,"ddd MM/DD/YYYY")# #}</td>
                 </tr>
                 <tr>
                     <td>
@@ -35,7 +35,7 @@
                         </cfif>
                         {% endif %}
                     </td>
-                    <td>{{ reservation.back_at|date:"g:i A m/d/Y" }}{# #TimeFormat(dateback, "h:MM tt")# #DateFormat(dateback,"ddd MM/DD/YYYY")# #}</td>
+                    <td>{{ reservation.back_at|date:"g:i A D m/d/Y" }}{# #TimeFormat(dateback, "h:MM tt")# #DateFormat(dateback,"ddd MM/DD/YYYY")# #}</td>
                 </tr>
                 <tr>
                     <td></td>
