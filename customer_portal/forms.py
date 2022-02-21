@@ -15,6 +15,8 @@ class PasswordForm(forms.Form):
 
 class ReservationCustomerInfoForm(forms.ModelForm):
 
+    cc_fields = ['cc_number', 'cc2_number']
+
     confirmation_code = forms.CharField(widget=forms.HiddenInput())
 
     insurance_company = forms.CharField(required=True, error_messages={'required': _("Please enter the driver's insurance carrier.")})
@@ -36,6 +38,8 @@ class ReservationCustomerInfoForm(forms.ModelForm):
     def __init__(self, *args, confirmation_code=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['confirmation_code'].initial = confirmation_code
+        for field in self.cc_fields:
+            self.fields[field].widget.attrs['class'] = 'cc-field'
 
     def clean(self):
         if not any((

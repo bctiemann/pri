@@ -392,6 +392,10 @@ class Customer(models.Model):
         ))
 
     @property
+    def has_primary_card(self):
+        return self.card_1 or (self.cc_number and self.cc_cvv and self.cc_phone)
+
+    @property
     def past_rentals(self):
         return self.basereservation_set.filter(rental__isnull=False)
 

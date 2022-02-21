@@ -414,6 +414,7 @@
                 </tr>
                 </tbody>
 
+                {% if not user.customer.has_primary_card %}
                 <cfif IsDefined("Customer.ccnum") AND (Customer.ccnum IS "" OR Customer.cccvv IS "" OR Customer.cctel IS "")>
 
                 <thead>
@@ -492,6 +493,7 @@
                 </tbody>
 
                 </cfif>
+                {% endif %}
 
                 <thead>
                 <tr>
