@@ -29,8 +29,18 @@
             </li>
         </ul>
 
+        {% if form.errors %}
+        <div class="exception" id="customer_form_error">
+            <h3>An error occurred</h3>
+            {% for fieldname, error_list in form.errors.items %}
+                <p class="alert-message">{{ error_list }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
         {% block subpage_pane %}{% endblock %}
 
+        {% comment %}
         <cfoutput>
         <cfif Len(formError) GT 0>
         <div class="exception" id="customer_form_error">
@@ -39,6 +49,7 @@
         </div>
         </cfif>
         </cfoutput>
+        {% endcomment %}
 
         {% comment %}
         <cfif page IS "driverinfo">

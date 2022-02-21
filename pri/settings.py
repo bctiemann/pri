@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    # 'django.forms',
 
     'rest_framework',
     'django_otp',
@@ -94,6 +95,7 @@ TEMPLATES = [
         },
     },
 ]
+# FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 WSGI_APPLICATION = 'pri.wsgi.application'
 
