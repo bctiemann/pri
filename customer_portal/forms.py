@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from sales.enums import get_exp_year_choices, get_exp_month_choices
 from sales.models import BaseReservation
 from users.models import Customer
+from backoffice.forms import CSSClassMixin
 
 
 class PasswordForm(forms.Form):
@@ -13,9 +14,10 @@ class PasswordForm(forms.Form):
     password_repeat = forms.CharField(widget=forms.PasswordInput())
 
 
-class ReservationCustomerInfoForm(forms.ModelForm):
+class ReservationCustomerInfoForm(CSSClassMixin, forms.ModelForm):
 
     cc_fields = ['cc_number', 'cc2_number']
+    phone_fields = ['mobile_phone', 'home_phone', 'work_phone', 'insurance_company_phone', 'cc_phone', 'cc2_phone']
 
     confirmation_code = forms.CharField(widget=forms.HiddenInput())
 
@@ -40,11 +42,15 @@ class ReservationCustomerInfoForm(forms.ModelForm):
 
     def __init__(self, *args, confirmation_code=None, **kwargs):
         super().__init__(*args, **kwargs)
+
         self.fields['confirmation_code'].initial = confirmation_code
-        for field in self.cc_fields:
-            self.fields[field].widget.attrs['class'] = 'cc-field'
         if self.instance.date_of_birth:
             self.fields['date_of_birth_date'].initial = self.instance.date_of_birth.strftime('%m/%d/%Y')
+
+        for field in self.cc_fields:
+            self.add_widget_css_class(field, 'cc-field')
+        for field in self.phone_fields:
+            self.add_widget_css_class(field, 'phone')
 
     def clean(self):
         if not any((

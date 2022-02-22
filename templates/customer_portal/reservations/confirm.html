@@ -281,10 +281,17 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="align-top">Address</td>
+                    <td>Address</td>
                     <td>
                         {{ form.address_line_1 }}
-                        <cftextarea name="addr" id="addr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#addr_dec#</cftextarea>
+{#                        <cftextarea name="addr" id="addr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#addr_dec#</cftextarea>#}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Address Line 2</td>
+                    <td>
+                        {{ form.address_line_2 }}
+{#                        <cftextarea name="addr" id="addr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#addr_dec#</cftextarea>#}
                     </td>
                 </tr>
                 <tr>

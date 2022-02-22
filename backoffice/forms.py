@@ -31,6 +31,9 @@ class CSSClassMixin:
         css_class_string = ' '.join(list(set(widget_css_classes)))
         self.fields[field].widget.attrs['class'] = css_class_string
 
+
+class CustomerSearchMixin:
+
     def style_customer_search_fields(self):
         # Populate conditionally non-editable fields from linked customer
         phone_fields = ['home_phone', 'work_phone', 'mobile_phone']
@@ -173,7 +176,7 @@ class ReservationDateTimeMixin:
         )
 
 
-class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):
+class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, CustomerSearchMixin, forms.ModelForm):
 
     customer = forms.ModelChoiceField(queryset=Customer.objects.all(), widget=forms.HiddenInput())
     reservation = forms.IntegerField(widget=forms.HiddenInput(), required=False)
@@ -466,7 +469,7 @@ class TaxRateForm(CSSClassMixin, forms.ModelForm):
 #         fields = '__all__'
 
 
-class GuidedDriveForm(CSSClassMixin, forms.ModelForm):
+class GuidedDriveForm(CSSClassMixin, CustomerSearchMixin, forms.ModelForm):
 
     requested_date_picker = forms.DateField(required=False)
     backup_date_picker = forms.DateField(required=False)
