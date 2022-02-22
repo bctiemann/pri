@@ -22,14 +22,17 @@ class ReservationCustomerInfoForm(forms.ModelForm):
     insurance_company = forms.CharField(required=True, error_messages={'required': _("Please enter the driver's insurance carrier.")})
     insurance_policy_number = forms.CharField(required=True, error_messages={'required': _("Please enter the driver's insurance policy number.")})
 
+    # Make a proxy date_of_birth field here so we can override the displayed date format from YYYY-MM-DD to MM/DD/YYYY
+    date_of_birth_date = forms.DateField()
+
     cc_number = forms.CharField(required=False)
-    cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices(since_founding=True, allow_null=False))
-    cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(allow_null=False))
+    cc_exp_yr = forms.ChoiceField(required=False, choices=get_exp_year_choices(since_founding=True, allow_null=False))
+    cc_exp_mo = forms.ChoiceField(required=False, choices=get_exp_month_choices(allow_null=False))
     cc_cvv = forms.CharField(required=False)
     cc_phone = PhoneNumberField(region='US', required=False)
 
     cc2_number = forms.CharField(required=False)
-    cc2_exp_yr = forms.ChoiceField(choices=get_exp_year_choices(since_founding=True, allow_null=True), required=False)
+    cc2_exp_yr = forms.ChoiceField(required=False, choices=get_exp_year_choices(since_founding=True, allow_null=True))
     cc2_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(allow_null=True), required=False)
     cc2_cvv = forms.CharField(required=False)
     cc2_phone = PhoneNumberField(region='US', required=False)
@@ -40,6 +43,8 @@ class ReservationCustomerInfoForm(forms.ModelForm):
         self.fields['confirmation_code'].initial = confirmation_code
         for field in self.cc_fields:
             self.fields[field].widget.attrs['class'] = 'cc-field'
+        if self.instance.date_of_birth:
+            self.fields['date_of_birth_date'].initial = self.instance.date_of_birth.strftime('%m/%d/%Y')
 
     def clean(self):
         if not any((
@@ -48,11 +53,12 @@ class ReservationCustomerInfoForm(forms.ModelForm):
             self.cleaned_data.get('home_phone'),
         )):
             raise forms.ValidationError('Please enter at least one preferred phone number.')
+        self.cleaned_data['date_of_birth'] = self.cleaned_data['date_of_birth_date']
 
     class Meta:
         model = Customer
         fields = (
-            'first_name', 'last_name', 'date_of_birth', 'address_line_1', 'address_line_2', 'city', 'state', 'zip',
+            'first_name', 'last_name', 'date_of_birth', 'date_of_birth_date', 'address_line_1', 'address_line_2', 'city', 'state', 'zip',
             'mobile_phone', 'work_phone', 'home_phone', 'fax', 'license_number', 'license_state',
             'cc_number', 'cc_exp_mo', 'cc_exp_yr', 'cc_cvv', 'cc_phone',
             'cc2_number', 'cc2_exp_mo', 'cc2_exp_yr', 'cc2_cvv', 'cc2_phone', 'cc2_instructions',
