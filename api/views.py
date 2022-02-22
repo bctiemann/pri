@@ -208,6 +208,10 @@ class ValidateRentalConfirmView(APIView):
 
         form.save()
 
+        if form.cleaned_data['cc2_instructions']:
+            reservation.customer_notes += '\n\n' + form.cleaned_data['cc2_instructions']
+            reservation.save()
+
         response = {
             'success': True,
             'reservation_type': 'rental',

@@ -74,7 +74,6 @@ class ConfirmReservationView(SidebarMixin, UpdateView):
     template_name = 'customer_portal/reservations/confirm.html'
     selected_page = 'reservations'
     model = BaseReservation
-    form_class = ReservationCustomerInfoForm
 
     def get_object(self, queryset=None):
         try:
