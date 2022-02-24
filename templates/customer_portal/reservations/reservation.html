@@ -1,0 +1,70 @@
+{% load bbcode_tags %}
+
+<div class="confcode">{{ reservation.confirmation_code }}</div>
+<table class="small-item-data">
+    <tr>
+        <td>
+            {% if reservation.delivery_required %}
+            <cfif delivery IS 1>
+                PRI Delivers Vehicle:
+            {% else %}
+            <cfelse>
+                Pick Up at PRI:
+            </cfif>
+            {% endif %}
+        </td>
+        <td>{{ reservation.out_at|date:"g:i A D m/d/Y" }}{# #TimeFormat(dateout, "h:MM tt")# #DateFormat(dateout,"ddd MM/DD/YYYY")# #}</td>
+    </tr>
+    <tr>
+        <td>
+            {% if reservation.delivery_required %}
+            <cfif delivery IS 1>
+                PRI Collects Vehicle:
+            {% else %}
+            <cfelse>
+                Due Back at PRI:
+            </cfif>
+            {% endif %}
+        </td>
+        <td>{{ reservation.back_at|date:"g:i A D m/d/Y" }}{# #TimeFormat(dateback, "h:MM tt")# #DateFormat(dateback,"ddd MM/DD/YYYY")# #}</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>{{ reservation.num_days }} day{{ reservation.num_days|pluralize }}</td>
+    </tr>
+</table>
+<p class="reservation-status">
+    {{ reservation.reservation.get_status_display }}{{ reservation.rental.get_status_display }}
+    {% comment %}
+    <cfif reservationid GT 0 AND status IS 0>
+        Unconfirmed
+    <cfelseif (reservationid GT 0 AND status IS 1) OR (rentalid GT 0 AND status IS 1)>
+        Confirmed
+    <cfelseif rentalid GT 0 AND status IS 2>
+        In Progress
+    <cfelseif rentalid GT 0 AND status IS 3>
+        Complete
+    </cfif>
+    {% endcomment %}
+</p>
+<div class="vehiclepic-box">
+    <img class="vehiclepic" src="{{ reservation.vehicle.vehicle_marketing.thumbnail_image.url }}" />
+    <span class="offer-title overlay-text bottom">{{ reservation.vehicle.make }} {{ reservation.vehicle.model }}</span>
+</div>
+{% if user.customer.info_is_complete %}
+<cfif InfoComplete>
+    {% if reservation.customer_nodes %}
+    <cfif notes IS NOT "">
+        <div class="customer-notes">
+            {{ reservation.customer_notes|bbcode }}
+        </div>
+    </cfif>
+    {% endif %}
+{% elif not reservation.is_past %}
+<cfelse>
+    <div class="exception complete-info-prompt">
+        <h3>Action Required</h3>
+        <p>Please complete your information.</p>
+    </div>
+</cfif>
+{% endif %}

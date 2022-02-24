@@ -185,6 +185,10 @@ class BaseReservation(ConfirmationCodeMixin, models.Model):
         return None
 
     @property
+    def is_past(self):
+        return self.out_at < now()
+
+    @property
     def num_days(self):
         if self.out_at and self.back_at:
             # Pad the selection with 30m so the estimate comes out to 1 day if up to 24.5 hours

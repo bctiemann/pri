@@ -4,7 +4,11 @@
 
 {% block subpage_pane %}
 
+    {% for reservation in past_rentals %}
     <cfoutput query="RentalsPast">
+        <div class="reservation complete">
+            {% include "customer_portal/reservations/reservation.html" %}
+        {% comment %}
         <div class="reservation complete">
             <div class="confcode">#confcode#</div>
             <table class="small-item-data">
@@ -45,11 +49,15 @@
                     </div>
                 </cfif>
             </cfif>
+        {% endcomment %}
         </div>
     </cfoutput>
+    {% endfor %}
 
+    {% if not past_reservations.exists %}
     <cfif RentalsPast.recordCount IS 0>
         <div class="no-records">No past rentals</div>
     </cfif>
+    {% endif %}
 
 {% endblock %}

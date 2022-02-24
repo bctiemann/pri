@@ -65,6 +65,11 @@ class ReservationConvertToRentalView(UpdateView):
     def form_valid(self, form):
         reservation = form.instance
 
+        # We delete the reservation object before converting it to a rental (no harm in this as Rental is a superset
+        # of Reservation, except for the status field). Have to delete prior to creating rental to avoid collision
+        # of confirmation_code.
+        reservation.delete()
+
         # Populate a new Rental object with fields explicitly from the Reservation
         rental = Rental.objects.create(
             type=Rental.ReservationType.RENTAL,
@@ -89,10 +94,6 @@ class ReservationConvertToRentalView(UpdateView):
             status=Rental.Status.CONFIRMED,
         )
         self.rental = rental
-
-        # We delete the reservation object after converting it to a rental (no harm in this as Rental is a superset
-        # of Reservation, except for the status field)
-        reservation.delete()
 
         return HttpResponseRedirect(self.get_success_url())
 

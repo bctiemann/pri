@@ -17,7 +17,7 @@ class PasswordForm(forms.Form):
 class ReservationCustomerInfoForm(CSSClassMixin, forms.ModelForm):
 
     cc_fields = ['cc_number', 'cc2_number']
-    phone_fields = ['mobile_phone', 'home_phone', 'work_phone', 'insurance_company_phone', 'cc_phone', 'cc2_phone']
+    phone_fields = ['mobile_phone', 'home_phone', 'work_phone', 'fax', 'insurance_company_phone', 'cc_phone', 'cc2_phone']
 
     confirmation_code = forms.CharField(widget=forms.HiddenInput())
 
