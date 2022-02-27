@@ -75,6 +75,8 @@ class ReservationMixin:
     @staticmethod
     def _get_login_customer(request, form):
         if form.customer:
+            if request.user.is_authenticated:
+                return form.customer
             if authenticate(request, username=form.customer.email, password=form.cleaned_data['password']):
                 login(request, form.customer.user)
                 return form.customer
@@ -176,6 +178,7 @@ class ValidateRentalPaymentView(ReservationMixin, APIView):
 
 
 class ValidateRentalLoginView(ValidateRentalPaymentView):
+    authentication_classes = (SessionAuthentication,)
     form_class = ReservationRentalLoginForm
 
 

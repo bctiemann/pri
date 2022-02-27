@@ -285,7 +285,7 @@ $(document).ready(function() {
         reserveValidateForm('rental', 'details');
     });
     $('.reserve-rental-confirm-btn').click(function() {
-        reserveValidateForm('validateReservation', 'confirm');
+        reserveValidateForm('rental', 'login');
     });
     $('.reserve-joyperf-price-btn').click(function() {
         reserveValidateForm('validateJoyPerf', 'price');
