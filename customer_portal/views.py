@@ -8,7 +8,8 @@ from sales.models import BaseReservation, Reservation, Rental, GuidedDrive, JoyR
 from users.models import Customer
 from users.views import LoginView, LogoutView
 from customer_portal.forms import (
-    PasswordForm, ReservationCustomerInfoForm, ReservationNotesForm, AccountDriverInfoForm, AccountInsuranceForm, AccountMusicPrefsForm,
+    PasswordForm, ReservationCustomerInfoForm, ReservationNotesForm, ReservationDetailsForm,
+    AccountDriverInfoForm, AccountInsuranceForm, AccountMusicPrefsForm,
 )
 
 
@@ -61,9 +62,11 @@ class SelectVehicleView(SidebarMixin, TemplateView):
         return context
 
 
-class MakeReservationView(SidebarMixin, TemplateView):
+class MakeReservationView(SidebarMixin, CreateView):
     template_name = 'customer_portal/reservations/new.html'
     selected_page = 'reservations'
+    model = Reservation
+    form_class = ReservationDetailsForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -3,10 +3,11 @@ from phonenumber_field.formfields import PhoneNumberField
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from sales.enums import get_exp_year_choices, get_exp_month_choices
 from sales.models import BaseReservation
+from sales.forms import ReservationRentalDetailsForm
 from users.models import Customer
 from backoffice.forms import CSSClassMixin
+from sales.enums import get_service_hours, TRUE_FALSE_CHOICES, get_exp_year_choices, get_exp_month_choices
 
 
 class PasswordForm(forms.Form):
@@ -95,6 +96,11 @@ class ReservationNotesForm(forms.ModelForm):
     class Meta:
         model = BaseReservation
         fields = ('customer_notes',)
+
+
+class ReservationDetailsForm(ReservationRentalDetailsForm):
+    # is_military = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES, required=False)
+    pass
 
 
 class AccountDriverInfoForm(forms.ModelForm):

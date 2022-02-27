@@ -24,22 +24,27 @@ var reserveValidateForm = function(reservationType, section) {
         $('.field-error').removeClass('field-error');
         if (data.success) {
             $('.' + section + ' .btn').prop('disabled', false);
-            if (section == 'price') {
-                if (method == 'validateReservation') {
-                    $('.price-numdays').html(data.numdays + ' day' + (data.numdays != 1 ? 's' : ''));
-                    $('.price-rental-total').html(data.tcostRaw.toFixed(2));
-                    $('.price-multi-day-discount').html(data.multi_day_discount.toFixed(2));
-                    $('.price-multi-day-discount-pct').html(data.multi_day_discount_pct);
+            if (section == 'details') {
+                if (reservationType === 'rental') {
+                    $('.price-numdays').html(data.price_data.num_days + ' day' + (data.price_data.num_days !== 1 ? 's' : ''));
+                    $('.price-rental-total').html(data.price_data.base_price.toFixed(2));
+                    $('.price-multi-day-discount').html(data.price_data.multi_day_discount.toFixed(2));
+                    $('.price-multi-day-discount-pct').html(data.price_data.multi_day_discount_pct);
                     $('.price-specific-discount').html(data.price_data.specific_discount.toFixed(2));
                     $('.price-specific-discount-label').html(data.price_data.specific_discount_label);
-                    $('.price-extra-miles').html(data.extra_miles);
-                    $('.price-extra-miles-cost').html(data.extra_miles_cost.toFixed(2));
-                    $('.price-subtotal').html(data.subtotal.toFixed(2));
-                    $('.price-tax').html(data.tax_amt.toFixed(2));
-                    $('.price-tax-rate').html(data.tax_rate);
-                    $('.price-total').html(data.total_w_tax.toFixed(2));
-                    $('.price-reservation-deposit').html(data.reservation_deposit.toFixed(2));
-                    if (data.delivery == 0) {
+                    if (data.price_data.specific_discount) {
+                        $('.specific-discount').show();
+                    } else {
+                        $('.specific-discount').hide();
+                    }
+                    $('.price-extra-miles').html(data.price_data.extra_miles);
+                    $('.price-extra-miles-cost').html(data.price_data.extra_miles_cost.toFixed(2));
+                    $('.price-subtotal').html(data.price_data.subtotal.toFixed(2));
+                    $('.price-tax').html(data.price_data.tax_amount.toFixed(2));
+                    $('.price-tax-rate').html(data.price_data.tax_rate);
+                    $('.price-total').html(data.price_data.total_with_tax.toFixed(2));
+                    $('.price-reservation-deposit').html(data.price_data.reservation_deposit.toFixed(2));
+                    if (data.delivery_required) {
                         $('.price-delivery-smallprint').css('visibility', 'hidden');
                     } else {
                         $('.price-delivery-smallprint').css('visibility', 'visible');
@@ -194,8 +199,8 @@ $(document).ready(function() {
     $('input#id_cc2_number').trigger($.Event( 'keyup', {which:$.ui.keyCode.SPACE, keyCode:$.ui.keyCode.SPACE}));
 
     // Date pickers
-    $('#dateout').datepicker();
-    $('#dateback').datepicker();
+    $('#id_out_date').datepicker();
+    $('#id_back_date').datepicker();
     $('#reqdate').datepicker();
     $('#bupdate').datepicker();
     $('#id_date_of_birth_date').datepicker({
@@ -277,7 +282,7 @@ $(document).ready(function() {
         pickVehicle($(this).attr('vehicleid'));
     });
     $('.reserve-rental-price-btn').click(function() {
-        reserveValidateForm('validateReservation', 'price');
+        reserveValidateForm('rental', 'details');
     });
     $('.reserve-rental-confirm-btn').click(function() {
         reserveValidateForm('validateReservation', 'confirm');
