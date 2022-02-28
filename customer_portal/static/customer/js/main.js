@@ -77,19 +77,21 @@ var reserveValidateForm = function(reservationType, section) {
         } else {
             $('.' + section + ' .btn').prop('disabled', false);
             $('#reservation_' + section + '_error .alert-message').html(data.error);
-            $('#reservation_' + section + '_error').show(); 
+            $('#reservation_' + section + '_error').show();
             let selectedFirst = false;
             for (var field in data.errors) {
                 const input = $('#id_' + field.toLowerCase());
                 input.addClass('field-error');
                 if (!selectedFirst) {
-                    if (reservationType === 'rental') {
+                    if (reservationType === 'rental' && section === 'confirm') {
                         alert(data.errors[field]);
                     }
                     $('#reservation_' + section + '_error .alert-message').html(data.errors[field]);
-                    input.select();
-                    input[0].scrollIntoView();
-                    selectedFirst = true;
+                    if (input.length) {
+                        input.select();
+                        input[0].scrollIntoView();
+                        selectedFirst = true;
+                    }
                 }
             } 
         }
