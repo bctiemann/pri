@@ -72,6 +72,7 @@ class ReservationRentalDetailsForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['extra_miles'].choices = ((k, v['label']) for k, v in settings.EXTRA_MILES_PRICES.items())
+        self.fields['delivery_zip'].widget.attrs['class'] = 'short'
 
     def is_valid(self):
         return super().is_valid()
