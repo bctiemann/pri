@@ -45,9 +45,9 @@ var reserveValidateForm = function(reservationType, section) {
                     $('.price-total').html(data.price_data.total_with_tax.toFixed(2));
                     $('.price-reservation-deposit').html(data.price_data.reservation_deposit.toFixed(2));
                     if (data.delivery_required) {
-                        $('.price-delivery-smallprint').css('visibility', 'hidden');
-                    } else {
                         $('.price-delivery-smallprint').css('visibility', 'visible');
+                    } else {
+                        $('.price-delivery-smallprint').css('visibility', 'hidden');
                     }
                 } else if (method == 'validateJoyPerf') {
                     $('.price-nodrv').html(data.nodrv + ' driver' + (data.nodrv != 1 ? 's' : ''));
@@ -151,7 +151,7 @@ var pickVehicle = function(vehicleid) {
 };
 
 var toggleDeliveryZip = function() {
-    if ($('#delivery').val() == 1) {
+    if ($('#id_delivery_required').val() == 1) {
         $('.delivery-zip').show();
     } else {
         $('.delivery-zip').hide();
@@ -298,6 +298,9 @@ $(document).ready(function() {
 
     $('.vehicle-pick-buttons').show();
     $('.vehicle-choice').hide();
+    $('#id_delivery_required').change(function() {
+        toggleDeliveryZip();
+    });
     $('.delivery-zip').hide();
 
 });

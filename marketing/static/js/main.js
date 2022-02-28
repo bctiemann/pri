@@ -74,9 +74,9 @@ var reserveValidateForm = function(reservationType, section) {
                     $('.price-total').html(data.price_data.total_with_tax.toFixed(2));
                     $('.price-reservation-deposit').html(data.price_data.reservation_deposit.toFixed(2));
                     if (data.delivery_required) {
-                        $('.price-delivery-smallprint').css('visibility', 'hidden');
-                    } else {
                         $('.price-delivery-smallprint').css('visibility', 'visible');
+                    } else {
+                        $('.price-delivery-smallprint').css('visibility', 'hidden');
                     }
                 } else if (reservationType === 'joyride' || reservationType === 'perfexp') {
                     $('.price-nodrv').html(data.price_data.num_drivers + ' driver' + (data.price_data.num_drivers != 1 ? 's' : ''));
