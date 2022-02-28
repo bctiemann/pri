@@ -46,10 +46,16 @@ class ReservationRentalDetailsForm(forms.ModelForm):
     # additional fields here if they do not exist in the model referenced in Meta (Reservation).
 
     vehicle_marketing = forms.ModelChoiceField(widget=forms.HiddenInput(), queryset=VehicleMarketing.objects.filter(status=VehicleStatus.READY))
-    out_date = forms.DateField(widget=forms.DateInput(attrs={'placeholder': 'MM/DD/YYYY', 'class': 'short'}))
+    out_date = forms.DateField(widget=forms.DateInput(
+        attrs={'placeholder': 'MM/DD/YYYY', 'class': 'short'}),
+        error_messages={'required': 'Please specify the date of the rental.'},
+    )
     out_time = forms.TimeField(widget=forms.Select(choices=get_service_hours()))
     out_at = forms.DateTimeField(required=False)
-    back_date = forms.DateField(widget=forms.DateInput(attrs={'placeholder': 'MM/DD/YYYY', 'class': 'short'}))
+    back_date = forms.DateField(widget=forms.DateInput(
+        attrs={'placeholder': 'MM/DD/YYYY', 'class': 'short'}),
+        error_messages={'required': 'Please specify the date when you\'ll be returning the vehicle.'},
+    )
     back_time = forms.TimeField(widget=forms.Select(choices=get_service_hours()))
     back_at = forms.DateTimeField(required=False)
     drivers = forms.ChoiceField(choices=DRIVERS_CHOICES)
