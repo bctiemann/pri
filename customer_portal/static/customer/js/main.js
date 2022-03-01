@@ -49,7 +49,8 @@ var reserveValidateForm = function(reservationType, section) {
                     } else {
                         $('.price-delivery-smallprint').css('visibility', 'hidden');
                     }
-                } else if (method == 'validateJoyPerf') {
+                } else if (reservationType === 'joyride' || reservationType === 'perfexp') {
+                    /*
                     $('.price-nodrv').html(data.nodrv + ' driver' + (data.nodrv != 1 ? 's' : ''));
                     $('.price-drvcost').html(data.drvcost.toFixed(2));
                     $('.price-nopax').html(data.nopax + ' passenger' + (data.nopax != 1 ? 's' : ''));
@@ -61,6 +62,7 @@ var reserveValidateForm = function(reservationType, section) {
                     $('.price-tax').html(data.tax_amt.toFixed(2));
                     $('.price-tax-rate').html(data.tax_rate);
                     $('.price-total').html(data.total_w_tax.toFixed(2));
+                    */
                 }
                 $('#reservation_price_error').hide();  
                 $('#reservation_confirm').show();
@@ -203,8 +205,8 @@ $(document).ready(function() {
     // Date pickers
     $('#id_out_date').datepicker();
     $('#id_back_date').datepicker();
-    $('#reqdate').datepicker();
-    $('#bupdate').datepicker();
+    $('#id_requested_date').datepicker();
+    $('#id_backup_date').datepicker();
     $('#id_date_of_birth_date').datepicker({
         changeMonth: true,
         changeYear: true,
@@ -289,11 +291,17 @@ $(document).ready(function() {
     $('.reserve-rental-confirm-btn').click(function() {
         reserveValidateForm('rental', 'login');
     });
-    $('.reserve-joyperf-price-btn').click(function() {
-        reserveValidateForm('validateJoyPerf', 'price');
+    $('.reserve-joyride-price-btn').click(function() {
+        reserveValidateForm('joyride', 'details');
     });
-    $('.reserve-joyperf-confirm-btn').click(function() {
-        reserveValidateForm('validateJoyPerf', 'confirm');
+    $('.reserve-joyride-confirm-btn').click(function() {
+        reserveValidateForm('joyride', 'login');
+    });
+    $('.reserve-perfexp-price-btn').click(function() {
+        reserveValidateForm('perfexp', 'details');
+    });
+    $('.reserve-perfexp-confirm-btn').click(function() {
+        reserveValidateForm('perfexp', 'login');
     });
 
     $('.vehicle-pick-buttons').show();

@@ -9,6 +9,7 @@ from users.models import Customer
 from users.views import LoginView, LogoutView
 from customer_portal.forms import (
     PasswordForm, ReservationCustomerInfoForm, ReservationNotesForm, ReservationDetailsForm,
+    JoyRideDetailsForm,
     AccountDriverInfoForm, AccountInsuranceForm, AccountMusicPrefsForm,
 )
 
@@ -128,9 +129,18 @@ class JoyRidePastView(SidebarMixin, TemplateView):
     selected_page = 'joy_ride'
 
 
-class JoyRideReserveView(SidebarMixin, TemplateView):
+class JoyRideReserveView(SidebarMixin, CreateView):
     template_name = 'customer_portal/joy_ride/reserve.html'
     selected_page = 'joy_ride'
+    model = JoyRide
+    form_class = JoyRideDetailsForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['ready_vehicles'] = VehicleMarketing.objects.filter(status=VehicleStatus.READY).order_by('-weighting')
+        context['cars'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.CAR)
+        context['bikes'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.BIKE)
+        return context
 
 
 class JoyRideConfirmView(SidebarMixin, UpdateView):

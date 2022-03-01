@@ -384,6 +384,8 @@ class JoyRideDetailsForm(forms.ModelForm):
     big_and_tall = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
     coupon_code = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': '(Optional)'}))
 
+    # TODO: Add clean_* methods for requested_date and backup_date, etc
+
     def clean(self):
         print('cleaned:')
         print(self.cleaned_data)

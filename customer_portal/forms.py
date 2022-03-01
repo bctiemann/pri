@@ -4,7 +4,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from sales.models import BaseReservation
-from sales.forms import ReservationRentalDetailsForm
+from sales.forms import ReservationRentalDetailsForm, JoyRideDetailsForm
 from users.models import Customer
 from backoffice.forms import CSSClassMixin
 from sales.enums import get_service_hours, TRUE_FALSE_CHOICES, get_exp_year_choices, get_exp_month_choices
@@ -99,7 +99,6 @@ class ReservationNotesForm(forms.ModelForm):
 
 
 class ReservationDetailsForm(ReservationRentalDetailsForm):
-    # is_military = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES, required=False)
     pass
 
 
