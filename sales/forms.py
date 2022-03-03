@@ -424,10 +424,30 @@ class JoyRidePaymentForm(JoyRideDetailsForm):
         'first_name', 'last_name', 'mobile_phone', 'home_phone', 'work_phone', 'fax', 'cc_number', 'cc_exp_yr',
         'cc_exp_mo', 'cc_cvv', 'cc_phone', 'address_line_1', 'address_line_2', 'city', 'state', 'zip'
     )
+    first_name = forms.CharField()
+    last_name = forms.CharField()
+    mobile_phone = PhoneNumberField(required=False)
+    work_phone = PhoneNumberField(required=False)
+    home_phone = PhoneNumberField(required=False)
+    fax = PhoneNumberField(required=False)
+    address_line_1 = forms.CharField()
+    address_line_2 = forms.CharField(required=False)
+    city = forms.CharField()
+    state = USStateField(widget=USStateSelect())
+    zip = USZipCodeField()
 
-    class Meta:
-        model = Customer
-        fields = '__all__'
+    password_new = forms.CharField(widget=forms.PasswordInput())
+    password_repeat = forms.CharField(widget=forms.PasswordInput())
+
+    cc_number = forms.CharField()
+    cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices())
+    cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices())
+    cc_cvv = forms.CharField()
+    cc_phone = PhoneNumberField()
+
+    # class Meta:
+    #     model = Customer
+    #     fields = '__all__'
 
 
 class JoyRideLoginForm(JoyRideDetailsForm):

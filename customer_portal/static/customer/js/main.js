@@ -73,7 +73,8 @@ var reserveValidateForm = function(reservationType, section) {
                 } else if (data.reservation_type == 'perfexp') {
                     window.location.href = data.custsite + 'perfexp_confirm.cfm?confcode=' + data.confcode;
                 } else if (data.reservation_type == 'joyride') {
-                    window.location.href = data.custsite + 'joyride_confirm.cfm?confcode=' + data.confcode;
+                    window.location.href = data.customer_site_url;
+                    // window.location.href = data.custsite + 'joyride_confirm.cfm?confcode=' + data.confcode;
                 }
             }
         } else {
@@ -133,11 +134,11 @@ var sendResetPassword = function() {
 };
 
 var setVehicles = function() {
-    $('#choice1').val($($('.vehicle-picker-pick.picked')[0]).attr('vehicleid') || 0);
-    $('#choice2').val($($('.vehicle-picker-pick.picked')[1]).attr('vehicleid') || 0);
-    $('#choice3').val($($('.vehicle-picker-pick.picked')[2]).attr('vehicleid') || 0);
+    $('#id_vehicle_choice_1').val($($('.vehicle-picker-pick.picked')[0]).attr('vehicleid') || 0);
+    $('#id_vehicle_choice_2').val($($('.vehicle-picker-pick.picked')[1]).attr('vehicleid') || 0);
+    $('#id_vehicle_choice_3').val($($('.vehicle-picker-pick.picked')[2]).attr('vehicleid') || 0);
     $('#dialog_pick_vehicles').dialog('close');
-    var picktype = $('.vehicle-picker-pick.picked').attr('type'); 
+    var picktype = $('.vehicle-picker-pick.picked').attr('type');
     var numpicked = $('.vehicle-picker-pick.picked').length;
     $('.vehicles-picked').html(numpicked + ' ' + picktype + (numpicked == 1 ? '' : 's') + ' picked');
 };
@@ -245,9 +246,9 @@ $(document).ready(function() {
         var vehicle_type = $(this).attr('type');
         $('.vehicle-picker-pick').hide().removeClass('picked');
         var current_picks = [
-            $('#choice1').val(),
-            $('#choice2').val(),
-            $('#choice3').val(),
+            $('#id_vehicle_choice_1').val(),
+            $('#id_vehicle_choice_2').val(),
+            $('#id_vehicle_choice_3').val(),
         ];
         $('.vehicle-picker-pick[type=' + vehicle_type + ']').show().each(function() {
             if (current_picks.indexOf($(this).attr('vehicleid')) > -1) {

@@ -255,6 +255,7 @@ class ValidateJoyRidePaymentView(ReservationMixin, APIView):
 
 
 class ValidateJoyRideLoginView(ValidateJoyRidePaymentView):
+    authentication_classes = (SessionAuthentication,)
     form_class = JoyRideLoginForm
 
 
