@@ -70,7 +70,7 @@ var reserveValidateForm = function(reservationType, section) {
                     $('.price-extra-miles-cost').html(data.price_data.extra_miles_cost.toFixed(2));
                     $('.price-subtotal').html(data.price_data.subtotal.toFixed(2));
                     $('.price-tax').html(data.price_data.tax_amount.toFixed(2));
-                    $('.price-tax-rate').html(data.price_data.tax_rate);
+                    $('.price-tax-rate').html(data.price_data.tax_rate_as_percent);
                     $('.price-total').html(data.price_data.total_with_tax.toFixed(2));
                     $('.price-reservation-deposit').html(data.price_data.reservation_deposit.toFixed(2));
                     if (data.delivery_required) {
@@ -94,6 +94,7 @@ var reserveValidateForm = function(reservationType, section) {
                     $('.price-specific-discount-label').html(data.price_data.specific_discount_label);
                     $('.price-subtotal').html(data.price_data.subtotal.toFixed(2));
                     $('.price-tax').html(data.price_data.tax_amount.toFixed(2));
+                    $('.price-tax-rate').html(data.price_data.tax_rate_as_percent);
                     $('.price-total').html(data.price_data.total_with_tax.toFixed(2));
                 }
                 if (data.price_data.customer_discount) {

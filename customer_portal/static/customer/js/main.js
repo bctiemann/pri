@@ -41,7 +41,7 @@ var reserveValidateForm = function(reservationType, section) {
                     $('.price-extra-miles-cost').html(data.price_data.extra_miles_cost.toFixed(2));
                     $('.price-subtotal').html(data.price_data.subtotal.toFixed(2));
                     $('.price-tax').html(data.price_data.tax_amount.toFixed(2));
-                    $('.price-tax-rate').html(data.price_data.tax_rate);
+                    $('.price-tax-rate').html(data.price_data.tax_rate_as_percent);
                     $('.price-total').html(data.price_data.total_with_tax.toFixed(2));
                     $('.price-reservation-deposit').html(data.price_data.reservation_deposit.toFixed(2));
                     if (data.delivery_required) {
@@ -50,19 +50,24 @@ var reserveValidateForm = function(reservationType, section) {
                         $('.price-delivery-smallprint').css('visibility', 'hidden');
                     }
                 } else if (reservationType === 'joyride' || reservationType === 'perfexp') {
-                    /*
-                    $('.price-nodrv').html(data.nodrv + ' driver' + (data.nodrv != 1 ? 's' : ''));
-                    $('.price-drvcost').html(data.drvcost.toFixed(2));
-                    $('.price-nopax').html(data.nopax + ' passenger' + (data.nopax != 1 ? 's' : ''));
-                    $('.price-paxcost').html(data.paxcost.toFixed(2));
-                    $('.price-event-total').html(data.trate.toFixed(2));
-                    $('.price-coupon-discount').html(data.coupon_discount.toFixed(2));
-                    $('.price-customer-discount').html(data.customer_discount.toFixed(2));
-                    $('.price-subtotal').html(data.subtotal.toFixed(2));
-                    $('.price-tax').html(data.tax_amt.toFixed(2));
-                    $('.price-tax-rate').html(data.tax_rate);
-                    $('.price-total').html(data.total_w_tax.toFixed(2));
-                    */
+                    $('.price-nodrv').html(data.price_data.num_drivers + ' driver' + (data.price_data.num_drivers !== 1 ? 's' : ''));
+                    $('.price-drvcost').html(data.price_data.base_price.toFixed(2));
+                    $('.price-nopax').html(data.price_data.num_passengers + ' passenger' + (data.price_data.num_passengers !== 1 ? 's' : ''));
+                    $('.price-paxcost').html(data.price_data.base_price.toFixed(2));
+                    // $('.price-event-total').html(data.trate.toFixed(2));
+                    $('.price-specific-discount').html(data.price_data.specific_discount.toFixed(2));
+                    $('.price-specific-discount-label').html(data.price_data.specific_discount_label);
+                    if (data.price_data.specific_discount) {
+                        $('.specific-discount').show();
+                    } else {
+                        $('.specific-discount').hide();
+                    }
+                    // $('.price-coupon-discount').html(data.coupon_discount.toFixed(2));
+                    // $('.price-customer-discount').html(data.customer_discount.toFixed(2));
+                    $('.price-subtotal').html(data.price_data.subtotal.toFixed(2));
+                    $('.price-tax').html(data.price_data.tax_amount.toFixed(2));
+                    $('.price-tax-rate').html(data.price_data.tax_rate_as_percent);
+                    $('.price-total').html(data.price_data.total_with_tax.toFixed(2));
                 }
                 $('#reservation_price_error').hide();  
                 $('#reservation_confirm').show();

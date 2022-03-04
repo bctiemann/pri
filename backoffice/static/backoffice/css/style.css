@@ -645,7 +645,7 @@ table.inputform input.search:focus {
 	outline: none;
 }
 table.inputform input.short {
-        width: 100px;
+        width: 120px;
 }
 table.inputform textarea {
         width: 340px;

@@ -172,7 +172,7 @@
 
     </div>
 
-    <div class="exception hidden" id="reservation_price_error">
+    <div class="exception hidden" id="reservation_details_error">
         <h3>An error occurred</h3>
         <p class="alert-message"></p>
     </div>
@@ -191,6 +191,7 @@
                 <td>$<span class="price-paxcost"></span></td>
                 <td></td>
             </tr>
+            {% comment %}
             <tr class="customer-discount">
                 <td>Promotional Discount</td>
                 <td>- $<span class="price-customer-discount"></span></td>
@@ -199,6 +200,12 @@
             <tr class="coupon-discount">
                 <td>Coupon Discount</td>
                 <td>- $<span class="price-coupon-discount"></span></td>
+                <td></td>
+            </tr>
+            {% endcomment %}
+            <tr>
+                <td><span class="price-specific-discount-label"></span></td>
+                <td>- $<span class="price-specific-discount"></span></td>
                 <td></td>
             </tr>
             <tr>
