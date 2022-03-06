@@ -3,7 +3,7 @@ from phonenumber_field.formfields import PhoneNumberField
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from sales.models import BaseReservation
+from sales.models import BaseReservation, JoyRide, PerformanceExperience
 from sales.forms import ReservationRentalDetailsForm, JoyRideDetailsForm
 from users.models import Customer
 from backoffice.forms import CSSClassMixin
@@ -86,7 +86,7 @@ class ReservationCustomerEmptyForm(forms.ModelForm):
 
 class ReservationNotesForm(forms.ModelForm):
 
-    customer_notes = forms.CharField(widget=forms.Textarea())
+    customer_notes = forms.CharField(widget=forms.Textarea(), required=False)
 
     # def __init__(self, *args, **kwargs):
     #     super().__init__(*args, **kwargs)
@@ -100,6 +100,14 @@ class ReservationNotesForm(forms.ModelForm):
 
 class ReservationDetailsForm(ReservationRentalDetailsForm):
     pass
+
+
+class JoyRideNotesForm(forms.ModelForm):
+    customer_notes = forms.CharField(widget=forms.Textarea(), required=False)
+
+    class Meta:
+        model = JoyRide
+        fields = ('customer_notes',)
 
 
 class AccountDriverInfoForm(forms.ModelForm):
