@@ -3,11 +3,13 @@
 {% block nav_reserve_class %}selected{% endblock %}
 
 {% block subpage_pane %}
+    {% comment %}
     <cfquery name="Vehicles" datasource="#DSN#">
         SELECT vehicleid,make,model,type,year,status FROM Vehicles
         WHERE status = 1
         ORDER BY weighting DESC
     </cfquery>
+    {% endcomment %}
 
     <form method="POST" name="reservation_form" id="reservation_form" action="{% url "customer_portal:joyride-reserve" %}" onsubmit="return false;" autocomplete="on">
     <cfoutput>
@@ -155,7 +157,7 @@
                 <td class="align-top">Notes/Requests</td>
                 <td>
                     {{ form.customer_notes }}
-                    <cftextarea name="notes" class="#StructKeyExists(fieldErrors,"notes") ? 'field-error' : ''#">#JoyPerf.notes#</cftextarea>
+{#                    <cftextarea name="notes" class="#StructKeyExists(fieldErrors,"notes") ? 'field-error' : ''#">#JoyPerf.notes#</cftextarea>#}
                 </td>
             </tr>
 

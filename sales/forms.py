@@ -378,13 +378,30 @@ class JoyRideDetailsForm(forms.ModelForm):
 
     num_passengers = forms.TypedChoiceField(coerce=lambda x: int(x), choices=get_numeric_choices(min_val=1, max_val=4))
     num_minors = forms.TypedChoiceField(coerce=lambda x: int(x), choices=get_numeric_choices(min_val=0, max_val=4))
-    requested_date = forms.DateField(widget=forms.DateInput(attrs={'placeholder': 'MM/DD/YYYY', 'class': 'short'}))
-    backup_date = forms.DateField(widget=forms.DateInput(attrs={'placeholder': 'MM/DD/YYYY', 'class': 'short'}))
+    requested_date = forms.DateField(widget=forms.DateInput(
+        attrs={'placeholder': 'MM/DD/YYYY', 'class': 'short'}),
+        error_messages={'required': 'Please specify your preferred date for the event.'},
+    )
+    backup_date = forms.DateField(widget=forms.DateInput(
+        attrs={'placeholder': 'MM/DD/YYYY', 'class': 'short'}),
+        error_messages={'required': 'Please provide an alternate date for the event.'},
+    )
     email = forms.EmailField()
     big_and_tall = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
     coupon_code = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': '(Optional)'}))
 
-    # TODO: Add clean_* methods for requested_date and backup_date, etc
+    def clean_requested_date(self):
+        if self.cleaned_data['requested_date'] < timezone.now().date():
+            raise forms.ValidationError(_("You've specified a date in the past."))
+        return self.cleaned_data['requested_date']
+
+    def clean_backup_date(self):
+        self.clean_requested_date()
+        if self.cleaned_data['backup_date'] < timezone.now().date():
+            raise forms.ValidationError(_("You've specified a date in the past."))
+        if self.cleaned_data['backup_date'] == self.cleaned_data['requested_date']:
+            raise forms.ValidationError(_("Alternate date can't be the same as the requested date."))
+        return self.cleaned_data['backup_date']
 
     def clean(self):
         print('cleaned:')
@@ -393,6 +410,14 @@ class JoyRideDetailsForm(forms.ModelForm):
             self.customer = Customer.objects.get(user__email=self.cleaned_data['email'])
         except (Customer.DoesNotExist, KeyError):
             pass
+
+        if not any((
+                self.cleaned_data['vehicle_choice_1'],
+                self.cleaned_data['vehicle_choice_2'],
+                self.cleaned_data['vehicle_choice_3'],
+        )):
+            raise forms.ValidationError(_("Please select at least one and up to three vehicles for your event."))
+
         return super().clean()
 
     @property

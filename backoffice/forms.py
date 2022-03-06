@@ -284,6 +284,7 @@ class EmployeeForm(forms.ModelForm):
         email = self.cleaned_data['email']
         if User.objects.filter(email=email).exclude(pk=self.instance.user.id).exists():
             raise forms.ValidationError(f'A user with email {email} already exists.')
+        return email
 
     class Meta:
         model = Employee
@@ -367,6 +368,7 @@ class CustomerForm(CSSClassMixin, forms.ModelForm):
         email = self.cleaned_data['email']
         if User.objects.filter(email=email).exclude(pk=self.instance.user.id).exists():
             raise forms.ValidationError(f'A user with email {email} already exists.')
+        return email
 
     class Meta:
         model = Customer
