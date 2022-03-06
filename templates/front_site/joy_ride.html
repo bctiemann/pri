@@ -105,17 +105,19 @@
         <img src="{% static "images/joyride.png" %}" />
     </div>
 
-    <form method="POST" name="reservation_form" id="reservation_form" action="perfexp.cfm" onsubmit="return false;" autocomplete="on">
+    <form method="POST" name="reservation_form" id="reservation_form" action="{% url "joy-ride" %}" onsubmit="return false;" autocomplete="on">
     <cfoutput>
 
     <div class="reservation-form-sidebar">
 
+    {% if form.errors %}
     <cfif Len(formError) GT 0>
     <div class="exception" id="reservation_form_error">
         <h3>An error occurred</h3>
         <p class="alert-message">#formError#</p>
     </div>
     </cfif>
+    {% endif %}
 
     <div id="reservation_identity">
 
@@ -295,7 +297,7 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
 
     </div>
 
-    <div class="exception hidden" id="reservation_identity_error">
+    <div class="exception hidden" id="reservation_details_error">
         <h3>An error occurred</h3>
         <p class="alert-message"></p>
     </div>

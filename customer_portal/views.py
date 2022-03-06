@@ -20,7 +20,9 @@ class SidebarMixin:
         context['upcoming_reservations'] = self.request.user.customer.basereservation_set.filter(out_at__gt=now())
         context['past_rentals'] = Rental.objects.filter(customer=self.request.user.customer, out_at__lt=now(), status=Rental.Status.COMPLETE)
         context['upcoming_joy_rides'] = self.request.user.customer.joyride_set.filter(requested_date__gt=now())
+        context['past_joy_rides'] = self.request.user.customer.joyride_set.filter(requested_date__lt=now(), status=GuidedDrive.Status.COMPLETE)
         context['upcoming_performance_experiences'] = self.request.user.customer.performanceexperience_set.filter(requested_date__gt=now())
+        context['past_performance_experiences'] = self.request.user.customer.performanceexperience_set.filter(requested_date__lt=now(), status=GuidedDrive.Status.COMPLETE)
         context['selected_page'] = getattr(self, 'selected_page', None)
         return context
 
