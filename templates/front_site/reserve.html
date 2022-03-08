@@ -675,6 +675,8 @@
 <p>An email has been sent to you containing a link to follow to receive your new password. Afterwards, please return here to continue with your reservation.</p>
 </div>
 
+{% include "global_includes/delivery_pricing.html" %}
+{% comment %}
 <div id="delivery_pricing" style="display: none;">
     <p>We deliver our vehicles to most locations within the New York City tri-state area. Delivery rates are as follows:</p>
     <table class="small-item-data delivery-pricing" style="margin-left: 0px;">
@@ -721,6 +723,7 @@ standing regulations. In such case we may pick you up and transport you to a sui
 familiarization process and any required paperwork.
     </p>
 </div>
+{% endcomment %}
 
 {% endblock %}
 </section>

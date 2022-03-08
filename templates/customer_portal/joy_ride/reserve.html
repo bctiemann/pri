@@ -132,7 +132,7 @@
                 <td>
                     {{ form.backup_date }}
                     <cfinput name="bupdate" value="#JoyPerf.bupdate#" style="width: 120px;" placeholder="MM/DD/YYYY" class="#StructKeyExists(fieldErrors,"bupdate") ? 'field-error' : ''#" />
-                    <small class="tooltip" title="We'll do our best to accommodate your first choice of date, but please pick an alternate just in case."><span class="ui-icon ui-icon-info"></span></small>
+                    <small class="tooltip" title="{{ form.backup_date.help_text }}"><span class="ui-icon ui-icon-info"></span></small>
                 </td>
             </tr>
             <tr>
@@ -143,7 +143,7 @@
                         <option value="0" <cfif JoyPerf.bigtall IS 0>selected</cfif>>No</option>
                         <option value="1" <cfif JoyPerf.bigtall IS 1>selected</cfif>>Yes</option>
                     </cfselect>
-                    <small class="tooltip" title="If anyone in your party is especially big or tall, please let us know so we can make sure everyone is comfortable."><span class="ui-icon ui-icon-info"></span></small>
+                    <small class="tooltip" title="{{ form.big_and_tall.help_text }}"><span class="ui-icon ui-icon-info"></span></small>
                 </td>
             </tr>
             <tr>
@@ -259,6 +259,8 @@
     <cfinput name="customerid" type="hidden" value="" />
     </form>
 
+    {% include "global_includes/vehicle_picker.html" %}
+    {% comment %}
     <div class="dialog vehicle-picker" id="dialog_pick_vehicles" title="Choose Up to Three Vehicles">
         {% for vehicle in ready_vehicles %}
         <cfoutput query="Vehicles">
@@ -273,4 +275,5 @@
         </cfoutput>
         {% endfor %}
     </div>
+    {% endcomment %}
 {% endblock %}

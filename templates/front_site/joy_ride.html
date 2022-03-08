@@ -241,7 +241,7 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
                 <td>
                     {{ form.backup_date }}
                     <cfinput name="bupdate" value="#JoyPerf.bupdate#" style="width: 120px;" placeholder="MM/DD/YYYY" class="#StructKeyExists(fieldErrors,"bupdate") ? 'field-error' : ''#" />
-                    <small class="tooltip" title="We'll do our best to accommodate your first choice of date, but please pick an alternate just in case."><span class="ui-icon ui-icon-info"></span></small>
+                    <small class="tooltip" title="{{ form.backup_date.help_text }}"><span class="ui-icon ui-icon-info"></span></small>
                 </td>
             </tr>
             <tr>
@@ -266,7 +266,7 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
                         <option value="0" <cfif JoyPerf.bigtall IS 0>selected</cfif>>No</option>
                         <option value="1" <cfif JoyPerf.bigtall IS 1>selected</cfif>>Yes</option>
                     </cfselect>
-                    <small class="tooltip" title="If anyone in your party is especially big or tall, please let us know so we can make sure everyone is comfortable."><span class="ui-icon ui-icon-info"></span></small>
+                    <small class="tooltip" title="{{ form.big_and_tall.help_text }}"><span class="ui-icon ui-icon-info"></span></small>
                 </td>
             </tr>
             <tr>
@@ -523,6 +523,8 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
 </div>
 </div>
 
+{% include "global_includes/vehicle_picker.html" %}
+{% comment %}
 <div class="dialog vehicle-picker" id="dialog_pick_vehicles" title="Choose Up to Three Vehicles">
     {% for vehicle in ready_vehicles %}
         <div
@@ -535,6 +537,7 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
         </div>
     {% endfor %}
 </div>
+{% endcomment %}
 
 {% endblock %}
 </section>
@@ -557,6 +560,8 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
 <p>An email has been sent to you containing a link to follow to receive your new password. Afterwards, please return here to continue with your reservation.</p>
 </div>
 
+{% include "global_includes/delivery_pricing.html" %}
+{% comment %}
 <div id="delivery_pricing" style="display: none;">
     <p>We deliver our vehicles to most locations within the New York City tri-state area. Delivery rates are as follows:</p>
     <table class="small-item-data delivery-pricing" style="margin-left: 0px;">
@@ -603,6 +608,7 @@ standing regulations. In such case we may pick you up and transport you to a sui
 familiarization process and any required paperwork.
     </p>
 </div>
+{% endcomment %}
 
     <div class="push"></div>
 </div>

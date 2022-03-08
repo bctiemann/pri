@@ -1,0 +1,12 @@
+<div class="dialog vehicle-picker" id="dialog_pick_vehicles" title="Choose Up to Three Vehicles">
+    {% for vehicle in ready_vehicles %}
+        <div
+            class="vehicle-picker-pick"
+            vehicleid="{{ vehicle.id }}"
+            type="{{ vehicle.vehicle_type_casual }}"
+        >
+            <img src="{{ vehicle.thumbnail_image.url }}" />
+            <span class="offer-title overlay-text bottom">{{ vehicle.make }} {{ vehicle.model }}</span>
+        </div>
+    {% endfor %}
+</div>

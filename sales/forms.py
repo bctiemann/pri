@@ -399,9 +399,14 @@ class JoyRideDetailsForm(forms.ModelForm):
     backup_date = forms.DateField(widget=forms.DateInput(
         attrs={'placeholder': 'MM/DD/YYYY', 'class': 'short'}),
         error_messages={'required': 'Please provide an alternate date for the event.'},
+        help_text='We\'ll do our best to accommodate your first choice of date, but please pick an alternate just in case.'
     )
     email = forms.EmailField()
-    big_and_tall = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES)
+    big_and_tall = forms.TypedChoiceField(
+        coerce=lambda x: x == 'True', initial=False,
+        choices=TRUE_FALSE_CHOICES,
+        help_text='If anyone in your party is especially big or tall, please let us know so we can make sure everyone is comfortable.',
+    )
     coupon_code = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': '(Optional)'}))
 
     def clean_requested_date(self):
