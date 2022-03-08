@@ -398,7 +398,10 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
         <table class="inputform payment">
             <tr>
                 <td>First Name</td>
-                <td><cfinput name="fname" value="#JoyPerf.fname#" maxlength="255" class="#StructKeyExists(fieldErrors,"fname") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ payment_form.first_name }}
+                    <cfinput name="fname" value="#JoyPerf.fname#" maxlength="255" class="#StructKeyExists(fieldErrors,"fname") ? 'field-error' : ''#" />
+                </td>
             </tr>
             <tr>
                 <td>Last Name</td>

@@ -21,6 +21,86 @@ from sales.enums import get_service_hours, TRUE_FALSE_CHOICES, get_exp_year_choi
 current_year = timezone.now().year
 
 
+# Reusable mixin for collecting all customer and payment data for the 2nd-phase form, used in reservations, joy rides,
+# performance experiences
+class PaymentFormMixin(forms.Form):
+
+    error_messages = {
+        'password_mismatch': _('The two password fields didn’t match.'),
+    }
+
+    # TODO: Add these fields and let this be a Reservation form to avoid confusion
+    customer_fields = (
+        'first_name', 'last_name', 'mobile_phone', 'home_phone', 'work_phone', 'fax', 'cc_number', 'cc_exp_yr',
+        'cc_exp_mo', 'cc_cvv', 'cc_phone', 'address_line_1', 'address_line_2', 'city', 'state', 'zip'
+    )
+    first_name = forms.CharField()
+    last_name = forms.CharField()
+    mobile_phone = PhoneNumberField(required=False)
+    work_phone = PhoneNumberField(required=False)
+    home_phone = PhoneNumberField(required=False)
+    fax = PhoneNumberField(required=False)
+    address_line_1 = forms.CharField()
+    address_line_2 = forms.CharField(required=False)
+    city = forms.CharField()
+    state = USStateField(widget=USStateSelect())
+    zip = USZipCodeField()
+
+    password_new = forms.CharField(widget=forms.PasswordInput())
+    password_repeat = forms.CharField(widget=forms.PasswordInput())
+
+    # EXP_MONTH_CHOICES = (
+    #     ('01', 'January (01)'),
+    #     ('02', 'February (02)'),
+    #     ('03', 'March (03)'),
+    #     ('04', 'April (04)'),
+    #     ('05', 'May (05)'),
+    #     ('06', 'June (06)'),
+    #     ('07', 'July (07)'),
+    #     ('08', 'August (08)'),
+    #     ('09', 'September (09)'),
+    #     ('10', 'October (10)'),
+    #     ('11', 'November (11)'),
+    #     ('12', 'December (12)'),
+    # )
+    # EXP_YEAR_CHOICES = ((year, year) for year in range(current_year, current_year + 11))
+
+    # first_name = forms.CharField()
+    # last_name = forms.CharField()
+    # mobile_phone = PhoneNumberField()
+    # home_phone = PhoneNumberField()
+    # work_phone = PhoneNumberField()
+    # fax = PhoneNumberField()
+    cc_number = forms.CharField()
+    cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices())
+    cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices())
+    cc_cvv = forms.CharField()
+    cc_phone = PhoneNumberField()
+    # password = forms.CharField(widget=forms.PasswordInput(), required=False)
+
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+        # current_year = timezone.now().year
+        # self.fields['cc_exp_yr'].choices = get_exp_year_choices()
+        # self.fields['extra_miles'].choices = ((k, v['label']) for k, v in settings.EXTRA_MILES_PRICES.items())
+
+    # class Meta:
+    #     model = Customer
+    #     fields = '__all__'
+
+    def clean_password_repeat(self):
+        password1 = self.cleaned_data.get('password_new')
+        password2 = self.cleaned_data.get('password_repeat')
+        if password1 and password2:
+            if password1 != password2:
+                raise forms.ValidationError(
+                    self.error_messages['password_mismatch'],
+                    code='password_mismatch',
+                )
+        password_validation.validate_password(password2, user=None)
+        return password2
+
+
 # Rental forms
 
 # 1st phase: Rental Details
@@ -284,82 +364,8 @@ class ReservationRentalDetailsForm(forms.ModelForm):
 
 
 # 2nd-phase form; extends ReservationRentalDetailsForm with Customer fields so it inherits all the first form's validations
-class ReservationRentalPaymentForm(ReservationRentalDetailsForm):
-
-    error_messages = {
-        'password_mismatch': _('The two password fields didn’t match.'),
-    }
-
-    # TODO: Add these fields and let this be a Reservation form to avoid confusion
-    customer_fields = (
-        'first_name', 'last_name', 'mobile_phone', 'home_phone', 'work_phone', 'fax', 'cc_number', 'cc_exp_yr',
-        'cc_exp_mo', 'cc_cvv', 'cc_phone', 'address_line_1', 'address_line_2', 'city', 'state', 'zip'
-    )
-    first_name = forms.CharField()
-    last_name = forms.CharField()
-    mobile_phone = PhoneNumberField(required=False)
-    work_phone = PhoneNumberField(required=False)
-    home_phone = PhoneNumberField(required=False)
-    fax = PhoneNumberField(required=False)
-    address_line_1 = forms.CharField()
-    address_line_2 = forms.CharField(required=False)
-    city = forms.CharField()
-    state = USStateField(widget=USStateSelect())
-    zip = USZipCodeField()
-
-    password_new = forms.CharField(widget=forms.PasswordInput())
-    password_repeat = forms.CharField(widget=forms.PasswordInput())
-
-    # EXP_MONTH_CHOICES = (
-    #     ('01', 'January (01)'),
-    #     ('02', 'February (02)'),
-    #     ('03', 'March (03)'),
-    #     ('04', 'April (04)'),
-    #     ('05', 'May (05)'),
-    #     ('06', 'June (06)'),
-    #     ('07', 'July (07)'),
-    #     ('08', 'August (08)'),
-    #     ('09', 'September (09)'),
-    #     ('10', 'October (10)'),
-    #     ('11', 'November (11)'),
-    #     ('12', 'December (12)'),
-    # )
-    # EXP_YEAR_CHOICES = ((year, year) for year in range(current_year, current_year + 11))
-
-    # first_name = forms.CharField()
-    # last_name = forms.CharField()
-    # mobile_phone = PhoneNumberField()
-    # home_phone = PhoneNumberField()
-    # work_phone = PhoneNumberField()
-    # fax = PhoneNumberField()
-    cc_number = forms.CharField()
-    cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices())
-    cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices())
-    cc_cvv = forms.CharField()
-    cc_phone = PhoneNumberField()
-    # password = forms.CharField(widget=forms.PasswordInput(), required=False)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # current_year = timezone.now().year
-        # self.fields['cc_exp_yr'].choices = get_exp_year_choices()
-        # self.fields['extra_miles'].choices = ((k, v['label']) for k, v in settings.EXTRA_MILES_PRICES.items())
-
-    # class Meta:
-    #     model = Customer
-    #     fields = '__all__'
-
-    def clean_password_repeat(self):
-        password1 = self.cleaned_data.get('password_new')
-        password2 = self.cleaned_data.get('password_repeat')
-        if password1 and password2:
-            if password1 != password2:
-                raise forms.ValidationError(
-                    self.error_messages['password_mismatch'],
-                    code='password_mismatch',
-                )
-        password_validation.validate_password(password2, user=None)
-        return password2
+class ReservationRentalPaymentForm(PaymentFormMixin, ReservationRentalDetailsForm):
+    pass
 
 
 # If the customer already exists, this form will be shown and processed instead of ReservationRentalPaymentForm
@@ -444,31 +450,33 @@ class JoyRideDetailsForm(forms.ModelForm):
         exclude = ('confirmation_code', 'status',)
 
 
-class JoyRidePaymentForm(JoyRideDetailsForm):
-    customer_fields = (
-        'first_name', 'last_name', 'mobile_phone', 'home_phone', 'work_phone', 'fax', 'cc_number', 'cc_exp_yr',
-        'cc_exp_mo', 'cc_cvv', 'cc_phone', 'address_line_1', 'address_line_2', 'city', 'state', 'zip'
-    )
-    first_name = forms.CharField()
-    last_name = forms.CharField()
-    mobile_phone = PhoneNumberField(required=False)
-    work_phone = PhoneNumberField(required=False)
-    home_phone = PhoneNumberField(required=False)
-    fax = PhoneNumberField(required=False)
-    address_line_1 = forms.CharField()
-    address_line_2 = forms.CharField(required=False)
-    city = forms.CharField()
-    state = USStateField(widget=USStateSelect())
-    zip = USZipCodeField()
+class JoyRidePaymentForm(PaymentFormMixin, JoyRideDetailsForm):
+    pass
 
-    password_new = forms.CharField(widget=forms.PasswordInput())
-    password_repeat = forms.CharField(widget=forms.PasswordInput())
-
-    cc_number = forms.CharField()
-    cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices())
-    cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices())
-    cc_cvv = forms.CharField()
-    cc_phone = PhoneNumberField()
+    # customer_fields = (
+    #     'first_name', 'last_name', 'mobile_phone', 'home_phone', 'work_phone', 'fax', 'cc_number', 'cc_exp_yr',
+    #     'cc_exp_mo', 'cc_cvv', 'cc_phone', 'address_line_1', 'address_line_2', 'city', 'state', 'zip'
+    # )
+    # first_name = forms.CharField()
+    # last_name = forms.CharField()
+    # mobile_phone = PhoneNumberField(required=False)
+    # work_phone = PhoneNumberField(required=False)
+    # home_phone = PhoneNumberField(required=False)
+    # fax = PhoneNumberField(required=False)
+    # address_line_1 = forms.CharField()
+    # address_line_2 = forms.CharField(required=False)
+    # city = forms.CharField()
+    # state = USStateField(widget=USStateSelect())
+    # zip = USZipCodeField()
+    #
+    # password_new = forms.CharField(widget=forms.PasswordInput())
+    # password_repeat = forms.CharField(widget=forms.PasswordInput())
+    #
+    # cc_number = forms.CharField()
+    # cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices())
+    # cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices())
+    # cc_cvv = forms.CharField()
+    # cc_phone = PhoneNumberField()
 
     # class Meta:
     #     model = Customer
