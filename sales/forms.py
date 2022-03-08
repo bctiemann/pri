@@ -410,11 +410,8 @@ class JoyRideDetailsForm(forms.ModelForm):
         return self.cleaned_data['requested_date']
 
     def clean_backup_date(self):
-        self.clean_requested_date()
         if self.cleaned_data['backup_date'] < timezone.now().date():
             raise forms.ValidationError(_("You've specified a date in the past."))
-        if self.cleaned_data['backup_date'] == self.cleaned_data['requested_date']:
-            raise forms.ValidationError(_("Alternate date can't be the same as the requested date."))
         return self.cleaned_data['backup_date']
 
     def clean(self):
@@ -431,6 +428,9 @@ class JoyRideDetailsForm(forms.ModelForm):
                 self.cleaned_data['vehicle_choice_3'],
         )):
             raise forms.ValidationError(_("Please select at least one and up to three vehicles for your event."))
+
+        if self.cleaned_data.get('backup_date') == self.cleaned_data.get('requested_date'):
+            self.add_error('backup_date', forms.ValidationError(_("Alternate date can't be the same as the requested date.")))
 
         return super().clean()
 
