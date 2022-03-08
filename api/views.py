@@ -72,6 +72,11 @@ class GetVehicleView(APIView):
 # also to provide a consolidated post() method which creates a reservation of any type attached to the customer
 class ReservationMixin:
 
+    customer_fields = (
+        'first_name', 'last_name', 'mobile_phone', 'home_phone', 'work_phone', 'fax', 'cc_number', 'cc_exp_yr',
+        'cc_exp_mo', 'cc_cvv', 'cc_phone', 'address_line_1', 'address_line_2', 'city', 'state', 'zip'
+    )
+
     @staticmethod
     def _get_login_customer(request, form):
         if form.customer:
@@ -88,7 +93,7 @@ class ReservationMixin:
             # try to create a new user which will fail the uniqueness constraint. Alternatively, do a get_or_create
             # user = User.objects.create_user(form.cleaned_data['email'], password=generate_password())
             user = User.objects.create_user(form.cleaned_data['email'], password=form.cleaned_data['password_new'])
-            customer_kwargs = {key: form.cleaned_data.get(key) for key in form.customer_fields}
+            customer_kwargs = {key: form.cleaned_data.get(key) for key in self.customer_fields}
             customer = Customer.objects.create(
                 user=user,
                 **customer_kwargs,

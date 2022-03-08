@@ -21,6 +21,14 @@ from sales.enums import get_service_hours, TRUE_FALSE_CHOICES, get_exp_year_choi
 current_year = timezone.now().year
 
 
+class CardFormMixin(forms.Form):
+    cc_number = forms.CharField()
+    cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices())
+    cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices())
+    cc_cvv = forms.CharField()
+    cc_phone = PhoneNumberField()
+
+
 # Reusable mixin for collecting all customer and payment data for the 2nd-phase form, used in reservations, joy rides,
 # performance experiences
 class PaymentFormMixin(forms.Form):
@@ -30,10 +38,10 @@ class PaymentFormMixin(forms.Form):
     }
 
     # TODO: Add these fields and let this be a Reservation form to avoid confusion
-    customer_fields = (
-        'first_name', 'last_name', 'mobile_phone', 'home_phone', 'work_phone', 'fax', 'cc_number', 'cc_exp_yr',
-        'cc_exp_mo', 'cc_cvv', 'cc_phone', 'address_line_1', 'address_line_2', 'city', 'state', 'zip'
-    )
+    # customer_fields = (
+    #     'first_name', 'last_name', 'mobile_phone', 'home_phone', 'work_phone', 'fax', 'cc_number', 'cc_exp_yr',
+    #     'cc_exp_mo', 'cc_cvv', 'cc_phone', 'address_line_1', 'address_line_2', 'city', 'state', 'zip'
+    # )
     first_name = forms.CharField()
     last_name = forms.CharField()
     mobile_phone = PhoneNumberField(required=False)
@@ -71,11 +79,11 @@ class PaymentFormMixin(forms.Form):
     # home_phone = PhoneNumberField()
     # work_phone = PhoneNumberField()
     # fax = PhoneNumberField()
-    cc_number = forms.CharField()
-    cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices())
-    cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices())
-    cc_cvv = forms.CharField()
-    cc_phone = PhoneNumberField()
+    # cc_number = forms.CharField()
+    # cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices())
+    # cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices())
+    # cc_cvv = forms.CharField()
+    # cc_phone = PhoneNumberField()
     # password = forms.CharField(widget=forms.PasswordInput(), required=False)
 
     # def __init__(self, *args, **kwargs):
@@ -364,7 +372,7 @@ class ReservationRentalDetailsForm(forms.ModelForm):
 
 
 # 2nd-phase form; extends ReservationRentalDetailsForm with Customer fields so it inherits all the first form's validations
-class ReservationRentalPaymentForm(PaymentFormMixin, ReservationRentalDetailsForm):
+class ReservationRentalPaymentForm(PaymentFormMixin, CardFormMixin, ReservationRentalDetailsForm):
     pass
 
 
@@ -450,7 +458,7 @@ class JoyRideDetailsForm(forms.ModelForm):
         exclude = ('confirmation_code', 'status',)
 
 
-class JoyRidePaymentForm(PaymentFormMixin, JoyRideDetailsForm):
+class JoyRidePaymentForm(PaymentFormMixin, CardFormMixin, JoyRideDetailsForm):
     pass
 
     # customer_fields = (
