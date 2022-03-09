@@ -17,6 +17,7 @@ from sales.models import Reservation, Coupon, PerformanceExperience, JoyRide
 from users.models import Customer
 from sales.calculators import RentalPriceCalculator, PerformanceExperiencePriceCalculator, JoyRidePriceCalculator
 from sales.enums import get_service_hours, TRUE_FALSE_CHOICES, get_exp_year_choices, get_exp_month_choices, get_numeric_choices
+from backoffice.forms import CSSClassMixin
 
 current_year = timezone.now().year
 
@@ -31,11 +32,14 @@ class CardFormMixin(forms.Form):
 
 # Reusable mixin for collecting all customer and payment data for the 2nd-phase form, used in reservations, joy rides,
 # performance experiences
-class PaymentFormMixin(forms.Form):
+class PaymentFormMixin(CSSClassMixin, forms.Form):
 
     error_messages = {
         'password_mismatch': _('The two password fields didn’t match.'),
     }
+
+    cc_fields = ('cc_number',)
+    phone_fields = ('mobile_phone', 'work_phone', 'home_phone', 'fax',)
 
     # TODO: Add these fields and let this be a Reservation form to avoid confusion
     # customer_fields = (
@@ -95,6 +99,13 @@ class PaymentFormMixin(forms.Form):
     # class Meta:
     #     model = Customer
     #     fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.cc_fields:
+            self.add_widget_css_class(field, 'cc-field')
+        for field in self.phone_fields:
+            self.add_widget_css_class(field, 'phone')
 
     def clean_password_repeat(self):
         password1 = self.cleaned_data.get('password_new')

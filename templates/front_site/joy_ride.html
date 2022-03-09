@@ -405,11 +405,17 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
             </tr>
             <tr>
                 <td>Last Name</td>
-                <td><cfinput name="lname" value="#JoyPerf.lname#" maxlength="255" class="#StructKeyExists(fieldErrors,"lname") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ payment_form.last_name }}
+                    <cfinput name="lname" value="#JoyPerf.lname#" maxlength="255" class="#StructKeyExists(fieldErrors,"lname") ? 'field-error' : ''#" />
+                </td>
             </tr>
             <tr>
                 <td>Mobile Phone</td>
-                <td><cfinput name="mphone" value="#JoyPerf.mphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"mphone") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ payment_form.mobile_phone }}
+                    <cfinput name="mphone" value="#JoyPerf.mphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"mphone") ? 'field-error' : ''#" />
+                </td>
             </tr>
             <tr>
                 <td>Home Phone</td>
@@ -539,7 +545,16 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
 </div>
 {% endcomment %}
 
+<div class="dialog" id="dialog_reset_password" title="Reset Password">
+    <p>We will send you an email with a link to click on to receive your new password.</p>
+</div>
+
+<div class="dialog" id="dialog_reset_password_done" title="Reset Password">
+    <p>An email has been sent to you containing a link to follow to receive your new password. Afterwards, please return here to continue with your reservation.</p>
+</div>
+
 {% endblock %}
+{% comment %}
 </section>
 
 
@@ -561,7 +576,6 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
 </div>
 
 {% include "global_includes/delivery_pricing.html" %}
-{% comment %}
 <div id="delivery_pricing" style="display: none;">
     <p>We deliver our vehicles to most locations within the New York City tri-state area. Delivery rates are as follows:</p>
     <table class="small-item-data delivery-pricing" style="margin-left: 0px;">
@@ -608,9 +622,9 @@ standing regulations. In such case we may pick you up and transport you to a sui
 familiarization process and any required paperwork.
     </p>
 </div>
-{% endcomment %}
 
     <div class="push"></div>
 </div>
 
 <CFINCLUDE TEMPLATE="inc_footer.cfm">
+{% endcomment %}

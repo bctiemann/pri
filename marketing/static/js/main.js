@@ -312,9 +312,9 @@ $('document').ready(function() {
     });
 
     // Credit card input processing
-    $('input#ccnum').payment('formatCardNumber');
-    $('input#cccvv').payment('formatCardCVC');
-    $('input#ccnum').trigger($.Event( 'keyup', {which:$.ui.keyCode.SPACE, keyCode:$.ui.keyCode.SPACE}));
+    $('input#id_cc_number').payment('formatCardNumber');
+    $('input#id_cc_cvv').payment('formatCardCVC');
+    $('input#id_cc_number').trigger($.Event( 'keyup', {which:$.ui.keyCode.SPACE, keyCode:$.ui.keyCode.SPACE}));
 
     $('.reserve-rental-details-btn').click(function() {
         reserveValidateForm('rental', 'details');
