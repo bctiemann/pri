@@ -39,7 +39,7 @@ class PaymentFormMixin(CSSClassMixin, forms.Form):
     }
 
     cc_fields = ('cc_number',)
-    phone_fields = ('mobile_phone', 'work_phone', 'home_phone', 'fax',)
+    phone_fields = ('mobile_phone', 'work_phone', 'home_phone', 'fax', 'cc_phone',)
 
     # TODO: Add these fields and let this be a Reservation form to avoid confusion
     # customer_fields = (

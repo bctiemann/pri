@@ -385,7 +385,7 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
         <p class="alert-message"></p>
     </div>
 
-    <div id="reservation_payment" <cfif NOT IsDefined("IdentityResult") OR (IsDefined("IdentityResult") AND NOT IdentityResult.success) OR (IsDefined("LoginResult") AND NOT LoginResult.success)>class="hidden"</cfif>>
+    <div id="reservation_payment" {# <cfif NOT IsDefined("IdentityResult") OR (IsDefined("IdentityResult") AND NOT IdentityResult.success) OR (IsDefined("LoginResult") AND NOT LoginResult.success)> #}class="hidden"{# </cfif> #}>
 
         <p class="reservation-info">
         We'll need a credit card to secure your reservation. Once the reservation is confirmed, you'll get access to the
@@ -419,23 +419,37 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
             </tr>
             <tr>
                 <td>Home Phone</td>
-                <td><cfinput name="hphone" value="#JoyPerf.hphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"hphone") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ payment_form.home_phone }}
+                    <cfinput name="hphone" value="#JoyPerf.hphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"hphone") ? 'field-error' : ''#" />
+                </td>
             </tr>
             <tr>
                 <td>Work Phone</td>
-                <td><cfinput name="wphone" value="#JoyPerf.wphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"wphone") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ payment_form.work_phone }}
+                    <cfinput name="wphone" value="#JoyPerf.wphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"wphone") ? 'field-error' : ''#" />
+                </td>
             </tr>
             <tr>
                 <td>Fax</td>
-                <td><cfinput name="fax" value="#JoyPerf.fax#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"fax") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ payment_form.fax }}
+                    <cfinput name="fax" value="#JoyPerf.fax#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"fax") ? 'field-error' : ''#" />
+                </td>
             </tr>
             <tr>
                 <td>Credit Card Number</td>
-                <td><cfinput name="ccnum" value="#JoyPerf.ccnum#" class="cc-field #StructKeyExists(fieldErrors,"ccnum") ? 'field-error' : ''#" autocomplete="cc-number"></td>
+                <td>
+                    {{ payment_form.cc_number }}
+                    <cfinput name="ccnum" value="#JoyPerf.ccnum#" class="cc-field #StructKeyExists(fieldErrors,"ccnum") ? 'field-error' : ''#" autocomplete="cc-number">
+                </td>
             </tr>
             <tr>
                 <td>Credit Card Expiration</td>
                 <td>
+                    {{ payment_form.cc_exp_mo }} / {{ payment_form.cc_exp_yr }}
+                    {% comment %}
                     <cfselect name="ccexpmo" class="#StructKeyExists(fieldErrors,"ccexpmo") ? 'field-error' : ''#">
                         <option value="01" <cfif JoyPerf.ccexpmo IS "01">selected</cfif>>January (01)</option>
                         <option value="02" <cfif JoyPerf.ccexpmo IS "02">selected</cfif>>February (02)</option>
@@ -465,30 +479,49 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
                         </cfloop>
                         </cfoutput>
                     </cfselect>
+                    {% endcomment %}
                 </td>
             </tr>
             <tr>
                 <td>CVV</td>
-                <td><cfinput name="cccvv" value="#JoyPerf.cccvv#" style="width: 70px;" class="#StructKeyExists(fieldErrors,"cccvv") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ payment_form.cc_cvv }}
+                    <cfinput name="cccvv" value="#JoyPerf.cccvv#" style="width: 70px;" class="#StructKeyExists(fieldErrors,"cccvv") ? 'field-error' : ''#" />
+                </td>
             </tr>
             <tr>
                 <td>Credit Card Bank Phone</td>
                 <td>
+                    {{ payment_form.cc_phone }}
                     <cfinput name="cctel" value="#JoyPerf.cctel#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"cctel") ? 'field-error' : ''#" />
                     <small class="tooltip" title="We need the customer service contact phone number shown on the back of your card so that we can verify the card if necessary, and to refund the security deposit after the rental is over.">Why do we need this?</small>
                 </td>
             </tr>
             <tr>
-                <td class="align-top">Street Address</td>
-                <td><cftextarea name="addr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#JoyPerf.addr#</cftextarea></td>
+                <td>Street Address Line 1</td>
+                <td>
+                    {{ payment_form.address_line_1 }}
+{#                    <cftextarea name="addr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#JoyPerf.addr#</cftextarea>#}
+                </td>
+            </tr>
+            <tr>
+                <td>Street Address Line 2</td>
+                <td>
+                    {{ payment_form.address_line_2 }}
+{#                    <cftextarea name="addr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#JoyPerf.addr#</cftextarea>#}
+                </td>
             </tr>
             <tr>
                 <td>City</td>
-                <td><cfinput name="city" value="#JoyPerf.city#" maxlength="150" class="#StructKeyExists(fieldErrors,"city") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ payment_form.city }}
+                    <cfinput name="city" value="#JoyPerf.city#" maxlength="150" class="#StructKeyExists(fieldErrors,"city") ? 'field-error' : ''#" />
+                </td>
             </tr>
             <tr>
                 <td class="label">State</td>
                 <td>
+                    {{ payment_form.state }}
                     <cfselect name="state" data-stripe="address_state" class="#StructKeyExists(fieldErrors,"state") ? 'field-error' : ''#">
                     <CFLOOP ARRAY="#states#" INDEX="state">
                         <CFOUTPUT><option value="#state.abbr#" <cfif JoyPerf.state IS "#state.abbr#">selected</cfif>>#state.name#</option></CFOUTPUT>
@@ -498,13 +531,35 @@ You'll also receive professional photos and video footage of your Joy Ride<sup>S
             </tr>
             <tr>
                 <td class="label">ZIP</td>
-                <td><cfinput name="zip" value="#JoyPerf.zip#" style="width: 100px;" maxlength="10" class="#StructKeyExists(fieldErrors,"zip") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ payment_form.zip }}
+                    <cfinput name="zip" value="#JoyPerf.zip#" style="width: 100px;" maxlength="10" class="#StructKeyExists(fieldErrors,"zip") ? 'field-error' : ''#" />
+                </td>
+            </tr>
+
+            <tr>
+                <td class="label"></td>
+                <td>
+                    Please choose a password.
+                </td>
+            </tr>
+            <tr>
+                <td class="label">Password</td>
+                <td>
+                    {{ payment_form.password_new }}
+                </td>
+            </tr>
+            <tr>
+                <td class="label">Password (repeat)</td>
+                <td>
+                    {{ payment_form.password_repeat }}
+                </td>
             </tr>
 
             <tr class="buttons">
                 <td></td>
                 <td>
-                    <button type="submit" name="payment_btn" class="btn reserve-joyperf-complete-btn">Complete Reservation</button>
+                    <button type="submit" name="payment_btn" class="btn reserve-joyride-complete-btn">Complete Reservation</button>
                     <div class="spinner next-form-spinner payment-spinner"></div>
                 </td>
             </tr>

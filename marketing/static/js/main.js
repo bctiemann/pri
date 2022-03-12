@@ -340,8 +340,11 @@ $('document').ready(function() {
     $('.reserve-rental-complete-btn').click(function() {
         reserveValidateForm('rental', 'payment');
     });
-    $('.reserve-joyperf-complete-btn').click(function() {
-        reserveValidateForm('validateJoyPerfPayment', 'payment');
+    $('.reserve-joyride-complete-btn').click(function() {
+        reserveValidateForm('joyride', 'payment');
+    });
+    $('.reserve-perfexp-complete-btn').click(function() {
+        reserveValidateForm('perfexp', 'payment');
     });
     $('.reserve-gift-complete-btn').click(function() {
         reserveValidateForm('buyGiftCert', 'payment');
