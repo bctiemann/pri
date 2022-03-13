@@ -3,6 +3,7 @@ from django.http import Http404
 
 from sales.forms import (
     ReservationRentalDetailsForm, ReservationRentalPaymentForm, ReservationRentalLoginForm,
+    PerformanceExperienceDetailsForm, PerformanceExperiencePaymentForm, PerformanceExperienceLoginForm,
     JoyRideDetailsForm, JoyRidePaymentForm, JoyRideLoginForm,
 )
 from marketing.views import NavMenuMixin
@@ -96,8 +97,11 @@ class ReserveView(NavMenuMixin, PaymentLoginFormMixin, FormView):
         return context
 
 
-class PerformanceExperienceView(NavMenuMixin, TemplateView):
+class PerformanceExperienceView(NavMenuMixin, PaymentLoginFormMixin, FormView):
     template_name = 'front_site/performance_experience.html'
+    form_class = PerformanceExperienceDetailsForm
+    payment_form_class = PerformanceExperiencePaymentForm
+    login_form_class = PerformanceExperienceLoginForm
 
     def get_context_data(self, slug=None, **kwargs):
         context = super().get_context_data(**kwargs)

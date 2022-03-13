@@ -395,14 +395,14 @@ class ReservationRentalLoginForm(ReservationRentalDetailsForm):
 
 # Joy Ride
 
-class JoyRideDetailsForm(forms.ModelForm):
+class GuidedDriveBaseDetailsForm(forms.Form):
 
     error_css_class = 'field-error'
     discount = None
     customer = None
 
     num_passengers = forms.TypedChoiceField(coerce=lambda x: int(x), choices=get_numeric_choices(min_val=1, max_val=4))
-    num_minors = forms.TypedChoiceField(coerce=lambda x: int(x), choices=get_numeric_choices(min_val=0, max_val=4))
+    # num_minors = forms.TypedChoiceField(coerce=lambda x: int(x), choices=get_numeric_choices(min_val=0, max_val=4))
     requested_date = forms.DateField(widget=forms.DateInput(
         attrs={'placeholder': 'MM/DD/YYYY', 'class': 'short'}),
         error_messages={'required': 'Please specify your preferred date for the event.'},
@@ -469,6 +469,11 @@ class JoyRideDetailsForm(forms.ModelForm):
         )
         return price_calculator.get_price_data()
 
+
+class JoyRideDetailsForm(GuidedDriveBaseDetailsForm, forms.ModelForm):
+
+    num_minors = forms.TypedChoiceField(coerce=lambda x: int(x), choices=get_numeric_choices(min_val=0, max_val=4))
+
     class Meta:
         model = JoyRide
         exclude = ('confirmation_code', 'status',)
@@ -508,5 +513,59 @@ class JoyRidePaymentForm(PaymentFormMixin, CardFormMixin, JoyRideDetailsForm):
 
 
 class JoyRideLoginForm(JoyRideDetailsForm):
+
+    password = forms.CharField(widget=forms.PasswordInput(), required=False)
+
+
+# Performance Experience
+
+class PerformanceExperienceDetailsForm(GuidedDriveBaseDetailsForm, forms.ModelForm):
+
+    DRIVERS_CHOICES = (
+        (1, '1'),
+        (2, '2'),
+        (3, '3'),
+        (4, '4'),
+        (5, 'More than 4 (will call)'),
+    )
+
+    PASSENGERS_CHOICES = (
+        (0, '0'),
+        (1, '1'),
+        (2, '2'),
+        (3, '3'),
+        (4, '4'),
+        (5, 'More than 4 (will call)'),
+    )
+
+    num_drivers = forms.TypedChoiceField(coerce=lambda x: int(x), choices=DRIVERS_CHOICES)
+    num_passengers = forms.TypedChoiceField(coerce=lambda x: int(x), choices=PASSENGERS_CHOICES)
+
+    @property
+    def price_data(self):
+        price_calculator = PerformanceExperiencePriceCalculator(
+            # vehicle_marketing=self.cleaned_data['vehicle_marketing'],
+            # num_days=self.num_days,
+            # extra_miles=self.cleaned_data['extra_miles'],
+            num_drivers=self.cleaned_data.get('num_drivers'),
+            num_passengers=self.cleaned_data.get('num_passengers'),
+            coupon_code=self.cleaned_data.get('coupon_code'),
+            email=self.cleaned_data.get('email'),
+            tax_zip=self.tax_zip,
+            effective_date=self.cleaned_data.get('out_date'),
+            is_military=self.cleaned_data.get('is_military'),
+        )
+        return price_calculator.get_price_data()
+
+    class Meta:
+        model = PerformanceExperience
+        exclude = ('confirmation_code', 'status',)
+
+
+class PerformanceExperiencePaymentForm(PaymentFormMixin, CardFormMixin, PerformanceExperienceDetailsForm):
+    pass
+
+
+class PerformanceExperienceLoginForm(PerformanceExperienceDetailsForm):
 
     password = forms.CharField(widget=forms.PasswordInput(), required=False)

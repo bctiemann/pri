@@ -110,6 +110,10 @@ urlpatterns = [
     path('api/validate/joyride/payment/', api_views.ValidateJoyRidePaymentView.as_view(), name='validate-joyride-payment'),
     path('api/validate/joyride/login/', api_views.ValidateJoyRideLoginView.as_view(), name='validate-joyride-login'),
 
+    path('api/validate/perfexp/details/', api_views.ValidatePerformanceExperienceDetailsView.as_view(), name='validate-perfexp-details'),
+    path('api/validate/perfexp/payment/', api_views.ValidatePerformanceExperiencePaymentView.as_view(), name='validate-perfexp-payment'),
+    path('api/validate/perfexp/login/', api_views.ValidatePerformanceExperienceLoginView.as_view(), name='validate-perfexp-login'),
+
     path('api/validate/newsletter/subscribe/', api_views.ValidateNewsletterSubscriptionView.as_view(), name='validate-newsletter-subscription'),
 
     path('api/customers/search/', api_views.SearchCustomersView.as_view(), name='search-customers'),

@@ -103,12 +103,12 @@ var reserveValidateForm = function(reservationType, section) {
                     $('.customer-discount').hide();
                 }
                 if (data.customer_id) {
-                    $('.price-breakdown').appendTo($('#price_breakdown_existing_user'));
+                    $('.price-breakdown').appendTo($('#price_breakdown_existing_user')).removeClass('hidden');
                     $('#reservation_payment').hide();
                     $('#reservation_payment_error').hide();
                     $('#reservation_login').show();
                 } else {
-                    $('.price-breakdown').appendTo($('#price_breakdown_new_user'));
+                    $('.price-breakdown').appendTo($('#price_breakdown_new_user')).removeClass('hidden');
                     $('#reservation_login').hide();
                     $('#reservation_password_error').hide();
                     $('#reservation_payment').show();
@@ -129,8 +129,9 @@ var reserveValidateForm = function(reservationType, section) {
             } else if (section === 'payment' || section === 'login') {
                 $('#customerid').val(data.customerid);
                 $('#login_pass').val(data.create_pass);
-                if (data.reservation_type == 'perfexp') {
-                    window.location.href = data.custsite + 'perfexp_confirm.cfm?confcode=' + data.confcode;
+                if (data.reservation_type === 'perfexp') {
+                    window.location.href = data.customer_site_url;
+                    // window.location.href = data.custsite + 'perfexp_confirm.cfm?confcode=' + data.confcode;
                 } else if (data.reservation_type === 'joyride') {
                     window.location.href = data.customer_site_url;
                     // window.location.href = data.custsite + 'joyride_confirm.cfm?confcode=' + data.confcode;

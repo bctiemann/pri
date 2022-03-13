@@ -105,433 +105,273 @@
         <img src="{% static "images/perfexp.png" %}" />
     </div>
 
-    <cfform method="POST" name="reservation_form" action="perfexp.cfm" onsubmit="return false;" autocomplete="on">
-    <cfoutput>
+    <form method="POST" name="reservation_form" id="reservation_form" action="perfexp.cfm" onsubmit="return false;" autocomplete="on">
 
-    <div class="reservation-form-sidebar">
+        <div class="reservation-form-sidebar">
 
-    <cfif Len(formError) GT 0>
-    <div class="exception" id="reservation_form_error">
-        <h3>An error occurred</h3>
-        <p class="alert-message">#formError#</p>
-    </div>
-    </cfif>
-
-    <div id="reservation_identity">
-
-        <p class="reservation-info">
-The PRI Performance Experience<sup>SM</sup> is a way for you to get in on the thrill of driving our lineup of performance machines without having to commit to a full rental of a single car. At PRI, we know
-that our customers share the same passion for driving that we do, and sampling from the variety of different styles of sports cars on the market is a big part of the enthusiast's lifestyle. Let
-us indulge it!
-        </p>
-
-        <p class="reservation-info">
-We'll take you for a guided tour of New York's Hudson Valley on some of the most amazing driving roads in the country, and you'll have the opportunity to spend quality time in the driver's seats
-of several different exotic and performance cars throughout the day.
-        </p>
-
-        <p class="reservation-info">
-Depending on the size of your party, you'll be able to experience three to six of our amazing cars (of your choice, depending on availability), with around half an hour of wheel time in each.
-You'll learn the performance and handling characteristics of each car and be treated to some of the best views and twisties New York has to offer.
-        </p>
-
-        <table class="inputform identity">
-            <tr class="vehicle-pick-buttons hidden">
-                <td class="align-top">Pick Your Vehicles</td>
-                <td>
-                    <button class="btn pick-vehicles-btn" type="car" style="margin-right: 16px;">Cars</button>
-                    <button class="btn pick-vehicles-btn" type="bike">Bikes</button>
-                    <span class="vehicles-picked" style="margin-left: 20px;"></span>
-                </td>
-            </tr>
-            <tr class="vehicle-choice">
-                <td>Vehicle Choice ##1</td>
-                <td>
-                    <cfselect name="choice1">
-                        <option value="0">(Choose Vehicle)</option>
-                        <optgroup label="Cars">
-                            <cfloop query="Vehicles">
-                                <cfif type IS 1>
-                                    <option value="#vehicleid#" <cfif JoyPerf.choice1 IS vehicleid>selected</cfif>>#make# #model#</option>
-                                </cfif>
-                            </cfloop>
-                        </optgroup>
-                        <optgroup label="Motorcycles">
-                            <cfloop query="Vehicles">
-                                <cfif type IS 2>
-                                    <option value="#vehicleid#" <cfif JoyPerf.choice1 IS vehicleid>selected</cfif>>#make# #model#</option>
-                                </cfif>
-                            </cfloop>
-                        </optgroup>
-                    </cfselect>
-                </td>
-            </tr>
-            <tr class="vehicle-choice">
-                <td>Vehicle Choice ##2</td>
-                <td>
-                    <cfselect name="choice2">
-                        <option value="0">(Choose Vehicle)</option>
-                        <optgroup label="Cars">
-                            <cfloop query="Vehicles">
-                                <cfif type IS 1>
-                                    <option value="#vehicleid#" <cfif JoyPerf.choice2 IS vehicleid>selected</cfif>>#make# #model#</option>
-                                </cfif>
-                            </cfloop>
-                        </optgroup>
-                        <optgroup label="Motorcycles">
-                            <cfloop query="Vehicles">
-                                <cfif type IS 2>
-                                    <option value="#vehicleid#" <cfif JoyPerf.choice2 IS vehicleid>selected</cfif>>#make# #model#</option>
-                                </cfif>
-                            </cfloop>
-                        </optgroup>
-                    </cfselect>
-                </td>
-            </tr>
-            <tr class="vehicle-choice">
-                <td>Vehicle Choice ##3</td>
-                <td>
-                    <cfselect name="choice3">
-                        <option value="0">(Choose Vehicle)</option>
-                        <optgroup label="Cars">
-                            <cfloop query="Vehicles">
-                                <cfif type IS 1>
-                                    <option value="#vehicleid#" <cfif JoyPerf.choice3 IS vehicleid>selected</cfif>>#make# #model#</option>
-                                </cfif>
-                            </cfloop>
-                        </optgroup>
-                        <optgroup label="Motorcycles">
-                            <cfloop query="Vehicles">
-                                <cfif type IS 2>
-                                    <option value="#vehicleid#" <cfif JoyPerf.choice3 IS vehicleid>selected</cfif>>#make# #model#</option>
-                                </cfif>
-                            </cfloop>
-                        </optgroup>
-                    </cfselect>
-                </td>
-            </tr>
-            <tr>
-                <td>Number of Drivers</td>
-                <td>
-                    <cfselect name="nodrv" class="#StructKeyExists(fieldErrors,"nodrv") ? 'field-error' : ''#">
-                        <option value="1" <cfif JoyPerf.nodrv IS 1>selected</cfif>>1</option>
-                        <option value="2" <cfif JoyPerf.nodrv IS 2>selected</cfif>>2</option>
-                        <option value="3" <cfif JoyPerf.nodrv IS 3>selected</cfif>>3</option>
-                        <option value="4" <cfif JoyPerf.nodrv IS 4>selected</cfif>>4</option>
-                        <option value="5" <cfif JoyPerf.nodrv IS 5>selected</cfif>>More than 4 (will call)</option>
-                    </cfselect>
-                </td>
-            </tr>
-            <tr>
-                <td>Number of Passengers</td>
-                <td>
-                    <cfselect name="nopax" class="#StructKeyExists(fieldErrors,"nopax") ? 'field-error' : ''#">
-                        <option value="0" <cfif JoyPerf.nopax IS 1>selected</cfif>>0</option>
-                        <option value="1" <cfif JoyPerf.nopax IS 1>selected</cfif>>1</option>
-                        <option value="2" <cfif JoyPerf.nopax IS 2>selected</cfif>>2</option>
-                        <option value="3" <cfif JoyPerf.nopax IS 3>selected</cfif>>3</option>
-                        <option value="4" <cfif JoyPerf.nopax IS 4>selected</cfif>>4</option>
-                        <option value="5" <cfif JoyPerf.nopax IS 5>selected</cfif>>More than 4 (will call)</option>
-                    </cfselect>
-                </td>
-            </tr>
-            <tr>
-                <td>Requested Date</td>
-                <td>
-                    <cfinput name="reqdate" value="#JoyPerf.reqdate#" style="width: 120px;" placeholder="MM/DD/YYYY" class="#StructKeyExists(fieldErrors,"reqdate") ? 'field-error' : ''#" />
-                </td>
-            </tr>
-            <tr>
-                <td>Alternate Date</td>
-                <td>
-                    <cfinput name="bupdate" value="#JoyPerf.bupdate#" style="width: 120px;" placeholder="MM/DD/YYYY" class="#StructKeyExists(fieldErrors,"bupdate") ? 'field-error' : ''#" />
-                    <small class="tooltip" title="We'll do our best to accommodate your first choice of date, but please pick an alternate just in case."><span class="ui-icon ui-icon-info"></span></small>
-                </td>
-            </tr>
-            <tr>
-                <td>Email</td>
-                <td><cfinput name="email" value="#JoyPerf.email#" maxlength="255" class="#StructKeyExists(fieldErrors,"email") ? 'field-error' : ''#" /></td>
-            </tr>
-            <tr class="inline-password">
-                <td>Password</td>
-                <td><cfinput name="inline_pass" type="password" value="#JoyPerf.inline_pass#" placeholder="(If returning customer)" class="#StructKeyExists(fieldErrors,"login_pass") ? 'field-error' : ''#" /></td>
-            </tr>
-            <tr>
-                <td>Big and Tall</td>
-                <td>
-                    <cfselect name="bigtall">
-                        <option value="0" <cfif JoyPerf.bigtall IS 0>selected</cfif>>No</option>
-                        <option value="1" <cfif JoyPerf.bigtall IS 1>selected</cfif>>Yes</option>
-                    </cfselect>
-                    <small class="tooltip" title="If anyone in your party is especially big or tall, please let us know so we can make sure everyone is comfortable."><span class="ui-icon ui-icon-info"></span></small>
-                </td>
-            </tr>
-            <tr>
-                <td>Discount/Coupon Code</td>
-                <td><cfinput name="coupon" value="#JoyPerf.coupon#" maxlength="20" placeholder="(Optional)" class="#StructKeyExists(fieldErrors,"coupon") ? 'field-error' : ''#" /></td>
-            </tr>
-            <tr>
-                <td class="align-top">Notes/Requests</td>
-                <td><cftextarea name="notes" class="#StructKeyExists(fieldErrors,"notes") ? 'field-error' : ''#">#JoyPerf.notes#</cftextarea></td>
-            </tr>
-
-            <cfif NOT IsDefined("IdentityResult") OR NOT IdentityResult.success OR (IsDefined("LoginResult") AND NOT LoginResult.success)>
-            <tr class="buttons">
-                <td></td>
-                <td>
-                    <button type="submit" name="identity_btn" class="btn reserve-joyperf-identity-btn">Continue</button>
-                    <div class="spinner next-form-spinner identity-spinner"></div>
-                </td>
-            </tr>
+            {% if form.errors %}
+            <cfif Len(formError) GT 0>
+            <div class="exception" id="reservation_form_error">
+                <h3>An error occurred</h3>
+                <p class="alert-message">#formError#</p>
+            </div>
             </cfif>
-        </table>
+            {% endif %}
 
-    </div>
+            <div id="reservation_details">
 
-    <div class="exception hidden" id="reservation_identity_error">
-        <h3>An error occurred</h3>
-        <p class="alert-message"></p>
-    </div>
+                <p class="reservation-info">
+                The PRI Performance Experience<sup>SM</sup> is a way for you to get in on the thrill of driving our lineup of performance machines without having to commit to a full rental of a single car. At PRI, we know
+                that our customers share the same passion for driving that we do, and sampling from the variety of different styles of sports cars on the market is a big part of the enthusiast's lifestyle. Let
+                us indulge it!
+                </p>
 
-    <div id="reservation_new_user" class="hidden">
+                <p class="reservation-info">
+                We'll take you for a guided tour of New York's Hudson Valley on some of the most amazing driving roads in the country, and you'll have the opportunity to spend quality time in the driver's seats
+                of several different exotic and performance cars throughout the day.
+                </p>
 
-        <p class="reservation-info">
-        Please create a password. This will allow you to submit your information securely and at your leisure.
-        </p>
+                <p class="reservation-info">
+                Depending on the size of your party, you'll be able to experience three to six of our amazing cars (of your choice, depending on availability), with around half an hour of wheel time in each.
+                You'll learn the performance and handling characteristics of each car and be treated to some of the best views and twisties New York has to offer.
+                </p>
 
-        <table class="inputform password">
-            <tr>
-                <td>Password</td>
-                <td><cfinput name="create_pass" type="password" value=""></td>
-            </tr>
-            <tr class="buttons">
-                <td></td>
-                <td>
-                    <button type="button" class="btn reserve-createpass-btn">Continue</button>
-                    <div class="spinner next-form-spinner password-spinner"></div>
-                </td>
-            </tr>
-        </table>
+                <table class="inputform details">
+                    <tr class="vehicle-pick-buttons hidden">
+                        <td class="align-top">Pick Your Vehicles</td>
+                        <td>
+                            <button class="btn pick-vehicles-btn" type="car" style="margin-right: 16px;">Cars</button>
+                            <button class="btn pick-vehicles-btn" type="bike">Bikes</button>
+                            <span class="vehicles-picked" style="margin-left: 20px;"></span>
+                        </td>
+                    </tr>
+                    <tr class="vehicle-choice">
+                        <td>Vehicle Choice ##1</td>
+                        <td>
+                            {{ form.vehicle_choice_1 }}
+                            <cfselect name="choice1">
+                                <option value="0">(Choose Vehicle)</option>
+                                <optgroup label="Cars">
+                                    <cfloop query="Vehicles">
+                                        <cfif type IS 1>
+                                            <option value="#vehicleid#" <cfif JoyPerf.choice1 IS vehicleid>selected</cfif>>#make# #model#</option>
+                                        </cfif>
+                                    </cfloop>
+                                </optgroup>
+                                <optgroup label="Motorcycles">
+                                    <cfloop query="Vehicles">
+                                        <cfif type IS 2>
+                                            <option value="#vehicleid#" <cfif JoyPerf.choice1 IS vehicleid>selected</cfif>>#make# #model#</option>
+                                        </cfif>
+                                    </cfloop>
+                                </optgroup>
+                            </cfselect>
+                        </td>
+                    </tr>
+                    <tr class="vehicle-choice">
+                        <td>Vehicle Choice ##2</td>
+                        <td>
+                            {{ form.vehicle_choice_2 }}
+                            <cfselect name="choice2">
+                                <option value="0">(Choose Vehicle)</option>
+                                <optgroup label="Cars">
+                                    <cfloop query="Vehicles">
+                                        <cfif type IS 1>
+                                            <option value="#vehicleid#" <cfif JoyPerf.choice2 IS vehicleid>selected</cfif>>#make# #model#</option>
+                                        </cfif>
+                                    </cfloop>
+                                </optgroup>
+                                <optgroup label="Motorcycles">
+                                    <cfloop query="Vehicles">
+                                        <cfif type IS 2>
+                                            <option value="#vehicleid#" <cfif JoyPerf.choice2 IS vehicleid>selected</cfif>>#make# #model#</option>
+                                        </cfif>
+                                    </cfloop>
+                                </optgroup>
+                            </cfselect>
+                        </td>
+                    </tr>
+                    <tr class="vehicle-choice">
+                        <td>Vehicle Choice ##3</td>
+                        <td>
+                            {{ form.vehicle_choice_3 }}
+                            <cfselect name="choice3">
+                                <option value="0">(Choose Vehicle)</option>
+                                <optgroup label="Cars">
+                                    <cfloop query="Vehicles">
+                                        <cfif type IS 1>
+                                            <option value="#vehicleid#" <cfif JoyPerf.choice3 IS vehicleid>selected</cfif>>#make# #model#</option>
+                                        </cfif>
+                                    </cfloop>
+                                </optgroup>
+                                <optgroup label="Motorcycles">
+                                    <cfloop query="Vehicles">
+                                        <cfif type IS 2>
+                                            <option value="#vehicleid#" <cfif JoyPerf.choice3 IS vehicleid>selected</cfif>>#make# #model#</option>
+                                        </cfif>
+                                    </cfloop>
+                                </optgroup>
+                            </cfselect>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Number of Drivers</td>
+                        <td>
+                            {{ form.num_drivers }}
+                            <cfselect name="nodrv" class="#StructKeyExists(fieldErrors,"nodrv") ? 'field-error' : ''#">
+                                <option value="1" <cfif JoyPerf.nodrv IS 1>selected</cfif>>1</option>
+                                <option value="2" <cfif JoyPerf.nodrv IS 2>selected</cfif>>2</option>
+                                <option value="3" <cfif JoyPerf.nodrv IS 3>selected</cfif>>3</option>
+                                <option value="4" <cfif JoyPerf.nodrv IS 4>selected</cfif>>4</option>
+                                <option value="5" <cfif JoyPerf.nodrv IS 5>selected</cfif>>More than 4 (will call)</option>
+                            </cfselect>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Number of Passengers</td>
+                        <td>
+                            {{ form.num_passengers }}
+                            <cfselect name="nopax" class="#StructKeyExists(fieldErrors,"nopax") ? 'field-error' : ''#">
+                                <option value="0" <cfif JoyPerf.nopax IS 1>selected</cfif>>0</option>
+                                <option value="1" <cfif JoyPerf.nopax IS 1>selected</cfif>>1</option>
+                                <option value="2" <cfif JoyPerf.nopax IS 2>selected</cfif>>2</option>
+                                <option value="3" <cfif JoyPerf.nopax IS 3>selected</cfif>>3</option>
+                                <option value="4" <cfif JoyPerf.nopax IS 4>selected</cfif>>4</option>
+                                <option value="5" <cfif JoyPerf.nopax IS 5>selected</cfif>>More than 4 (will call)</option>
+                            </cfselect>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Requested Date</td>
+                        <td>
+                            {{ form.requested_date }}
+                            <cfinput name="reqdate" value="#JoyPerf.reqdate#" style="width: 120px;" placeholder="MM/DD/YYYY" class="#StructKeyExists(fieldErrors,"reqdate") ? 'field-error' : ''#" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Alternate Date</td>
+                        <td>
+                            {{ form.backup_date }}
+                            <cfinput name="bupdate" value="#JoyPerf.bupdate#" style="width: 120px;" placeholder="MM/DD/YYYY" class="#StructKeyExists(fieldErrors,"bupdate") ? 'field-error' : ''#" />
+                            <small class="tooltip" title="We'll do our best to accommodate your first choice of date, but please pick an alternate just in case."><span class="ui-icon ui-icon-info"></span></small>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td>
+                            {{ form.email }}
+                            <cfinput name="email" value="#JoyPerf.email#" maxlength="255" class="#StructKeyExists(fieldErrors,"email") ? 'field-error' : ''#" />
+                        </td>
+                    </tr>
+                    {% comment %}
+                    <tr class="inline-password">
+                        <td>Password</td>
+                        <td><cfinput name="inline_pass" type="password" value="#JoyPerf.inline_pass#" placeholder="(If returning customer)" class="#StructKeyExists(fieldErrors,"login_pass") ? 'field-error' : ''#" /></td>
+                    </tr>
+                    {% endcomment %}
+                    <tr>
+                        <td>Big and Tall</td>
+                        <td>
+                            {{ form.big_and_tall }}
+                            <cfselect name="bigtall">
+                                <option value="0" <cfif JoyPerf.bigtall IS 0>selected</cfif>>No</option>
+                                <option value="1" <cfif JoyPerf.bigtall IS 1>selected</cfif>>Yes</option>
+                            </cfselect>
+                            <small class="tooltip" title="If anyone in your party is especially big or tall, please let us know so we can make sure everyone is comfortable."><span class="ui-icon ui-icon-info"></span></small>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Discount/Coupon Code</td>
+                        <td>
+                            {{ form.coupon_code }}
+                            <cfinput name="coupon" value="#JoyPerf.coupon#" maxlength="20" placeholder="(Optional)" class="#StructKeyExists(fieldErrors,"coupon") ? 'field-error' : ''#" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="align-top">Notes/Requests</td>
+                        <td>
+                            {{ form.customer_notes }}
+{#                            <cftextarea name="notes" class="#StructKeyExists(fieldErrors,"notes") ? 'field-error' : ''#">#JoyPerf.notes#</cftextarea>#}
+                        </td>
+                    </tr>
 
-    </div>
+                    <cfif NOT IsDefined("IdentityResult") OR NOT IdentityResult.success OR (IsDefined("LoginResult") AND NOT LoginResult.success)>
+                    <tr class="buttons">
+                        <td></td>
+                        <td>
+                            <button type="submit" name="identity_btn" class="btn reserve-perfexp-details-btn">Continue</button>
+                            <div class="spinner next-form-spinner identity-spinner"></div>
+                        </td>
+                    </tr>
+                    </cfif>
+                </table>
 
-    <div id="reservation_login" class="hidden">
+            </div>
 
-        <p class="reservation-info">
-        Welcome back! Please enter your password and your reservation will be processed immediately.
-        </p>
+            <div class="exception hidden" id="reservation_details_error">
+                <h3>An error occurred</h3>
+                <p class="alert-message"></p>
+            </div>
 
-        <div id="price_breakdown_existing_user">
-        <table class="price-breakdown small-item-data">
-            <tr>
-                <td><span class="price-nodrv"></span></td>
-                <td>$<span class="price-drvcost"></span></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td><span class="price-nopax"></span></td>
-                <td>$<span class="price-paxcost"></span></td>
-                <td></td>
-            </tr>
-            <tr class="customer-discount">
-                <td>Promotional Discount</td>
-                <td>- $<span class="price-customer-discount"></span></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>Subtotal</td>
-                <td>$<span class="price-subtotal"></span></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>Tax (<span class="price-tax-rate"></span>%)</td>
-                <td>$<span class="price-tax"></span></td>
-                <td></td>
-            </tr>
-            <tr class="total">
-                <td>Total</td>
-                <td>$<span class="price-total"></span></td>
-                <td></td>
-            </tr>
-        </table>
+            <table class="price-breakdown small-item-data hidden">
+                <tr>
+                    <td><span class="price-nodrv"></span></td>
+                    <td>$<span class="price-drvcost"></span></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><span class="price-nopax"></span></td>
+                    <td>$<span class="price-paxcost"></span></td>
+                    <td></td>
+                </tr>
+                <tr class="customer-discount">
+                    <td>Promotional Discount</td>
+                    <td>- $<span class="price-customer-discount"></span></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Subtotal</td>
+                    <td>$<span class="price-subtotal"></span></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Tax (<span class="price-tax-rate"></span>%)</td>
+                    <td>$<span class="price-tax"></span></td>
+                    <td></td>
+                </tr>
+                <tr class="total">
+                    <td>Total</td>
+                    <td>$<span class="price-total"></span></td>
+                    <td></td>
+                </tr>
+            </table>
+
+            {% with reservation_type='perfexp' %}
+                {% include "front_site/includes/login_form.html" %}
+
+                {% include "front_site/includes/payment_form.html" %}
+            {% endwith %}
+
         </div>
 
-        <table class="inputform password">
-            <tr>
-                <td>Password</td>
-                <td>
-                    <cfinput name="login_pass" type="password" value="">
-                    <small class="forgot-password dialog-trigger">Forgot?</small>
-                </td>
-            </tr>
-            <tr class="buttons">
-                <td></td>
-                <td>
-                    <button type="button" class="btn reserve-login-btn">Complete Reservation</button>
-                    <div class="spinner next-form-spinner password-spinner"></div>
-                </td>
-            </tr>
-        </table>
-
-    </div>
-
-    <div class="exception hidden" id="reservation_password_error">
-        <h3>An error occurred</h3>
-        <p class="alert-message"></p>
-    </div>
-
-    <div id="reservation_payment" <cfif NOT IsDefined("IdentityResult") OR (IsDefined("IdentityResult") AND NOT IdentityResult.success) OR (IsDefined("LoginResult") AND NOT LoginResult.success)>class="hidden"</cfif>>
-
-        <p class="reservation-info">
-        We'll need a credit card to secure your reservation. Once the reservation is confirmed, you'll get access to the
-        secure PRI Customer Portal, where you can manage your rentals, confirm your insurance information, and specify
-        your preferred methods of payment for the rental and the security deposit.
-        </p>
-
-        <div id="price_breakdown_new_user"></div>
-
-        <table class="inputform payment">
-            <tr>
-                <td>First Name</td>
-                <td><cfinput name="fname" value="#JoyPerf.fname#" maxlength="255" class="#StructKeyExists(fieldErrors,"fname") ? 'field-error' : ''#" /></td>
-            </tr>
-            <tr>
-                <td>Last Name</td>
-                <td><cfinput name="lname" value="#JoyPerf.lname#" maxlength="255" class="#StructKeyExists(fieldErrors,"lname") ? 'field-error' : ''#" /></td>
-            </tr>
-            <tr>
-                <td>Mobile Phone</td>
-                <td><cfinput name="mphone" value="#JoyPerf.mphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"mphone") ? 'field-error' : ''#" /></td>
-            </tr>
-            <tr>
-                <td>Home Phone</td>
-                <td><cfinput name="hphone" value="#JoyPerf.hphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"hphone") ? 'field-error' : ''#" /></td>
-            </tr>
-            <tr>
-                <td>Work Phone</td>
-                <td><cfinput name="wphone" value="#JoyPerf.wphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"wphone") ? 'field-error' : ''#" /></td>
-            </tr>
-            <tr>
-                <td>Fax</td>
-                <td><cfinput name="fax" value="#JoyPerf.fax#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"fax") ? 'field-error' : ''#" /></td>
-            </tr>
-            <tr>
-                <td>Credit Card Number</td>
-                <td><cfinput name="ccnum" value="#JoyPerf.ccnum#" class="cc-field #StructKeyExists(fieldErrors,"ccnum") ? 'field-error' : ''#" autocomplete="cc-number"></td>
-            </tr>
-            <tr>
-                <td>Credit Card Expiration</td>
-                <td>
-                    <cfselect name="ccexpmo" class="#StructKeyExists(fieldErrors,"ccexpmo") ? 'field-error' : ''#">
-                        <option value="01" <cfif JoyPerf.ccexpmo IS "01">selected</cfif>>January (01)</option>
-                        <option value="02" <cfif JoyPerf.ccexpmo IS "02">selected</cfif>>February (02)</option>
-                        <option value="03" <cfif JoyPerf.ccexpmo IS "03">selected</cfif>>March (03)</option>
-                        <option value="04" <cfif JoyPerf.ccexpmo IS "04">selected</cfif>>April (04)</option>
-                        <option value="05" <cfif JoyPerf.ccexpmo IS "05">selected</cfif>>May (05)</option>
-                        <option value="06" <cfif JoyPerf.ccexpmo IS "06">selected</cfif>>June (06)</option>
-                        <option value="07" <cfif JoyPerf.ccexpmo IS "07">selected</cfif>>July (07)</option>
-                        <option value="08" <cfif JoyPerf.ccexpmo IS "08">selected</cfif>>August (08)</option>
-                        <option value="09" <cfif JoyPerf.ccexpmo IS "09">selected</cfif>>September (09)</option>
-                        <option value="10" <cfif JoyPerf.ccexpmo IS "10">selected</cfif>>October (10)</option>
-                        <option value="11" <cfif JoyPerf.ccexpmo IS "11">selected</cfif>>November (11)</option>
-                        <option value="12" <cfif JoyPerf.ccexpmo IS "12">selected</cfif>>December (12)</option>
-                    </cfselect> /
-
-                    <cfset tyear = #Dateformat(Now(),"yyyy")#>
-                    <cfset fyear = tyear+15>
-                    <cfset ynow=#LSDateFormat(Now(),"yyyy")#>
-                    <cfset ythen=(#ynow# + 11)>
-                    <cfset mnow=#LSDateFormat(Now(),"mm")#>
-                    <cfset dyear=ynow>
-                    <cfselect name="ccexpyr" class="#StructKeyExists(fieldErrors,"ccexpyr") ? 'field-error' : ''#">
-                        <cfoutput>
-                        <cfloop index="year" from="#ynow#" to="#ythen#">
-                            <option value="#dyear#" <cfif JoyPerf.ccexpyr IS "#dyear#">selected</cfif>>#dyear#</option>>
-                            <cfset dyear = dyear + 1>
-                        </cfloop>
-                        </cfoutput>
-                    </cfselect>
-                </td>
-            </tr>
-            <tr>
-                <td>CVV</td>
-                <td><cfinput name="cccvv" value="#JoyPerf.cccvv#" style="width: 70px;" class="#StructKeyExists(fieldErrors,"cccvv") ? 'field-error' : ''#" /></td>
-            </tr>
-            <tr>
-                <td>Credit Card Bank Phone</td>
-                <td>
-                    <cfinput name="cctel" value="#JoyPerf.cctel#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"cctel") ? 'field-error' : ''#" />
-                    <small class="tooltip" title="We need the customer service contact phone number shown on the back of your card so that we can verify the card if necessary, and to refund the security deposit after the rental is over."><span class="ui-icon ui-icon-info"></span></small>
-                </td>
-            </tr>
-            <tr>
-                <td class="align-top">Street Address</td>
-                <td><cftextarea name="addr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#JoyPerf.addr#</cftextarea></td>
-            </tr>
-            <tr>
-                <td>City</td>
-                <td><cfinput name="city" value="#JoyPerf.city#" maxlength="150" class="#StructKeyExists(fieldErrors,"city") ? 'field-error' : ''#" /></td>
-            </tr>
-            <tr>
-                <td class="label">State</td>
-                <td>
-                    <cfselect name="state" data-stripe="address_state" class="#StructKeyExists(fieldErrors,"state") ? 'field-error' : ''#">
-                    <CFLOOP ARRAY="#states#" INDEX="state">
-                        <CFOUTPUT><option value="#state.abbr#" <cfif JoyPerf.state IS "#state.abbr#">selected</cfif>>#state.name#</option></CFOUTPUT>
-                    </CFLOOP>
-                    </cfselect>
-                </td>
-            </tr>
-            <tr>
-                <td class="label">ZIP</td>
-                <td><cfinput name="zip" value="#JoyPerf.zip#" style="width: 100px;" maxlength="10" class="#StructKeyExists(fieldErrors,"zip") ? 'field-error' : ''#" /></td>
-            </tr>
-
-            <tr class="buttons">
-                <td></td>
-                <td>
-                    <button type="submit" name="payment_btn" class="btn reserve-joyperf-complete-btn">Complete Reservation</button>
-                    <div class="spinner next-form-spinner payment-spinner"></div>
-                </td>
-            </tr>
-        </table>
-
-    </div>
-
-    <div class="exception hidden" id="reservation_payment_error">
-        <h3>An error occurred</h3>
-        <p class="alert-message"></p>
-    </div>
-
-    </div>
-
-    </cfoutput>
-    <cfinput name="type" type="hidden" value="2" />
-    <cfinput name="nominors" type="hidden" value="0" />
-    <cfinput name="reservation_type" type="hidden" value="perfexp" />
-    <cfinput name="customerid" type="hidden" value="" />
-    </cfform>
+    </form>
 
 </div>
 </div>
 
+{% include "global_includes/vehicle_picker.html" %}
 
-<div class="dialog vehicle-picker" id="dialog_pick_vehicles" title="Choose Up to Three Vehicles">
-    {% for vehicle in ready_vehicles %}
-        <div
-            class="vehicle-picker-pick"
-            vehicleid="{{ vehicle.id }}"
-            type="{{ vehicle.vehicle_type_casual }}"
-        >
-            <img src="{{ vehicle.thumbnail_image.url }}" />
-            <span class="offer-title overlay-text bottom">{{ vehicle.make }} {{ vehicle.model }}</span>
-        </div>
-    {% endfor %}
+<div class="dialog" id="dialog_reset_password" title="Reset Password">
+    <p>We will send you an email with a link to click on to receive your new password.</p>
+</div>
+
+<div class="dialog" id="dialog_reset_password_done" title="Reset Password">
+    <p>An email has been sent to you containing a link to follow to receive your new password. Afterwards, please return here to continue with your reservation.</p>
 </div>
 
 {% endblock %}
+{% comment %}
 </section>
-
 
 <div class="dialog vehicle-picker" id="dialog_pick_vehicles" title="Choose Up to Three Vehicles">
     <cfoutput query="Vehicles">
@@ -551,7 +391,6 @@ You'll learn the performance and handling characteristics of each car and be tre
 </div>
 
 {% include "global_includes/delivery_pricing.html" %}
-{% comment %}
 <div id="delivery_pricing" style="display: none;">
     <p>We deliver our vehicles to most locations within the New York City tri-state area. Delivery rates are as follows:</p>
     <table class="small-item-data delivery-pricing" style="margin-left: 0px;">
@@ -601,6 +440,6 @@ familiarization process and any required paperwork.
 
     <div class="push"></div>
 </div>
-{% endcomment %}
 
 <CFINCLUDE TEMPLATE="inc_footer.cfm">
+{% endcomment %}

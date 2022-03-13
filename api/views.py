@@ -22,6 +22,7 @@ from django.forms.models import model_to_dict
 
 from sales.forms import (
     ReservationRentalDetailsForm, ReservationRentalPaymentForm, ReservationRentalLoginForm,
+    PerformanceExperienceDetailsForm, PerformanceExperiencePaymentForm, PerformanceExperienceLoginForm,
     JoyRideDetailsForm, JoyRidePaymentForm, JoyRideLoginForm,
 )
 from marketing.forms import NewsletterSubscribeForm
@@ -80,6 +81,7 @@ class ReservationMixin:
     @staticmethod
     def _get_login_customer(request, form):
         if form.customer:
+            # TODO: If authenticated user is not the same as the user in the request, logout and re-auth using POST data
             if request.user.is_authenticated:
                 return form.customer
             if authenticate(request, username=form.customer.email, password=form.cleaned_data['password']):
@@ -262,6 +264,42 @@ class ValidateJoyRidePaymentView(ReservationMixin, APIView):
 class ValidateJoyRideLoginView(ValidateJoyRidePaymentView):
     authentication_classes = (SessionAuthentication,)
     form_class = JoyRideLoginForm
+
+
+# Performance Experience
+
+class ValidatePerformanceExperienceDetailsView(APIView):
+
+    # authentication_classes = ()
+    # permission_classes = ()
+
+    def post(self, request):
+        form = PerformanceExperienceDetailsForm(request.POST)
+        print(form.data)
+        print(form.is_valid())
+        print(form.errors.as_json())
+        response = {
+            'success': form.is_valid(),
+            'errors': form.errors,
+            'errors_html': form.errors.as_ul(),
+            'customer_id': form.customer.id if form.customer else None,
+            'price_data': form.price_data,
+            # 'delivery_required': form.cleaned_data['delivery_required'],
+        }
+        return Response(response)
+
+
+class ValidatePerformanceExperiencePaymentView(ReservationMixin, APIView):
+    form_class = PerformanceExperiencePaymentForm
+    reservation_type = 'perfexp'
+
+    def get_customer_site_url(self, confirmation_code):
+        return reverse('customer_portal:perfexp-confirm', kwargs={'confirmation_code': confirmation_code}),
+
+
+class ValidatePerformanceExperienceLoginView(ValidatePerformanceExperiencePaymentView):
+    authentication_classes = (SessionAuthentication,)
+    form_class = PerformanceExperienceLoginForm
 
 
 # Newsletter
