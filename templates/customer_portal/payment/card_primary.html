@@ -5,24 +5,43 @@
 {% block subpage_pane %}
     <div class="form-page" page="card1">
 
-    <cfform method="POST" name="payment_form" action="payment.cfm" autocomplete="on">
+    <form method="POST" name="payment_form" action="{% url "customer_portal:payment-card-primary" %}" autocomplete="on">
 
+    {{ user.customer.has_primary_card }}
+    {{ user.customer.card_1 }}
         <cfoutput>
         <table class="inputform rentalinfo">
 
         <tr>
             <td>Primary Credit Card Number</td>
-            <cfif ccnum_dec IS "" OR IsDefined("Form.ccnum")>
-                <td><cfinput name="ccnum" maxlength="30" value="#formatCCNumber(ccnum_dec)#" class="cc-field #StructKeyExists(fieldErrors,"ccnum") ? 'field-error' : ''#" autocomplete="cc-number" /></td>
-            <cfelse>
-                <td>
-                    #formatCCNumber(maskCCNumber(ccnum_dec))#
-                    <cfinput name="ccnum" type="hidden" value="#formatCCNumber(ccnum_dec)#" />
-                </td>
-            </cfif>
+            <td>
+                {% if user.customer.has_primary_card %}
+                    {{ user.customer.cc_number }}
+                {% else %}
+                    {% comment %}
+                <cfif ccnum_dec IS "" OR IsDefined("Form.ccnum")>
+                    <td><cfinput name="ccnum" maxlength="30" value="#formatCCNumber(ccnum_dec)#" class="cc-field #StructKeyExists(fieldErrors,"ccnum") ? 'field-error' : ''#" autocomplete="cc-number" /></td>
+                <cfelse>
+                    <td>
+                        #formatCCNumber(maskCCNumber(ccnum_dec))#
+                        <cfinput name="ccnum" type="hidden" value="#formatCCNumber(ccnum_dec)#" />
+                    </td>
+                </cfif>
+                    {% endcomment %}
+                    {{ form.cc_number }}
+                {% endif %}
+            </td>
         </tr>
         <tr>
             <td>Expiration</td>
+            <td>
+                {% if user.customer.has_primary_card %}
+                    {{ user.customer.cc_exp_mo }} / {{ user.customer.cc_exp_yr }}
+                {% else %}
+                    {{ form.cc_exp_mo }} / {{ form.cc_exp_yr }}
+                {% endif %}
+            </td>
+        {% comment %}
             <cfif Customer.ccexpmo IS "" OR IsDefined("Form.ccexpmo")>
                 <td>
                     <cfselect name="ccexpmo" class="#StructKeyExists(fieldErrors,"ccexpmo") ? 'field-error' : ''#">
@@ -62,9 +81,18 @@
                     <cfinput name="ccexpyr" type="hidden" value="#Customer.ccexpyr#" />
                 </td>
             </cfif>
+            {% endcomment %}
         </tr>
         <tr>
             <td>Security Code (CVV)</td>
+            <td>
+                {% if user.customer.has_primary_card %}
+                    {{ user.customer.cc_cvv }}
+                {% else %}
+                    {{ form.cc_cvv }}
+                {% endif %}
+            </td>
+            {% comment %}
             <cfif Customer.cccvv IS "" OR IsDefined("Form.cccvv")>
                 <td><cfinput name="cccvv" maxlength="5" value="#Customer.cccvv#" class="#StructKeyExists(fieldErrors,"cccvv") ? 'field-error' : ''#" /></td>
             <cfelse>
@@ -73,9 +101,19 @@
                     <cfinput name="cccvv" type="hidden" value="#Customer.cccvv#" />
                 </td>
             </cfif>
+            {% endcomment %}
         </tr>
         <tr>
             <td>Bank Telephone</td>
+            <td>
+                {% if user.customer.has_primary_card %}
+                    {{ user.customer.cc_phone }}
+                {% else %}
+                    {{ form.cc_phone }}
+                    <span class="inline-text ui-icon ui-icon-info tooltip" title="We need the customer service contact phone number shown on the back of your card so that we can verify the card if necessary, and to refund the security deposit after the rental is over."></span>
+                {% endif %}
+            </td>
+            {% comment %}
             <cfif Customer.cctel IS "" OR IsDefined("Form.cctel")>
                 <td>
                     <cfinput name="cctel" maxlength="20" value="#Customer.cctel#" class="phone #StructKeyExists(fieldErrors,"cctel") ? 'field-error' : ''#" />
@@ -87,26 +125,37 @@
                     <cfinput name="cctel" type="hidden" value="#Customer.cctel#" />
                 </td>
             </cfif>
+            {% endcomment %}
         </tr>
 
         <tr class="buttons">
             <td></td>
             <td>
+                {% if user.customer.has_primary_card %}
+                <cfelse>
+                    <cfinput name="fnc" type="hidden" value="clear" />
+                    <button
+                        type="button"
+                        class="btn delete"
+                        onclick="return confirmDeleteCard(this.form, '{% url "customer_portal:payment-card-primary-clear" %}')"
+                    >
+                        Clear Card
+                    </button>
+                </cfif>
+                {% else %}
                 <cfif ccnum_dec IS "" OR IsDefined("Form.ccnum")>
                     <cfinput name="fnc" type="hidden" value="update" />
                     <button name="submit" type="submit" class="btn">Submit</button>
-                <cfelse>
-                    <cfinput name="fnc" type="hidden" value="clear" />
-                    <button type="button" class="btn delete" onclick="return confirmDeleteCard(this.form)">Clear Card</button>
-                </cfif>
+                {% endif %}
             </td>
         </tr>
 
         </table>
         </cfoutput>
 
+        {% csrf_token %}
     <cfinput name="page" type="hidden" value="#page#" />
-    </cfform>
+    </form>
 
     </div>
 {% endblock %}

@@ -40,7 +40,9 @@ urlpatterns = [
 
     path('payment/', RedirectView.as_view(url=reverse_lazy('customer_portal:payment-card-primary')), name='payment-info'),
     path('payment/primary/', views.PaymentCardPrimaryView.as_view(), name='payment-card-primary'),
+    path('payment/primary/clear/', views.PaymentCardPrimaryClearView.as_view(), name='payment-card-primary-clear'),
     path('payment/secondary/', views.PaymentCardSecondaryView.as_view(), name='payment-card-secondary'),
+    path('payment/secondary/clear/', views.PaymentCardSecondaryClearView.as_view(), name='payment-card-secondary-clear'),
 
     path('password/', views.PasswordView.as_view(), name='password'),
 

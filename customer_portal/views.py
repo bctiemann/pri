@@ -12,6 +12,7 @@ from customer_portal.forms import (
     JoyRideDetailsForm, JoyRideNotesForm,
     PerformanceExperienceDetailsForm, PerformanceExperienceNotesForm,
     AccountDriverInfoForm, AccountInsuranceForm, AccountMusicPrefsForm,
+    CustomerCardPrimaryForm, CustomerCardSecondaryForm,
 )
 
 
@@ -253,22 +254,58 @@ class AccountMusicView(SidebarMixin, UpdateView):
 
 # Payment Methods
 
-class PaymentInfoView(SidebarMixin, FormView):
-    template_name = 'customer_portal/payment/base.html'
-    selected_page = 'payment_info'
-    form_class = PasswordForm
+# class PaymentInfoView(SidebarMixin, FormView):
+#     template_name = 'customer_portal/payment/base.html'
+#     selected_page = 'payment_info'
+#     form_class = PasswordForm
 
 
-class PaymentCardPrimaryView(SidebarMixin, FormView):
+class PaymentCardPrimaryView(SidebarMixin, UpdateView):
     template_name = 'customer_portal/payment/card_primary.html'
     selected_page = 'payment_info'
-    form_class = PasswordForm
+    form_class = CustomerCardPrimaryForm
+    model = Customer
+
+    def get_object(self, queryset=None):
+        return self.request.user.customer
+
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse('customer_portal:payment-card-primary')
+
+
+class PaymentCardPrimaryClearView(PaymentCardPrimaryView):
+
+    def post(self, request, *args, **kwargs):
+        customer = self.get_object()
+        customer.card_1.delete()
+        return super().post(request, *args, **kwargs)
 
 
 class PaymentCardSecondaryView(SidebarMixin, FormView):
     template_name = 'customer_portal/payment/card_secondary.html'
     selected_page = 'payment_info'
-    form_class = PasswordForm
+    form_class = CustomerCardSecondaryForm
+    model = Customer
+
+    def get_object(self, queryset=None):
+        return self.request.user.customer
+
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse('customer_portal:payment-card-secondary')
+
+
+class PaymentCardSecondaryClearView(PaymentCardSecondaryView):
+
+    def post(self, request, *args, **kwargs):
+        customer = self.get_object()
+        customer.card_2.delete()
+        return super().post(request, *args, **kwargs)
 
 
 # Other pages/functions

@@ -393,7 +393,11 @@ class Customer(models.Model):
 
     @property
     def has_primary_card(self):
-        return self.card_1 or (self.cc_number and self.cc_cvv and self.cc_phone)
+        return bool(self.card_1 or (self.cc_number and self.cc_cvv and self.cc_phone))
+
+    @property
+    def has_secondary_card(self):
+        return bool(self.card_2 or (self.cc2_number and self.cc2_cvv and self.cc2_phone))
 
     @property
     def past_rentals(self):
@@ -410,6 +414,23 @@ class Customer(models.Model):
     @property
     def card_2(self):
         return self.card_set.filter(is_primary=False).first()
+
+    # def add_card_1(self):
+    #     card_1_data = {
+    #         'number': self.cc_number,
+    #         'exp_month': self.cc_exp_mo,
+    #         'exp_year': self.cc_exp_yr,
+    #         'cvv': self.cc_cvv,
+    #     }
+    #     card_1_changed = customer.card_1 and customer.card_1.card_is_changed(**card_1_data)
+    #     card_1 = customer.card_1
+    #     if card_1_changed or not customer.card_1:
+    #         card_1_form = CardForm(data=card_1_data, instance=customer.card_1)
+    #         card_1 = card_1_form.save()
+    #         card_1.customer = customer
+    #         card_1.is_primary = True
+    #         card_1.save()
+    #         stripe.add_card_to_customer(customer, card=card_1)
 
     def add_to_stripe(self):
         stripe_customer = stripe.add_stripe_customer(self.full_name, self.email, self.phone)

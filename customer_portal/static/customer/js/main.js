@@ -191,8 +191,9 @@ var formatPhone = function(str) {
     return str;
 };
 
-var confirmDeleteCard = function(form) {
+var confirmDeleteCard = function(form, url) {
     if (confirm('This card\'s information will be deleted. Are you sure?')) {
+        form.action = url;
         form.submit();
     }
     return false;

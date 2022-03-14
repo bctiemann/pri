@@ -82,7 +82,6 @@ class Stripe:
 
         return card
 
-
     def add_card_to_customer(self, customer, card_token=None, card=None):
         if not card and not card_token:
             raise Exception('Provide either a card_token or a Card instance.')
