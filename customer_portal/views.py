@@ -10,7 +10,7 @@ from users.views import LoginView, LogoutView
 from customer_portal.forms import (
     PasswordForm, ReservationCustomerInfoForm, ReservationNotesForm, ReservationDetailsForm,
     JoyRideDetailsForm, JoyRideNotesForm,
-    PerformanceExperienceNotesForm,
+    PerformanceExperienceDetailsForm, PerformanceExperienceNotesForm,
     AccountDriverInfoForm, AccountInsuranceForm, AccountMusicPrefsForm,
 )
 
@@ -174,9 +174,18 @@ class PerformanceExperiencePastView(SidebarMixin, TemplateView):
     selected_page = 'performance_experience'
 
 
-class PerformanceExperienceReserveView(SidebarMixin, TemplateView):
+class PerformanceExperienceReserveView(SidebarMixin, CreateView):
     template_name = 'customer_portal/performance_experience/reserve.html'
     selected_page = 'performance_experience'
+    model = PerformanceExperience
+    form_class = PerformanceExperienceDetailsForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['ready_vehicles'] = VehicleMarketing.objects.filter(status=VehicleStatus.READY).order_by('-weighting')
+        context['cars'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.CAR)
+        context['bikes'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.BIKE)
+        return context
 
 
 class PerformanceExperienceConfirmView(SidebarMixin, UpdateView):

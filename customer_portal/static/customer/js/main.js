@@ -51,9 +51,9 @@ var reserveValidateForm = function(reservationType, section) {
                     }
                 } else if (reservationType === 'joyride' || reservationType === 'perfexp') {
                     $('.price-nodrv').html(data.price_data.num_drivers + ' driver' + (data.price_data.num_drivers !== 1 ? 's' : ''));
-                    $('.price-drvcost').html(data.price_data.base_price.toFixed(2));
+                    $('.price-drvcost').html(data.price_data.driver_cost.toFixed(2));
                     $('.price-nopax').html(data.price_data.num_passengers + ' passenger' + (data.price_data.num_passengers !== 1 ? 's' : ''));
-                    $('.price-paxcost').html(data.price_data.base_price.toFixed(2));
+                    $('.price-paxcost').html(data.price_data.passenger_cost.toFixed(2));
                     // $('.price-event-total').html(data.trate.toFixed(2));
                     $('.price-specific-discount').html(data.price_data.specific_discount.toFixed(2));
                     $('.price-specific-discount-label').html(data.price_data.specific_discount_label);
@@ -76,7 +76,8 @@ var reserveValidateForm = function(reservationType, section) {
                     window.location.href = data.customer_site_url;
                     // window.location.href = data.custsite + 'reserve_confirm.cfm?confcode=' + data.confcode;
                 } else if (data.reservation_type == 'perfexp') {
-                    window.location.href = data.custsite + 'perfexp_confirm.cfm?confcode=' + data.confcode;
+                    window.location.href = data.customer_site_url;
+                    // window.location.href = data.custsite + 'perfexp_confirm.cfm?confcode=' + data.confcode;
                 } else if (data.reservation_type == 'joyride') {
                     window.location.href = data.customer_site_url;
                     // window.location.href = data.custsite + 'joyride_confirm.cfm?confcode=' + data.confcode;

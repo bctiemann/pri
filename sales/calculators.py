@@ -332,25 +332,33 @@ class PerformanceExperiencePriceCalculator(PriceCalculator):
         self.post_specific_discount_subtotal = self.subtotal
 
     @property
-    def base_price(self):
-        driver_cost = 0
+    def driver_cost(self):
         if self.num_drivers == 1:
-            driver_cost = settings.PERFORMANCE_EXPERIENCE_PRICES['1_drv']
+            return settings.PERFORMANCE_EXPERIENCE_PRICES['1_drv']
         elif self.num_drivers == 2:
-            driver_cost = settings.PERFORMANCE_EXPERIENCE_PRICES['2_drv']
+            return settings.PERFORMANCE_EXPERIENCE_PRICES['2_drv']
         elif self.num_drivers == 3:
-            driver_cost = settings.PERFORMANCE_EXPERIENCE_PRICES['3_drv']
+            return settings.PERFORMANCE_EXPERIENCE_PRICES['3_drv']
         elif self.num_drivers == 4:
-            driver_cost = settings.PERFORMANCE_EXPERIENCE_PRICES['4_drv']
+            return settings.PERFORMANCE_EXPERIENCE_PRICES['4_drv']
         else:
-            driver_cost = settings.PERFORMANCE_EXPERIENCE_PRICES['cost_per_drv_gt_4'] * self.num_drivers
+            return settings.PERFORMANCE_EXPERIENCE_PRICES['cost_per_drv_gt_4'] * self.num_drivers
 
-        passenger_cost = settings.PERFORMANCE_EXPERIENCE_PRICES['cost_per_pax'] * self.num_passengers
+    @property
+    def passenger_cost(self):
+        return settings.PERFORMANCE_EXPERIENCE_PRICES['cost_per_pax'] * self.num_passengers
 
-        return driver_cost + passenger_cost
+    @property
+    def base_price(self):
+        return self.driver_cost + self.passenger_cost
 
     def get_price_data(self):
         return dict(
+            num_drivers=self.num_drivers,
+            num_passengers=self.num_passengers,
+            driver_cost=self.driver_cost,
+            passenger_cost=self.passenger_cost,
+
             tax_zip=self.tax_zip,
             tax_rate=self.tax_rate.total_rate,
             tax_rate_as_percent=self.tax_rate.total_rate * 100,
@@ -395,7 +403,7 @@ class JoyRidePriceCalculator(PriceCalculator):
         self.post_specific_discount_subtotal = self.subtotal
 
     @property
-    def base_price(self):
+    def passenger_cost(self):
         if self.num_passengers == 1:
             return settings.JOY_RIDE_PRICES['1_pax']
         elif self.num_passengers == 2:
@@ -407,10 +415,16 @@ class JoyRidePriceCalculator(PriceCalculator):
         else:
             return settings.JOY_RIDE_PRICES['cost_per_pax_gt_4'] * self.num_passengers
 
+    @property
+    def base_price(self):
+        return self.passenger_cost
+
     def get_price_data(self):
         return dict(
             num_drivers=0,
             num_passengers=self.num_passengers,
+            driver_cost=0,
+            passenger_cost=self.passenger_cost,
 
             tax_zip=self.tax_zip,
             tax_rate=self.tax_rate.total_rate,

@@ -3,21 +3,25 @@
 {% block nav_reserve_class %}selected{% endblock %}
 
 {% block subpage_pane %}
+    {% comment %}
     <cfquery name="Vehicles" datasource="#DSN#">
         SELECT vehicleid,make,model,type FROM Vehicles
         WHERE status = 1
         ORDER BY weighting DESC
     </cfquery>
+    {% endcomment %}
 
-    <cfform method="POST" name="reservation_form" action="perfexp.cfm" onsubmit="return false;" autocomplete="on">
+    <form method="POST" name="reservation_form" id="reservation_form" action="perfexp.cfm" onsubmit="return false;" autocomplete="on">
     <cfoutput>
 
+        {% if form.errors %}
         <cfif Len(formError) GT 0>
         <div class="exception" id="reservation_form_error">
             <h3>An error occurred</h3>
             <p class="alert-message">#formError#</p>
         </div>
         </cfif>
+        {% endif %}
 
         <div id="reservation_price">
 
@@ -33,6 +37,7 @@
                 <tr class="vehicle-choice">
                     <td>Vehicle Choice ##1</td>
                 <td>
+                    {{ form.vehicle_choice_1 }}
                     <cfselect name="choice1">
                         <option value="0">(Choose Vehicle)</option>
                         <optgroup label="Cars">
@@ -55,6 +60,7 @@
             <tr class="vehicle-choice">
                 <td>Vehicle Choice ##2</td>
                 <td>
+                    {{ form.vehicle_choice_2 }}
                     <cfselect name="choice2">
                         <option value="0">(Choose Vehicle)</option>
                         <optgroup label="Cars">
@@ -77,6 +83,7 @@
             <tr class="vehicle-choice">
                 <td>Vehicle Choice ##3</td>
                 <td>
+                    {{ form.vehicle_choice_3 }}
                     <cfselect name="choice3">
                         <option value="0">(Choose Vehicle)</option>
                         <optgroup label="Cars">
@@ -99,6 +106,7 @@
             <tr>
                 <td>Number of Drivers</td>
                 <td>
+                    {{ form.num_drivers }}
                     <cfselect name="nodrv" class="#StructKeyExists(fieldErrors,"nodrv") ? 'field-error' : ''#">
                         <option value="1" <cfif JoyPerf.nodrv IS 1>selected</cfif>>1</option>
                         <option value="2" <cfif JoyPerf.nodrv IS 2>selected</cfif>>2</option>
@@ -111,6 +119,7 @@
             <tr>
                 <td>Number of Passengers</td>
                 <td>
+                    {{ form.num_passengers }}
                     <cfselect name="nopax" class="#StructKeyExists(fieldErrors,"nopax") ? 'field-error' : ''#">
                         <option value="0" <cfif JoyPerf.nopax IS 0>selected</cfif>>0</option>
                         <option value="1" <cfif JoyPerf.nopax IS 1>selected</cfif>>1</option>
@@ -124,12 +133,14 @@
             <tr>
                 <td>Requested Date</td>
                 <td>
+                    {{ form.requested_date }}
                     <cfinput name="reqdate" value="#JoyPerf.reqdate#" style="width: 120px;" placeholder="MM/DD/YYYY" class="#StructKeyExists(fieldErrors,"reqdate") ? 'field-error' : ''#" />
                 </td>
             </tr>
             <tr>
                 <td>Alternate Date</td>
                 <td>
+                    {{ form.backup_date }}
                     <cfinput name="bupdate" value="#JoyPerf.bupdate#" style="width: 120px;" placeholder="MM/DD/YYYY" class="#StructKeyExists(fieldErrors,"bupdate") ? 'field-error' : ''#" />
                     <small class="tooltip" title="We'll do our best to accommodate your first choice of date, but please pick an alternate just in case."><span class="ui-icon ui-icon-info"></span></small>
                 </td>
@@ -137,6 +148,7 @@
             <tr>
                 <td>Big and Tall</td>
                 <td>
+                    {{ form.big_and_tall }}
                     <cfselect name="bigtall">
                         <option value="0" <cfif JoyPerf.bigtall IS 0>selected</cfif>>No</option>
                         <option value="1" <cfif JoyPerf.bigtall IS 1>selected</cfif>>Yes</option>
@@ -146,18 +158,24 @@
             </tr>
             <tr>
                 <td>Discount/Coupon Code</td>
-                <td><cfinput name="coupon" value="#JoyPerf.coupon#" maxlength="20" placeholder="(Optional)" class="#StructKeyExists(fieldErrors,"coupon") ? 'field-error' : ''#" /></td>
+                <td>
+                    {{ form.coupon_code }}
+                    <cfinput name="coupon" value="#JoyPerf.coupon#" maxlength="20" placeholder="(Optional)" class="#StructKeyExists(fieldErrors,"coupon") ? 'field-error' : ''#" />
+                </td>
             </tr>
             <tr>
                 <td class="align-top">Notes/Requests</td>
-                <td><cftextarea name="notes" class="#StructKeyExists(fieldErrors,"notes") ? 'field-error' : ''#">#JoyPerf.notes#</cftextarea></td>
+                <td>
+                    {{ form.customer_notes }}
+{#                    <cftextarea name="notes" class="#StructKeyExists(fieldErrors,"notes") ? 'field-error' : ''#">#JoyPerf.notes#</cftextarea>#}
+                </td>
             </tr>
 
             <cfif NOT IsDefined("IdentityResult") OR NOT IdentityResult.success OR (IsDefined("LoginResult") AND NOT LoginResult.success)>
             <tr class="buttons">
                 <td></td>
                 <td>
-                    <button type="submit" name="price_btn" class="btn reserve-joyperf-price-btn">Continue</button>
+                    <button type="submit" name="price_btn" class="btn reserve-perfexp-price-btn">Continue</button>
                     <div class="spinner next-form-spinner price-spinner"></div>
                 </td>
             </tr>
@@ -166,7 +184,7 @@
 
     </div>
 
-    <div class="exception hidden" id="reservation_price_error">
+    <div class="exception hidden" id="reservation_details_error">
         <h3>An error occurred</h3>
         <p class="alert-message"></p>
     </div>
@@ -185,6 +203,7 @@
                 <td>$<span class="price-paxcost"></span></td>
                 <td></td>
             </tr>
+            {% comment %}
             <tr class="customer-discount">
                 <td>Promotional Discount</td>
                 <td>- $<span class="price-customer-discount"></span></td>
@@ -193,6 +212,12 @@
             <tr class="coupon-discount">
                 <td>Coupon Discount</td>
                 <td>- $<span class="price-coupon-discount"></span></td>
+                <td></td>
+            </tr>
+            {% endcomment %}
+            <tr>
+                <td><span class="price-specific-discount-label"></span></td>
+                <td>- $<span class="price-specific-discount"></span></td>
                 <td></td>
             </tr>
             <tr>
@@ -217,7 +242,7 @@
             <tr class="buttons">
                 <td></td>
                 <td>
-                    <button type="submit" name="confirm_btn" class="btn reserve-joyperf-confirm-btn">Complete Reservation</button>
+                    <button type="submit" name="confirm_btn" class="btn reserve-perfexp-confirm-btn">Complete Reservation</button>
                     <div class="spinner next-form-spinner confirm-spinner"></div>
                 </td>
             </tr>
@@ -234,14 +259,18 @@
 
 
     </cfoutput>
+    {% csrf_token %}
+    <input type="hidden" name="email" id="id_email" value="{{ user.email }}" />
     <cfinput name="page" type="hidden" value="reserve" />
     <cfinput name="method" type="hidden" value="validateJoyPerf" />
     <cfinput name="type" type="hidden" value="2" />
     <cfinput name="nominors" type="hidden" value="0" />
     <cfinput name="reservation_type" type="hidden" value="perfexp" />
     <cfinput name="customerid" type="hidden" value="" />
-    </cfform>
+    </form>
 
+    {% include "global_includes/vehicle_picker.html" %}
+    {% comment %}
     <div class="dialog vehicle-picker" id="dialog_pick_vehicles" title="Choose Up to Three Vehicles">
         <cfoutput query="Vehicles">
             <div class="vehicle-picker-pick" vehicleid="#vehicleid#" type="<cfif type IS 1>car<cfelseif type IS 2>bike</cfif>">
@@ -250,4 +279,5 @@
             </div>
         </cfoutput>
     </div>
+    {% endcomment %}
 {% endblock %}

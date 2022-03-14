@@ -79,10 +79,10 @@ var reserveValidateForm = function(reservationType, section) {
                         $('.price-delivery-smallprint').css('visibility', 'hidden');
                     }
                 } else if (reservationType === 'joyride' || reservationType === 'perfexp') {
-                    $('.price-nodrv').html(data.price_data.num_drivers + ' driver' + (data.price_data.num_drivers != 1 ? 's' : ''));
-                    $('.price-drvcost').html(data.price_data.base_price.toFixed(2));
-                    $('.price-nopax').html(data.price_data.num_passengers + ' passenger' + (data.price_data.num_passengers != 1 ? 's' : ''));
-                    $('.price-paxcost').html(data.price_data.base_price.toFixed(2));
+                    $('.price-nodrv').html(data.price_data.num_drivers + ' driver' + (data.price_data.num_drivers !== 1 ? 's' : ''));
+                    $('.price-drvcost').html(data.price_data.driver_cost.toFixed(2));
+                    $('.price-nopax').html(data.price_data.num_passengers + ' passenger' + (data.price_data.num_passengers !== 1 ? 's' : ''));
+                    $('.price-paxcost').html(data.price_data.passenger_cost.toFixed(2));
                     // $('.price-event-total').html(data.price_data.subtotal.toFixed(2));
                     $('.price-customer-discount').html(data.price_data.customer_discount.toFixed(2));
                     $('.price-specific-discount').html(data.price_data.specific_discount.toFixed(2));

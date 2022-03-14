@@ -4,7 +4,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from sales.models import BaseReservation, JoyRide, PerformanceExperience
-from sales.forms import ReservationRentalDetailsForm, JoyRideDetailsForm
+from sales.forms import ReservationRentalDetailsForm, JoyRideDetailsForm, PerformanceExperienceDetailsForm
 from users.models import Customer
 from backoffice.forms import CSSClassMixin
 from sales.enums import get_service_hours, TRUE_FALSE_CHOICES, get_exp_year_choices, get_exp_month_choices
