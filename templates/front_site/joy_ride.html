@@ -96,10 +96,9 @@
 <section class="l-content">
 {% endcomment %}
 
+{% block page %}Joy Ride{% endblock %}
+
 {% block content %}
-<div class="l-container">
-<div class="well" style="padding-bottom: 100px;">
-    <div class='section-header'>Joy Ride</div>
 
     <div class="reservation-pics-sidebar">
         <img src="{% static "images/joyride.png" %}" />
@@ -341,18 +340,15 @@
 
     </form>
 
-</div>
-</div>
+    {% include "global_includes/vehicle_picker.html" %}
 
-{% include "global_includes/vehicle_picker.html" %}
+    <div class="dialog" id="dialog_reset_password" title="Reset Password">
+        <p>We will send you an email with a link to click on to receive your new password.</p>
+    </div>
 
-<div class="dialog" id="dialog_reset_password" title="Reset Password">
-    <p>We will send you an email with a link to click on to receive your new password.</p>
-</div>
-
-<div class="dialog" id="dialog_reset_password_done" title="Reset Password">
-    <p>An email has been sent to you containing a link to follow to receive your new password. Afterwards, please return here to continue with your reservation.</p>
-</div>
+    <div class="dialog" id="dialog_reset_password_done" title="Reset Password">
+        <p>An email has been sent to you containing a link to follow to receive your new password. Afterwards, please return here to continue with your reservation.</p>
+    </div>
 
 {% endblock %}
 {% comment %}

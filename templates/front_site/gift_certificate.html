@@ -1,10 +1,9 @@
 {% extends "front_site/base.html" %}
 {% load static %}
 
+{% block page_title %}Gift Certificate{% endblock %}
+
 {% block content %}
-<div class="l-container">
-<div class="well" style="padding-bottom: 100px;">
-    <div class='section-header'>Gift Certificate</div>
 
     <div class="reservation-pics-sidebar">
         <img src="{% static "images/gifts.png" %}" />
@@ -12,6 +11,7 @@
 
     <div class="reservation-form-sidebar">
 
+    {% block gift_certificate_content %}
         <form method="POST" name="reservation_form" id="reservation_form" action="{% url "gift-certificate" %}" onsubmit="return false;" autocomplete="on">
 
             {% if form.errors %}
@@ -215,9 +215,8 @@
             </div>
 
         </form>
+    {% endblock %}
 
     </div>
 
-</div>
-</div>
 {% endblock %}

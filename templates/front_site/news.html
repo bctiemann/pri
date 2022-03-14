@@ -1,10 +1,9 @@
 {% extends "front_site/base.html" %}
 {% load bbcode_tags tz %}
 
+{% block page_title %}News{% endblock %}
+
 {% block content %}
-<div class="l-container">
-<div class="well">
-    <div class='section-header'>News</div>
 
     {% comment %}
     <cfquery name="News" datasource="#FDSN#" cachedWithin="#tMin#">
@@ -40,6 +39,4 @@
     </cfif>
     {% endif %}
 
-</div>
-</div>
 {% endblock %}

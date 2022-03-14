@@ -1,11 +1,9 @@
 {% extends "front_site/base.html" %}
 {% load static humanize bbcode_tags %}
 
-{% block content %}
+{% block page_title %}Our Fleet{% endblock %}
 
-<div class="l-container">
-<div class="well">
-    <div class='section-header'>Our Fleet</div>
+{% block content %}
 
     {% comment %}
     <CFQUERY NAME="Vehicles" DATASOURCE="#DSN#">
@@ -108,6 +106,4 @@
 
     </div>
 
-</div>
-</div>
 {% endblock %}

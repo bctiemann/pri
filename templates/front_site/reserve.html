@@ -113,10 +113,9 @@
 
 <section class="l-content">
 
+{% block page_title %}Reserve Your Vehicle{% endblock %}
+
 {% block content %}
-<div class="l-container">
-<div class="well" style="padding-bottom: 100px;">
-    <div class='section-header'>Reserve Your Vehicle</div>
 
     {% comment %}
     <CFQUERY NAME="tPics" DATASOURCE="#FDSN#">
@@ -664,18 +663,15 @@
     {% csrf_token %}
     </form>
 
-</div>
-</div>
+    <div class="dialog" id="dialog_reset_password" title="Reset Password">
+    <p>We will send you an email with a link to click on to receive your new password.</p>
+    </div>
 
-<div class="dialog" id="dialog_reset_password" title="Reset Password">
-<p>We will send you an email with a link to click on to receive your new password.</p>
-</div>
+    <div class="dialog" id="dialog_reset_password_done" title="Reset Password">
+    <p>An email has been sent to you containing a link to follow to receive your new password. Afterwards, please return here to continue with your reservation.</p>
+    </div>
 
-<div class="dialog" id="dialog_reset_password_done" title="Reset Password">
-<p>An email has been sent to you containing a link to follow to receive your new password. Afterwards, please return here to continue with your reservation.</p>
-</div>
-
-{% include "global_includes/delivery_pricing.html" %}
+    {% include "global_includes/delivery_pricing.html" %}
 {% comment %}
 <div id="delivery_pricing" style="display: none;">
     <p>We deliver our vehicles to most locations within the New York City tri-state area. Delivery rates are as follows:</p>

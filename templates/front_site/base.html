@@ -13,11 +13,18 @@
         <CFINCLUDE TEMPLATE="inc_nav.cfm">
         {% include "front_site/includes/nav.html" %}
 
+        {% block full_page_content %}
         <section class="l-content">
+            <div class="l-container">
+                <div class="well">
 
-            {% block content %}{% endblock %}
+                    <div class='section-header'>{% block page_title %}{% endblock %}</div>
+                    {% block content %}{% endblock %}
 
+                </div>
+            </div>
         </section>
+        {% endblock %}
 
         <div class="push"></div>
     </div>
