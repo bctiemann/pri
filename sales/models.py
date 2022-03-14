@@ -351,6 +351,11 @@ class JoyRide(GuidedDrive):
         )
         return price_calculator.get_price_data()
 
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.event_type = self.EventType.JOY_RIDE
+        super().save(*args, **kwargs)
+
 
 class PerformanceExperience(GuidedDrive):
     service_type = ServiceType.PERFORMANCE_EXPERIENCE.value
@@ -371,6 +376,11 @@ class PerformanceExperience(GuidedDrive):
             override_subtotal=self.override_subtotal,
         )
         return price_calculator.get_price_data()
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.event_type = self.EventType.PERFORMANCE_EXPERIENCE
+        super().save(*args, **kwargs)
 
 
 class GiftCertificate(models.Model):
