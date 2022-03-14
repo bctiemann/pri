@@ -68,6 +68,7 @@
                 <cfthrow message="Invalid confirmation code.">
             </cfif>
 
+            {% comment %}
             <cfquery name="PerfExp" datasource="#DSN#">
                 SELECT joyperfid,confcode,reqdate,bupdate,JoyPerf.notes,
                 V1.make AS v1_make,V1.model AS v1_model,V1.year AS v1_year,
@@ -80,46 +81,48 @@
                 WHERE confcode = <CFQUERYPARAM value="#confcode#" CFSQLType="CF_SQL_VARCHAR">
                 AND customerid = <CFQUERYPARAM value="#YourID.customerid#" CFSQLType="CF_SQL_INTEGER">
             </cfquery>
+            {% endcomment %}
 
-            <p class="reservation-info">
+            <div class="reservation-info">
             <p>
             Thank you for your reservation! Your Performance Experience is now booked for the date(s) you indicated, with the vehicles you chose (pending availability).
             We will follow up with you to provide details on the event (the meeting location, time, etc.); we'll also contact you if we have any difficulty scheduling
             the vehicles of your choice.
             </p>
-            </p>
+            </div>
 
             <cfoutput query="PerfExp">
 
             <div class="confcode-container">
                 <p>Confirmation code:</p>
-                <div class="confcode">#confcode#</div>
+                <div class="confcode">{{ performanceexperience.confirmation_code }}</div>
             </div>
 
             <table class="reservation-details small-item-data">
                 <tr>
                     <td>Vehicle 1:</td>
-                    <td>#v1_make# #v1_model#</td>
+                    <td>{{ performanceexperience.vehicle_choice_1.make }} {{ performanceexperience.vehicle_choice_1.model }}</td>
                 </tr>
                 <tr>
                     <td>Vehicle 2:</td>
-                    <td>#v2_make# #v2_model#</td>
+                    <td>{{ performanceexperience.vehicle_choice_2.make }} {{ performanceexperience.vehicle_choice_2.model }}</td>
                 </tr>
                 <tr>
                     <td>Vehicle 3:</td>
-                    <td>#v3_make# #v3_model#</td>
+                    <td>{{ performanceexperience.vehicle_choice_3.make }} {{ performanceexperience.vehicle_choice_3.model }}</td>
                 </tr>
                 <tr>
                     <td>Requested Date:</td>
-                    <td>#DateFormat(reqdate,"ddd MM/DD/YYYY")#</td>
+                    <td>{{ performanceexperience.requested_date|date:"D m/d/Y" }}</td>
                 </tr>
                 <tr>
                     <td>Alternate Date:</td>
-                    <td>#DateFormat(bupdate,"ddd MM/DD/YYYY")#</td>
+                    <td>{{ performanceexperience.backup_date|date:"D m/d/Y" }}</td>
                 </tr>
             </table>
             </cfoutput>
 
+            {% comment %}
             <cfif YourID.firsttime IS 1>
                 <cftry>
                     <cfset pass_dec = Decrypt(CustFront.password,globalkey,"AES","hex")>
@@ -134,10 +137,11 @@
                 </div>
                 </cfoutput>
             </cfif>
+            {% endcomment %}
 
-            <cfif True>
+{#            <cfif True>#}
 
-                <cfform method="POST" name="reservation_form" action="perfexp_confirm.cfm" autocomplete="on">
+                <form method="POST" name="reservation_form" action="{% url "customer_portal:perfexp-confirm" confirmation_code=performanceexperience.confirmation_code %}" autocomplete="on">
 
                 <cfoutput query="PerfExp">
                 <table class="inputform rentalinfo">
@@ -158,7 +162,10 @@
                 <tbody>
                 <tr>
                     <td class="align-top">Notes/Requests</td>
-                    <td><cftextarea name="notes" id="notes" class="#StructKeyExists(fieldErrors,"notes") ? 'field-error' : ''#">#notes#</cftextarea></td>
+                    <td>
+                        {{ form.customer_notes }}
+{#                        <cftextarea name="notes" id="notes" class="#StructKeyExists(fieldErrors,"notes") ? 'field-error' : ''#">#notes#</cftextarea>#}
+                    </td>
                 </tr>
 
                 <tr class="buttons">
@@ -170,13 +177,15 @@
                 </table>
                 </cfoutput>
 
+                {% csrf_token %}
                 <cfinput name="method" type="hidden" value="updateJoyPerfNotes" />
                 <cfinput name="confcode" type="hidden" value="#confcode#" />
                 <cfinput name="joyperfid" type="hidden" value="#PerfExp.joyperfid#" />
-                </cfform>
+                </form>
 
-            </cfif>
+{#            </cfif>#}
 
+            {% comment %}
             <cfcatch type="Any">
                 <cfoutput>
                 <div class="exception">
@@ -186,6 +195,7 @@
                 </cfoutput>
             </cfcatch>
         </cftry>
+        {% endcomment %}
         {% endblock %}
     </div>
 
