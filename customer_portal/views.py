@@ -10,6 +10,7 @@ from users.views import LoginView, LogoutView
 from customer_portal.forms import (
     PasswordForm, ReservationCustomerInfoForm, ReservationNotesForm, ReservationDetailsForm,
     JoyRideDetailsForm, JoyRideNotesForm,
+    PerformanceExperienceNotesForm,
     AccountDriverInfoForm, AccountInsuranceForm, AccountMusicPrefsForm,
 )
 
@@ -182,7 +183,7 @@ class PerformanceExperienceConfirmView(SidebarMixin, UpdateView):
     template_name = 'customer_portal/performance_experience/confirm.html'
     selected_page = 'performance_experience'
     model = PerformanceExperience
-    form_class = ReservationCustomerInfoForm
+    form_class = PerformanceExperienceNotesForm
 
     def get_object(self, queryset=None):
         try:
@@ -190,15 +191,8 @@ class PerformanceExperienceConfirmView(SidebarMixin, UpdateView):
         except PerformanceExperience.DoesNotExist:
             raise Http404
 
-    def get_form_kwargs(self):
-        """Return the keyword arguments for instantiating the form."""
-        kwargs = super().get_form_kwargs()
-        if hasattr(self, 'object'):
-            kwargs.update({'instance': self.object.customer, 'event': self.object})
-        return kwargs
-
     def get_success_url(self):
-        return reverse('customer_portal:confirm-perfexp', kwargs={'confirmation_code': self.kwargs['confirmation_code']})
+        return reverse('customer_portal:perfexp-confirm', kwargs={'confirmation_code': self.kwargs['confirmation_code']})
 
 
 # Account Info

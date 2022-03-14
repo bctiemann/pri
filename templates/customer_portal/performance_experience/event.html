@@ -1,0 +1,46 @@
+{% load bbcode_tags %}
+
+<div class="confcode">{{ event.confirmation_code }}</div>
+<table class="small-item-data">
+    <tr>
+        <td>Requested Date:</td>
+        <td>{{ event.requested_date|date:"m/d/Y" }}</td>
+    </tr>
+    <tr>
+        <td>Alternate Date:</td>
+        <td>{{ event.backup_date|date:"m/d/Y" }}</td>
+    </tr>
+</table>
+
+{% if event.vehicle_choice_1 %}
+<cfif choice1 GT 0>
+    <div class="vehiclepic-box joyperf choice1">
+        <img class="vehiclepic" src="{{ event.vehicle_choice_1.vehicle_marketing.thumbnail_image.url }}" />
+        <span class="offer-title overlay-text bottom">{{ event.vehicle_choice_1.make }} {{ event.vehicle_choice_1.model }}</span>
+    </div>
+</cfif>
+{% endif %}
+{% if event.vehicle_choice_2 %}
+<cfif choice2 GT 0>
+    <div class="vehiclepic-box joyperf choice2">
+        <img class="vehiclepic" src="{{ event.vehicle_choice_2.vehicle_marketing.thumbnail_image.url }}" />
+        <span class="offer-title overlay-text bottom">{{ event.vehicle_choice_2.make }} {{ event.vehicle_choice_2.model }}</span>
+    </div>
+</cfif>
+{% endif %}
+{% if event.vehicle_choice_3 %}
+<cfif choice3 GT 0>
+    <div class="vehiclepic-box joyperf choice3">
+        <img class="vehiclepic" src="{{ event.vehicle_choice_3.vehicle_marketing.thumbnail_image.url }}" />
+        <span class="offer-title overlay-text bottom">{{ event.vehicle_choice_3.make }} {{ event.vehicle_choice_3.model }}</span>
+    </div>
+</cfif>
+{% endif %}
+
+{% if event.customer_notes %}
+<cfif notes IS NOT "">
+    <div class="customer-notes">
+        {{ event.customer_notes|bbcode|safe }}
+    </div>
+</cfif>
+{% endif %}

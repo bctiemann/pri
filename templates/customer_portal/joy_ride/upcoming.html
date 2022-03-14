@@ -7,7 +7,7 @@
     <cfoutput query="JoyRideUpcoming">
         <a href="{% url "customer_portal:joyride-confirm" confirmation_code=event.confirmation_code %}">
         <div class="reservation">
-            {% include "customer_portal/joy_ride/joy_ride.html" %}
+            {% include "customer_portal/joy_ride/event.html" %}
         </div>
         </a>
     </cfoutput>

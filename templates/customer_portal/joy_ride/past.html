@@ -6,7 +6,7 @@
     {% for event in past_joy_rides %}
     <cfoutput query="JoyRidePast">
         <div class="reservation">
-            {% include "customer_portal/joy_ride/joy_ride.html" %}
+            {% include "customer_portal/joy_ride/event.html" %}
         </div>
     </cfoutput>
     {% endfor %}

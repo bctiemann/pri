@@ -110,6 +110,14 @@ class JoyRideNotesForm(forms.ModelForm):
         fields = ('customer_notes',)
 
 
+class PerformanceExperienceNotesForm(forms.ModelForm):
+    customer_notes = forms.CharField(widget=forms.Textarea(), required=False)
+
+    class Meta:
+        model = PerformanceExperience
+        fields = ('customer_notes',)
+
+
 class AccountDriverInfoForm(forms.ModelForm):
 
     def clean_license_number(self):
