@@ -81,6 +81,7 @@ urlpatterns = [
     path('joy_ride/', sales_views.JoyRideView.as_view(), name='joy-ride'),
 
     path('gift_certificate/', sales_views.GiftCertificateView.as_view(), name='gift-certificate'),
+    path('gift_certificate/<str:tag>/', sales_views.GiftCertificateStatusView.as_view(), name='gift-certificate-status'),
 
     path('newsletter/', marketing_views.NewsletterView.as_view(), name='newsletter'),
     path('newsletter/done/', marketing_views.NewsletterDoneView.as_view(), name='newsletter-done'),
@@ -115,6 +116,8 @@ urlpatterns = [
     path('api/validate/perfexp/login/', api_views.ValidatePerformanceExperienceLoginView.as_view(), name='validate-perfexp-login'),
 
     path('api/validate/newsletter/subscribe/', api_views.ValidateNewsletterSubscriptionView.as_view(), name='validate-newsletter-subscription'),
+
+    path('api/validate/gift/payment/', api_views.ValidateGiftCertificateView.as_view(), name='validate-gift-certificate'),
 
     path('api/customers/search/', api_views.SearchCustomersView.as_view(), name='search-customers'),
     path('api/tax_rate/', api_views.TaxRateByZipView.as_view(), name='tax-rate-by-zip'),

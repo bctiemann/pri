@@ -5,6 +5,7 @@ import decimal
 import random
 import uuid
 import logging
+import string
 from localflavor.us.models import USStateField, USZipCodeField
 from avalara import AvataxClient
 from requests import HTTPError
@@ -21,6 +22,7 @@ from django.shortcuts import reverse
 
 from sales.enums import SERVICE_TYPE_CODE_MAP, ServiceType
 from sales.utils import EncryptedUSSocialSecurityNumberField, format_cc_number
+from pri.cipher import AESCipher
 
 logger = logging.getLogger(__name__)
 
@@ -372,16 +374,16 @@ class PerformanceExperience(GuidedDrive):
 
 
 class GiftCertificate(models.Model):
-    tag = models.CharField(max_length=255, blank=True)
+    tag = models.CharField(max_length=255, blank=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     issued_at = models.DateTimeField(null=True, blank=True)
-    beneficiary_name = models.CharField(max_length=255, blank=True)
+    beneficiary_name = models.CharField(max_length=255)
 
-    cc_name = models.CharField(max_length=255, null=True, blank=True)
-    cc_address = fields.EncryptedCharField(max_length=255, null=True, blank=True)
-    cc_city = models.CharField(max_length=255, blank=True)
-    cc_state = USStateField(null=True, blank=True)
-    cc_zip = USZipCodeField(null=True, blank=True)
+    cc_name = models.CharField(max_length=255, null=True)
+    cc_address = fields.EncryptedCharField(max_length=255, null=True)
+    cc_city = models.CharField(max_length=255)
+    cc_state = USStateField(null=True)
+    cc_zip = USZipCodeField(null=True)
 
     card = models.ForeignKey('sales.Card', null=True, blank=True, on_delete=models.SET_NULL)
 
@@ -391,8 +393,8 @@ class GiftCertificate(models.Model):
     cc_cvv = models.CharField(max_length=6, blank=True, verbose_name='CC CVV')
     cc_phone = PhoneNumberField(blank=True, verbose_name='CC contact phone')
 
-    email = models.EmailField(null=True, blank=True)
-    phone = PhoneNumberField(blank=True)
+    email = models.EmailField(null=True)
+    phone = PhoneNumberField()
     is_used = models.BooleanField(default=False)
     used_on = models.DateField(null=True, blank=True)
     remarks = fields.EncryptedTextField(blank=True)
@@ -401,8 +403,22 @@ class GiftCertificate(models.Model):
     message = models.CharField(max_length=200, blank=True)
     value_message = models.CharField(max_length=255, blank=True)
 
+    def get_random_character(self):
+        return random.choice(string.ascii_letters + string.digits)
+
+    # TODO: Make a proper bidirectional unique hash token that can be looked up from the email
+    def generate_tag(self, key):
+        aes = AESCipher(key)
+        encrypted_email = aes.encrypt(self.email)
+        hash_str = encrypted_email[0:10].upper()
+        for i in range(0, 3):
+            hash_str += self.get_random_character()
+        return hash_str
+
     def save(self, *args, **kwargs):
         self.cc_number = format_cc_number(self.cc_number)
+        if not self.tag:
+            self.tag = self.generate_tag(settings.GLOBAL_KEY_LEGACY)
         super().save(*args, **kwargs)
 
     @property

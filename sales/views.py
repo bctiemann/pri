@@ -1,11 +1,13 @@
-from django.views.generic import TemplateView, FormView, CreateView
+from django.views.generic import TemplateView, FormView, CreateView, UpdateView
 from django.http import Http404
 
 from sales.forms import (
     ReservationRentalDetailsForm, ReservationRentalPaymentForm, ReservationRentalLoginForm,
     PerformanceExperienceDetailsForm, PerformanceExperiencePaymentForm, PerformanceExperienceLoginForm,
     JoyRideDetailsForm, JoyRidePaymentForm, JoyRideLoginForm,
+    GiftCertificateForm,
 )
+from sales.models import GiftCertificate
 from marketing.views import NavMenuMixin
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
 
@@ -123,10 +125,24 @@ class JoyRideView(NavMenuMixin, PaymentLoginFormMixin, FormView):
         return context
 
 
-class GiftCertificateView(NavMenuMixin, TemplateView):
+class GiftCertificateView(NavMenuMixin, CreateView):
     template_name = 'front_site/gift_certificate.html'
+    form_class = GiftCertificateForm
+    model = GiftCertificate
 
     # def get_context_data(self, slug=None, **kwargs):
     #     context = super().get_context_data(**kwargs)
     #     context['vehicle_type'] = VehicleType
     #     return context
+
+
+class GiftCertificateStatusView(NavMenuMixin, UpdateView):
+    template_name = 'front_site/gift_certificate_status.html'
+    model = GiftCertificate
+    fields = '__all__'
+
+    def get_object(self, queryset=None):
+        try:
+            self.object = GiftCertificate.objects.get(tag=self.kwargs['tag'])
+        except GiftCertificate.DoesNotExist:
+            raise Http404

@@ -24,6 +24,7 @@ from sales.forms import (
     ReservationRentalDetailsForm, ReservationRentalPaymentForm, ReservationRentalLoginForm,
     PerformanceExperienceDetailsForm, PerformanceExperiencePaymentForm, PerformanceExperienceLoginForm,
     JoyRideDetailsForm, JoyRidePaymentForm, JoyRideLoginForm,
+    GiftCertificateForm,
 )
 from marketing.forms import NewsletterSubscribeForm
 from customer_portal.forms import ReservationCustomerInfoForm
@@ -358,6 +359,38 @@ class ValidateNewsletterSubscriptionView(APIView):
             'errors': form.errors,
             'errors_html': form.errors.as_ul(),
             'success_url': reverse('newsletter-done'),
+        }
+        return Response(response)
+
+
+# Gift Certificate
+
+class ValidateGiftCertificateView(APIView):
+
+    form_type = None
+
+    def post(self, request):
+        # form_class = self._get_form_class()
+        form = GiftCertificateForm(request.POST)
+        # form = form_class(request.POST)
+        print(form.data)
+        print(self.form_type)
+        print(form.is_valid())
+        print(form.errors.as_json())
+        if not form.is_valid():
+            return Response({
+                'success': False,
+                'errors': form.errors,
+            })
+
+        gift_certificate = form.save()
+
+        response = {
+            'success': form.is_valid(),
+            'errors': form.errors,
+            'errors_html': form.errors.as_ul(),
+            'reservation_type': 'gift',
+            'success_url': reverse('gift-certificate-status', kwargs={'tag': gift_certificate.tag}),
         }
         return Response(response)
 

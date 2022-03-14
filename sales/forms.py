@@ -13,7 +13,7 @@ from django.utils.translation import gettext_lazy as _, ngettext_lazy
 from django.contrib.auth import password_validation
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleStatus
-from sales.models import Reservation, Coupon, PerformanceExperience, JoyRide
+from sales.models import Reservation, Coupon, PerformanceExperience, JoyRide, GiftCertificate
 from users.models import Customer
 from sales.calculators import RentalPriceCalculator, PerformanceExperiencePriceCalculator, JoyRidePriceCalculator
 from sales.enums import get_service_hours, TRUE_FALSE_CHOICES, get_exp_year_choices, get_exp_month_choices, get_numeric_choices
@@ -569,3 +569,33 @@ class PerformanceExperiencePaymentForm(PaymentFormMixin, CardFormMixin, Performa
 class PerformanceExperienceLoginForm(PerformanceExperienceDetailsForm):
 
     password = forms.CharField(widget=forms.PasswordInput(), required=False)
+
+
+class GiftCertificateForm(CSSClassMixin, CardFormMixin, forms.ModelForm):
+
+    AMOUNT_CHOICES = (
+        (100, '$100'),
+        (250, '$250'),
+        (500, '$500'),
+        (1000, '$1,000'),
+        (1500, '$1,500'),
+        (2000, '$2,000'),
+        (5000, '$5,000'),
+    )
+
+    cc_fields = ('cc_number',)
+    phone_fields = ('phone', 'cc_phone',)
+
+    amount = forms.TypedChoiceField(coerce=lambda x: int(x), choices=AMOUNT_CHOICES)
+    message = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': '(Optional)'}))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.cc_fields:
+            self.add_widget_css_class(field, 'cc-field')
+        for field in self.phone_fields:
+            self.add_widget_css_class(field, 'phone')
+
+    class Meta:
+        model = GiftCertificate
+        fields = '__all__'

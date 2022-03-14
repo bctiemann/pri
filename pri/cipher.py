@@ -14,7 +14,7 @@ class AESCipher(object):
 
     def encrypt(self, raw):
         raw = self._pad(raw)
-        encrypted = self.cipher.encrypt(raw)
+        encrypted = self.cipher.encrypt(raw.encode('utf-8'))
         encoded = base64.b64encode(encrypted)
         return str(encoded, 'utf-8')
 

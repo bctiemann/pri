@@ -138,7 +138,8 @@ var reserveValidateForm = function(reservationType, section) {
                 } else if (data.reservation_type === 'rental') {
                     window.location.href = data.customer_site_url;
                 } else if (data.reservation_type == 'gift') {
-                    window.location.href = 'gift.cfm?tag=' + data.tag;
+                    window.location.href = data.success_url;
+                    // window.location.href = 'gift.cfm?tag=' + data.tag;
                 // } else if (data.reservation_type == 'subscribe') {
                 //     window.location.href = 'newsletter.cfm?done=1';
                 // } else if (data.reservation_type == 'unsubscribe') {
@@ -348,7 +349,7 @@ $('document').ready(function() {
         reserveValidateForm('perfexp', 'payment');
     });
     $('.reserve-gift-complete-btn').click(function() {
-        reserveValidateForm('buyGiftCert', 'payment');
+        reserveValidateForm('gift', 'payment');
     });
     $('.subscribe-complete-btn').click(function() {
         reserveValidateForm('newsletter', 'subscribe');

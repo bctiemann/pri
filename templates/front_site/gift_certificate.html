@@ -1,59 +1,6 @@
 {% extends "front_site/base.html" %}
 {% load static %}
 
-{% comment %}
-<!--- If a form was submitted, the user had JS turned off, so we have to process the sequential logic. --->
-<cfset fieldErrors = StructNew()>
-<cfset formError = "">
-<cfif IsDefined("Form.reservation_type")>
-
-    <!--- Validate the first page (identity and rental date/specs) --->
-    <cfset ret = StructAppend(Form, Variables)>
-    <cfinvoke
-        component="cfc/porknbeans"
-        method="buyGiftCert"
-        returnVariable="GiftCertResult"
-        argumentCollection="#Form#">
-    </cfinvoke>
-    <cfset fieldErrors = GiftCertResult.fieldErrors>
-
-    <!--- Push to confirmation page if successful --->
-    <cfif GiftCertResult.success>
-        <cfset redirectUrl = "gift.cfm?tag=" & GiftCertResult.tag>
-        <cflocation url=#redirectUrl#>
-    </cfif>
-
-    <!--- We're still here, so bind the form variables for redisplay --->
-    <cfset GiftCert = Form>
-    <cfset formError = NOT GiftCertResult.success ? GiftCertResult.error : "">
-
-<!--- If the user has JS on, pull a blank GiftCert object to populate the form --->
-<cfelse>
-
-    <cfquery name="GiftCert" datasource="#DSN#">
-        SELECT giftcertid,tag,issued,usename,ccname,ccaddr,cccity,ccstate,cczip,ccnum,ccexpyr,ccexpmo,cctel,
-        email,phone,used,usedon,remarks,amount,ispaid,message,cccvv FROM GiftCerts
-        WHERE giftcertid = 0
-    </cfquery>
-
-</cfif>
-
-<CFINCLUDE TEMPLATE="inc_states.cfm">
-<CFINCLUDE TEMPLATE="inc_header.cfm">
-<title>Performance Rentals</title>
-<CFINCLUDE TEMPLATE="inc_meta.cfm">
-<CFINCLUDE TEMPLATE="inc_styles.cfm">
-<CFINCLUDE TEMPLATE="inc_js.cfm">
-</head>
-<body>
-
-<div class="wrapper">
-
-<CFINCLUDE TEMPLATE="inc_nav.cfm">
-
-<section class="l-content">
-{% endcomment %}
-
 {% block content %}
 <div class="l-container">
 <div class="well" style="padding-bottom: 100px;">
@@ -65,59 +12,44 @@
 
     <div class="reservation-form-sidebar">
 
+        <form method="POST" name="reservation_form" id="reservation_form" action="{% url "gift-certificate" %}" onsubmit="return false;" autocomplete="on">
 
-    <cfif IsDefined("URL.tag")>
-
-        <cfquery name="GiftCert" datasource="#DSN#">
-            SELECT giftcertid,tag,issued,usename,ccname,ccaddr,cccity,ccstate,cczip,ccnum,ccexpyr,ccexpmo,cctel,
-            email,phone,used,usedon,remarks,amount,ispaid,message,cccvv FROM GiftCerts
-            WHERE tag = <CFQUERYPARAM value="#URL.tag#" CFSQLType="CF_SQL_VARCHAR" maxlength="255">
-        </cfquery>
-
-        <cfif GiftCert.recordCount IS 0>
+            {% if form.errors %}
+            <cfif Len(formError) GT 0>
             <div class="exception" id="reservation_form_error">
                 <h3>An error occurred</h3>
-                <p class="alert-message">Gift certificate ID not found.</p>
+                <p class="alert-message">#formError#</p>
             </div>
-        <cfelse>
-            <p class="reservation-info">
-Thank you for your purchase! Your gift certificate will be emailed to you as soon as it's been prepared. If you don't receive it within a day, please check your spam/junk folder.
-            </p>
-        </cfif>
-
-    <cfelse>
-
-        <cfform method="POST" name="reservation_form" action="gift.cfm" onsubmit="return false;" autocomplete="on">
-        <cfoutput>
-
-        <cfif Len(formError) GT 0>
-        <div class="exception" id="reservation_form_error">
-            <h3>An error occurred</h3>
-            <p class="alert-message">#formError#</p>
-        </div>
-        </cfif>
+            </cfif>
+            {% endif %}
 
             <div id="gift_payment">
 
                 <p class="reservation-info">
-If you've got a gearhead in your life, one of the best, most memorable gifts you can give is an experience&mdash;some time behind the wheel of one of our exhilarating vehicles. Our gift certificates can be
-applied to any of our rental services: street rentals, track rentals, or our Performance Experience and Joy Ride events, allowing the recipient to choose the car or experience most to his or her liking.
-What's more, you'll be able to share the gift with them on that special day!
+                If you've got a gearhead in your life, one of the best, most memorable gifts you can give is an experience&mdash;some time behind the wheel of one of our exhilarating vehicles. Our gift certificates can be
+                applied to any of our rental services: street rentals, track rentals, or our Performance Experience and Joy Ride events, allowing the recipient to choose the car or experience most to his or her liking.
+                What's more, you'll be able to share the gift with them on that special day!
                 </p>
 
                 <p class="reservation-info">
-You can purchase a PRI gift certificate right here, right now, and have it in your hands in just a few hours! Our secure, automated system will collect your information and prepare the gift certificate,
-email you instructions on how to retrieve it, and you can then print it yourself. No waiting on the phone or trying to intercept the mailman here!
+                You can purchase a PRI gift certificate right here, right now, and have it in your hands in just a few hours! Our secure, automated system will collect your information and prepare the gift certificate,
+                email you instructions on how to retrieve it, and you can then print it yourself. No waiting on the phone or trying to intercept the mailman here!
                 </p>
 
                 <table class="inputform payment">
                     <tr>
                         <td>Your Name</td>
-                        <td><cfinput name="ccname" value="#GiftCert.ccname#" class="#StructKeyExists(fieldErrors,"ccname") ? 'field-error' : ''#" /></td>
+                        <td>
+                            {{ form.cc_name }}
+                            <cfinput name="ccname" value="#GiftCert.ccname#" class="#StructKeyExists(fieldErrors,"ccname") ? 'field-error' : ''#" />
+                        </td>
                     </tr>
                     <tr>
                         <td>Your Email</td>
-                        <td><cfinput name="email" value="#GiftCert.email#" class="#StructKeyExists(fieldErrors,"email") ? 'field-error' : ''#" /></td>
+                        <td>
+                            {{ form.email }}
+                            <cfinput name="email" value="#GiftCert.email#" class="#StructKeyExists(fieldErrors,"email") ? 'field-error' : ''#" />
+                        </td>
                     </tr>
                     <tr class="smallprint">
                         <td></td>
@@ -128,11 +60,15 @@ email you instructions on how to retrieve it, and you can then print it yourself
 
                     <tr>
                         <td>Contact Phone Number</td>
-                        <td><cfinput name="phone" value="#GiftCert.phone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"phone") ? 'field-error' : ''#" /></td>
+                        <td>
+                            {{ form.phone }}
+                            <cfinput name="phone" value="#GiftCert.phone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"phone") ? 'field-error' : ''#" />
+                        </td>
                     </tr>
                     <tr>
                         <td>Gift Certificate Amount</td>
                         <td>
+                            {{ form.amount }}
                             <cfselect name="amount" class="#StructKeyExists(fieldErrors,"amount") ? 'field-error' : ''#">
                                 <option value="100" <cfif GiftCert.amount IS 100>selected</cfif>>$100</option>
                                 <option value="250" <cfif GiftCert.amount IS 250>selected</cfif>>$250</option>
@@ -147,7 +83,10 @@ email you instructions on how to retrieve it, and you can then print it yourself
                     </tr>
                     <tr>
                         <td>Beneficiary Name</td>
-                        <td><cfinput name="usename" value="#GiftCert.usename#" class="#StructKeyExists(fieldErrors,"usename") ? 'field-error' : ''#" /></td>
+                        <td>
+                            {{ form.beneficiary_name }}
+                            <cfinput name="usename" value="#GiftCert.usename#" class="#StructKeyExists(fieldErrors,"usename") ? 'field-error' : ''#" />
+                        </td>
                     </tr>
                     <tr class="smallprint">
                         <td></td>
@@ -156,16 +95,23 @@ email you instructions on how to retrieve it, and you can then print it yourself
                         </td>
                     </tr>
                     <tr>
-                        <td class="align-top">Billing Address</td>
-                        <td><cftextarea name="ccaddr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"ccaddr") ? 'field-error' : ''#">#GiftCert.ccaddr#</cftextarea></td>
+                        <td >Billing Address</td>
+                        <td>
+                            {{ form.cc_address }}
+{#                            <cftextarea name="ccaddr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"ccaddr") ? 'field-error' : ''#">#GiftCert.ccaddr#</cftextarea>#}
+                        </td>
                     </tr>
                     <tr>
                         <td>Billing City</td>
-                        <td><cfinput name="cccity" value="#GiftCert.cccity#" class="#StructKeyExists(fieldErrors,"cccity") ? 'field-error' : ''#" /></td>
+                        <td>
+                            {{ form.cc_city }}
+                            <cfinput name="cccity" value="#GiftCert.cccity#" class="#StructKeyExists(fieldErrors,"cccity") ? 'field-error' : ''#" />
+                        </td>
                     </tr>
                     <tr>
                         <td>Billing State</td>
                         <td>
+                            {{ form.cc_state }}
                             <cfselect name="ccstate" class="#StructKeyExists(fieldErrors,"ccstate") ? 'field-error' : ''#">
                                 <cfloop array="#states#" index="state">
                                     <option value="#state.abbr#" <CFIF GiftCert.ccstate IS state.abbr>selected</CFIF>>#state.name#</option>
@@ -175,15 +121,23 @@ email you instructions on how to retrieve it, and you can then print it yourself
                     </tr>
                     <tr>
                         <td>Billing Zip</td>
-                        <td><cfinput name="cczip" value="#GiftCert.cczip#" maxlength="10" class="#StructKeyExists(fieldErrors,"cczip") ? 'field-error' : ''#" /></td>
+                        <td>
+                            {{ form.cc_zip }}
+                            <cfinput name="cczip" value="#GiftCert.cczip#" maxlength="10" class="#StructKeyExists(fieldErrors,"cczip") ? 'field-error' : ''#" />
+                        </td>
                     </tr>
                     <tr>
                         <td>Credit Card Number</td>
-                        <td><cfinput name="ccnum" value="#GiftCert.ccnum#" maxlength="30" class="cc-field #StructKeyExists(fieldErrors,"ccnum") ? 'field-error' : ''#" /></td>
+                        <td>
+                            {{ form.cc_number }}
+                            <cfinput name="ccnum" value="#GiftCert.ccnum#" maxlength="30" class="cc-field #StructKeyExists(fieldErrors,"ccnum") ? 'field-error' : ''#" />
+                        </td>
                     </tr>
                     <tr>
                         <td>Credit Card Expiration</td>
                         <td>
+                            {{ form.cc_exp_mo }} / {{ form.cc_exp_yr }}
+                            {% comment %}
                             <cfselect name="ccexpmo" class="#StructKeyExists(fieldErrors,"ccexpmo") ? 'field-error' : ''#">
                                 <option value="01" <cfif GiftCert.ccexpmo IS "01">selected</cfif>>January (01)</option>
                                 <option value="02" <cfif GiftCert.ccexpmo IS "02">selected</cfif>>February (02)</option>
@@ -213,19 +167,29 @@ email you instructions on how to retrieve it, and you can then print it yourself
                                 </cfloop>
                                 </cfoutput>
                             </cfselect>
+                            {% endcomment %}
                         </td>
                     </tr>
                     <tr>
                         <td>CVV</td>
-                        <td><cfinput name="cccvv" value="#GiftCert.cccvv#" maxlength="5" class="#StructKeyExists(fieldErrors,"cccvv") ? 'field-error' : ''#" /></td>
+                        <td>
+                            {{ form.cc_cvv }}
+                            <cfinput name="cccvv" value="#GiftCert.cccvv#" maxlength="5" class="#StructKeyExists(fieldErrors,"cccvv") ? 'field-error' : ''#" />
+                        </td>
                     </tr>
                     <tr>
                         <td>Credit Card Bank Phone</td>
-                        <td><cfinput name="cctel" value="#GiftCert.cctel#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"cctel") ? 'field-error' : ''#" /></td>
+                        <td>
+                            {{ form.cc_phone }}
+                            <cfinput name="cctel" value="#GiftCert.cctel#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"cctel") ? 'field-error' : ''#" />
+                        </td>
                     </tr>
                     <tr>
                         <td>Personal Message</td>
-                        <td><cfinput name="message" value="#GiftCert.message#" maxlength="100" style="width: 300px;" placeholder="(Optional)" class="#StructKeyExists(fieldErrors,"message") ? 'field-error' : ''#" /></td>
+                        <td>
+                            {{ form.message }}
+                            <cfinput name="message" value="#GiftCert.message#" maxlength="100" style="width: 300px;" placeholder="(Optional)" class="#StructKeyExists(fieldErrors,"message") ? 'field-error' : ''#" />
+                        </td>
                     </tr>
                     <tr class="smallprint">
                         <td></td>
@@ -245,27 +209,15 @@ email you instructions on how to retrieve it, and you can then print it yourself
 
             </div>
 
-        <div class="exception hidden" id="reservation_payment_error">
-            <h3>An error occurred</h3>
-            <p class="alert-message"></p>
-        </div>
+            <div class="exception hidden" id="reservation_payment_error">
+                <h3>An error occurred</h3>
+                <p class="alert-message"></p>
+            </div>
 
-        </cfoutput>
-        <cfinput type="hidden" name="reservation_type" value="gift" />
-        </cfform>
-
-    </cfif>
-
+        </form>
 
     </div>
 
 </div>
 </div>
 {% endblock %}
-
-</section>
-
-    <div class="push"></div>
-</div>
-
-<CFINCLUDE TEMPLATE="inc_footer.cfm">
