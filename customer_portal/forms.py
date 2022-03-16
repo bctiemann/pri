@@ -21,7 +21,7 @@ class CustomerCardPrimaryForm(CSSClassMixin, forms.ModelForm):
     phone_fields = ['cc_phone']
 
     cc_number = forms.CharField(required=False)
-    cc_exp_yr = forms.ChoiceField(required=False, choices=get_exp_year_choices(since_founding=True, allow_null=False))
+    cc_exp_yr = forms.ChoiceField(required=False, choices=get_exp_year_choices(since_founding=False, allow_null=False))
     cc_exp_mo = forms.ChoiceField(required=False, choices=get_exp_month_choices(allow_null=False))
     cc_cvv = forms.CharField(required=False)
     cc_phone = PhoneNumberField(region='US', required=False)
@@ -34,6 +34,8 @@ class CustomerCardPrimaryForm(CSSClassMixin, forms.ModelForm):
         for field in self.phone_fields:
             self.add_widget_css_class(field, 'phone')
 
+    # TODO: clean_cc_number
+
     class Meta:
         model = Customer
         fields = ('cc_number', 'cc_exp_mo', 'cc_exp_yr', 'cc_cvv', 'cc_phone',)
@@ -45,7 +47,7 @@ class CustomerCardSecondaryForm(CSSClassMixin, forms.ModelForm):
     phone_fields = ['cc2_phone']
 
     cc2_number = forms.CharField(required=False)
-    cc2_exp_yr = forms.ChoiceField(required=False, choices=get_exp_year_choices(since_founding=True, allow_null=False))
+    cc2_exp_yr = forms.ChoiceField(required=False, choices=get_exp_year_choices(since_founding=False, allow_null=False))
     cc2_exp_mo = forms.ChoiceField(required=False, choices=get_exp_month_choices(allow_null=False))
     cc2_cvv = forms.CharField(required=False)
     cc2_phone = PhoneNumberField(region='US', required=False)
@@ -57,6 +59,8 @@ class CustomerCardSecondaryForm(CSSClassMixin, forms.ModelForm):
             self.add_widget_css_class(field, 'cc-field')
         for field in self.phone_fields:
             self.add_widget_css_class(field, 'phone')
+
+    # TODO: clean_cc2_number
 
     class Meta:
         model = Customer

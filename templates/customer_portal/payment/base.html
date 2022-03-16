@@ -22,16 +22,18 @@
             </li>
         </ul>
 
-        {% block subpage_pane %}{% endblock %}
-
+        {% if form.errors %}
         <cfoutput>
         <cfif Len(formError) GT 0>
         <div class="exception" id="customer_form_error">
             <h3>An error occurred</h3>
-            <p class="alert-message">#formError#</p>
+            <p class="alert-message">{{ form.errors }}</p>
         </div>
         </cfif>
         </cfoutput>
+        {% endif %}
+
+        {% block subpage_pane %}{% endblock %}
 
         {% comment %}
         <cfif page IS "card1">

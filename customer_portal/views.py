@@ -280,11 +280,12 @@ class PaymentCardPrimaryClearView(PaymentCardPrimaryView):
 
     def post(self, request, *args, **kwargs):
         customer = self.get_object()
-        customer.card_1.delete()
+        if customer.card_2:
+            customer.card_1.delete()
         return super().post(request, *args, **kwargs)
 
 
-class PaymentCardSecondaryView(SidebarMixin, FormView):
+class PaymentCardSecondaryView(SidebarMixin, UpdateView):
     template_name = 'customer_portal/payment/card_secondary.html'
     selected_page = 'payment_info'
     form_class = CustomerCardSecondaryForm
@@ -304,7 +305,8 @@ class PaymentCardSecondaryClearView(PaymentCardSecondaryView):
 
     def post(self, request, *args, **kwargs):
         customer = self.get_object()
-        customer.card_2.delete()
+        if customer.card_2:
+            customer.card_2.delete()
         return super().post(request, *args, **kwargs)
 
 
