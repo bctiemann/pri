@@ -423,20 +423,22 @@ class Customer(models.Model):
     def attach_card_1_to_stripe(self):
         if not self.stripe_customer:
             self.add_to_stripe()
-        if all((self.cc_number, self.cc_exp_mo, self.cc_exp_yr, self.cc_cvv)):
+        if all((self.cc_number, self.cc_exp_mo, self.cc_exp_yr, self.cc_cvv)) and not self.card_1:
             card_token = stripe.get_card_token(self.cc_number, self.cc_exp_mo, self.cc_exp_yr, self.cc_cvv)
             stripe.add_card_to_customer(self, card_token=card_token, is_primary=True)
 
     def attach_card_2_to_stripe(self):
         if not self.stripe_customer:
             self.add_to_stripe()
-        if all((self.cc2_number, self.cc2_exp_mo, self.cc2_exp_yr, self.cc2_cvv)):
+        if all((self.cc2_number, self.cc2_exp_mo, self.cc2_exp_yr, self.cc2_cvv)) and not self.card_2:
             card_token = stripe.get_card_token(self.cc2_number, self.cc2_exp_mo, self.cc2_exp_yr, self.cc2_cvv)
             stripe.add_card_to_customer(self, card_token=card_token)
 
     def save(self, *args, **kwargs):
         self.cc_number = format_cc_number(self.cc_number)
         self.cc2_number = format_cc_number(self.cc2_number)
+        self.attach_card_1_to_stripe()
+        self.attach_card_2_to_stripe()
         super().save(*args, **kwargs)
 
     def __str__(self):
