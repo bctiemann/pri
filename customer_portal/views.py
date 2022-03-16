@@ -1,5 +1,7 @@
+from stripe.error import CardError
+
 from django.views.generic import TemplateView, FormView, CreateView, UpdateView
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse_lazy, reverse
 from django.utils.timezone import now
 
@@ -280,9 +282,15 @@ class PaymentCardPrimaryClearView(PaymentCardPrimaryView):
 
     def post(self, request, *args, **kwargs):
         customer = self.get_object()
-        if customer.card_2:
+        if customer.card_1:
             customer.card_1.delete()
-        return super().post(request, *args, **kwargs)
+        customer.cc_number = ''
+        customer.cc_exp_mo = ''
+        customer.cc_exp_yr = ''
+        customer.cc_cvv = ''
+        customer.cc_phone = ''
+        customer.save()
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class PaymentCardSecondaryView(SidebarMixin, UpdateView):
@@ -293,6 +301,13 @@ class PaymentCardSecondaryView(SidebarMixin, UpdateView):
 
     def get_object(self, queryset=None):
         return self.request.user.customer
+
+    def form_valid(self, form):
+        try:
+            return super().form_valid(form)
+        except CardError as e:
+            form.add_error(None, e.user_message)
+            return self.render_to_response(self.get_context_data(form=form))
 
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
@@ -307,7 +322,13 @@ class PaymentCardSecondaryClearView(PaymentCardSecondaryView):
         customer = self.get_object()
         if customer.card_2:
             customer.card_2.delete()
-        return super().post(request, *args, **kwargs)
+        customer.cc2_number = ''
+        customer.cc2_exp_mo = ''
+        customer.cc2_exp_yr = ''
+        customer.cc2_cvv = ''
+        customer.cc2_phone = ''
+        customer.save()
+        return HttpResponseRedirect(self.get_success_url())
 
 
 # Other pages/functions

@@ -22,6 +22,7 @@
             </li>
         </ul>
 
+    {{ form.errors }}
         {% if form.errors %}
         <cfoutput>
         <cfif Len(formError) GT 0>

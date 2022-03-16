@@ -46,11 +46,11 @@ class CustomerCardSecondaryForm(CSSClassMixin, forms.ModelForm):
     cc_fields = ['cc2_number']
     phone_fields = ['cc2_phone']
 
-    cc2_number = forms.CharField(required=False)
-    cc2_exp_yr = forms.ChoiceField(required=False, choices=get_exp_year_choices(since_founding=False, allow_null=False))
-    cc2_exp_mo = forms.ChoiceField(required=False, choices=get_exp_month_choices(allow_null=False))
-    cc2_cvv = forms.CharField(required=False)
-    cc2_phone = PhoneNumberField(region='US', required=False)
+    cc2_number = forms.CharField()
+    cc2_exp_yr = forms.ChoiceField(choices=get_exp_year_choices(since_founding=False, allow_null=False))
+    cc2_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(allow_null=False))
+    cc2_cvv = forms.CharField()
+    cc2_phone = PhoneNumberField(region='US')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

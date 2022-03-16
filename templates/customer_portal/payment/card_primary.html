@@ -15,7 +15,7 @@
         <tr>
             <td>Primary Credit Card Number</td>
             <td>
-                {% if user.customer.has_primary_card %}
+                {% if user.customer.has_primary_card and not form.errors %}
                     {{ user.customer.cc_number }}
                 {% else %}
                     {% comment %}
@@ -35,7 +35,7 @@
         <tr>
             <td>Expiration</td>
             <td>
-                {% if user.customer.has_primary_card %}
+                {% if user.customer.has_primary_card and not form.errors %}
                     {{ user.customer.cc_exp_mo }} / {{ user.customer.cc_exp_yr }}
                 {% else %}
                     {{ form.cc_exp_mo }} / {{ form.cc_exp_yr }}
@@ -86,7 +86,7 @@
         <tr>
             <td>Security Code (CVV)</td>
             <td>
-                {% if user.customer.has_primary_card %}
+                {% if user.customer.has_primary_card and not form.errors %}
                     {{ user.customer.cc_cvv }}
                 {% else %}
                     {{ form.cc_cvv }}
@@ -106,7 +106,7 @@
         <tr>
             <td>Bank Telephone</td>
             <td>
-                {% if user.customer.has_primary_card %}
+                {% if user.customer.has_primary_card and not form.errors %}
                     {{ user.customer.cc_phone.as_national }}
                 {% else %}
                     {{ form.cc_phone }}
@@ -131,7 +131,7 @@
         <tr class="buttons">
             <td></td>
             <td>
-                {% if user.customer.has_primary_card %}
+                {% if user.customer.has_primary_card and not form.errors %}
                 <cfelse>
                     <cfinput name="fnc" type="hidden" value="clear" />
                     <button

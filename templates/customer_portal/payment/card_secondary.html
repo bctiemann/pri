@@ -9,12 +9,13 @@
 
     {{ user.customer.has_secondary_card }}
     {{ user.customer.card_2 }}
+    {{ form.instance }}
         <table class="inputform rentalinfo">
 
         <tr>
             <td>Secondary Credit Card Number</td>
             <td>
-                {% if user.customer.has_secondary_card %}
+                {% if user.customer.has_secondary_card and not form.errors %}
                     {{ user.customer.cc2_number }}
                 {% else %}
                     {{ form.cc2_number }}
@@ -24,7 +25,7 @@
         <tr>
             <td>Expiration</td>
             <td>
-                {% if user.customer.has_secondary_card %}
+                {% if user.customer.has_secondary_card and not form.errors %}
                     {{ user.customer.cc2_exp_mo }} / {{ user.customer.cc2_exp_yr }}
                 {% else %}
                     {{ form.cc2_exp_mo }} / {{ form.cc2_exp_yr }}
@@ -34,7 +35,7 @@
         <tr>
             <td>Security Code (CVV)</td>
             <td>
-                {% if user.customer.has_secondary_card %}
+                {% if user.customer.has_secondary_card and not form.errors %}
                     {{ user.customer.cc2_cvv }}
                 {% else %}
                     {{ form.cc2_cvv }}
@@ -44,7 +45,7 @@
         <tr>
             <td>Bank Telephone</td>
             <td>
-                {% if user.customer.has_secondary_card %}
+                {% if user.customer.has_secondary_card and not form.errors %}
                     {{ user.customer.cc2_phone.as_national }}
                 {% else %}
                     {{ form.cc2_phone }}
@@ -56,7 +57,7 @@
         <tr class="buttons">
             <td></td>
             <td>
-                {% if user.customer.has_secondary_card %}
+                {% if user.customer.has_secondary_card and not form.errors %}
                     <button
                         type="button"
                         class="btn delete"
