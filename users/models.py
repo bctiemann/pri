@@ -415,27 +415,24 @@ class Customer(models.Model):
     def card_2(self):
         return self.card_set.filter(is_primary=False).first()
 
-    # def add_card_1(self):
-    #     card_1_data = {
-    #         'number': self.cc_number,
-    #         'exp_month': self.cc_exp_mo,
-    #         'exp_year': self.cc_exp_yr,
-    #         'cvv': self.cc_cvv,
-    #     }
-    #     card_1_changed = customer.card_1 and customer.card_1.card_is_changed(**card_1_data)
-    #     card_1 = customer.card_1
-    #     if card_1_changed or not customer.card_1:
-    #         card_1_form = CardForm(data=card_1_data, instance=customer.card_1)
-    #         card_1 = card_1_form.save()
-    #         card_1.customer = customer
-    #         card_1.is_primary = True
-    #         card_1.save()
-    #         stripe.add_card_to_customer(customer, card=card_1)
-
     def add_to_stripe(self):
         stripe_customer = stripe.add_stripe_customer(self.full_name, self.email, self.phone)
         self.stripe_customer = stripe_customer
         self.save()
+
+    def attach_card_1_to_stripe(self):
+        if not self.stripe_customer:
+            self.add_to_stripe()
+        if all((self.cc_number, self.cc_exp_mo, self.cc_exp_yr, self.cc_cvv)):
+            card_token = stripe.get_card_token(self.cc_number, self.cc_exp_mo, self.cc_exp_yr, self.cc_cvv)
+            stripe.add_card_to_customer(self, card_token=card_token, is_primary=True)
+
+    def attach_card_2_to_stripe(self):
+        if not self.stripe_customer:
+            self.add_to_stripe()
+        if all((self.cc2_number, self.cc2_exp_mo, self.cc2_exp_yr, self.cc2_cvv)):
+            card_token = stripe.get_card_token(self.cc2_number, self.cc2_exp_mo, self.cc2_exp_yr, self.cc2_cvv)
+            stripe.add_card_to_customer(self, card_token=card_token)
 
     def save(self, *args, **kwargs):
         self.cc_number = format_cc_number(self.cc_number)

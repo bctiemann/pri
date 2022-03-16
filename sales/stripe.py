@@ -42,7 +42,7 @@ class Stripe:
         )
         return token
 
-    def add_card_to_stripe_customer(self, stripe_customer, card_token, card=None):
+    def add_card_to_stripe_customer(self, stripe_customer, card_token, card=None, is_primary=False):
         try:
             stripe_card = stripe.Customer.create_source(
                 stripe_customer,
@@ -69,6 +69,7 @@ class Stripe:
             card.exp_month = stripe_card.exp_month
             card.exp_year = stripe_card.exp_year
             card.fingerprint = stripe_card.fingerprint
+            card.is_primary = is_primary
             card.save()
         else:
             card = Card.objects.create(
@@ -78,11 +79,12 @@ class Stripe:
                 exp_month=stripe_card.exp_month,
                 exp_year=stripe_card.exp_year,
                 fingerprint=stripe_card.fingerprint,
+                is_primary=is_primary,
             )
 
         return card
 
-    def add_card_to_customer(self, customer, card_token=None, card=None):
+    def add_card_to_customer(self, customer, card_token=None, card=None, is_primary=False):
         if not card and not card_token:
             raise Exception('Provide either a card_token or a Card instance.')
 
@@ -92,6 +94,7 @@ class Stripe:
         if not customer.stripe_customer:
             customer.add_to_stripe()
 
-        card = self.add_card_to_stripe_customer(customer.stripe_customer, card_token, card=card)
+        card = self.add_card_to_stripe_customer(customer.stripe_customer, card_token, card=card, is_primary=is_primary)
+        print(card)
         card.customer = customer
         card.save()
