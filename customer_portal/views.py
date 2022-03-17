@@ -8,6 +8,7 @@ from django.contrib.auth.views import LoginView
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
 from sales.models import BaseReservation, Reservation, Rental, GuidedDrive, JoyRide, PerformanceExperience
+from sales.enums import CC_ERROR_PARAM_MAP, CC2_ERROR_PARAM_MAP
 from users.models import Customer
 from users.views import LogoutView
 from customer_portal.forms import (
@@ -279,6 +280,13 @@ class PaymentCardPrimaryView(SidebarMixin, UpdateView):
     def get_object(self, queryset=None):
         return self.request.user.customer
 
+    def form_valid(self, form):
+        try:
+            return super().form_valid(form)
+        except CardError as e:
+            form.add_error(CC_ERROR_PARAM_MAP.get(e.param), e.user_message)
+            return self.render_to_response(self.get_context_data(form=form))
+
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
 
@@ -314,7 +322,7 @@ class PaymentCardSecondaryView(SidebarMixin, UpdateView):
         try:
             return super().form_valid(form)
         except CardError as e:
-            form.add_error(None, e.user_message)
+            form.add_error(CC2_ERROR_PARAM_MAP.get(e.param), e.user_message)
             return self.render_to_response(self.get_context_data(form=form))
 
     def post(self, request, *args, **kwargs):

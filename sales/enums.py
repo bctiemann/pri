@@ -90,3 +90,17 @@ SERVICE_TYPE_CODE_MAP = {
     ServiceType.PERFORMANCE_EXPERIENCE.value: 'X',
     ServiceType.JOY_RIDE.value: 'Y',
 }
+
+CC_ERROR_PARAM_MAP = {
+    'number': 'cc_number',
+    'exp_month': 'cc_exp_mo',
+    'exp_year': 'cc_exp_yr',
+    'cvc': 'cc_cvv',
+}
+
+CC2_ERROR_PARAM_MAP = {
+    'number': 'cc2_number',
+    'exp_month': 'cc2_exp_mo',
+    'exp_year': 'cc2_exp_yr',
+    'cvc': 'cc2_cvv',
+}

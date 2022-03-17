@@ -20,11 +20,11 @@ class CustomerCardPrimaryForm(CSSClassMixin, forms.ModelForm):
     cc_fields = ['cc_number']
     phone_fields = ['cc_phone']
 
-    cc_number = forms.CharField(required=False)
-    cc_exp_yr = forms.ChoiceField(required=False, choices=get_exp_year_choices(since_founding=False, allow_null=False))
-    cc_exp_mo = forms.ChoiceField(required=False, choices=get_exp_month_choices(allow_null=False))
-    cc_cvv = forms.CharField(required=False)
-    cc_phone = PhoneNumberField(region='US', required=False)
+    cc_number = forms.CharField()
+    cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices(since_founding=False, allow_null=False))
+    cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(allow_null=False))
+    cc_cvv = forms.CharField()
+    cc_phone = PhoneNumberField(region='US')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

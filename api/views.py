@@ -3,6 +3,7 @@ import logging
 import pytz
 import requests
 import stripe
+from stripe.error import CardError
 
 from rest_framework import viewsets, mixins, status
 from rest_framework.views import APIView
@@ -31,6 +32,7 @@ from customer_portal.forms import ReservationCustomerInfoForm
 from sales.models import BaseReservation, Reservation, Rental, TaxRate, generate_code
 from sales.tasks import send_email
 from sales.calculators import PriceCalculator
+from sales.enums import CC2_ERROR_PARAM_MAP
 from sales.models import Card
 from users.models import User, Customer, Employee, generate_password
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture
@@ -217,7 +219,15 @@ class ValidateRentalConfirmView(APIView):
                 'errors': form.errors,
             })
 
-        form.save()
+        # Save the rental confirmation, and handle Stripe card error on CC2 here
+        try:
+            form.save()
+        except CardError as e:
+            form.add_error(CC2_ERROR_PARAM_MAP.get(e.param), e.user_message)
+            return Response({
+                'success': False,
+                'errors': form.errors,
+            })
 
         if form.cleaned_data['cc2_instructions']:
             reservation.customer_notes += '\n\n' + form.cleaned_data['cc2_instructions']
