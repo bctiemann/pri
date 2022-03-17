@@ -29,6 +29,7 @@
 <div id="content" class="loginwrap">
 <div class="logincontent">
 
+{% comment %}
 <CFIF IsDefined("AccessDenied")>
     <div class="loginerror">
         <h3>ACCESS DENIED</h3>
@@ -70,16 +71,30 @@
         <p>Your 2-factor key has expired.</p>
     </div>
 </CFIF>
+{% endcomment %}
 
-<cfform method="post" action="index.cfm">
+{% if form.errors %}
+    <div class="loginerror">
+        <h3>ACCESS DENIED</h3>
+        {% for field, error in form.errors.items %}
+            <p>{{ error }}</p>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<form method="post" action="{% url "customer_portal:login" %}">
 <table class="inputform">
     <tr>
         <td>Email</td>
-        <td><cfinput type="text" size="20" name="email" required="yes" message="Please enter an email address." /></td>
+        <td>
+            {{ form.username }}
+            <cfinput type="text" size="20" name="email" required="yes" message="Please enter an email address." />
+        </td>
     </tr>
     <tr>
         <td>Password</td>
         <td>
+            {{ form.password }}
             <cfinput type="password" size="20" name="pass" required="yes" message="You must enter a password." />
             <small class="forgot-password dialog-trigger">Forgot?</small>
         </td>
@@ -89,7 +104,9 @@
         <td><button type="submit" class="btn">Log In</button></td>
     </tr>
 </table>
-</cfform>
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}" />
+</form>
 
 </div>
 </div>

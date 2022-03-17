@@ -4,11 +4,12 @@ from django.views.generic import TemplateView, FormView, CreateView, UpdateView
 from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse_lazy, reverse
 from django.utils.timezone import now
+from django.contrib.auth.views import LoginView
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
 from sales.models import BaseReservation, Reservation, Rental, GuidedDrive, JoyRide, PerformanceExperience
 from users.models import Customer
-from users.views import LoginView, LogoutView
+from users.views import LogoutView
 from customer_portal.forms import (
     PasswordForm, ReservationCustomerInfoForm, ReservationNotesForm, ReservationDetailsForm,
     JoyRideDetailsForm, JoyRideNotesForm,
@@ -34,6 +35,13 @@ class SidebarMixin:
 class LoginView(LoginView):
     template_name = 'customer_portal/login.html'
     home_url = reverse_lazy('customer_portal:home')
+    next_page = reverse_lazy('customer_portal:home')
+
+    # form_list = (
+    #     ('auth', UserLoginForm),
+        # ('token', AuthenticationTokenForm),
+        # ('backup', BackupTokenForm),
+    # )
 
 
 class LogoutView(LogoutView):
