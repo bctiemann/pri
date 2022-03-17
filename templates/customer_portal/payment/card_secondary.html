@@ -1,4 +1,5 @@
 {% extends "customer_portal/payment/base.html" %}
+{% load card_tags %}
 
 {% block nav_card_secondary_class %}selected{% endblock %}
 
@@ -16,7 +17,7 @@
             <td>Secondary Credit Card Number</td>
             <td>
                 {% if user.customer.has_secondary_card and not form.errors %}
-                    {{ user.customer.cc2_number }}
+                    {{ user.customer.cc2_number|mask_cc_number }}
                 {% else %}
                     {{ form.cc2_number }}
                 {% endif %}

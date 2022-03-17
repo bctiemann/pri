@@ -1,4 +1,5 @@
 {% extends "customer_portal/payment/base.html" %}
+{% load card_tags %}
 
 {% block nav_card_primary_class %}selected{% endblock %}
 
@@ -16,7 +17,7 @@
             <td>Primary Credit Card Number</td>
             <td>
                 {% if user.customer.has_primary_card and not form.errors %}
-                    {{ user.customer.cc_number }}
+                    {{ user.customer.cc_number|mask_cc_number }}
                 {% else %}
                     {% comment %}
                 <cfif ccnum_dec IS "" OR IsDefined("Form.ccnum")>

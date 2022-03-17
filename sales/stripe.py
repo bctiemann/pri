@@ -84,7 +84,7 @@ class Stripe:
 
         return card
 
-    def add_card_to_customer(self, customer, card_token=None, card=None, is_primary=False):
+    def add_card_to_customer(self, customer, card_token=None, card=None, is_primary=False, number=None):
         if not card and not card_token:
             raise Exception('Provide either a card_token or a Card instance.')
 
@@ -94,7 +94,8 @@ class Stripe:
         if not customer.stripe_customer:
             customer.add_to_stripe()
 
-        card = self.add_card_to_stripe_customer(customer.stripe_customer, card_token, card=card, is_primary=is_primary)
-        print(card)
-        card.customer = customer
-        card.save()
+        updated_card = self.add_card_to_stripe_customer(customer.stripe_customer, card_token, card=card, is_primary=is_primary)
+        updated_card.customer = customer
+        if number:
+            updated_card.number = number
+        updated_card.save()
