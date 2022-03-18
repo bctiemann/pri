@@ -2,6 +2,7 @@ from phonenumber_field.formfields import PhoneNumberField
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth import password_validation
 
 from sales.models import BaseReservation, JoyRide, PerformanceExperience
 from sales.forms import ReservationRentalDetailsForm, JoyRideDetailsForm, PerformanceExperienceDetailsForm
@@ -11,8 +12,25 @@ from sales.enums import get_service_hours, TRUE_FALSE_CHOICES, get_exp_year_choi
 
 
 class PasswordForm(forms.Form):
+
+    error_messages = {
+        'password_mismatch': _('The two password fields didn’t match.'),
+    }
+
     password = forms.CharField(widget=forms.PasswordInput())
     password_repeat = forms.CharField(widget=forms.PasswordInput())
+
+    def clean_password_repeat(self):
+        password1 = self.cleaned_data.get('password')
+        password2 = self.cleaned_data.get('password_repeat')
+        if password1 and password2:
+            if password1 != password2:
+                raise forms.ValidationError(
+                    self.error_messages['password_mismatch'],
+                    code='password_mismatch',
+                )
+        password_validation.validate_password(password2, user=None)
+        return password2
 
 
 class CustomerCardPrimaryForm(CSSClassMixin, forms.ModelForm):

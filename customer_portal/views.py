@@ -5,11 +5,12 @@ from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse_lazy, reverse
 from django.utils.timezone import now
 from django.contrib.auth.views import LoginView
+from django.contrib.auth import login
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
 from sales.models import BaseReservation, Reservation, Rental, GuidedDrive, JoyRide, PerformanceExperience
 from sales.enums import CC_ERROR_PARAM_MAP, CC2_ERROR_PARAM_MAP
-from users.models import Customer
+from users.models import Customer, User
 from users.views import LogoutView
 from customer_portal.forms import (
     PasswordForm, ReservationCustomerInfoForm, ReservationNotesForm, ReservationDetailsForm,
@@ -353,6 +354,21 @@ class PasswordView(SidebarMixin, FormView):
     template_name = 'customer_portal/password.html'
     selected_page = 'password'
     form_class = PasswordForm
+
+    def form_valid(self, form):
+        print(form.cleaned_data)
+        self.request.user.set_password(form.cleaned_data['password'])
+        self.request.user.save()
+        login(self.request, self.request.user)
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('customer_portal:password-done')
+
+
+class PasswordDoneView(SidebarMixin, TemplateView):
+    template_name = 'customer_portal/password_done.html'
+    selected_page = 'password'
 
 
 class FindUsView(SidebarMixin, TemplateView):

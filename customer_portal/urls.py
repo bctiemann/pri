@@ -45,6 +45,7 @@ urlpatterns = [
     path('payment/secondary/clear/', views.PaymentCardSecondaryClearView.as_view(), name='payment-card-secondary-clear'),
 
     path('password/', views.PasswordView.as_view(), name='password'),
+    path('password/done/', views.PasswordDoneView.as_view(), name='password-done'),
 
     path('find_us/', views.FindUsView.as_view(), name='find-us'),
 ]
