@@ -65,34 +65,49 @@ class ReservationConvertToRentalView(UpdateView):
     def form_valid(self, form):
         reservation = form.instance
 
-        # We delete the reservation object before converting it to a rental (no harm in this as Rental is a superset
+        # Collect all the field values from the BaseReservation, which will be used to create the Rental
+        reservation_fields = {}
+        for field in reservation.basereservation_ptr._meta.get_fields():
+            if field.name not in ['id', 'reservation', 'rental']:
+                reservation_fields[field.name] = getattr(reservation, field.name)
+
+        # reservation_fields = vars(reservation)
+        # reservation_fields.pop('id')
+        # reservation_fields.pop('_state')
+
+        reservation_fields['type'] = Rental.ReservationType.RENTAL
+        reservation_fields['status'] = Rental.Status.CONFIRMED
+
+        # We delete the Reservation object before converting it to a Rental (no harm in this as Rental is a superset
         # of Reservation, except for the status field). Have to delete prior to creating rental to avoid collision
         # of confirmation_code.
         reservation.delete()
 
+        rental = Rental.objects.create(**reservation_fields)
+
         # Populate a new Rental object with fields explicitly from the Reservation
-        rental = Rental.objects.create(
-            type=Rental.ReservationType.RENTAL,
-            vehicle=reservation.vehicle,
-            customer=reservation.customer,
-            reserved_at=reservation.reserved_at,
-            out_at=reservation.out_at,
-            back_at=reservation.back_at,
-            drivers=reservation.drivers,
-            miles_included=reservation.miles_included,
-            extra_miles=reservation.extra_miles,
-            customer_notes=reservation.customer_notes,
-            coupon_code=reservation.coupon_code,
-            is_military=reservation.is_military,
-            deposit_amount=reservation.deposit_amount,
-            confirmation_code=reservation.confirmation_code,
-            app_channel=reservation.app_channel,
-            delivery_required=reservation.delivery_required,
-            delivery_zip=reservation.delivery_zip,
-            override_subtotal=reservation.override_subtotal,
-            final_price_data=reservation.final_price_data,
-            status=Rental.Status.CONFIRMED,
-        )
+        # rental = Rental.objects.create(
+        #     type=Rental.ReservationType.RENTAL,
+        #     vehicle=reservation.vehicle,
+        #     customer=reservation.customer,
+        #     reserved_at=reservation.reserved_at,
+        #     out_at=reservation.out_at,
+        #     back_at=reservation.back_at,
+        #     drivers=reservation.drivers,
+        #     miles_included=reservation.miles_included,
+        #     extra_miles=reservation.extra_miles,
+        #     customer_notes=reservation.customer_notes,
+        #     coupon_code=reservation.coupon_code,
+        #     is_military=reservation.is_military,
+        #     deposit_amount=reservation.deposit_amount,
+        #     confirmation_code=reservation.confirmation_code,
+        #     app_channel=reservation.app_channel,
+        #     delivery_required=reservation.delivery_required,
+        #     delivery_zip=reservation.delivery_zip,
+        #     override_subtotal=reservation.override_subtotal,
+        #     final_price_data=reservation.final_price_data,
+        #     status=Rental.Status.CONFIRMED,
+        # )
         self.rental = rental
 
         return HttpResponseRedirect(self.get_success_url())
