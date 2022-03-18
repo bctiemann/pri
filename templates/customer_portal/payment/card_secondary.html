@@ -8,9 +8,6 @@
 
     <form method="POST" name="payment_form" action="{% url "customer_portal:payment-card-secondary" %}" autocomplete="on">
 
-    {{ user.customer.has_secondary_card }}
-    {{ user.customer.card_2 }}
-    {{ form.instance }}
         <table class="inputform rentalinfo">
 
         <tr>

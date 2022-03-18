@@ -22,13 +22,14 @@
             </li>
         </ul>
 
-    {{ form.errors }}
         {% if form.errors %}
         <cfoutput>
         <cfif Len(formError) GT 0>
         <div class="exception" id="customer_form_error">
             <h3>An error occurred</h3>
-            <p class="alert-message">{{ form.errors }}</p>
+            {% for field, error in form.errors.items %}
+                <p class="alert-message">{{ error }}</p>
+            {% endfor %}
         </div>
         </cfif>
         </cfoutput>

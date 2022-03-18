@@ -8,8 +8,6 @@
 
     <form method="POST" name="payment_form" action="{% url "customer_portal:payment-card-primary" %}" autocomplete="on">
 
-    {{ user.customer.has_primary_card }}
-    {{ user.customer.card_1 }}
         <cfoutput>
         <table class="inputform rentalinfo">
 
