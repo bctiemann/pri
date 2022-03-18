@@ -15,7 +15,7 @@
 
         <tr>
             <td>Secondary Credit Card Number</td>
-            <td>
+            <td class="{% if form.errors.cc2_number %}field-error{% endif %}">
                 {% if user.customer.has_secondary_card and not form.errors %}
                     {{ user.customer.cc2_number|mask_cc_number }}
                 {% else %}
@@ -25,7 +25,7 @@
         </tr>
         <tr>
             <td>Expiration</td>
-            <td>
+            <td class="{% if form.errors.cc2_exp_mo or form.errors.cc2_exp_yr %}field-error{% endif %}">
                 {% if user.customer.has_secondary_card and not form.errors %}
                     {{ user.customer.cc2_exp_mo }} / {{ user.customer.cc2_exp_yr }}
                 {% else %}
@@ -35,7 +35,7 @@
         </tr>
         <tr>
             <td>Security Code (CVV)</td>
-            <td>
+            <td class="{% if form.errors.cc2_cvv %}field-error{% endif %}">
                 {% if user.customer.has_secondary_card and not form.errors %}
                     {{ user.customer.cc2_cvv }}
                 {% else %}
@@ -45,7 +45,7 @@
         </tr>
         <tr>
             <td>Bank Telephone</td>
-            <td>
+            <td class="{% if form.errors.cc2_phone %}field-error{% endif %}">
                 {% if user.customer.has_secondary_card and not form.errors %}
                     {{ user.customer.cc2_phone.as_national }}
                 {% else %}
