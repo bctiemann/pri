@@ -1,5 +1,34 @@
 var maxphonelength = 14;
 
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
 var reserveValidateForm = function(reservationType, section) {
     var params = {};
     var formArray = $('#reservation_form').serializeArray();
@@ -119,10 +148,10 @@ var sendResetPassword = function() {
     var params = {
         component: 'cassidy',
         method: 'sendResetPassword',
-        email: $('#email').val(),
+        email: $('#password_reset_email').val(),
     }
     $('#dialog_reset_password').dialog('close');
-    $.post('ajax_post.cfm',params,function(data) {
+    $.post('/recovery/password_reset/',params,function(data) {
         console.log(data);
         if (data.success) {
             $('#dialog_reset_password_done').dialog({
