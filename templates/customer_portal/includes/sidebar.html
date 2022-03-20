@@ -4,6 +4,7 @@
 <a class="header-logo" href="{% url "customer_portal:home" %}"><img src='{% static "customer/images/PRI_logo.png" %}' alt='Performance Rentals' width="255px"></a>
 </cfoutput>
 
+{% if user.is_authenticated %}
 <cfif IsValidUser>
 
     {% comment %}
@@ -150,3 +151,4 @@
 </ul>
 
 </cfif>
+{% endif %}

@@ -68,8 +68,8 @@ class LogoutView(LogoutView):
 #         return reverse_lazy('change-password-done')
 
 
-class PasswordChangeDoneView(TemplateView):
-    template_name = 'accounts/change_password_done.html'
+# class PasswordChangeDoneView(TemplateView):
+#     template_name = 'accounts/change_password_done.html'
 
 
 class PasswordResetView(PasswordResetView):
