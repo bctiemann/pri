@@ -30,15 +30,17 @@
 
     <div class="calendar-container"></div>
 
+        {% if vehicle %}
         <cfif vid GT 0>
         <div class="dialog" id="dialog_reserve_vehicle" title="Reserve Vehicle">
         <cfoutput>
-        <p>You're reserving your #Vehicle.make# #Vehicle.model# for <span class="reserve-date"></span>.
+        <p>You're reserving your {{ vehicle.make }} {{ vehicle.model }} for <span class="reserve-date"></span>.
         </cfoutput>
         Please enter the number of days you'd like to reserve it for.</p>
         <input id="reserve_number_days" placeholder="1" />
         </div>
-    </cfif>
+        </cfif>
+        {% endif %}
 
     <div class="dialog" id="dialog_reserve_vehicle_done" title="Reserve Vehicle">
     <p>Your vehicle has been reserved for the dates selected.</p>

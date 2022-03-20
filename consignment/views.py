@@ -6,7 +6,7 @@ from django.views.generic import TemplateView, FormView, CreateView
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView
 
@@ -14,6 +14,14 @@ from users.views import LogoutView
 from fleet.models import Vehicle
 from consignment.utils import EventCalendar
 from customer_portal.forms import PasswordForm
+
+
+class SidebarMixin:
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['selected_page'] = getattr(self, 'selected_page', None)
+        return context
 
 
 class VehicleContextMixin:
@@ -28,14 +36,6 @@ class VehicleContextMixin:
         return context
 
 
-class VehiclePageMixin:
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['selected_page'] = 'vehicles'
-        return context
-
-
 class LoginView(LoginView):
     template_name = 'consignment/login.html'
     home_url = reverse_lazy('consignment:home')
@@ -46,12 +46,14 @@ class LogoutView(LogoutView):
     pass
 
 
-class CalendarView(VehicleContextMixin, VehiclePageMixin, TemplateView):
+class CalendarView(SidebarMixin, VehicleContextMixin, TemplateView):
     template_name = 'consignment/calendar.html'
+    selected_page = 'vehicles'
 
 
-class ProceedsView(VehicleContextMixin, VehiclePageMixin, TemplateView):
+class ProceedsView(VehicleContextMixin, TemplateView):
     template_name = 'consignment/proceeds.html'
+    selected_page = 'vehicles'
 
 
 class CalendarWidgetView(VehicleContextMixin, TemplateView):
@@ -103,16 +105,18 @@ class CalendarWidgetView(VehicleContextMixin, TemplateView):
         return context
 
 
-class PaymentsView(TemplateView):
+class ReserveView(FormView):
+
+    def post(self, request, *args, **kwargs):
+        return JsonResponse({'success': True})
+
+
+class PaymentsView(SidebarMixin, TemplateView):
     template_name = 'consignment/payments.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['selected_page'] = 'payments'
-        return context
+    selected_page = 'payments'
 
 
-class PasswordView(FormView):
+class PasswordView(SidebarMixin, FormView):
     template_name = 'consignment/password.html'
     selected_page = 'password'
     form_class = PasswordForm
@@ -128,6 +132,6 @@ class PasswordView(FormView):
         return reverse('consignment:password-done')
 
 
-class PasswordDoneView(TemplateView):
+class PasswordDoneView(SidebarMixin, TemplateView):
     template_name = 'consignment/password_done.html'
     selected_page = 'password'

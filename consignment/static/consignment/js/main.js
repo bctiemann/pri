@@ -4,6 +4,35 @@ var monthOffset = 0;
 var dateout = null;
 var reservationid = null;
 
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
 var sendResetPassword = function() {
     var params = {
         component: 'cassidy',
@@ -72,13 +101,13 @@ var reserveVehicle = function() {
     var params = {
         component: 'cassidy',
         method: 'reserveVehicle',
-        vehicleid: vid,
+        // vehicleid: vid,
         dateout: dateout,
         numdays: $('#reserve_number_days').val(),
     }
 console.log(params);
     $('#dialog_reserve_vehicle').dialog('close');
-    $.post('ajax_post.cfm',params,function(data) {
+    $.post(`/special/reserve/${vehicleSlug}/`,params,function(data) {
         console.log(data);
         if (data.success) {
             $('#dialog_reserve_vehicle_done').dialog({

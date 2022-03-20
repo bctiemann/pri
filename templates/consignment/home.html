@@ -45,7 +45,7 @@
 {% block content %}
 
     {% if vehicle %}
-        <img class="vehicle-header" src="#OnSite#images/#vehicleid#-thumb.jpg" />
+        <img class="vehicle-header" src="{{ vehicle.vehicle_marketing.thumbnail_image.url }}" />
         <h1>{{ vehicle.make }} {{ vehicle.model }}</h1>
     {% else %}
         <h1>All Vehicles</h1>

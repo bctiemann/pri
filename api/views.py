@@ -405,6 +405,12 @@ class ValidateGiftCertificateView(APIView):
         return Response(response)
 
 
+# Consignment
+
+class ConsignmentReserveView(APIView):
+    pass
+
+
 # Single entrypoint to handle all API calls from mobile app
 class LegacyPostView(APIView):
 
