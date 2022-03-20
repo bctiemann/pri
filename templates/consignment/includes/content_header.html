@@ -8,11 +8,14 @@
         </div>
         <div class="banner left">
             <cfoutput>
+            {% if user.is_authenticated %}
             <cfif IsValidUser>
-                <p>PRI Special Use Portal - <span class="your-name">#YourID.fname# #YourID.lname#</span></p>
+                <p>PRI Special Use Portal - <span class="your-name">{{ user.consigner.full_name }}</span></p>
+            {% else %}
             <cfelse>
                 <p>PRI Special Use Portal</p>
             </cfif>
+            {% endif %}
             </cfoutput>
         </div>
     </div>

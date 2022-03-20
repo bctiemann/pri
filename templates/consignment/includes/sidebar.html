@@ -1,9 +1,10 @@
 {% load static %}
 
 <cfoutput>
-<a class="header-logo" href="#OnCnsSite#"><img src='{% static "consignment/images/PRI_logo.png" %}' alt='Performance Rentals' width="255px"></a>
+<a class="header-logo" href="{% url "consignment:home" %}"><img src='{% static "consignment/images/PRI_logo.png" %}' alt='Performance Rentals' width="255px"></a>
 </cfoutput>
 
+{% if user.is_authenticated %}
 <cfif IsValidUser>
 
     {% comment %}
@@ -39,9 +40,11 @@
         {% endcomment %}
 
         <a href="{% url "consignment:calendar" slug=menu_vehicle.slug %}">
+            {% if menu_vehicle.upcoming_rentals.exists %}
             <cfif RentalsUpcoming.recordCount GT 0>
-                <div class="badge">#RentalsUpcoming.recordCount#</div>
+                <div class="badge">{{ menu_vehicle.upcoming_rentals.count }}</div>
             </cfif>
+            {% endif %}
             {{ menu_vehicle.make }} {{ menu_vehicle.model }}
         </a>
     </li>
@@ -49,17 +52,18 @@
     {% endfor %}
 </ul>
 <ul class="sidebar-nav">
-    <li class="account-info <cfif selectedPage IS "payments">selected-page</cfif>">
-        <a href="payments.cfm">Payments</a>
+    <li class="account-info {% if selected_page == "payments" %}selected-page{% endif %}">
+        <a href="{% url "consignment:payments" %}">Payments</a>
     </li>
-    <li class="account-info <cfif selectedPage IS "password">selected-page</cfif>">
-        <a href="password.cfm">Change Password</a>
+    <li class="account-info {% if selected_page == "password" %}selected-page{% endif %}">
+        <a href="{% url "consignment:password" %}">Change Password</a>
     </li>
 </ul>
 <ul class="sidebar-nav">
     <li class="account-info">
-        <a href="index.cfm?exit=1">Log Out</a>
+        <a href="{% url "consignment:logout" %}">Log Out</a>
     </li>
 </ul>
 
 </cfif>
+{% endif %}

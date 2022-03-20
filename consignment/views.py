@@ -3,14 +3,17 @@ from dateutil.relativedelta import relativedelta
 
 from django.shortcuts import render
 from django.views.generic import TemplateView, FormView, CreateView
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.http import Http404
+from django.contrib.auth import login
+from django.contrib.auth.views import LoginView
 
-from users.views import LoginView
+from users.views import LogoutView
 from fleet.models import Vehicle
 from consignment.utils import EventCalendar
+from customer_portal.forms import PasswordForm
 
 
 class VehicleContextMixin:
@@ -36,6 +39,11 @@ class VehiclePageMixin:
 class LoginView(LoginView):
     template_name = 'consignment/login.html'
     home_url = reverse_lazy('consignment:home')
+    next_page = reverse_lazy('consignment:home')
+
+
+class LogoutView(LogoutView):
+    pass
 
 
 class CalendarView(VehicleContextMixin, VehiclePageMixin, TemplateView):
@@ -93,3 +101,33 @@ class CalendarWidgetView(VehicleContextMixin, TemplateView):
         context['next_month'] = mark_safe(next_cal.formatmonth())
 
         return context
+
+
+class PaymentsView(TemplateView):
+    template_name = 'consignment/payments.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['selected_page'] = 'payments'
+        return context
+
+
+class PasswordView(FormView):
+    template_name = 'consignment/password.html'
+    selected_page = 'password'
+    form_class = PasswordForm
+
+    def form_valid(self, form):
+        print(form.cleaned_data)
+        self.request.user.set_password(form.cleaned_data['password'])
+        self.request.user.save()
+        login(self.request, self.request.user)
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('consignment:password-done')
+
+
+class PasswordDoneView(TemplateView):
+    template_name = 'consignment/password_done.html'
+    selected_page = 'password'

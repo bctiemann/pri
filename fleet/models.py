@@ -14,6 +14,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
 from django.core.files.base import ContentFile
+from django.utils import timezone
 from django.core.files.storage import default_storage
 
 
@@ -119,6 +120,12 @@ class Vehicle(models.Model):
         """
         AND (nextmiles <= <CFQUERYPARAM value="#Vehicles.mileage#" CFSQLType="CF_SQL_INTEGER"> + 500 AND donestamp IS NULL AND donemiles IS NULL)
         """
+
+    @property
+    def upcoming_rentals(self):
+        from sales.models import BaseReservation, Rental
+        now = timezone.now()
+        return self.basereservation_set.filter(type=BaseReservation.ReservationType.RENTAL, back_at__date__gt=now.date()).exclude(rental__status=Rental.Status.CANCELLED)
 
     # TODO: Either expose the slug in the backoffice vehicle form and make it controllable, or add collision
     # checking to this method for creating new records

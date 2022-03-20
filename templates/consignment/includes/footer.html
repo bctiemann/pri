@@ -5,15 +5,15 @@
 <cfoutput>
 <nav>
 <div class="l-container">
-<a href='#OnSite#' class='footer-logo'><img src="{% static "consignment/images/PRI_logo.png" %}" alt='Performance Rentals' width='255px'></a>
+<a href='{% url "home" %}' class='footer-logo'><img src="{% static "consignment/images/PRI_logo.png" %}" alt='Performance Rentals' width='255px'></a>
 <ul style="text-align: right;">
-    <li><a href="#OnSite#fleet.cfm">Fleet &amp; Rates</a></li>
-    <li><a href="#OnSite#services.cfm">Services</a></li>
-    <li><a href="#OnSite#specials.cfm">Specials</a></li>
-    <li><a href="#OnSite#about.cfm">About Us</a></li>
-    <li><a href="#OnSite#policies.cfm">Policies</a></li>
-    <li><a href="#OnSite#news.cfm">News</a></li>
-    <li><a href="#OnSite#contact.cfm">Contact</a></li>
+    <li><a href="{% url "fleet" %}">Fleet &amp; Rates</a></li>
+    <li><a href="{% url "services" %}">Services</a></li>
+    <li><a href="{% url "specials" %}">Specials</a></li>
+    <li><a href="{% url "about" %}">About Us</a></li>
+    <li><a href="{% url "policies" %}">Policies</a></li>
+    <li><a href="{% url "news" %}">News</a></li>
+    <li><a href="{% url "contact" %}">Contact</a></li>
 </ul>
 </div>
 </nav>
@@ -22,10 +22,10 @@
 <section class='info'>
 <div class='l-container'>
 <ul>
-    <li><a href="#OnSite#terms.cfm">Terms & Conditions</a></li>
-    <li><a href="#OnSite#privacy.cfm">Privacy Policy</a></li>
-    <li><a href="#OnSite#media.cfm">Media Inquiries</a></li>
-    <li><a href="#OnSite#terms.cfm">Copyright &copy; 2007-<CFOUTPUT>#DateFormat(Now(),"yyyy")#</CFOUTPUT> Performance Rentals, Inc. All Rights Reserved.	</a></li>
+    <li><a href="{% url "terms-and-conditions" %}">Terms & Conditions</a></li>
+    <li><a href="{% url "privacy-policy" %}">Privacy Policy</a></li>
+    <li><a href="{% url "media-inquiries" %}">Media Inquiries</a></li>
+    <li><a href="{% url "terms-and-conditions" %}">Copyright &copy; 2007-{% now "Y" %} Performance Rentals, Inc. All Rights Reserved.</a></li>
 </ul>
 </div>
 </section>
