@@ -133,10 +133,13 @@ class TrackActivityView(APIView):
     authentication_classes = (BasicAuthentication, SessionAuthentication)
 
     def post(self, request):
-        request.user.admin_last_activity = parse_datetime(request.POST.get('last_activity'))
-        request.user.save()
+        is_sleeping = False
+        if request.user.is_authenticated:
+            request.user.admin_last_activity = parse_datetime(request.POST.get('last_activity'))
+            request.user.save()
+            is_sleeping = request.user.is_sleeping
         return Response({
-            'is_sleeping': request.user.is_sleeping,
+            'is_sleeping': is_sleeping,
         })
 
 

@@ -14,7 +14,7 @@ from django.http import HttpResponse, JsonResponse, Http404, HttpResponseForbidd
 from two_factor.views import LoginView, PhoneSetupView, PhoneDeleteView, DisableView
 from two_factor.forms import AuthenticationTokenForm, BackupTokenForm
 
-from users.forms import UserLoginForm, PasswordChangeForm
+from users.forms import UserLoginForm
 from users.models import User
 
 import logging
@@ -51,21 +51,21 @@ class LogoutView(LogoutView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class PasswordChangeView(UpdateView):
-    model = User
-    form_class = PasswordChangeForm
-    template_name = 'accounts/change_password.html'
-
-    def get_object(self, queryset=None):
-        return self.request.user
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        update_session_auth_hash(self.request, self.request.user)
-        return response
-
-    def get_success_url(self):
-        return reverse_lazy('change-password-done')
+# class PasswordChangeView(UpdateView):
+#     model = User
+#     form_class = PasswordChangeForm
+#     template_name = 'accounts/change_password.html'
+#
+#     def get_object(self, queryset=None):
+#         return self.request.user
+#
+#     def form_valid(self, form):
+#         response = super().form_valid(form)
+#         update_session_auth_hash(self.request, self.request.user)
+#         return response
+#
+#     def get_success_url(self):
+#         return reverse_lazy('change-password-done')
 
 
 class PasswordChangeDoneView(TemplateView):
@@ -73,15 +73,30 @@ class PasswordChangeDoneView(TemplateView):
 
 
 class PasswordResetView(PasswordResetView):
+    email_template_name = 'front_site/email/password_recovery.html'
+    success_url = reverse_lazy("password_reset_complete")
 
     def form_valid(self, form):
         logger.info(f'{form.cleaned_data["email"]} requested a password reset')
-        return super().form_valid(form)
+        # return super().form_valid(form)
+        opts = {
+            "use_https": self.request.is_secure(),
+            "token_generator": self.token_generator,
+            "from_email": self.from_email,
+            "email_template_name": self.email_template_name,
+            "subject_template_name": self.subject_template_name,
+            "request": self.request,
+            "html_email_template_name": self.html_email_template_name,
+            "extra_email_context": self.extra_email_context,
+        }
+        form.save(**opts)
+        return JsonResponse({})
 
 
 class PasswordResetConfirmView(PasswordResetConfirmView):
     post_reset_login = True
+    template_name = 'customer_portal/account/change_password.html'
 
     def form_valid(self, form):
-        logger.info(f'{self.user} successfully reset their password')
+        # logger.info(f'{self.user} successfully reset their password')
         return super().form_valid(form)
