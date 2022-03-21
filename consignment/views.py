@@ -3,7 +3,7 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 
 from django.shortcuts import render
-from django.views.generic import TemplateView, FormView, CreateView
+from django.views.generic import TemplateView, FormView, CreateView, UpdateView
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -15,7 +15,8 @@ from users.views import LogoutView
 from fleet.models import Vehicle, VehicleStatus
 from sales.models import Rental
 from consignment.utils import EventCalendar
-from customer_portal.forms import PasswordForm
+from consignment.models import Consigner
+from consignment.forms import PasswordForm, ConsignerPaymentInfoForm
 
 
 class SidebarMixin:
@@ -130,9 +131,17 @@ class PaymentHistoryView(SidebarMixin, TemplateView):
     selected_page = 'payments'
 
 
-class PaymentInfoView(SidebarMixin, TemplateView):
+class PaymentInfoView(SidebarMixin, UpdateView):
     template_name = 'consignment/payment_info.html'
     selected_page = 'payments'
+    model = Consigner
+    form_class = ConsignerPaymentInfoForm
+
+    def get_object(self, queryset=None):
+        return self.request.user.consigner
+
+    def get_success_url(self):
+        return reverse('consignment:payment-info')
 
 
 class PasswordView(SidebarMixin, FormView):

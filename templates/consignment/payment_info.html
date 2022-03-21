@@ -10,7 +10,7 @@
                 Please ensure accuracy as we are not responsible for failed transfers due to inaccurate information.
                 </p>
 
-                <cfform method="POST" name="payment_form" action="payments.cfm" autocomplete="on" onsubmit="return true; return false;">
+                <form method="POST" name="payment_form" action="{% url "consignment:payment-info" %}" autocomplete="on" onsubmit="return true; return false;">
 
                     <cfoutput>
                     <table class="inputform rentalinfo">
@@ -18,6 +18,7 @@
                     <tr>
                         <td>Bank Routing Number</td>
                         <td>
+                            {{ form.routing_number }}
                             <cfset ar_masked = maskAcctNumber(ar_dec)>
                             <cftry>
                                 <cfset ar = Form.ar>
@@ -31,6 +32,7 @@
                     <tr>
                         <td>Bank Account Number</td>
                         <td>
+                            {{ form.account_number }}
                             <cfset aa_masked = maskAcctNumber(aa_dec)>
                             <cftry>
                                 <cfset aa = Form.aa>
@@ -43,7 +45,10 @@
                     </tr>
                     <tr>
                         <td class="align-top">Address</td>
-                        <td><cftextarea name="addr" id="addr" style="height: 80px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#addr_dec#</cftextarea></td>
+                        <td>
+                            {{ form.address }}
+{#                            <cftextarea name="addr" id="addr" style="height: 80px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#addr_dec#</cftextarea>#}
+                        </td>
                     </tr>
 
                     <tr class="buttons">
@@ -57,8 +62,9 @@
                     </table>
                     </cfoutput>
 
+                    {% csrf_token %}
                 <cfinput name="page" type="hidden" value="#page#" />
-                </cfform>
+                </form>
 
                 </div>
 {% endblock %}
