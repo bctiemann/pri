@@ -125,8 +125,13 @@ class ReserveView(FormView):
         return JsonResponse({'success': True})
 
 
-class PaymentsView(SidebarMixin, TemplateView):
-    template_name = 'consignment/payments.html'
+class PaymentHistoryView(SidebarMixin, TemplateView):
+    template_name = 'consignment/payment_history.html'
+    selected_page = 'payments'
+
+
+class PaymentInfoView(SidebarMixin, TemplateView):
+    template_name = 'consignment/payment_info.html'
     selected_page = 'payments'
 
 

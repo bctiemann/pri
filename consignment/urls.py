@@ -23,7 +23,8 @@ urlpatterns = [
     path('calendar_widget/<str:slug>/', views.CalendarWidgetView.as_view(), name='calendar-widget'),
     path('reserve/<str:slug>/', views.ReserveView.as_view(), name='reserve'),
 
-    path('payments/', views.PaymentsView.as_view(), name='payments'),
+    path('payments/history/', views.PaymentHistoryView.as_view(), name='payment-history'),
+    path('payments/info/', views.PaymentInfoView.as_view(), name='payment-info'),
 
     path('password/', views.PasswordView.as_view(), name='password'),
     path('password/done/', views.PasswordDoneView.as_view(), name='password-done'),

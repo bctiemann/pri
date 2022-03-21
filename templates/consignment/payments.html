@@ -3,6 +3,7 @@
 {% block content %}
         <h1>Payments</h1>
 
+        {% comment %}
         <cfquery name="ConsignmentVehicles" datasource="#DSN#">
             SELECT vehicleid FROM ConsignmentVehicles
             WHERE consignerid = <CFQUERYPARAM value="#YourID.consignerid#" CFSQLType="CF_SQL_NUMERIC">
@@ -15,14 +16,22 @@
             </cfquery>
             <cfset VehiclePrices[vehicleid] = VehiclePrice>
         </cfloop>
+        {% endcomment %}
 
         <div class="form-page-container">
 
             <ul class="form-page-nav two-col">
-                <li page="history" <cfif page IS "history">class="selected"</cfif>><a href="payments.cfm?page=history">Payment History</a></li>
-                <li page="info" <cfif page IS "info">class="selected"</cfif>><a href="payments.cfm?page=info">Payment Info</a></li>
+                <li page="history" class="{% block nav_payment_history_class %}{% endblock %}">
+                    <a href="{% url "consignment:payment-history" %}">Payment History</a>
+                </li>
+                <li page="info" class="{% block nav_payment_info_class %}{% endblock %}">
+                    <a href="{% url "consignment:payment-info" %}">Payment Info</a>
+                </li>
             </ul>
 
+            {% block subpage_pane %}{% endblock %}
+
+            {% if form.errors %}
             <cfoutput>
             <cfif Len(formError) GT 0>
             <div class="exception" id="customer_form_error">
@@ -31,7 +40,9 @@
             </div>
             </cfif>
             </cfoutput>
+            {% endif %}
 
+            {% comment %}
             <cfif page IS "history">
 
                 <cfquery name="Transactions" datasource="#DSN#">
@@ -159,6 +170,7 @@
                 </div>
 
             </cfif>
+            {% endcomment %}
 
         </div>
 {% endblock %}
