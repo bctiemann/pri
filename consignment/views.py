@@ -53,7 +53,7 @@ class CalendarView(SidebarMixin, VehicleContextMixin, TemplateView):
     selected_page = 'vehicles'
 
 
-class ProceedsView(VehicleContextMixin, TemplateView):
+class ProceedsView(SidebarMixin, VehicleContextMixin, TemplateView):
     template_name = 'consignment/proceeds.html'
     selected_page = 'vehicles'
 
