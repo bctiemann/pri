@@ -63,7 +63,7 @@ class ProceedsView(VehicleContextMixin, TemplateView):
             vehicle__in=self.request.user.consigner.vehicle_set.all(),
             # vehicle__status=VehicleStatus.READY,
             status=Rental.Status.COMPLETE,
-        )
+        ).order_by('out_at')
         if 'vehicle' in context:
             context['past_rentals'] = context['past_rentals'].filter(vehicle=context['vehicle'])
         context['total_gross'] = sum([Decimal(x.gross_revenue) for x in context['past_rentals']])
