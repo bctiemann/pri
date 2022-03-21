@@ -1,5 +1,6 @@
 import calendar
 from dateutil.relativedelta import relativedelta
+from decimal import Decimal
 
 from django.shortcuts import render
 from django.views.generic import TemplateView, FormView, CreateView
@@ -11,7 +12,8 @@ from django.contrib.auth import login
 from django.contrib.auth.views import LoginView
 
 from users.views import LogoutView
-from fleet.models import Vehicle
+from fleet.models import Vehicle, VehicleStatus
+from sales.models import Rental
 from consignment.utils import EventCalendar
 from customer_portal.forms import PasswordForm
 
@@ -54,6 +56,18 @@ class CalendarView(SidebarMixin, VehicleContextMixin, TemplateView):
 class ProceedsView(VehicleContextMixin, TemplateView):
     template_name = 'consignment/proceeds.html'
     selected_page = 'vehicles'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['past_rentals'] = Rental.objects.filter(
+            vehicle__in=self.request.user.consigner.vehicle_set.all(),
+            # vehicle__status=VehicleStatus.READY,
+            status=Rental.Status.COMPLETE,
+        )
+        if 'vehicle' in context:
+            context['past_rentals'] = context['past_rentals'].filter(vehicle=context['vehicle'])
+        context['total_gross'] = sum([Decimal(x.gross_revenue) for x in context['past_rentals']])
+        return context
 
 
 class CalendarWidgetView(VehicleContextMixin, TemplateView):

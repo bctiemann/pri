@@ -1,4 +1,5 @@
 {% extends "consignment/home.html" %}
+{% load humanize %}
 
 {% block nav_proceeds_class %}selected{% endblock %}
 
@@ -32,8 +33,10 @@
             <th>Mileage</th>
             <th>Gross</th>
         </tr>
+        {% for rental in past_rentals %}
         <cfoutput query="PastRentals">
 
+        {% comment %}
         <cfif numdays GTE 7>
             <cfset gross = VehiclePrices[vehicleid].price * numdays * (1 - VehiclePrices[vehicleid].disc7day/100)>
         <cfelseif numdays GTE 3>
@@ -43,23 +46,25 @@
         <cfelse>
             <cfset gross = VehiclePrices[vehicleid].price * numdays>
         </cfif>
+        {% endcomment %}
 
         <tr>
-            <td>#make# #model#</td>
-            <td>#DateFormat(dateout,"MM/DD/YYYY")#</td>
-            <td>#DateFormat(dateback,"MM/DD/YYYY")#</td>
-            <td class="numeric">#NumberFormat(milesback,",")#</td>
-            <td class="numeric">$#NumberFormat(gross,",.__")#</td>
+            <td>{{ rental.vehicle.make }} {{ rental.vehicle.model }}</td>
+            <td>{{ rental.out_at|date:"m/d/Y" }}{# #DateFormat(dateout,"MM/DD/YYYY")# #}</td>
+            <td>{{ rental.back_at|date:"m/d/Y" }}{# #DateFormat(dateback,"MM/DD/YYYY")# #}</td>
+            <td class="numeric">{{ rental.mileage_back|intcomma }}{# #NumberFormat(milesback,",")# #}</td>
+            <td class="numeric">${{ rental.gross_revenue|intcomma }}{# #NumberFormat(gross,",.__")# #}</td>
         </tr>
         <cfset rateTotal = rateTotal + gross>
         </cfoutput>
+        {% endfor %}
         <cfoutput>
         <tr>
             <td></td>
             <td></td>
             <td></td>
             <td></td>
-            <td class="numeric">$#NumberFormat(rateTotal,",.__")#</td>
+            <td class="numeric">${{ total_gross|intcomma }}{# #NumberFormat(rateTotal,",.__")# #}</td>
         </tr>
         </cfoutput>
     </table>

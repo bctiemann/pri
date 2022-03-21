@@ -267,6 +267,13 @@ class Rental(BaseReservation):
     def extended_days_amount(self):
         return self.extended_days * self.vehicle.vehicle_marketing.price_per_day
 
+    # Legacy gross revenue is presented to the UI as "estimated gross amounts of rental revenues collected from the
+    # selected vehicle(s). These amounts do not reflect taxes, fees, or deductions by PRI prior to the calculation of
+    # net revenues". Legacy calculation is num_days * rate_per_day - multi_day_discount
+    @property
+    def gross_revenue(self):
+        return self.final_price_data['post_multi_day_discount_subtotal']
+
 
 class Driver(models.Model):
     rental = models.ForeignKey('sales.Rental', on_delete=models.CASCADE)
