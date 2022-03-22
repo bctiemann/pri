@@ -133,7 +133,8 @@ var clearReservation = function() {
     }
 console.log(params);
     $('#dialog_clear_reservation').dialog('close');
-    $.post('ajax_post.cfm',params,function(data) {
+    // $.post('ajax_post.cfm',params,function(data) {
+    $.post(`/special/unreserve/${reservationid}/`,params,function(data) {
         console.log(data);
         if (data.success) {
             loadCalendar(0);

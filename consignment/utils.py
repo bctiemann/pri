@@ -35,13 +35,15 @@ class EventCalendar(calendar.HTMLCalendar):
 
         date_str = focus_date.strftime('%m/%d/%Y')
         classes = self.cssclasses[weekday]
+        reservation_id_str = ''
         if focus_date.date() == timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE)).date():
             classes += ' today'
         if rentals:
             classes += ' rental'
         if consigner_reservations:
             classes += ' reservation'
-        return '<td class="%s" date="%s"><div class="day-label">%d</div></td>' % (classes, date_str, day)
+            reservation_id_str = 'reservationid="%s"' % ','.join([str(r.id) for r in consigner_reservations])
+        return '<td class="%s" date="%s" %s><div class="day-label">%d</div></td>' % (classes, date_str, reservation_id_str, day)
 
     def formatmonth(self, withyear=True):
         month_start = datetime.datetime(self.year, self.month, 1)

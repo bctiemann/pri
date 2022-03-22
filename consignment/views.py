@@ -3,7 +3,7 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 
 from django.shortcuts import render
-from django.views.generic import TemplateView, FormView, CreateView, UpdateView
+from django.views.generic import TemplateView, FormView, CreateView, UpdateView, DeleteView
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -142,6 +142,20 @@ class ReserveView(CreateView):
         except Vehicle.DoesNotExist:
             raise Http404
         return super().post(request, *args, **kwargs)
+
+
+class ReleaseReservationView(DeleteView):
+    model = ConsignmentReservation
+
+    def get_object(self, queryset=None):
+        reservation = super().get_object(queryset)
+        if reservation.consigner != self.request.user.consigner:
+            raise Http404
+        return reservation
+
+    def form_valid(self, form):
+        self.object.delete()
+        return JsonResponse({'success': True})
 
 
 class PaymentHistoryView(SidebarMixin, TemplateView):
