@@ -1,3 +1,5 @@
+import datetime
+
 from phonenumber_field.formfields import PhoneNumberField
 
 from django import forms
@@ -7,7 +9,7 @@ from django.contrib.auth import password_validation
 from sales.models import BaseReservation, JoyRide, PerformanceExperience
 from sales.forms import ReservationRentalDetailsForm, JoyRideDetailsForm, PerformanceExperienceDetailsForm
 from users.models import Customer
-from consignment.models import Consigner
+from consignment.models import Consigner, ConsignmentReservation
 from backoffice.forms import CSSClassMixin
 from sales.enums import get_service_hours, TRUE_FALSE_CHOICES, get_exp_year_choices, get_exp_month_choices
 from customer_portal.forms import PasswordForm
@@ -40,6 +42,21 @@ class ConsignerPaymentInfoForm(forms.ModelForm):
     class Meta:
         model = Consigner
         fields = ('account_number', 'routing_number', 'address',)
+
+
+class ConsignmentReservationForm(forms.ModelForm):
+
+    num_days = forms.IntegerField()
+    back_at = forms.DateField(required=False)
+
+    def clean(self):
+        out_at = self.cleaned_data.get('out_at')
+        num_days = self.cleaned_data.get('num_days', 0)
+        self.cleaned_data['back_at'] = out_at + datetime.timedelta(days=num_days)
+
+    class Meta:
+        model = ConsignmentReservation
+        exclude = ('consigner', 'vehicle',)
 
 
 class CustomerCardPrimaryForm(CSSClassMixin, forms.ModelForm):

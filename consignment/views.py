@@ -15,8 +15,8 @@ from users.views import LogoutView
 from fleet.models import Vehicle, VehicleStatus
 from sales.models import Rental
 from consignment.utils import EventCalendar
-from consignment.models import Consigner
-from consignment.forms import PasswordForm, ConsignerPaymentInfoForm
+from consignment.models import Consigner, ConsignmentReservation
+from consignment.forms import PasswordForm, ConsignerPaymentInfoForm, ConsignmentReservationForm
 
 
 class SidebarMixin:
@@ -120,10 +120,28 @@ class CalendarWidgetView(VehicleContextMixin, TemplateView):
         return context
 
 
-class ReserveView(FormView):
+class ReserveView(CreateView):
+    form_class = ConsignmentReservationForm
+    model = ConsignmentReservation
+    vehicle = None
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.consigner = self.request.user.consigner
+        self.object.vehicle = self.vehicle
+        self.object.save()
+        return JsonResponse({'success': True})
+
+    def form_invalid(self, form):
+        return JsonResponse({'success': False, 'errors': form.errors})
 
     def post(self, request, *args, **kwargs):
-        return JsonResponse({'success': True})
+        print(request.POST)
+        try:
+            self.vehicle = Vehicle.objects.get(slug=kwargs['slug'])
+        except Vehicle.DoesNotExist:
+            raise Http404
+        return super().post(request, *args, **kwargs)
 
 
 class PaymentHistoryView(SidebarMixin, TemplateView):

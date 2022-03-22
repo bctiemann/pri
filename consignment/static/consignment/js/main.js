@@ -102,8 +102,8 @@ var reserveVehicle = function() {
         component: 'cassidy',
         method: 'reserveVehicle',
         // vehicleid: vid,
-        dateout: dateout,
-        numdays: $('#reserve_number_days').val(),
+        out_at: dateout,
+        num_days: $('#reserve_number_days').val(),
     }
 console.log(params);
     $('#dialog_reserve_vehicle').dialog('close');
@@ -120,7 +120,7 @@ console.log(params);
             });
             loadCalendar(0);
         } else { 
-            alert(data.error);
+            alert(data.errors);
         }
     });
 };
