@@ -186,7 +186,7 @@ var sendResetPassword = function() {
     var params = {
         component: 'porknbeans',
         method: 'sendResetPassword',
-        email: $('#email').val(),
+        email: $('#id_email').val(),
     }
     $('#dialog_reset_password').dialog('close');
     // $.post('ajax_post.cfm',params,function(data) {
