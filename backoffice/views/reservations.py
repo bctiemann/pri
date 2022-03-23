@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-from . import ListViewMixin
+from . import ListViewMixin, AdminViewMixin
 from fleet.models import VehicleMarketing
 from sales.models import Reservation, Rental
 from sales.calculators import RentalPriceCalculator
@@ -23,14 +23,14 @@ class ReservationViewMixin:
     paginate_by = 25
 
 
-class ReservationListView(PermissionRequiredMixin, ReservationViewMixin, ListViewMixin, ListView):
+class ReservationListView(AdminViewMixin, PermissionRequiredMixin, ReservationViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_reservation',)
     template_name = 'backoffice/reservation/list.html'
     search_fields = ('customer__first_name', 'customer__last_name', 'customer__user__email', 'vehicle__make', 'confirmation_code',)
 
 
-class ReservationDetailView(ReservationViewMixin, ListViewMixin, UpdateView):
+class ReservationDetailView(AdminViewMixin, ReservationViewMixin, ListViewMixin, UpdateView):
     template_name = 'backoffice/reservation/detail.html'
     form_class = ReservationForm
 
@@ -43,7 +43,7 @@ class ReservationDetailView(ReservationViewMixin, ListViewMixin, UpdateView):
         return reverse('backoffice:reservation-detail', kwargs={'pk': self.object.id})
 
 
-class ReservationCreateView(ReservationViewMixin, ListViewMixin, CreateView):
+class ReservationCreateView(AdminViewMixin, ReservationViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/reservation/detail.html'
     form_class = ReservationForm
 

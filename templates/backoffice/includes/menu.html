@@ -316,11 +316,15 @@
 
 
 <div class="legend">
+    {% if user.employee.reservations_access %}
     <CFIF YourID.acclev IS 1 OR YourID.acclev IS 2>
+        {% if reservations.exists %}
         <CFIF pReservations.TotalOf IS NOT 0>
-            <a class="l_reservations" href="reservations.cfm?Option=1"><CFOUTPUT>#pReservations.TotalOf#</CFOUTPUT> Reservation<CFIF pReservations.TotalOf IS NOT 1>s</CFIF></a>
+            <a class="l_reservations" href="{% url "backoffice:reservation-list" %}"><CFOUTPUT>{{ reservations.count }}</CFOUTPUT> Reservation{{ reservations.count|pluralize }}</CFIF></a>
         </CFIF>
+        {% endif %}
     </CFIF>
+    {% endif %}
     <CFIF YourID.acclev IS 1 OR YourID.acclev IS 2>
         <CFIF pRentals.TotalOf IS NOT 0>
             <a class="l_rentals" href="rentals.cfm"><CFOUTPUT>#pRentals.TotalOf#</CFOUTPUT> Rental<CFIF pRentals.TotalOf IS NOT 1>s</CFIF> In Progress</a>
