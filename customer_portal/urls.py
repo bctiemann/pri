@@ -4,6 +4,7 @@ from django.conf.urls import static
 from django.conf import settings
 from django.urls import reverse
 from django.views.generic.base import RedirectView
+from django.contrib.auth import views as auth_views
 
 from fleet import views as fleet_views
 from customer_portal import views
@@ -48,4 +49,25 @@ urlpatterns = [
     path('password/done/', views.PasswordDoneView.as_view(), name='password-done'),
 
     path('find_us/', views.FindUsView.as_view(), name='find-us'),
+
+    # AJAX route for requesting password reset token email
+    path('recovery/password_reset/',
+         views.PasswordResetView.as_view(
+             template_name='accounts/password_reset_form.html',
+             from_email=settings.SUPPORT_EMAIL,
+             extra_email_context={
+                 'site_name': settings.COMPANY_NAME
+             },
+         ),
+         name='password_reset',
+         ),
+
+    # Emailed link to form for resetting password
+    path('recovery/reset/<uidb64>/<token>/', views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+
+    # Success view for password recovery change form
+    path('recovery/change/done/',
+         auth_views.PasswordChangeDoneView.as_view(template_name='customer_portal/account/password_change_done.html'),
+         name='password_reset_complete'
+     ),
 ]

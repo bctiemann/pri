@@ -189,7 +189,8 @@ var sendResetPassword = function() {
         email: $('#email').val(),
     }
     $('#dialog_reset_password').dialog('close');
-    $.post('ajax_post.cfm',params,function(data) {
+    // $.post('ajax_post.cfm',params,function(data) {
+    $.post('/customer/recovery/password_reset/',params,function(data) {
         console.log(data);
         if (data.success) {
             $('#dialog_reset_password_done').dialog({

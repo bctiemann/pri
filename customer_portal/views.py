@@ -1,10 +1,11 @@
+import logging
 from stripe.error import CardError
 
 from django.views.generic import TemplateView, FormView, CreateView, UpdateView
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.urls import reverse_lazy, reverse
 from django.utils.timezone import now
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetConfirmView
 from django.contrib.auth import login
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
@@ -19,6 +20,9 @@ from customer_portal.forms import (
     AccountDriverInfoForm, AccountInsuranceForm, AccountMusicPrefsForm,
     CustomerCardPrimaryForm, CustomerCardSecondaryForm,
 )
+
+logger = logging.getLogger(__name__)
+auth_logger = logging.getLogger('auth')
 
 
 class SidebarMixin:
@@ -374,3 +378,24 @@ class PasswordDoneView(SidebarMixin, TemplateView):
 class FindUsView(SidebarMixin, TemplateView):
     template_name = 'customer_portal/find_us.html'
     selected_page = 'find_us'
+
+
+# Password recovery
+
+class PasswordResetView(PasswordResetView):
+    email_template_name = 'customer_portal/email/password_recovery.html'
+    success_url = reverse_lazy("customer_portal:password_reset_complete")
+
+    def form_valid(self, form):
+        logger.info(f'{form.cleaned_data["email"]} requested a password reset')
+        response = super().form_valid(form)
+        return JsonResponse({'success': True})
+
+
+class PasswordResetConfirmView(PasswordResetConfirmView):
+    post_reset_login = True
+    template_name = 'customer_portal/account/change_password.html'
+
+    def form_valid(self, form):
+        # logger.info(f'{self.user} successfully reset their password')
+        return super().form_valid(form)

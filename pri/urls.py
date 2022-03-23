@@ -32,29 +32,6 @@ urlpatterns = [
 
     path('sign_out/', users_views.LogoutView.as_view(next_page='home'), name='sign-out'),
 
-    # AJAX route for requesting password reset token email
-    path('recovery/password_reset/',
-        users_views.PasswordResetView.as_view(
-            template_name='accounts/password_reset_form.html',
-            from_email=settings.SUPPORT_EMAIL,
-            extra_email_context={
-                'site_name': settings.COMPANY_NAME
-            },
-        ),
-        name='password_reset',
-        ),
-
-    # Emailed link to form for resetting password
-    path('recovery/reset/<uidb64>/<token>/', users_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
-
-    # Success view for password recovery change form
-    path('recovery/change/done/',
-         auth_views.PasswordChangeDoneView.as_view(
-             template_name='customer_portal/account/password_change_done.html'
-         ),
-         name='password_reset_complete'
-         ),
-
     # This is an example of directly registering an app's views in the central site's urls.py. As the site grows,
     # it might be better for each app dir to have its own urls.py and for this file to include that app's urls.py
     # at a specified mount point.
