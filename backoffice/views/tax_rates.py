@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-from . import ListViewMixin
+from . import ListViewMixin, AdminViewMixin
 from backoffice.forms import TaxRateForm
 from sales.models import TaxRate
 
@@ -20,14 +20,14 @@ class TaxRateViewMixin:
     default_sort = 'postal_code'
 
 
-class TaxRateListView(PermissionRequiredMixin, TaxRateViewMixin, ListViewMixin, ListView):
+class TaxRateListView(PermissionRequiredMixin, AdminViewMixin, TaxRateViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_taxrate',)
     template_name = 'backoffice/tax_rate/list.html'
     search_fields = ('postal_code',)
 
 
-class TaxRateDetailView(TaxRateViewMixin, ListViewMixin, UpdateView):
+class TaxRateDetailView(AdminViewMixin, TaxRateViewMixin, ListViewMixin, UpdateView):
     template_name = 'backoffice/tax_rate/detail.html'
     form_class = TaxRateForm
 
@@ -41,7 +41,7 @@ class TaxRateDetailView(TaxRateViewMixin, ListViewMixin, UpdateView):
         return reverse('backoffice:taxrate-detail', kwargs={'pk': self.object.id})
 
 
-class TaxRateCreateView(TaxRateViewMixin, ListViewMixin, CreateView):
+class TaxRateCreateView(AdminViewMixin, TaxRateViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/tax_rate/detail.html'
     form_class = TaxRateForm
 

@@ -8,7 +8,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-from . import ListViewMixin
+from . import ListViewMixin, AdminViewMixin
 from backoffice.forms import GiftCertificateForm, CardForm
 from sales.models import GiftCertificate
 from sales.stripe import Stripe
@@ -24,14 +24,14 @@ class GiftCertificateViewMixin:
     paginate_by = 25
 
 
-class GiftCertificateListView(PermissionRequiredMixin, GiftCertificateViewMixin, ListViewMixin, ListView):
+class GiftCertificateListView(PermissionRequiredMixin, AdminViewMixin, GiftCertificateViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_giftcertificate',)
     template_name = 'backoffice/gift_certificate/list.html'
     search_fields = ('toll_account', 'tag_number', 'vehicle',)
 
 
-class GiftCertificateDetailView(GiftCertificateViewMixin, ListViewMixin, UpdateView):
+class GiftCertificateDetailView(AdminViewMixin, GiftCertificateViewMixin, ListViewMixin, UpdateView):
     template_name = 'backoffice/gift_certificate/detail.html'
     form_class = GiftCertificateForm
 
@@ -80,7 +80,7 @@ class GiftCertificateDetailView(GiftCertificateViewMixin, ListViewMixin, UpdateV
         return reverse('backoffice:giftcert-detail', kwargs={'pk': self.object.id})
 
 
-class GiftCertificateCreateView(GiftCertificateViewMixin, ListViewMixin, CreateView):
+class GiftCertificateCreateView(AdminViewMixin, GiftCertificateViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/gift_certificate/detail.html'
     form_class = GiftCertificateForm
 

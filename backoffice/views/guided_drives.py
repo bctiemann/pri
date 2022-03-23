@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-from . import ListViewMixin
+from . import ListViewMixin, AdminViewMixin
 from backoffice.forms import JoyRideForm, PerformanceExperienceForm
 from sales.models import GuidedDrive, JoyRide, PerformanceExperience
 
@@ -40,7 +40,7 @@ class PerformanceExperienceViewMixin:
     event_type = PerformanceExperience.EventType.PERFORMANCE_EXPERIENCE
 
 
-class GuidedEventListView(PermissionRequiredMixin, GuidedDriveContextMixin, ListViewMixin, ListView):
+class GuidedEventListView(PermissionRequiredMixin, AdminViewMixin, GuidedDriveContextMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_guideddrive',)
     template_name = 'backoffice/guided_drive/list.html'
@@ -55,7 +55,7 @@ class PerformanceExperienceListView(PerformanceExperienceViewMixin, GuidedEventL
     pass
 
 
-class GuidedDriveDetailView(GuidedDriveContextMixin, ListViewMixin, UpdateView):
+class GuidedDriveDetailView(AdminViewMixin, GuidedDriveContextMixin, ListViewMixin, UpdateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -80,7 +80,7 @@ class PerformanceExperienceDetailView(PerformanceExperienceViewMixin, GuidedDriv
         return reverse('backoffice:perfexp-detail', kwargs={'pk': self.object.id})
 
 
-class JoyRideCreateView(GuidedDriveContextMixin, JoyRideViewMixin, ListViewMixin, CreateView):
+class JoyRideCreateView(AdminViewMixin, GuidedDriveContextMixin, JoyRideViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/guided_drive/detail.html'
     form_class = JoyRideForm
 
@@ -88,7 +88,7 @@ class JoyRideCreateView(GuidedDriveContextMixin, JoyRideViewMixin, ListViewMixin
         return reverse('backoffice:joyride-detail', kwargs={'pk': self.object.id})
 
 
-class PerformanceExperienceCreateView(GuidedDriveContextMixin, PerformanceExperienceViewMixin, ListViewMixin, CreateView):
+class PerformanceExperienceCreateView(AdminViewMixin, GuidedDriveContextMixin, PerformanceExperienceViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/guided_drive/detail.html'
     form_class = PerformanceExperienceForm
 

@@ -8,7 +8,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-from . import ListViewMixin
+from . import ListViewMixin, AdminViewMixin
 from backoffice.forms import MassEmailForm, EmailImageForm
 from marketing.models import EmailImage
 
@@ -28,7 +28,7 @@ class MassEmailViewMixin:
         return context
 
 
-class MassEmailComposeView(MassEmailViewMixin, FormView):
+class MassEmailComposeView(AdminViewMixin, MassEmailViewMixin, FormView):
     template_name = 'backoffice/mass_email/compose.html'
     form_class = MassEmailForm
 
@@ -44,16 +44,16 @@ class MassEmailComposeView(MassEmailViewMixin, FormView):
         return reverse('backoffice:massemail-compose-done')
 
 
-class MassEmailComposeDoneView(MassEmailViewMixin, TemplateView):
+class MassEmailComposeDoneView(AdminViewMixin, MassEmailViewMixin, TemplateView):
     template_name = 'backoffice/mass_email/done.html'
 
 
-class MassEmailImageListView(MassEmailViewMixin, ListViewMixin, ListView):
+class MassEmailImageListView(AdminViewMixin, MassEmailViewMixin, ListViewMixin, ListView):
     template_name = 'backoffice/mass_email/image_list.html'
     model = EmailImage
 
 
-class MassEmailImageCreateView(MassEmailViewMixin, ListViewMixin, CreateView):
+class MassEmailImageCreateView(AdminViewMixin, MassEmailViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/mass_email/image_create.html'
     form_class = EmailImageForm
 

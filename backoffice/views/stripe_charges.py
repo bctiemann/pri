@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-from . import ListViewMixin
+from . import ListViewMixin, AdminViewMixin
 from backoffice.forms import StripeChargeForm, CardForm
 from sales.models import Charge
 from sales.stripe import Stripe
@@ -21,14 +21,14 @@ class StripeChargeViewMixin:
     default_sort = '-id'
 
 
-class StripeChargeListView(PermissionRequiredMixin, StripeChargeViewMixin, ListViewMixin, ListView):
+class StripeChargeListView(PermissionRequiredMixin, AdminViewMixin, StripeChargeViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_charge',)
     template_name = 'backoffice/stripe_charge/list.html'
     search_fields = ('full_name', 'email', 'phone',)
 
 
-class StripeChargeDetailView(StripeChargeViewMixin, ListViewMixin, UpdateView):
+class StripeChargeDetailView(AdminViewMixin, StripeChargeViewMixin, ListViewMixin, UpdateView):
     template_name = 'backoffice/stripe_charge/detail.html'
     form_class = StripeChargeForm
 
@@ -76,7 +76,7 @@ class StripeChargeDetailView(StripeChargeViewMixin, ListViewMixin, UpdateView):
         return reverse('backoffice:charge-detail', kwargs={'pk': self.object.id})
 
 
-class StripeChargeCreateView(StripeChargeViewMixin, ListViewMixin, CreateView):
+class StripeChargeCreateView(AdminViewMixin, StripeChargeViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/stripe_charge/detail.html'
     form_class = StripeChargeForm
 
@@ -84,7 +84,7 @@ class StripeChargeCreateView(StripeChargeViewMixin, ListViewMixin, CreateView):
         return reverse('backoffice:charge-detail', kwargs={'pk': self.object.id})
 
 
-class StripeChargeChargeView(StripeChargeViewMixin, CreateView):
+class StripeChargeChargeView(AdminViewMixin, StripeChargeViewMixin, CreateView):
     template_name = 'backoffice/stripe_charge/charge.html'
     form_class = StripeChargeForm
 

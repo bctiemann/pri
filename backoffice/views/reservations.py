@@ -23,7 +23,7 @@ class ReservationViewMixin:
     paginate_by = 25
 
 
-class ReservationListView(AdminViewMixin, PermissionRequiredMixin, ReservationViewMixin, ListViewMixin, ListView):
+class ReservationListView(PermissionRequiredMixin, AdminViewMixin, ReservationViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_reservation',)
     template_name = 'backoffice/reservation/list.html'

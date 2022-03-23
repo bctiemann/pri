@@ -8,7 +8,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-from . import ListViewMixin
+from . import ListViewMixin, AdminViewMixin
 from backoffice.forms import ScheduledServiceForm, IncidentalServiceForm, VehicleSelectorForm
 from service.models import ScheduledService, IncidentalService
 from fleet.models import Vehicle
@@ -58,7 +58,7 @@ class ServiceViewMixin:
         return context
 
 
-class DueServiceListView(PermissionRequiredMixin, ServiceViewMixin, ListViewMixin, ListView):
+class DueServiceListView(PermissionRequiredMixin, AdminViewMixin, ServiceViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_service',)
     template_name = 'backoffice/service/list_due.html'
@@ -66,7 +66,7 @@ class DueServiceListView(PermissionRequiredMixin, ServiceViewMixin, ListViewMixi
     model = Vehicle
 
 
-class UpcomingServiceListView(PermissionRequiredMixin, ServiceViewMixin, ListViewMixin, ListView):
+class UpcomingServiceListView(PermissionRequiredMixin, AdminViewMixin, ServiceViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_service',)
     template_name = 'backoffice/service/list_upcoming.html'
@@ -74,7 +74,7 @@ class UpcomingServiceListView(PermissionRequiredMixin, ServiceViewMixin, ListVie
     model = Vehicle
 
 
-class ServiceHistoryListView(PermissionRequiredMixin, ServiceViewMixin, ListViewMixin, TemplateView):
+class ServiceHistoryListView(PermissionRequiredMixin, AdminViewMixin, ServiceViewMixin, ListViewMixin, TemplateView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_service',)
     template_name = 'backoffice/service/list_history.html'
@@ -87,7 +87,7 @@ class ServiceHistoryListView(PermissionRequiredMixin, ServiceViewMixin, ListView
         return context
 
 
-class ScheduledServiceDetailView(ServiceViewMixin, ListViewMixin, UpdateView):
+class ScheduledServiceDetailView(AdminViewMixin, ServiceViewMixin, ListViewMixin, UpdateView):
     template_name = 'backoffice/service/detail_scheduled.html'
     form_class = ScheduledServiceForm
 
@@ -101,7 +101,7 @@ class ScheduledServiceDetailView(ServiceViewMixin, ListViewMixin, UpdateView):
         return reverse('backoffice:service-detail-scheduled', kwargs={'pk': self.object.id})
 
 
-class ScheduledServiceCreateView(ServiceViewMixin, ListViewMixin, CreateView):
+class ScheduledServiceCreateView(AdminViewMixin, ServiceViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/service/detail_scheduled.html'
     form_class = ScheduledServiceForm
 
@@ -109,7 +109,7 @@ class ScheduledServiceCreateView(ServiceViewMixin, ListViewMixin, CreateView):
         return reverse('backoffice:service-detail-scheduled', kwargs={'pk': self.object.id})
 
 
-class IncidentalServiceDetailView(ServiceViewMixin, ListViewMixin, UpdateView):
+class IncidentalServiceDetailView(AdminViewMixin, ServiceViewMixin, ListViewMixin, UpdateView):
     template_name = 'backoffice/service/detail_incidental.html'
     form_class = IncidentalServiceForm
     model = IncidentalService
@@ -124,7 +124,7 @@ class IncidentalServiceDetailView(ServiceViewMixin, ListViewMixin, UpdateView):
         return reverse('backoffice:service-detail-incidental', kwargs={'pk': self.object.id})
 
 
-class IncidentalServiceCreateView(ServiceViewMixin, ListViewMixin, CreateView):
+class IncidentalServiceCreateView(AdminViewMixin, ServiceViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/service/detail_incidental.html'
     form_class = IncidentalServiceForm
     model = IncidentalService

@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-from . import ListViewMixin
+from . import ListViewMixin, AdminViewMixin
 from backoffice.forms import RedFlagForm
 from sales.models import RedFlag
 
@@ -20,14 +20,14 @@ class RedFlagViewMixin:
     default_sort = '-id'
 
 
-class RedFlagListView(PermissionRequiredMixin, RedFlagViewMixin, ListViewMixin, ListView):
+class RedFlagListView(PermissionRequiredMixin, AdminViewMixin, RedFlagViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_redflag',)
     template_name = 'backoffice/red_flag/list.html'
     search_fields = ('full_name', 'email', 'home_phone', 'mobile_phone',)
 
 
-class RedFlagDetailView(RedFlagViewMixin, ListViewMixin, UpdateView):
+class RedFlagDetailView(AdminViewMixin, RedFlagViewMixin, ListViewMixin, UpdateView):
     template_name = 'backoffice/red_flag/detail.html'
     form_class = RedFlagForm
 
@@ -41,7 +41,7 @@ class RedFlagDetailView(RedFlagViewMixin, ListViewMixin, UpdateView):
         return reverse('backoffice:redflag-detail', kwargs={'pk': self.object.id})
 
 
-class RedFlagCreateView(RedFlagViewMixin, ListViewMixin, CreateView):
+class RedFlagCreateView(AdminViewMixin, RedFlagViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/red_flag/detail.html'
     form_class = RedFlagForm
 

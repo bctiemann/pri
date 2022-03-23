@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-from . import ListViewMixin
+from . import ListViewMixin, AdminViewMixin
 from backoffice.forms import ConsignerForm
 from consignment.models import Consigner
 
@@ -20,14 +20,14 @@ class ConsignerViewMixin:
     default_sort = '-id'
 
 
-class ConsignerListView(PermissionRequiredMixin, ConsignerViewMixin, ListViewMixin, ListView):
+class ConsignerListView(PermissionRequiredMixin, AdminViewMixin, ConsignerViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_consigner',)
     template_name = 'backoffice/consigner/list.html'
     search_fields = ('first_name', 'last_name', 'user__email',)
 
 
-class ConsignerDetailView(ConsignerViewMixin, ListViewMixin, UpdateView):
+class ConsignerDetailView(AdminViewMixin, ConsignerViewMixin, ListViewMixin, UpdateView):
     template_name = 'backoffice/consigner/detail.html'
     form_class = ConsignerForm
 
@@ -35,7 +35,7 @@ class ConsignerDetailView(ConsignerViewMixin, ListViewMixin, UpdateView):
         return reverse('backoffice:consigner-detail', kwargs={'pk': self.object.id})
 
 
-class ConsignerCreateView(ConsignerViewMixin, ListViewMixin, CreateView):
+class ConsignerCreateView(AdminViewMixin, ConsignerViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/consigner/detail.html'
     form_class = ConsignerForm
 

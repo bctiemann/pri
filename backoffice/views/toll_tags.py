@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-from . import ListViewMixin
+from . import ListViewMixin, AdminViewMixin
 from backoffice.forms import TollTagForm
 from fleet.models import TollTag
 
@@ -20,14 +20,14 @@ class TollTagViewMixin:
     default_sort = '-id'
 
 
-class TollTagListView(PermissionRequiredMixin, TollTagViewMixin, ListViewMixin, ListView):
+class TollTagListView(PermissionRequiredMixin, AdminViewMixin, TollTagViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_tolltag',)
     template_name = 'backoffice/toll_tag/list.html'
     search_fields = ('toll_account', 'tag_number', 'vehicle',)
 
 
-class TollTagDetailView(TollTagViewMixin, ListViewMixin, UpdateView):
+class TollTagDetailView(AdminViewMixin, TollTagViewMixin, ListViewMixin, UpdateView):
     template_name = 'backoffice/toll_tag/detail.html'
     form_class = TollTagForm
 
@@ -35,7 +35,7 @@ class TollTagDetailView(TollTagViewMixin, ListViewMixin, UpdateView):
         return reverse('backoffice:tolltag-detail', kwargs={'pk': self.object.id})
 
 
-class TollTagCreateView(TollTagViewMixin, ListViewMixin, CreateView):
+class TollTagCreateView(AdminViewMixin, TollTagViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/toll_tag/detail.html'
     form_class = TollTagForm
 

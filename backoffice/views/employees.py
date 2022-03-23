@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-from . import ListViewMixin
+from . import ListViewMixin, AdminViewMixin
 from users.models import User, Employee
 from backoffice.forms import EmployeeForm
 
@@ -19,14 +19,14 @@ class EmployeeViewMixin:
     page_group = 'employees'
 
 
-class EmployeeListView(PermissionRequiredMixin, EmployeeViewMixin, ListViewMixin, ListView):
+class EmployeeListView(PermissionRequiredMixin, AdminViewMixin, EmployeeViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_employee',)
     template_name = 'backoffice/employee/list.html'
     search_fields = ('first_name', 'last_name', 'user__email',)
 
 
-class EmployeeDetailView(EmployeeViewMixin, ListViewMixin, UpdateView):
+class EmployeeDetailView(AdminViewMixin, EmployeeViewMixin, ListViewMixin, UpdateView):
     template_name = 'backoffice/employee/detail.html'
     form_class = EmployeeForm
 
@@ -38,7 +38,7 @@ class EmployeeDetailView(EmployeeViewMixin, ListViewMixin, UpdateView):
         return reverse('backoffice:employee-detail', kwargs={'pk': self.object.id})
 
 
-class EmployeeCreateView(EmployeeViewMixin, ListViewMixin, CreateView):
+class EmployeeCreateView(AdminViewMixin, EmployeeViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/employee/detail.html'
     form_class = EmployeeForm
 

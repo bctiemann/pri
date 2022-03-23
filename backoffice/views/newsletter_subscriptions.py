@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-from . import ListViewMixin
+from . import ListViewMixin, AdminViewMixin
 from marketing.models import NewsletterSubscription
 
 
@@ -18,7 +18,7 @@ class NewsletterSubscriptionViewMixin:
     page_group = 'newsletter_subscriptions'
 
 
-class NewsletterSubscriptionListView(PermissionRequiredMixin, NewsletterSubscriptionViewMixin, ListViewMixin, ListView):
+class NewsletterSubscriptionListView(PermissionRequiredMixin, AdminViewMixin, NewsletterSubscriptionViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_newslettersubscription',)
     template_name = 'backoffice/newsletter_subscription/list.html'

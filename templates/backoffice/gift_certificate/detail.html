@@ -22,6 +22,7 @@
             <td>Created</td>
             <td>{{ giftcertificate.created_at|date:"m/d/Y" }}</td>
         </tr>
+        {% if giftcertificate %}
         <tr>
             <td>Tag</td>
             <td>
@@ -29,6 +30,7 @@
                 <cfinput type="hidden" name="tag" value="#GiftCert.tag#" />
             </td>
         </tr>
+        {% endif %}
         <tr>
             <td>Is Paid/Issued</td>
             <td>

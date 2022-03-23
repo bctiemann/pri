@@ -6,7 +6,7 @@ from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView
 from django.http import Http404, HttpResponseRedirect
 
-from . import ListViewMixin
+from . import ListViewMixin, AdminViewMixin
 from fleet.models import VehicleType, VehicleStatus, Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, TollTag
 from backoffice.forms import (
     VehicleForm, VehicleShowcaseForm, VehicleThumbnailForm, VehicleInspectionForm, VehicleMobileThumbForm,
@@ -41,14 +41,14 @@ class VehicleViewMixin:
         return context
 
 
-class VehicleListView(VehicleViewMixin, ListViewMixin, ListView):
+class VehicleListView(AdminViewMixin, VehicleViewMixin, ListViewMixin, ListView):
     template_name = 'backoffice/vehicle/list.html'
     search_fields = ('make', 'model', 'year',)
     # Set this to allow pagination
     # paginate_by = 10
 
 
-class VehicleDetailView(VehicleViewMixin, ListViewMixin, UpdateView):
+class VehicleDetailView(AdminViewMixin, VehicleViewMixin, ListViewMixin, UpdateView):
     template_name = 'backoffice/vehicle/detail.html'
     form_class = VehicleForm
     marketing_form_class = VehicleMarketingForm
@@ -89,7 +89,7 @@ class VehicleDetailView(VehicleViewMixin, ListViewMixin, UpdateView):
         return reverse('backoffice:vehicle-detail', kwargs={'pk': self.object.id})
 
 
-class VehicleCreateView(VehicleViewMixin, ListViewMixin, CreateView):
+class VehicleCreateView(AdminViewMixin, VehicleViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/vehicle/detail.html'
     form_class = VehicleForm
 

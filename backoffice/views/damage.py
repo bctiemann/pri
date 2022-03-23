@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-from . import ListViewMixin
+from . import ListViewMixin, AdminViewMixin
 from backoffice.forms import DamageForm, VehicleSelectorForm
 from service.models import Damage
 from fleet.models import Vehicle
@@ -53,14 +53,14 @@ class DamageViewMixin:
         return context
 
 
-class DamageListView(PermissionRequiredMixin, DamageViewMixin, ListViewMixin, ListView):
+class DamageListView(PermissionRequiredMixin, AdminViewMixin, DamageViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_damage',)
     template_name = 'backoffice/damage/list.html'
     search_fields = ('title', 'notes',)
 
 
-class DamageDetailView(DamageViewMixin, ListViewMixin, UpdateView):
+class DamageDetailView(AdminViewMixin, DamageViewMixin, ListViewMixin, UpdateView):
     template_name = 'backoffice/damage/detail.html'
     form_class = DamageForm
 
@@ -74,7 +74,7 @@ class DamageDetailView(DamageViewMixin, ListViewMixin, UpdateView):
         return reverse('backoffice:damage-detail', kwargs={'pk': self.object.id})
 
 
-class DamageCreateView(DamageViewMixin, ListViewMixin, CreateView):
+class DamageCreateView(AdminViewMixin, DamageViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/damage/detail.html'
     form_class = DamageForm
 

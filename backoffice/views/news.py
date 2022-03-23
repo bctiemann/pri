@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-from . import ListViewMixin
+from . import ListViewMixin, AdminViewMixin
 from backoffice.forms import NewsItemForm
 from marketing.models import NewsItem
 
@@ -20,14 +20,14 @@ class NewsItemViewMixin:
     default_sort = '-created_at'
 
 
-class NewsItemListView(PermissionRequiredMixin, NewsItemViewMixin, ListViewMixin, ListView):
+class NewsItemListView(PermissionRequiredMixin, AdminViewMixin, NewsItemViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_newsitem',)
     template_name = 'backoffice/news/list.html'
     search_fields = ('subject', 'body',)
 
 
-class NewsItemDetailView(NewsItemViewMixin, ListViewMixin, UpdateView):
+class NewsItemDetailView(AdminViewMixin, NewsItemViewMixin, ListViewMixin, UpdateView):
     template_name = 'backoffice/news/detail.html'
     form_class = NewsItemForm
 
@@ -35,7 +35,7 @@ class NewsItemDetailView(NewsItemViewMixin, ListViewMixin, UpdateView):
         return reverse('backoffice:news-detail', kwargs={'pk': self.object.id})
 
 
-class NewsItemCreateView(NewsItemViewMixin, ListViewMixin, CreateView):
+class NewsItemCreateView(AdminViewMixin, NewsItemViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/news/detail.html'
     form_class = NewsItemForm
 

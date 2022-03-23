@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-from . import ListViewMixin
+from . import ListViewMixin, AdminViewMixin
 from users.models import User, Customer, generate_password
 from backoffice.forms import CustomerForm, CloneCustomerForm, CardForm
 from sales.stripe import Stripe
@@ -22,14 +22,14 @@ class CustomerViewMixin:
     paginate_by = 25
 
 
-class CustomerListView(PermissionRequiredMixin, CustomerViewMixin, ListViewMixin, ListView):
+class CustomerListView(PermissionRequiredMixin, AdminViewMixin, CustomerViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_customer',)
     template_name = 'backoffice/customer/list.html'
     search_fields = ('first_name', 'last_name', 'user__email',)
 
 
-class CustomerDetailView(CustomerViewMixin, ListViewMixin, UpdateView):
+class CustomerDetailView(AdminViewMixin, CustomerViewMixin, ListViewMixin, UpdateView):
     template_name = 'backoffice/customer/detail.html'
     form_class = CustomerForm
 
@@ -107,7 +107,7 @@ class CustomerDetailView(CustomerViewMixin, ListViewMixin, UpdateView):
         return reverse('backoffice:customer-detail', kwargs={'pk': self.object.id})
 
 
-class CustomerCreateView(CustomerViewMixin, ListViewMixin, CreateView):
+class CustomerCreateView(AdminViewMixin, CustomerViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/customer/detail.html'
     form_class = CustomerForm
 

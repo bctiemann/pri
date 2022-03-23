@@ -14,7 +14,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect, HttpResponseNotFound
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-from . import ListViewMixin
+from . import ListViewMixin, AdminViewMixin
 from fleet.models import VehicleMarketing, VehicleType
 from sales.models import Rental, Driver
 from users.models import Customer
@@ -33,14 +33,14 @@ class RentalViewMixin:
     paginate_by = 25
 
 
-class RentalListView(PermissionRequiredMixin, RentalViewMixin, ListViewMixin, ListView):
+class RentalListView(PermissionRequiredMixin, AdminViewMixin, RentalViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_rental',)
     template_name = 'backoffice/rental/list.html'
     search_fields = ('customer__first_name', 'customer__last_name', 'customer__user__email', 'vehicle__make', 'confirmation_code',)
 
 
-class RentalDetailView(PermissionRequiredMixin, RentalViewMixin, ListViewMixin, UpdateView):
+class RentalDetailView(PermissionRequiredMixin, AdminViewMixin, RentalViewMixin, ListViewMixin, UpdateView):
     permission_required = ('users.edit_rental',)
     template_name = 'backoffice/rental/detail.html'
     form_class = RentalForm
@@ -55,7 +55,7 @@ class RentalDetailView(PermissionRequiredMixin, RentalViewMixin, ListViewMixin, 
         return reverse('backoffice:rental-detail', kwargs={'pk': self.object.id})
 
 
-class RentalCreateView(PermissionRequiredMixin, RentalViewMixin, ListViewMixin, CreateView):
+class RentalCreateView(PermissionRequiredMixin, AdminViewMixin, RentalViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/rental/detail.html'
     permission_required = ('users.create_rental',)
     form_class = RentalForm

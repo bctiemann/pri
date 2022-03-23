@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-from . import ListViewMixin
+from . import ListViewMixin, AdminViewMixin
 from backoffice.forms import CouponForm
 from sales.models import Coupon
 
@@ -19,14 +19,14 @@ class CouponViewMixin:
     page_group = 'coupons'
 
 
-class CouponListView(PermissionRequiredMixin, CouponViewMixin, ListViewMixin, ListView):
+class CouponListView(PermissionRequiredMixin, AdminViewMixin, CouponViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_coupon',)
     template_name = 'backoffice/coupon/list.html'
     search_fields = ('code', 'amount',)
 
 
-class CouponDetailView(CouponViewMixin, ListViewMixin, UpdateView):
+class CouponDetailView(AdminViewMixin, CouponViewMixin, ListViewMixin, UpdateView):
     template_name = 'backoffice/coupon/detail.html'
     form_class = CouponForm
 
@@ -34,7 +34,7 @@ class CouponDetailView(CouponViewMixin, ListViewMixin, UpdateView):
         return reverse('backoffice:coupon-detail', kwargs={'pk': self.object.id})
 
 
-class CouponCreateView(CouponViewMixin, ListViewMixin, CreateView):
+class CouponCreateView(AdminViewMixin, CouponViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/coupon/detail.html'
     form_class = CouponForm
 

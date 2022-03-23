@@ -8,7 +8,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-from . import ListViewMixin
+from . import ListViewMixin, AdminViewMixin
 from marketing.models import SurveyResponse
 
 
@@ -19,7 +19,7 @@ class SurveyResponseViewMixin:
     page_group = 'survey_results'
 
 
-class SurveyResponseListView(PermissionRequiredMixin, SurveyResponseViewMixin, ListViewMixin, ListView):
+class SurveyResponseListView(PermissionRequiredMixin, AdminViewMixin, SurveyResponseViewMixin, ListViewMixin, ListView):
     # PermissionRequiredMixin allows us to specify permission_required (all must be true) for specific models
     permission_required = ('users.view_surveyresponse',)
     template_name = 'backoffice/survey_response/list.html'
