@@ -31,6 +31,13 @@ class AdminViewMixin:
         context['now'] = timezone.now()
         context['vehicles'] = VehicleMarketing.objects.filter(status=VehicleStatus.READY).order_by('vehicle_type', 'id')
 
+        context['todo_list_rentals'] = Rental.objects.filter(status__in=(
+            Rental.Status.INCOMPLETE,
+            Rental.Status.CONFIRMED,
+            Rental.Status.IN_PROGRESS,
+            Rental.Status.COMPLETE,
+        )).select_related('customer')
+
         context['reservations'] = Reservation.objects.filter(status=Reservation.Status.UNCONFIRMED)
         context['rentals'] = Rental.objects.filter(status__in=(
             Rental.Status.INCOMPLETE,

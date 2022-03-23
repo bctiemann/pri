@@ -267,6 +267,26 @@ class Rental(BaseReservation):
     def extended_days_amount(self):
         return self.extended_days * self.vehicle.vehicle_marketing.price_per_day
 
+    @property
+    def is_incomplete(self):
+        return self.status in (self.Status.INCOMPLETE, self.Status.CONFIRMED, self.Status.IN_PROGRESS)
+
+    @property
+    def needs_deposit_charged(self):
+        return bool(self.status == self.Status.CONFIRMED and not self.deposit_charged_at)
+
+    @property
+    def needs_deposit_refunded(self):
+        return bool(self.status == self.Status.COMPLETE and not self.deposit_refunded_at)
+
+    @property
+    def needs_insurance_verified(self):
+        return bool(self.is_incomplete and not self.customer.coverage_verified)
+
+    @property
+    def needs_background_check(self):
+        return bool(self.is_incomplete and not self.customer.license_history)
+
     # Legacy gross revenue is presented to the UI as "estimated gross amounts of rental revenues collected from the
     # selected vehicle(s). These amounts do not reflect taxes, fees, or deductions by PRI prior to the calculation of
     # net revenues". Legacy calculation is num_days * rate_per_day - multi_day_discount

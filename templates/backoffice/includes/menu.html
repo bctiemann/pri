@@ -63,24 +63,34 @@
 	<div class="popupbox" id="todolist">
 		<CFSET todocount = 0>
 		<ul class="navmenu">
+        {% for rental in todo_list_rentals %}
 		<CFOUTPUT QUERY="tdRentals">
+            {% if rental.needs_deposit_charged %}
 			<CFIF status IS 1 AND depchargedon IS "">
-				<li><a class="tnav" href="rentals.cfm?rentalid=#rentalid#">Charge deposit on #rentalid# (#fname# #lname#)</a></li>
+				<li><a class="tnav" href="{% url "backoffice:rental-detail" pk=rental.id %}">Charge deposit on {{ rental.id }} ({{ rental.customer.full_name }})</a></li>
 				<CFSET todocount = todocount + 1>
 			</CFIF>
+            {% endif %}
+            {% if rental.needs_deposit_refunded %}
 			<CFIF status IS 3 AND deprefundon IS "">
-				<li><a class="tnav" href="rentals.cfm?rentalid=#rentalid#">Refund deposit on #rentalid# (#fname# #lname#)</a></li>
+				<li><a class="tnav" href="{% url "backoffice:rental-detail" pk=rental.id %}">Refund deposit on {{ rental.id }} ({{ rental.customer.full_name }})</a></li>
 				<CFSET todocount = todocount + 1>
 			</CFIF>
+            {% endif %}
+            {% if rental.needs_insurance_verified %}
 			<CFIF status IS NOT 3 AND status IS NOT 4 AND coverage IS 0>
-				<li><a class="tnav" href="rentals.cfm?rentalid=#rentalid#">Verify insurance on #rentalid# (#fname# #lname#)</a></li>
+				<li><a class="tnav" href="{% url "backoffice:rental-detail" pk=rental.id %}">Verify insurance on {{ rental.id }} ({{ rental.customer.full_name }})</a></li>
 				<CFSET todocount = todocount + 1>
 			</CFIF>
+            {% endif %}
+            {% if rental.needs_background_check %}
 			<CFIF status IS NOT 3 AND status IS NOT 4 AND licensehist IS "">
-				<li><a class="tnav" href="rentals.cfm?rentalid=#rentalid#">Background check on #rentalid# (#fname# #lname#)</a></li>
+				<li><a class="tnav" href="{% url "backoffice:rental-detail" pk=rental.id %}">Background check on {{ rental.id }} ({{ rental.customer.full_name }})</a></li>
 				<CFSET todocount = todocount + 1>
 			</CFIF>
+            {% endif %}
 		</CFOUTPUT>
+        {% endfor %}
 		</ul>
 	</div>
 
@@ -92,7 +102,9 @@
 
 	<a class="headermenu" id="priceslink" href="javascript:nop()">Prices</a>
 	<a class="headermenu" id="todolistlink" href="javascript:nop()">To-Do List
-	<CFIF todocount GT 0><span class="badgebubble"><CFOUTPUT>#todocount#</CFOUTPUT></span></CFIF>
+	{% if todo_list_rentals.exists %}
+        <CFIF todocount GT 0><span class="badgebubble"><CFOUTPUT>{{ todo_list_rentals.count }}</CFOUTPUT></span></CFIF>
+    {% endif %}
 	</a>
 	<a class="headermenu" id="logoutlink" href="{% url "backoffice:logout" %}">Logout [{{ user.full_name }}]</a>
 </div>
