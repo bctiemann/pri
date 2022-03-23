@@ -213,7 +213,8 @@ class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, CustomerSearchMix
             self.add_widget_css_class(field, 'short')
 
         # self.fields['tax_percent'].initial = decimal.Decimal(settings.DEFAULT_TAX_RATE) * 100
-        self.fields['tax_percent'].initial = self.instance.get_price_data()['tax_rate'] * 100
+        if self.instance.id:
+            self.fields['tax_percent'].initial = self.instance.get_price_data()['tax_rate'] * 100
         self.fields['override_subtotal'].widget.attrs['placeholder'] = 'Override'
 
     class Meta:

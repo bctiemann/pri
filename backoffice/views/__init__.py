@@ -17,7 +17,8 @@ from users.views import LoginView
 from users.models import User
 from backoffice.models import BBSPost
 from fleet.models import VehicleMarketing, VehicleStatus
-from sales.models import Reservation
+from sales.models import Reservation, Rental, PerformanceExperience, JoyRide, GiftCertificate, AdHocPayment
+from service.models import ScheduledService, Damage
 
 
 # Home and login/logout views
@@ -29,7 +30,19 @@ class AdminViewMixin:
         context['admin_users'] = User.objects.filter(is_backoffice=True)
         context['now'] = timezone.now()
         context['vehicles'] = VehicleMarketing.objects.filter(status=VehicleStatus.READY).order_by('vehicle_type', 'id')
+
         context['reservations'] = Reservation.objects.filter(status=Reservation.Status.UNCONFIRMED)
+        context['rentals'] = Rental.objects.filter(status__in=(
+            Rental.Status.INCOMPLETE,
+            Rental.Status.CONFIRMED,
+            Rental.Status.IN_PROGRESS,
+        ))
+        context['performance_experiences'] = PerformanceExperience.objects.filter(status=PerformanceExperience.Status.PENDING)
+        context['joy_rides'] = JoyRide.objects.filter(status=JoyRide.Status.PENDING)
+        context['maintenances'] = ScheduledService.objects.filter(is_due=True)
+        context['damages'] = Damage.objects.filter(is_repaired=False)
+        context['gift_certificates'] = GiftCertificate.objects.filter(is_paid=False)
+        context['adhoc_payments'] = AdHocPayment.objects.filter(is_paid=False, is_submitted=True)
         return context
 
 

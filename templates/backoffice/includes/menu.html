@@ -326,42 +326,70 @@
         {% endif %}
     </CFIF>
     {% endif %}
+    {% if user.employee.reservations_access %}
     <CFIF YourID.acclev IS 1 OR YourID.acclev IS 2>
+        {% if rentals.exists %}
         <CFIF pRentals.TotalOf IS NOT 0>
-            <a class="l_rentals" href="rentals.cfm"><CFOUTPUT>#pRentals.TotalOf#</CFOUTPUT> Rental<CFIF pRentals.TotalOf IS NOT 1>s</CFIF> In Progress</a>
+            <a class="l_rentals" href="{% url "backoffice:rental-list" %}"><CFOUTPUT>{{ rentals.count }}</CFOUTPUT> Rental{{ rentals.count|pluralize }} In Progress</a>
         </CFIF>
+        {% endif %}
     </CFIF>
+    {% endif %}
+    {% if user.employee.reservations_access %}
     <CFIF YourID.acclev IS 1 OR YourID.acclev IS 2>
+        {% if performance_experiences.exists %}
         <CFIF pPerfExp.TotalOf IS NOT 0>
-            <a class="l_perfexp" href="joyperf.cfm?type=2"><CFOUTPUT>#pPerfExp.TotalOf#</CFOUTPUT> PerfExp<CFIF pPerfExp.TotalOf IS NOT 1>s</CFIF></a>
+            <a class="l_perfexp" href="{% url "backoffice:perfexp-list" %}"><CFOUTPUT>{{ performance_experiences.count }}</CFOUTPUT> PerfExp{{ performance_experiences.count|pluralize }}</a>
         </CFIF>
+        {% endif %}
     </CFIF>
+    {% endif %}
+    {% if user.employee.reservations_access %}
     <CFIF YourID.acclev IS 1 OR YourID.acclev IS 2>
+        {% if joy_rides.exists %}
         <CFIF pJoyRide.TotalOf IS NOT 0>
-            <a class="l_joyride" href="joyperf.cfm?type=1"><CFOUTPUT>#pJoyRide.TotalOf#</CFOUTPUT> Joy Ride<CFIF pJoyRide.TotalOf IS NOT 1>s</CFIF></a>
+            <a class="l_joyride" href="{% url "backoffice:joyride-list" %}"><CFOUTPUT>{{ joy_rides.count }}</CFOUTPUT> Joy Ride{{ joy_rides.count|pluralize }}</a>
         </CFIF>
+        {% endif %}
     </CFIF>
+    {% endif %}
+    {% if user.employee.maintenance_access %}
     <CFIF YourID.acclev IS 1 OR YourID.acclev IS 3>
+        {% if maintenances.exists %}
         <CFIF maintCount IS NOT 0>
-            <a class="l_service" href="service.cfm"><CFOUTPUT>#maintCount#</CFOUTPUT> Service<CFIF maintCount IS NOT 1>s</CFIF></a>
+            <a class="l_service" href="{% url "backoffice:service-list-due" %}"><CFOUTPUT>{{ maintenances.count }}</CFOUTPUT> Service{{ maintenances.count|pluralize }}</a>
         </CFIF>
+        {% endif %}
     </CFIF>
+    {% endif %}
+    {% if user.employee.maintenance_access %}
     <CFIF YourID.acclev IS 1 OR YourID.acclev IS 3>
+        {% if damages.exists %}
         <CFIF pDamage.TotalOf IS NOT 0>
-            <a class="l_damage" href="damage.cfm"><CFOUTPUT>#pDamage.TotalOf#</CFOUTPUT> Damage<CFIF pDamage.TotalOf IS NOT 1>s</CFIF></a>
+            <a class="l_damage" href="{% url "backoffice:damage-list" %}"><CFOUTPUT>{{ damages.count }}</CFOUTPUT> Damage{{ damages.count|pluralize }}</CFIF></a>
         </CFIF>
+        {% endif %}
     </CFIF>
+    {% endif %}
+    {% if user.employee.admin_access %}
     <CFIF YourID.acclev IS 1>
+        {% if gift_certificates.exists %}
         <CFIF pGift.TotalOf IS NOT 0>
-            <a class="l_gift" href="gift.cfm"><CFOUTPUT>#pGift.TotalOf#</CFOUTPUT> Gift Cert<CFIF pGift.TotalOf IS NOT 1>s</CFIF></a>
+            <a class="l_gift" href="{% url "backoffice:giftcert-list" %}"><CFOUTPUT>{{ gift_certificates.count }}</CFOUTPUT> Gift Cert{{ gift_certificates.count|pluralize }}</a>
         </CFIF>
+        {% endif %}
+    {% endif %}
+    {% if user.employee.admin_access %}
+        {% if adhoc_payments.exists %}
         <CFIF pSub.TotalOf IS NOT 0>
-            <a class="l_subpay" href="subpay.cfm"><CFOUTPUT>#pSub.TotalOf#</CFOUTPUT> SubPay<CFIF pSub.TotalOf IS NOT 1>s</CFIF></a>
+            <a class="l_subpay" href="{% url "backoffice:adhocpayment-list" %}"><CFOUTPUT>{{ adhocpayments.count }}</CFOUTPUT> SubPay{{ adhocpayments.count|pluralize }}</a>
         </CFIF>
+        {% endif %}
 <!---
         <CFIF pTimesheet.TotalOf IS NOT 0>
             <a class="l_timesheet" href="mants.cfm"><CFOUTPUT>#pTimesheet.TotalOf#</CFOUTPUT> Unapproved Timesheet<CFIF pTimesheet.TotalOf IS NOT 1>s</CFIF></a>
         </CFIF>
 --->
     </CFIF>
+    {% endif %}
 </div>
