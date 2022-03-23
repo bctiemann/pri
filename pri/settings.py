@@ -163,6 +163,8 @@ AUTH_USER_MODEL = 'users.User'
 
 AUTH_EXEMPT_ROUTES = (
     'login',
+    'password_reset',
+    'password_reset_confirm',
 )
 
 # This logging setup has the following attributes:

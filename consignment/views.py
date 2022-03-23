@@ -1,4 +1,5 @@
 import calendar
+import logging
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 
@@ -9,7 +10,7 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.http import Http404, JsonResponse
 from django.contrib.auth import login
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetConfirmView
 
 from users.views import LogoutView
 from fleet.models import Vehicle, VehicleStatus
@@ -17,6 +18,9 @@ from sales.models import Rental
 from consignment.utils import EventCalendar
 from consignment.models import Consigner, ConsignmentReservation
 from consignment.forms import PasswordForm, ConsignerPaymentInfoForm, ConsignmentReservationForm
+
+logger = logging.getLogger(__name__)
+auth_logger = logging.getLogger('auth')
 
 
 class SidebarMixin:
@@ -195,3 +199,25 @@ class PasswordView(SidebarMixin, FormView):
 class PasswordDoneView(SidebarMixin, TemplateView):
     template_name = 'consignment/password_done.html'
     selected_page = 'password'
+
+
+# Password recovery
+
+class PasswordResetView(PasswordResetView):
+    email_template_name = 'consignment/email/password_recovery.html'
+    success_url = reverse_lazy("consignment:password_reset_complete")
+
+    def form_valid(self, form):
+        logger.info(f'{form.cleaned_data["email"]} requested a password reset')
+        response = super().form_valid(form)
+        return JsonResponse({'success': True})
+
+
+class PasswordResetConfirmView(PasswordResetConfirmView):
+    post_reset_login = True
+    template_name = 'consignment/account/change_password.html'
+    success_url = reverse_lazy("consignment:password_reset_complete")
+
+    def form_valid(self, form):
+        # logger.info(f'{self.user} successfully reset their password')
+        return super().form_valid(form)

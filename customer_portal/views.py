@@ -395,6 +395,7 @@ class PasswordResetView(PasswordResetView):
 class PasswordResetConfirmView(PasswordResetConfirmView):
     post_reset_login = True
     template_name = 'customer_portal/account/change_password.html'
+    success_url = reverse_lazy("customer_portal:password_reset_complete")
 
     def form_valid(self, form):
         # logger.info(f'{self.user} successfully reset their password')

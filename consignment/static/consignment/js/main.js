@@ -37,7 +37,7 @@ var sendResetPassword = function() {
     var params = {
         component: 'cassidy',
         method: 'sendResetPassword',
-        email: $('#email').val(),
+        email: $('#password_reset_email').val(),
     }
     $('#dialog_reset_password').dialog('close');
     // $.post('ajax_post.cfm',params,function(data) {
