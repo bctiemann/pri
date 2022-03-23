@@ -18,6 +18,8 @@ def settings_constants(request):
         'stripe_publishable_key': settings.STRIPE_PUBLIC_KEY,
         'server_base_url': settings.SERVER_BASE_URL,
         'site_email': settings.SITE_EMAIL,
+        'joy_ride_prices': settings.JOY_RIDE_PRICES,
+        'performance_experience_prices': settings.PERFORMANCE_EXPERIENCE_PRICES,
     }
     return context
 

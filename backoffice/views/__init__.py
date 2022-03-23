@@ -16,6 +16,7 @@ from django.core.exceptions import FieldError
 from users.views import LoginView
 from users.models import User
 from backoffice.models import BBSPost
+from fleet.models import VehicleMarketing, VehicleStatus
 from sales.models import Reservation
 
 
@@ -27,6 +28,7 @@ class AdminViewMixin:
         context = super().get_context_data(*args, **kwargs)
         context['admin_users'] = User.objects.filter(is_backoffice=True)
         context['now'] = timezone.now()
+        context['vehicles'] = VehicleMarketing.objects.filter(status=VehicleStatus.READY).order_by('vehicle_type', 'id')
         context['reservations'] = Reservation.objects.filter(status=Reservation.Status.UNCONFIRMED)
         return context
 
