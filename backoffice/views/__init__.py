@@ -14,7 +14,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.core.exceptions import FieldError
 
 from users.views import LoginView
-from users.models import User
+from users.models import User, Customer
 from backoffice.models import BBSPost
 from fleet.models import VehicleMarketing, VehicleStatus
 from sales.models import Reservation, Rental, PerformanceExperience, JoyRide, GiftCertificate, AdHocPayment
@@ -37,6 +37,7 @@ class AdminViewMixin:
             Rental.Status.IN_PROGRESS,
             Rental.Status.COMPLETE,
         )).select_related('customer')
+        context['todo_item_count'] = sum([r.todo_item_count for r in context['todo_list_rentals']])
 
         context['reservations'] = Reservation.objects.filter(status=Reservation.Status.UNCONFIRMED)
         context['rentals'] = Rental.objects.filter(status__in=(
@@ -65,6 +66,8 @@ class HomeView(AdminViewMixin, TemplateView):
         three_days_ago = timezone.now() - timedelta(days=3)
         context['bbs_posts'] = BBSPost.objects.filter(created_at__gte=three_days_ago, deleted_at__isnull=True)
         context['short_bbs'] = True
+
+        context['customers'] = Customer.objects.all()
         return context
 
 

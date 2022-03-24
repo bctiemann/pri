@@ -287,6 +287,16 @@ class Rental(BaseReservation):
     def needs_background_check(self):
         return bool(self.is_incomplete and not self.customer.license_history)
 
+    @property
+    def todo_item_count(self):
+        todo_items = (
+            self.needs_deposit_charged,
+            self.needs_deposit_refunded,
+            self.needs_insurance_verified,
+            self.needs_background_check,
+        )
+        return sum([1 for item in todo_items if item])
+
     # Legacy gross revenue is presented to the UI as "estimated gross amounts of rental revenues collected from the
     # selected vehicle(s). These amounts do not reflect taxes, fees, or deductions by PRI prior to the calculation of
     # net revenues". Legacy calculation is num_days * rate_per_day - multi_day_discount

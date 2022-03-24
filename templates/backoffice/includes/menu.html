@@ -103,7 +103,7 @@
 	<a class="headermenu" id="priceslink" href="javascript:nop()">Prices</a>
 	<a class="headermenu" id="todolistlink" href="javascript:nop()">To-Do List
 	{% if todo_list_rentals.exists %}
-        <CFIF todocount GT 0><span class="badgebubble"><CFOUTPUT>{{ todo_list_rentals.count }}</CFOUTPUT></span></CFIF>
+        <CFIF todocount GT 0><span class="badgebubble"><CFOUTPUT>{{ todo_item_count }}</CFOUTPUT></span></CFIF>
     {% endif %}
 	</a>
 	<a class="headermenu" id="logoutlink" href="{% url "backoffice:logout" %}">Logout [{{ user.full_name }}]</a>
