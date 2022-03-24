@@ -1,4 +1,5 @@
 from datetime import timedelta
+from decimal import Decimal
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -9,7 +10,7 @@ from django.utils.dateparse import parse_datetime
 from django.utils import timezone
 from django.views.generic import TemplateView, DetailView, UpdateView, CreateView, DeleteView
 from django.contrib.auth.views import LogoutView
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.http import Http404, HttpResponseRedirect
 from django.core.exceptions import FieldError
 
@@ -17,8 +18,9 @@ from users.views import LoginView
 from users.models import User, Customer
 from backoffice.models import BBSPost
 from fleet.models import VehicleMarketing, VehicleStatus
-from sales.models import Reservation, Rental, PerformanceExperience, JoyRide, GiftCertificate, AdHocPayment
+from sales.models import Reservation, Rental, PerformanceExperience, JoyRide, GuidedDrive, GiftCertificate, AdHocPayment
 from service.models import ScheduledService, Damage
+from marketing.models import NewsletterSubscription
 
 
 # Home and login/logout views
@@ -67,7 +69,25 @@ class HomeView(AdminViewMixin, TemplateView):
         context['bbs_posts'] = BBSPost.objects.filter(created_at__gte=three_days_ago, deleted_at__isnull=True)
         context['short_bbs'] = True
 
+        # Stats for dashboard
         context['customers'] = Customer.objects.all()
+        context['upcoming_rentals'] = Rental.objects.filter(out_at__gt=timezone.now())
+        context['newsletter_subscriptions'] = NewsletterSubscription.objects.filter(confirmed_at__isnull=False)
+        context['gift_certificate_total'] = GiftCertificate.objects.filter(is_paid=True).aggregate(total=Sum('amount'))['total']
+        context['ad_hoc_payment_total'] = AdHocPayment.objects.filter(is_paid=True).aggregate(total=Sum('amount'))['total']
+        joy_rides = JoyRide.objects.filter(status=JoyRide.Status.COMPLETE)
+        performance_experiences = PerformanceExperience.objects.filter(status=PerformanceExperience.Status.COMPLETE)
+        joy_ride_total = sum([Decimal(j.final_price_data['subtotal']) for j in joy_rides if j.final_price_data])
+        performance_experience_total = sum([Decimal(p.final_price_data['subtotal']) for p in performance_experiences if p.final_price_data])
+        context['guided_drive_total'] = joy_ride_total + performance_experience_total
+        rentals = Rental.objects.filter(status=Rental.Status.COMPLETE)
+        context['rental_total'] = sum([Decimal(r.final_price_data['subtotal']) for r in rentals if r.final_price_data])
+        context['all_bucks'] = sum((
+            context['gift_certificate_total'],
+            context['ad_hoc_payment_total'],
+            context['guided_drive_total'],
+            context['rental_total'],
+        ))
         return context
 
 

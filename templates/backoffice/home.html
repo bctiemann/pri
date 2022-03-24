@@ -1,5 +1,5 @@
 {% extends "backoffice/base.html" %}
-{% load static %}
+{% load static humanize %}
 
 {% block nav %}
     <h1 class="pageheader">Status (Waiting Room)
@@ -143,25 +143,25 @@
             {% endcomment %}
 
                 <small><b>fact:</b> we have
-    (<CFOUTPUT>#customers.TotalOf#</CFOUTPUT>) <a
-    href="customers.cfm">customers</a></small><br>
+    (<CFOUTPUT>{{ customers.count }}</CFOUTPUT>) <a
+    href="{% url "backoffice:customer-list" %}">customer{{ customers.count|pluralize }}</a></small><br>
                 <small><b>fact:</b> we have
-    (<CFOUTPUT>#rentals.TotalOf#</CFOUTPUT>) upcoming <a
-    href="rentals.cfm">rentals</a></small><br>
+    (<CFOUTPUT>{{ upcoming_rentals.count }}</CFOUTPUT>) upcoming <a
+    href="{% url "backoffice:rental-list" %}">rental{{ upcoming_rentals.count|pluralize }}</a></small><br>
     <small><b>fact:</b> we have
-    (<CFOUTPUT>#newsletter.TotalOf#</CFOUTPUT>) <a
-    href="massemail.cfm">newsletter subs</a></small><br>
+    (<CFOUTPUT>{{ newsletter_subscriptions.count }}</CFOUTPUT>) <a
+    href="{% url "backoffice:massemail-compose-plaintext" %}">newsletter sub{{ newsletter_subscriptions.count|pluralize }}</a></small><br>
     <CFIF YourID.acclev IS 1>
     <small><b>fact:</b> we've made
-    (<CFOUTPUT>#NumberFormat(gtot,"$___,___.__")#</CFOUTPUT>) from gift certificates</small><br>
+    (<CFOUTPUT>${{ gift_certificate_total|floatformat:2|intcomma }}{# #NumberFormat(gtot,"$___,___.__")# #}</CFOUTPUT>) from gift certificates</small><br>
     <small><b>fact:</b> we've hoovered up
-    (<CFOUTPUT>#NumberFormat(stot,"$___,___.__")#</CFOUTPUT>) in substitute payments</small><br>
+    (<CFOUTPUT>${{ ad_hoc_payment_total|floatformat:2|intcomma }}{# #NumberFormat(stot,"$___,___.__")# #}</CFOUTPUT>) in substitute payments</small><br>
     <small><b>fact:</b> we've acquired
-    (<CFOUTPUT>#NumberFormat(joyperftot,"$___,___.__")#</CFOUTPUT>) from joyrides and perf exps</small><br>
+    (<CFOUTPUT>${{ guided_drive_total|floatformat:2|intcomma }}{# #NumberFormat(joyperftot,"$___,___.__")# #}</CFOUTPUT>) from joyrides and perf exps</small><br>
     <small><b>fact:</b> we've absconded with
-    (<CFOUTPUT>#NumberFormat(rtot,"$___,___.__")#</CFOUTPUT>) from rentals</small><br>
+    (<CFOUTPUT>${{ rental_total|floatformat:2|intcomma }}{# #NumberFormat(rtot,"$___,___.__")# #}</CFOUTPUT>) from rentals</small><br>
     <small><b>fact:</b> all told we've made
-    (<CFOUTPUT>#NumberFormat(allbucks,"$___,___.__")#</CFOUTPUT>) since ever</small><br>
+    (<CFOUTPUT>${{ all_bucks|floatformat:2|intcomma }}{# #NumberFormat(allbucks,"$___,___.__")# #}</CFOUTPUT>) since ever</small><br>
     </CFIF>
     </td>
     </tr>
