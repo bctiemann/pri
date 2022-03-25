@@ -108,6 +108,14 @@ urlpatterns = [
     path('customer/', include(('customer_portal.urls', 'customer_portal'), namespace='customer_portal')),
     path('special/', include(('consignment.urls', 'consignment'), namespace='consignment')),
 
+    # SEO
+    path('exotic-car-rental/', marketing_views.FleetView.as_view(vehicle_type='cars')),
+    path('sports-car-rental/', marketing_views.FleetView.as_view(vehicle_type='cars')),
+    path('sport-bike-rental/', marketing_views.FleetView.as_view(vehicle_type='bikes')),
+    path('<str:city>/exotic-car-rental/', marketing_views.FleetView.as_view(vehicle_type='cars')),
+    path('<str:slug>-rental/', marketing_views.VehicleView.as_view()),
+    path('<str:city>/<str:slug>-rental/', marketing_views.VehicleView.as_view()),
+
     path('', include(tf_urls, 'two_factor')),
 ]
 

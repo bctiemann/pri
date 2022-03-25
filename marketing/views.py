@@ -33,10 +33,12 @@ class HomeView(NavMenuMixin, TemplateView):
 
 class FleetView(NavMenuMixin, TemplateView):
     template_name = 'front_site/fleet.html'
+    vehicle_type = None
 
     # If this view is called with a vehicle_type param, we validate that it is an acceptable value, then pass it
     # through to the super() method. If there is no vehicle_type, it is None by default.
     def get(self, request, *args, vehicle_type=None, **kwargs):
+        vehicle_type = vehicle_type or self.vehicle_type
         if vehicle_type and vehicle_type not in ['cars', 'bikes']:
             raise Http404
         return super().get(request, *args, vehicle_type=vehicle_type, **kwargs)
@@ -61,7 +63,7 @@ class VehicleView(NavMenuMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         # We filter() rather than get() because vehicle_marketing.slug is not unique (we may have multiple of the
         # same vehicle)
-        context['vehicle'] = VehicleMarketing.objects.filter(slug=slug, status=VehicleStatus.READY).first()
+        context['vehicle'] = VehicleMarketing.objects.filter(slug__iexact=slug, status=VehicleStatus.READY).first()
         if not context['vehicle']:
             raise Http404
         return context
