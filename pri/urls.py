@@ -109,12 +109,14 @@ urlpatterns = [
     path('special/', include(('consignment.urls', 'consignment'), namespace='consignment')),
 
     # SEO
+    # Add more patterns as you see fit. Each should have a unique name, and should be added to footer_seo.html and sitemaps.py
     path('exotic-car-rental/', marketing_views.FleetView.as_view(vehicle_type='cars'), name='seo-exotic-car-rental'),
     path('sports-car-rental/', marketing_views.FleetView.as_view(vehicle_type='cars'), name='seo-sports-car-rental'),
+    path('motorcycle-rental/', marketing_views.FleetView.as_view(vehicle_type='bikes'), name='seo-motorcycle-rental'),
     path('sport-bike-rental/', marketing_views.FleetView.as_view(vehicle_type='bikes'), name='seo-sport-bike-rental'),
-    path('<str:city>/exotic-car-rental/', marketing_views.FleetView.as_view(vehicle_type='cars'), name='seo-city-exotic-car-rental'),
+    path('<str:location>/exotic-car-rental/', marketing_views.FleetView.as_view(vehicle_type='cars'), name='seo-location-exotic-car-rental'),
     path('<str:slug>-rental/', marketing_views.VehicleView.as_view(), name='seo-vehicle-rental'),
-    path('<str:city>/<str:slug>-rental/', marketing_views.VehicleView.as_view(), name='seo-city-vehicle-rental'),
+    path('<str:location>/<str:slug>-rental/', marketing_views.VehicleView.as_view(), name='seo-location-vehicle-rental'),
 
     # Sitemap: https://return.co.de/blog/articles/sitemaps-static-views-arguments/
 

@@ -1,0 +1,10 @@
+<a class="ant" href="{% url "seo-exotic-car-rental" %}">Exotic Car Rental in Tampa</a>
+<a class="ant" href="{% url "seo-sports-car-rental" %}">Sports Car Rental in Tampa</a>
+<a class="ant" href="{% url "seo-motorcycle-rental" %}">Motorcycle Rental in Tampa</a>
+<a class="ant" href="{% url "seo-sport-bike-rental" %}">Sportbike Rental in Tampa</a>
+<a class="ant" href="{% url "seo-location-exotic-car-rental" location="tampa" %}">Exotic Car Rental in Tampa</a>
+{% for vehicle in ready_vehicles %}
+    <a class="ant" href="{% url "seo-vehicle-rental" slug=vehicle.slug %}">{{ vehicle.make }} {{ vehicle.model }} Rental in Tampa</a>
+    <a class="ant" href="{% url "seo-location-vehicle-rental" slug=vehicle.slug location="tampa" %}">{{ vehicle.make }} {{ vehicle.model }} Rental in Tampa</a>
+    <a class="ant" href="{% url "seo-location-vehicle-rental" slug=vehicle.slug location="florida" %}">{{ vehicle.make }} {{ vehicle.model }} Rental in Florida</a>
+{% endfor %}
