@@ -109,12 +109,14 @@ urlpatterns = [
     path('special/', include(('consignment.urls', 'consignment'), namespace='consignment')),
 
     # SEO
-    path('exotic-car-rental/', marketing_views.FleetView.as_view(vehicle_type='cars')),
-    path('sports-car-rental/', marketing_views.FleetView.as_view(vehicle_type='cars')),
-    path('sport-bike-rental/', marketing_views.FleetView.as_view(vehicle_type='bikes')),
-    path('<str:city>/exotic-car-rental/', marketing_views.FleetView.as_view(vehicle_type='cars')),
-    path('<str:slug>-rental/', marketing_views.VehicleView.as_view()),
-    path('<str:city>/<str:slug>-rental/', marketing_views.VehicleView.as_view()),
+    path('exotic-car-rental/', marketing_views.FleetView.as_view(vehicle_type='cars'), name='seo-exotic-car-rental'),
+    path('sports-car-rental/', marketing_views.FleetView.as_view(vehicle_type='cars'), name='seo-sports-car-rental'),
+    path('sport-bike-rental/', marketing_views.FleetView.as_view(vehicle_type='bikes'), name='seo-sport-bike-rental'),
+    path('<str:city>/exotic-car-rental/', marketing_views.FleetView.as_view(vehicle_type='cars'), name='seo-city-exotic-car-rental'),
+    path('<str:slug>-rental/', marketing_views.VehicleView.as_view(), name='seo-vehicle-rental'),
+    path('<str:city>/<str:slug>-rental/', marketing_views.VehicleView.as_view(), name='seo-city-vehicle-rental'),
+
+    # Sitemap: https://return.co.de/blog/articles/sitemaps-static-views-arguments/
 
     path('', include(tf_urls, 'two_factor')),
 ]
