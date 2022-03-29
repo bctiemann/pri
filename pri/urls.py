@@ -19,6 +19,9 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls import static
 from django.conf import settings
+from django.contrib.sitemaps.views import sitemap
+
+from sitemaps import sitemaps
 from api import views as api_views
 from fleet import views as rentals_views
 from marketing import views as marketing_views
@@ -119,6 +122,7 @@ urlpatterns = [
     path('<str:location>/<str:slug>-rental/', marketing_views.VehicleView.as_view(), name='seo-location-vehicle-rental'),
 
     # Sitemap: https://return.co.de/blog/articles/sitemaps-static-views-arguments/
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
 
     path('', include(tf_urls, 'two_factor')),
 ]

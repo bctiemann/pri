@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'django.contrib.sites',
+    'django.contrib.sitemaps',
     # 'django.forms',
 
     'rest_framework',
@@ -256,6 +258,8 @@ USE_L10N = True
 USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+SITE_ID = 1
 
 
 # TEST_RUNNER = 'pri.test_runner.PytestTestRunner'
