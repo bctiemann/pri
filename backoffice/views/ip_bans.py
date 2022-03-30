@@ -39,6 +39,12 @@ class IPBanCreateView(AdminViewMixin, IPBanViewMixin, ListViewMixin, CreateView)
     template_name = 'backoffice/ip_ban/detail.html'
     form_class = IPBanForm
 
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.created_by = self.request.user
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())
+
     def get_success_url(self):
         return reverse('backoffice:ipban-detail', kwargs={'pk': self.object.id})
 
