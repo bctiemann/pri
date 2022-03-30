@@ -437,8 +437,9 @@ class Customer(models.Model):
     def save(self, *args, **kwargs):
         self.cc_number = format_cc_number(self.cc_number)
         self.cc2_number = format_cc_number(self.cc2_number)
-        self.attach_card_1_to_stripe()
-        self.attach_card_2_to_stripe()
+        if self.id:
+            self.attach_card_1_to_stripe()
+            self.attach_card_2_to_stripe()
         super().save(*args, **kwargs)
 
     def __str__(self):
