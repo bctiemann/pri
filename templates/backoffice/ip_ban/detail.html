@@ -16,6 +16,14 @@
     {% endif %}
 
     <table class="inputform ipbans">
+        {% if ipban %}
+        <tr>
+            <td>Resolved CIDR Address</td>
+            <td>
+                {{ ipban.cidr_address }}
+            </td>
+        </tr>
+        {% endif %}
         <tr>
             <td>IP Address/Network</td>
             <td>
