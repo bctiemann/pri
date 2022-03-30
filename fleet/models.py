@@ -128,7 +128,7 @@ class Vehicle(models.Model):
         return self.basereservation_set.filter(type=BaseReservation.ReservationType.RENTAL, back_at__date__gt=now.date()).exclude(rental__status=Rental.Status.CANCELLED)
 
     # TODO: Either expose the slug in the backoffice vehicle form and make it controllable, or add collision
-    # checking to this method for creating new records
+    #  checking to this method for creating new records
     def get_slug(self):
         return slugify(f'{self.make} {self.model}')
 
