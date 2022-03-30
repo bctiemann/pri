@@ -69,7 +69,7 @@ class RedFlagAdmin(admin.ModelAdmin):
 
 
 class IPBanAdmin(admin.ModelAdmin):
-    list_display = ('id', 'ip_address', 'cidr', 'created_at', 'expires_at',)
+    list_display = ('id', 'ip_address', 'prefix_bits', 'created_at', 'expires_at',)
     autocomplete_fields = ('created_by',)
 
 

@@ -77,7 +77,7 @@
         <cfoutput>
         <th col="id" default-sort="desc">ID</th>
         <th col="ip_address">IP Network</th>
-        <th col="cidr">CIDR</th>
+        <th col="prefix_bits">CIDR bits</th>
         <th col="created_at" default-sort="desc">Created</th>
         <th col="expires_at" default-sort="desc">Expires</th>
         </cfoutput>
@@ -85,8 +85,8 @@
     {% for ipban in ipban_list %}
         <tr class="clickable click-to-edit" destination="{% url "backoffice:ipban-detail" pk=ipban.id %}">
             <td><a href="{% url "backoffice:ipban-detail" pk=ipban.id %}">{{ ipban.id }}</a></td>
-            <td>{{ ipban.ip_address }}</td>
-            <td>{{ ipban.cidr }}</td>
+            <td>{{ ipban.network_address }}</td>
+            <td>{{ ipban.prefix_bits }}</td>
             <td>{{ ipban.created_at|date:"m/d/Y" }}</td>
             <td>{{ ipban.expires_at|date:"m/d/Y" }}</td>
         </tr>

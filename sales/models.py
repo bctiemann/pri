@@ -6,6 +6,7 @@ import random
 import uuid
 import logging
 import string
+import ipaddress
 from localflavor.us.models import USStateField, USZipCodeField
 from avalara import AvataxClient
 from requests import HTTPError
@@ -536,10 +537,18 @@ class RedFlag(models.Model):
 
 class IPBan(models.Model):
     ip_address = models.GenericIPAddressField()
-    cidr = models.IntegerField()
+    prefix_bits = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('users.User', null=True, blank=True, on_delete=models.SET_NULL)
     expires_at = models.DateTimeField(null=True, blank=True)
+
+    @property
+    def cidr_address(self):
+        return ipaddress.ip_network(f'{self.ip_address}/{self.prefix_bits}', strict=False)
+
+    @property
+    def network_address(self):
+        return self.cidr_address.network_address
 
 
 class AdHocPayment(models.Model):
