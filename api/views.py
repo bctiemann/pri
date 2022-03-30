@@ -132,6 +132,8 @@ class ReservationMixin:
                 },
             })
 
+        # TODO: Check IP here. If more than 2 customers created with the same IP in the last 10 minutes, fail silently.
+
         # Create Reservation
 
         reservation = form.save(commit=False)
