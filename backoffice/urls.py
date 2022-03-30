@@ -9,7 +9,7 @@ from backoffice import views
 from backoffice.views import (
     vehicles, reservations, rentals, guided_drives, employees, customers, coupons, toll_tags, tax_rates, bbs,
     consigners, consignment_payments, news, site_content, gift_certificates, adhoc_payments, newsletter_subscriptions,
-    stripe_charges, red_flags, survey_responses, damage, service, mass_email,
+    stripe_charges, red_flags, ip_bans, survey_responses, damage, service, mass_email,
 )
 
 
@@ -112,6 +112,11 @@ urlpatterns = [
     path('red_flags/create/', red_flags.RedFlagCreateView.as_view(is_create_view=True), name='redflag-create'),
     path('red_flags/<int:pk>/', red_flags.RedFlagDetailView.as_view(), name='redflag-detail'),
     path('red_flags/<int:pk>/delete/', red_flags.RedFlagDeleteView.as_view(), name='redflag-delete'),
+
+    path('ip_bans/', ip_bans.IPBanListView.as_view(), name='ipban-list'),
+    path('ip_bans/create/', ip_bans.IPBanCreateView.as_view(is_create_view=True), name='ipban-create'),
+    path('ip_bans/<int:pk>/', ip_bans.IPBanDetailView.as_view(), name='ipban-detail'),
+    path('ip_bans/<int:pk>/delete/', ip_bans.IPBanDeleteView.as_view(), name='ipban-delete'),
 
     path('bbs/', bbs.BBSListView.as_view(), name='bbs-list'),
     path('bbs/<int:pk>/reply/', bbs.BBSReplyPostView.as_view(), name='bbs-reply'),

@@ -5,7 +5,7 @@ from django.db.models import JSONField
 
 from sales.models import (
     Reservation, Rental, Promotion, Coupon, TaxRate, JoyRide, PerformanceExperience, GiftCertificate,
-    AdHocPayment, Card, Charge
+    AdHocPayment, Card, Charge, RedFlag, IPBan
 )
 
 
@@ -63,6 +63,16 @@ class ChargeAdmin(admin.ModelAdmin):
     autocomplete_fields = ('card',)
 
 
+class RedFlagAdmin(admin.ModelAdmin):
+    list_display = ('id', 'full_name',)
+    # autocomplete_fields = ('card',)
+
+
+class IPBanAdmin(admin.ModelAdmin):
+    list_display = ('id', 'ip_address', 'cidr', 'created_at', 'expires_at',)
+    autocomplete_fields = ('created_by',)
+
+
 admin.site.register(Reservation, ReservationAdmin)
 admin.site.register(Rental, RentalAdmin)
 admin.site.register(JoyRide, JoyRideAdmin)
@@ -74,3 +84,5 @@ admin.site.register(GiftCertificate, GiftCertificateAdmin)
 admin.site.register(AdHocPayment, AdHocPaymentAdmin)
 admin.site.register(Card, CardAdmin)
 admin.site.register(Charge, ChargeAdmin)
+admin.site.register(RedFlag, RedFlagAdmin)
+admin.site.register(IPBan, IPBanAdmin)

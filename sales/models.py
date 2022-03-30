@@ -534,6 +534,14 @@ class RedFlag(models.Model):
     remarks = models.TextField(blank=True)
 
 
+class IPBan(models.Model):
+    ip_address = models.GenericIPAddressField()
+    cidr = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey('users.User', null=True, blank=True, on_delete=models.SET_NULL)
+    expires_at = models.DateTimeField(null=True, blank=True)
+
+
 class AdHocPayment(models.Model):
     full_name = models.CharField(max_length=100, blank=True)
     email = models.EmailField(blank=True)

@@ -11,7 +11,7 @@ from consignment.models import Consigner, ConsignmentPayment
 from users.models import User, Employee, Customer
 from sales.models import (
     Reservation, Rental, GuidedDrive, JoyRide, PerformanceExperience, Coupon, TaxRate, GiftCertificate, AdHocPayment,
-    Charge, Card, RedFlag
+    Charge, Card, RedFlag, IPBan
 )
 from sales.enums import (
     TRUE_FALSE_CHOICES, DELIVERY_REQUIRED_CHOICES, birth_years, operational_years, get_service_hours,
@@ -673,6 +673,13 @@ class RedFlagForm(forms.ModelForm):
         model = RedFlag
         fields = '__all__'
         # exclude = ('confirmation_code',)
+
+
+class IPBanForm(forms.ModelForm):
+
+    class Meta:
+        model = IPBan
+        fields = '__all__'
 
 
 class DamageForm(CSSClassMixin, forms.ModelForm):

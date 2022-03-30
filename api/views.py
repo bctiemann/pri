@@ -112,6 +112,8 @@ class ReservationMixin:
         return customer
 
     def post(self, request):
+        # TODO: kill switch
+
         form = self.form_class(request.POST)
         print(form.data)
         print(form.is_valid())

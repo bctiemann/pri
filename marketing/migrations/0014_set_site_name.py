@@ -7,11 +7,14 @@ import marketing.models
 
 
 def set_site_name(apps, schema_editor):
-    Site = apps.get_model('sites', 'Site')
-    initial_site = Site.objects.all().first()
-    initial_site.domain = 'performancerentals.us'
-    initial_site.name = 'Performance Rentals'
-    initial_site.save()
+    try:
+        Site = apps.get_model('sites', 'Site')
+        initial_site = Site.objects.all().first()
+        initial_site.domain = 'performancerentals.us'
+        initial_site.name = 'Performance Rentals'
+        initial_site.save()
+    except LookupError:
+        pass
 
 
 class Migration(migrations.Migration):

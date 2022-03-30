@@ -194,6 +194,13 @@
 {% if user.employee.admin_access %}
 <CFIF YourID.acclev IS 1>
 	<li>
+	<a class="tnav {% if page_group == 'ip_bans' %}selected{% endif %}" href="{% url "backoffice:ipban-list" %}">IP Bans</a>
+	</li>
+</CFIF>
+{% endif %}
+{% if user.employee.admin_access %}
+<CFIF YourID.acclev IS 1>
+	<li>
 	<a class="tnav {% if page_group == 'tolltags' %}selected{% endif %}" href="{% url "backoffice:tolltag-list" %}">Toll Tags (E-ZPass)</a>
 	</li>
 </CFIF>
