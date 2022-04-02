@@ -40,6 +40,7 @@ from api.serializers import (
     VehicleSerializer, VehicleDetailSerializer, CustomerSearchSerializer, ScheduleConflictSerializer,
     TaxRateFetchSerializer, CardSerializer
 )
+from sales.views import ReservationMixin
 
 logger = logging.getLogger(__name__)
 
@@ -75,92 +76,6 @@ class GetVehicleView(APIView):
             raise Http404
         serializer = VehicleDetailSerializer(vehicle)
         return Response({'vehicle': serializer.data})
-
-
-# Mixin to get the resolved and authenticated customer from the reservation form, creating it new if necessary;
-# also to provide a consolidated post() method which creates a reservation of any type attached to the customer
-class ReservationMixin:
-
-    @staticmethod
-    def _get_login_customer(request, form):
-        if form.customer:
-            # TODO: If authenticated user is not the same as the user in the request, logout and re-auth using POST data
-            if request.user.is_authenticated:
-                return form.customer
-            if authenticate(request, username=form.customer.email, password=form.cleaned_data['password']):
-                login(request, form.customer.user)
-                return form.customer
-            # Only way to return None is if password is incorrect for an existing user's email
-            return None
-        else:
-            # Create Customer object and login
-            # TODO: Ensure that every User has a Customer attached, as providing an email of an unattached user will
-            #  try to create a new user which will fail the uniqueness constraint. Alternatively, do a get_or_create
-            #  user = User.objects.create_user(form.cleaned_data['email'], password=generate_password())
-            user = User.objects.create_user(form.cleaned_data['email'], password=form.cleaned_data['password_new'])
-            customer_kwargs = {key: form.cleaned_data.get(key) for key in customer_fields}
-            remote_addr = request.META.get('REMOTE_ADDR') or request.META.get("HTTP_X_FORWARDED_FOR")
-            # Create the customer object. Stripe cards are not registered until the Customer has an id (has been saved).
-            customer = Customer.objects.create(
-                user=user,
-                registration_ip=remote_addr,
-                **customer_kwargs,
-            )
-            # Save a second time to register Stripe cards
-            customer.save()
-            login(request, user)
-        return customer
-
-    def post(self, request):
-        # TODO: kill switch
-
-        form = self.form_class(request.POST)
-        print(form.data)
-        print(form.is_valid())
-        print(form.errors.as_json())
-        if not form.is_valid():
-            return Response({
-                'success': False,
-                'errors': form.errors,
-            })
-
-        # Create Customer or login existing user
-        customer = self._get_login_customer(request, form)
-        if not customer:
-            return Response({
-                'success': False,
-                'errors': {
-                    'password': ['Incorrect password'],
-                },
-            })
-
-        # TODO: Check IP here. If more than 2 customers created with the same IP in the last 10 minutes, fail silently.
-
-        # Create Reservation
-
-        reservation = form.save(commit=False)
-        reservation.customer = customer
-
-        # If rental, resolve vehicle
-        if 'vehicle_marketing' in form.cleaned_data:
-            reservation.vehicle = form.cleaned_data['vehicle_marketing'].vehicle
-
-        try:
-            reservation.save()
-        except IntegrityError as e:
-            raise APIException(detail=e, code='collision')
-
-        response = {
-            'success': form.is_valid(),
-            'errors': form.errors,
-            'errors_html': form.errors.as_ul(),
-            'reservation_type': self.reservation_type,
-            'customer_site_url': self.get_customer_site_url(confirmation_code=reservation.confirmation_code),
-        }
-        return Response(response)
-
-    def get_customer_site_url(self, **kwargs):
-        raise NotImplementedError
 
 
 # 1st phase form; gathers basic rental details (vehicle date in/out, extra miles, etc)
