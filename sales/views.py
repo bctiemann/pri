@@ -1,6 +1,8 @@
 from django.views.generic import TemplateView, FormView, CreateView, UpdateView
 from django.http import Http404
 
+from rest_framework.response import Response
+
 from sales.forms import (
     ReservationRentalDetailsForm, ReservationRentalPaymentForm, ReservationRentalLoginForm,
     PerformanceExperienceDetailsForm, PerformanceExperiencePaymentForm, PerformanceExperienceLoginForm,
@@ -182,6 +184,16 @@ class ReserveView(NavMenuMixin, PaymentLoginFormMixin, FormView):
         # context['payment_form'] = self.get_payment_form()
         # context['login_form'] = self.get_login_form()
         return context
+
+
+class ReserveLoginFormView(ReserveView):
+    template_name = 'front_site/reserve/login_form.html'
+    form_class = ReservationRentalLoginForm
+
+
+class ReservePaymentFormView(ReserveView):
+    template_name = 'front_site/reserve/payment_form.html'
+    form_class = ReservationRentalLoginForm
 
 
 class PerformanceExperienceView(NavMenuMixin, PaymentLoginFormMixin, FormView):

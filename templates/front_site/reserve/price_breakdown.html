@@ -1,0 +1,52 @@
+<table class="price-breakdown small-item-data">
+    <tr>
+        <td>Rental total (<span class="price-numdays"></span>)</td>
+        <td>$<span class="price-rental-total"></span></td>
+        <td></td>
+    </tr>
+    <tr class="multiday">
+        <td>Multi-Day Discount (<span class="price-multi-day-discount-pct"></span>%)</td>
+        <td>- $<span class="price-multi-day-discount"></span></td>
+        <td></td>
+    </tr>
+    <tr class="specific-discount">
+        <td><span class="price-specific-discount-label"></span></td>
+        <td>- $<span class="price-specific-discount"></span></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Extra Miles (<span class="price-extra-miles"></span>)</td>
+        <td>$<span class="price-extra-miles-cost"></span></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Subtotal</td>
+        <td>$<span class="price-subtotal"></span></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Tax (<span class="price-tax-rate"></span>%)</td>
+        <td>$<span class="price-tax"></span></td>
+        <td></td>
+    </tr>
+    <tr class="total">
+        <td>Total</td>
+        <td>$<span class="price-total"></span></td>
+        <td></td>
+    </tr>
+    <tr class="deposit">
+        <td>Reservation Deposit</td>
+        <td>$<span class="price-reservation-deposit"></span></td>
+        <td class="tooltip" title="We will charge your card 50% of the rental total in order to secure your reservation. The remainder will be due at the time you receive the vehicle.">Amount to be charged now <span class="ui-icon ui-icon-info"></span></td>
+    </tr>
+    <tr class="smallprint">
+        <td colspan="3" class="price-delivery-smallprint">
+        Delivery may incur additional charges. <span class="delivery-pricing" title="pricing">See pricing <span class="ui-icon ui-icon-info"></span></span>
+        </td>
+    </tr>
+    <tr class="security-deposit">
+        <td>Security Deposit</td>
+        <td>$<span class="price-security-deposit">{{ vehicle.security_deposit }}</span></td>
+        <td class="tooltip" title="We require a security deposit of some form of collateral with rentals of our vehicles. This typically is done by placing an authorization (&quot;hold&quot;) on a credit card. This hold is performed 1-2 days prior to the rental date, and is released right after the rental is over. If you would like to use different cards for your rental and your security deposit, you will be able to submit a card for the security deposit after you complete the reservation.">Refundable collateral amount <span class="ui-icon ui-icon-info"></span></td>
+    </tr>
+</table>

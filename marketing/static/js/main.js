@@ -29,6 +29,63 @@ $.ajaxSetup({
     }
 });
 
+var populatePriceBreakdown = function(data, reservationType) {
+    if (reservationType === 'rental') {
+        $('.price-numdays').html(data.price_data.num_days + ' day' + (data.price_data.num_days !== 1 ? 's' : ''));
+        $('.price-rental-total').html(data.price_data.base_price.toFixed(2));
+        $('.price-multi-day-discount').html(data.price_data.multi_day_discount.toFixed(2));
+        $('.price-multi-day-discount-pct').html(data.price_data.multi_day_discount_pct);
+        $('.price-specific-discount').html(data.price_data.specific_discount.toFixed(2));
+        $('.price-specific-discount-label').html(data.price_data.specific_discount_label);
+        if (data.price_data.specific_discount) {
+            $('.specific-discount').show();
+        } else {
+            $('.specific-discount').hide();
+        }
+        $('.price-extra-miles').html(data.price_data.extra_miles);
+        $('.price-extra-miles-cost').html(data.price_data.extra_miles_cost.toFixed(2));
+        $('.price-subtotal').html(data.price_data.subtotal.toFixed(2));
+        $('.price-tax').html(data.price_data.tax_amount.toFixed(2));
+        $('.price-tax-rate').html(data.price_data.tax_rate_as_percent);
+        $('.price-total').html(data.price_data.total_with_tax.toFixed(2));
+        $('.price-reservation-deposit').html(data.price_data.reservation_deposit.toFixed(2));
+        if (data.delivery_required) {
+            $('.price-delivery-smallprint').css('visibility', 'visible');
+        } else {
+            $('.price-delivery-smallprint').css('visibility', 'hidden');
+        }
+    } else if (reservationType === 'joyride' || reservationType === 'perfexp') {
+        $('.price-nodrv').html(data.price_data.num_drivers + ' driver' + (data.price_data.num_drivers !== 1 ? 's' : ''));
+        $('.price-drvcost').html(data.price_data.driver_cost.toFixed(2));
+        $('.price-nopax').html(data.price_data.num_passengers + ' passenger' + (data.price_data.num_passengers !== 1 ? 's' : ''));
+        $('.price-paxcost').html(data.price_data.passenger_cost.toFixed(2));
+        // $('.price-event-total').html(data.price_data.subtotal.toFixed(2));
+        $('.price-customer-discount').html(data.price_data.customer_discount.toFixed(2));
+        $('.price-specific-discount').html(data.price_data.specific_discount.toFixed(2));
+        if (data.price_data.specific_discount) {
+            $('.specific-discount').show();
+        } else {
+            $('.specific-discount').hide();
+        }
+        $('.price-specific-discount-label').html(data.price_data.specific_discount_label);
+        $('.price-subtotal').html(data.price_data.subtotal.toFixed(2));
+        $('.price-tax').html(data.price_data.tax_amount.toFixed(2));
+        $('.price-tax-rate').html(data.price_data.tax_rate_as_percent);
+        $('.price-total').html(data.price_data.total_with_tax.toFixed(2));
+    }
+    if (data.customer_id) {
+        // $('.price-breakdown').appendTo($('#price_breakdown_existing_user')).removeClass('hidden');
+        // $('#reservation_payment').hide();
+        // $('#reservation_payment_error').hide();
+        // $('#reservation_login').show();
+    } else {
+        // $('.price-breakdown').appendTo($('#price_breakdown_new_user')).removeClass('hidden');
+        // $('#reservation_login').hide();
+        // $('#reservation_password_error').hide();
+        // $('#reservation_payment').show();
+    }
+};
+
 var reserveValidateForm = function(reservationType, section) {
     var params = {};
     var formArray = $('#reservation_form').serializeArray();
@@ -46,14 +103,39 @@ var reserveValidateForm = function(reservationType, section) {
 //    $.post('ajax_post.cfm',params,function(data) {
     console.log(method);
     console.log(section);
-    $('#reservation_payment').hide();
-    $('#reservation_login').hide();
+    // $('#reservation_payment').hide();
+    // $('#reservation_login').hide();
     // $('#reservation_existing_user').hide();
+
+    // If submitting the phase 1 form, empty both phase 2 form containers
+    if (section === 'details') {
+        $('#login_form_container').empty();
+        $('#payment_form_container').empty();
+    }
     $.post(`/api/validate/${reservationType}/${section}/`, params, function(data) {
         console.log(data);
         $('.' + section + ' .field-error').removeClass('field-error');
         if (data.success) {
             if (section === 'details') {
+                if (data.customer_id) {
+                    let formUrl = `/vehicle/${params.vehicle_slug}/reserve/login/`;
+                    $('#login_form_container').load(formUrl, function() {
+                        console.log('login form');
+                        console.log(data);
+                        populatePriceBreakdown(data, reservationType);
+                        refreshUI();
+                    })
+                } else {
+                    let formUrl = `/vehicle/${params.vehicle_slug}/reserve/payment/`;
+                    $('#payment_form_container').load(formUrl, function() {
+                        console.log('payment form');
+                        console.log(data);
+                        populatePriceBreakdown(data, reservationType);
+                        refreshUI();
+                    })
+                }
+
+                /*
                 if (reservationType === 'rental') {
                     $('.price-numdays').html(data.price_data.num_days + ' day' + (data.price_data.num_days !== 1 ? 's' : ''));
                     $('.price-rental-total').html(data.price_data.base_price.toFixed(2));
@@ -102,6 +184,8 @@ var reserveValidateForm = function(reservationType, section) {
                 } else {
                     $('.customer-discount').hide();
                 }
+                */
+                /*
                 if (data.customer_id) {
                     $('.price-breakdown').appendTo($('#price_breakdown_existing_user')).removeClass('hidden');
                     $('#reservation_payment').hide();
@@ -113,6 +197,7 @@ var reserveValidateForm = function(reservationType, section) {
                     $('#reservation_password_error').hide();
                     $('#reservation_payment').show();
                 }
+                */
             } else if (section == 'password') {
                 if (method == 'validateLogin') {
                     $('#customerid').val(data.customerid);
@@ -137,7 +222,7 @@ var reserveValidateForm = function(reservationType, section) {
                     // window.location.href = data.custsite + 'joyride_confirm.cfm?confcode=' + data.confcode;
                 } else if (data.reservation_type === 'rental') {
                     window.location.href = data.customer_site_url;
-                } else if (data.reservation_type == 'gift') {
+                } else if (data.reservation_type === 'gift') {
                     window.location.href = data.success_url;
                     // window.location.href = 'gift.cfm?tag=' + data.tag;
                 // } else if (data.reservation_type == 'subscribe') {
@@ -260,6 +345,78 @@ var formatPhone = function(str) {
 };
 
 
+var refreshUI = function() {
+    // Date pickers
+    $('#id_out_date').datepicker({});
+    $('#id_back_date').datepicker({});
+    $('#id_requested_date').datepicker({});
+    $('#id_backup_date').datepicker({});
+
+    // Tooltips
+    $('.tooltip').tooltip();
+    $('.delivery-pricing').tooltip({
+        content: function() {
+            return $('#delivery_pricing').html();
+        },
+    });
+
+    // Enforce formatting for phone numbers
+    $('.phone').on('keyup change', function() {
+        $(this).val(formatPhone($(this).val()));
+    });
+
+    // Credit card input processing
+    $('input#id_cc_number').payment('formatCardNumber');
+    $('input#id_cc_cvv').payment('formatCardCVC');
+    $('input#id_cc_number').trigger($.Event( 'keyup', {which:$.ui.keyCode.SPACE, keyCode:$.ui.keyCode.SPACE}));
+
+        $('.reserve-rental-details-btn').click(function() {
+        reserveValidateForm('rental', 'details');
+    });
+    $('.reserve-joyride-details-btn').click(function() {
+        reserveValidateForm('joyride', 'details');
+    });
+    $('.reserve-perfexp-details-btn').click(function() {
+        reserveValidateForm('perfexp', 'details');
+    });
+    $('.reserve-createpass-btn').click(function() {
+        reserveValidateForm('validatePassword', 'password');
+    });
+    $('.reserve-rental-login-btn').click(function() {
+        reserveValidateForm('rental', 'login');
+    });
+    $('.reserve-joyride-login-btn').click(function() {
+        reserveValidateForm('joyride', 'login');
+    });
+    $('.reserve-perfexp-login-btn').click(function() {
+        reserveValidateForm('perfexp', 'login');
+    });
+    $('.reserve-rental-complete-btn').click(function() {
+        reserveValidateForm('rental', 'payment');
+    });
+    $('.reserve-joyride-complete-btn').click(function() {
+        reserveValidateForm('joyride', 'payment');
+    });
+    $('.reserve-perfexp-complete-btn').click(function() {
+        reserveValidateForm('perfexp', 'payment');
+    });
+    $('.reserve-gift-complete-btn').click(function() {
+        reserveValidateForm('gift', 'payment');
+    });
+    $('.subscribe-complete-btn').click(function() {
+        reserveValidateForm('newsletter', 'subscribe');
+    });
+    $('.unsubscribe-complete-btn').click(function() {
+        reserveValidateForm('unsubscribeNewsletter', 'payment');
+    });
+    $('.subpay-complete-btn').click(function() {
+        reserveValidateForm('submitSubPay', 'payment');
+    });
+    $('.survey-complete-btn').click(function() {
+        reserveValidateForm('submitSurvey', 'payment');
+    });
+}
+
 $('document').ready(function() {
 
     (function() {
@@ -282,6 +439,9 @@ $('document').ready(function() {
         }
     })();
 
+    refreshUI();
+
+    /*
     // Date pickers
     $('#id_out_date').datepicker({});
     $('#id_back_date').datepicker({});
@@ -295,6 +455,7 @@ $('document').ready(function() {
             return $('#delivery_pricing').html();
         },
     });
+     */
 
     // Reset Password dialog
     $('.forgot-password').click(function() {
@@ -309,6 +470,7 @@ $('document').ready(function() {
         });
     });
 
+    /*
     // Enforce formatting for phone numbers
     $('.phone').on('keyup change', function() {
         $(this).val(formatPhone($(this).val()));
@@ -318,7 +480,9 @@ $('document').ready(function() {
     $('input#id_cc_number').payment('formatCardNumber');
     $('input#id_cc_cvv').payment('formatCardCVC');
     $('input#id_cc_number').trigger($.Event( 'keyup', {which:$.ui.keyCode.SPACE, keyCode:$.ui.keyCode.SPACE}));
+     */
 
+    /*
     $('.reserve-rental-details-btn').click(function() {
         reserveValidateForm('rental', 'details');
     });
@@ -364,6 +528,7 @@ $('document').ready(function() {
     $('.survey-complete-btn').click(function() {
         reserveValidateForm('submitSurvey', 'payment');
     });
+     */
 
     $('.pick-vehicles-btn').click(function() {
         var vehicle_type = $(this).attr('type');

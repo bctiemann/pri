@@ -12,7 +12,11 @@
     <table class="inputform details">
         <tr>
             <td>Vehicle</td>
-            <td><input name="vehicle_marketing" type="hidden" value="{{ vehicle.id }}" />{{ vehicle.make}} {{ vehicle.model }}</td>
+            <td>
+                <input name="vehicle_marketing" type="hidden" value="{{ vehicle.id }}" />
+                <input name="vehicle_slug" type="hidden" value="{{ vehicle.slug }}" />
+                {{ vehicle.make}} {{ vehicle.model }}
+            </td>
         </tr>
         <tr>
             <td>Rental Date</td>
