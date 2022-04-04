@@ -1,0 +1,9 @@
+{% if form.errors %}
+    <div class="exception">
+        <h3>Validation error occurred.</h3>
+        {% for field, error in form.errors.items %}
+            <p>{{ field }}:</p>
+            {{ error }}
+        {% endfor %}
+    </div>
+{% endif %}

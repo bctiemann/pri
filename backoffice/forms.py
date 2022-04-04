@@ -678,6 +678,11 @@ class RedFlagForm(forms.ModelForm):
 
 class IPBanForm(forms.ModelForm):
 
+    def clean_prefix_bits(self):
+        if self.cleaned_data['prefix_bits'] == 0:
+            raise forms.ValidationError('Cannot specify prefix bit length of 0.')
+        return self.cleaned_data['prefix_bits']
+
     class Meta:
         model = IPBan
         fields = '__all__'
