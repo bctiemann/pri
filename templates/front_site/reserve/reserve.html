@@ -177,9 +177,10 @@
         </div>
 
         </cfoutput>
-        <cfinput name="customerid" type="hidden" value="" />
-        <cfinput name="reservation_type" type="hidden" value="rental" />
-        <cfinput name="taxpct" type="hidden" value="" />
+{#        <cfinput name="customerid" type="hidden" value="" />#}
+{#        <cfinput name="reservation_type" type="hidden" value="rental" />#}
+{#        <cfinput name="taxpct" type="hidden" value="" />#}
+{#        <input type="hidden" name="form_type" value="{{ form_type }}" />#}
         {% csrf_token %}
     </form>
 

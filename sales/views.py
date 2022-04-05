@@ -70,7 +70,11 @@ class ReservationMixin:
             # TODO: Ensure that every User has a Customer attached, as providing an email of an unattached user will
             #  try to create a new user which will fail the uniqueness constraint. Alternatively, do a get_or_create
             #  user = User.objects.create_user(form.cleaned_data['email'], password=generate_password())
-            user = User.objects.create_user(form.cleaned_data['email'], password=form.cleaned_data['password_new'])
+            new_password = form.cleaned_data.get('password_new')
+            # User changed email address after submitting a valid one in the details form
+            if not new_password:
+                return None
+            user = User.objects.create_user(form.cleaned_data['email'], password=new_password)
             customer_kwargs = {key: form.cleaned_data.get(key) for key in customer_fields}
             remote_addr = request.META.get('REMOTE_ADDR') or request.META.get("HTTP_X_FORWARDED_FOR")
             # Create the customer object. Stripe cards are not registered until the Customer has an id (has been saved).
