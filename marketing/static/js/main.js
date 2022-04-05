@@ -114,13 +114,13 @@ var reserveValidateForm = function(reservationType, section) {
         $('#login_form_container').empty();
         $('#payment_form_container').empty();
     }
-    $.post(`/api/validate/${reservationType}/form/${section}/`, params, function(data) {
+    $.post(`/api/validate/${reservationType}/${section}/`, params, function(data) {
         console.log(data);
         $('.' + section + ' .field-error').removeClass('field-error');
         if (data.success) {
             if (section === 'details') {
                 if (data.customer_id) {
-                    let formUrl = `/vehicle/${params.vehicle_slug}/reserve/login/`;
+                    let formUrl = `/vehicle/${params.vehicle_slug}/reserve/form/login/`;
                     $('#login_form_container').load(formUrl, function() {
                         console.log('login form');
                         console.log(data);
@@ -128,7 +128,7 @@ var reserveValidateForm = function(reservationType, section) {
                         refreshUI();
                     })
                 } else {
-                    let formUrl = `/vehicle/${params.vehicle_slug}/reserve/payment/`;
+                    let formUrl = `/vehicle/${params.vehicle_slug}/reserve/form/payment/`;
                     $('#payment_form_container').load(formUrl, function() {
                         console.log('payment form');
                         console.log(data);

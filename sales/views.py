@@ -1,9 +1,13 @@
 from django.views.generic import TemplateView, FormView, CreateView, UpdateView
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import reverse
+from django.db import IntegrityError
+from django.contrib.auth import authenticate, login
 
 from rest_framework.response import Response
+from rest_framework.exceptions import APIException
 
+from users.models import User, Customer
 from sales.forms import (
     ReservationRentalDetailsForm, ReservationRentalPaymentForm, ReservationRentalLoginForm,
     PerformanceExperienceDetailsForm, PerformanceExperiencePaymentForm, PerformanceExperienceLoginForm,
@@ -13,6 +17,11 @@ from sales.forms import (
 from sales.models import GiftCertificate
 from marketing.views import NavMenuMixin
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
+
+customer_fields = (
+    'first_name', 'last_name', 'mobile_phone', 'home_phone', 'work_phone', 'fax', 'cc_number', 'cc_exp_yr',
+    'cc_exp_mo', 'cc_cvv', 'cc_phone', 'address_line_1', 'address_line_2', 'city', 'state', 'zip'
+)
 
 
 class PaymentLoginFormMixin:
@@ -37,6 +46,7 @@ class PaymentLoginFormMixin:
         context = super().get_context_data(**kwargs)
         context['payment_form'] = self.get_payment_form()
         context['login_form'] = self.get_login_form()
+        # context['form_type'] = self.form_type
         return context
 
 
@@ -74,30 +84,31 @@ class ReservationMixin:
             login(request, user)
         return customer
 
-    def post(self, request):
+    def create_reservation(self, request, form=None):
         # TODO: kill switch
 
-        form = self.form_class(request.POST)
+        form = form or self.form_class(request.POST)
         print(form.data)
         print(form.is_valid())
         print(form.errors.as_json())
         if not form.is_valid():
-            return Response({
+            return {
                 'success': False,
                 'errors': form.errors,
-            })
+            }
 
         # Create Customer or login existing user
         customer = self._get_login_customer(request, form)
         if not customer:
-            return Response({
+            return {
                 'success': False,
                 'errors': {
                     'password': ['Incorrect password'],
                 },
-            })
+            }
 
         # TODO: Check IP here. If more than 2 customers created with the same IP in the last 10 minutes, fail silently.
+        #  Push to honeypot success page.
 
         # Create Reservation
 
@@ -113,14 +124,13 @@ class ReservationMixin:
         except IntegrityError as e:
             raise APIException(detail=e, code='collision')
 
-        response = {
+        return {
             'success': form.is_valid(),
             'errors': form.errors,
             'errors_html': form.errors.as_ul(),
             'reservation_type': self.reservation_type,
             'customer_site_url': self.get_customer_site_url(confirmation_code=reservation.confirmation_code),
         }
-        return Response(response)
 
     def get_customer_site_url(self, **kwargs):
         raise NotImplementedError
@@ -128,12 +138,13 @@ class ReservationMixin:
 
 # This template is rendered with three forms: details (phase 1), payment (phase 2 for new user), and login (phase 2 for
 # returning user. All three forms have different validation needs and field sets
-class ReserveView(NavMenuMixin, PaymentLoginFormMixin, FormView):
+class ReserveView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, FormView):
     template_name = 'front_site/reserve/reserve.html'
     form_class = ReservationRentalDetailsForm
     payment_form_class = ReservationRentalPaymentForm
     login_form_class = ReservationRentalLoginForm
     form_type = 'details'
+    reservation_type = 'rental'
 
     def get(self, request, *args, **kwargs):
         """Handle GET requests: instantiate a blank version of the form."""
@@ -169,7 +180,10 @@ class ReserveView(NavMenuMixin, PaymentLoginFormMixin, FormView):
     #     elif self.form_type =
 
     def form_valid(self, form):
-        return super().form_valid(form)
+        reservation_result = self.create_reservation(self.request, form)
+        if reservation_result['success']:
+            return HttpResponseRedirect(reservation_result['customer_site_url'])
+        return self.render_to_response(self.get_context_data(form=form, form_type=self.form_type, slug=form.vehicle.slug))
 
     def form_invalid(self, form, **kwargs):
         """If the form is invalid, render the invalid form."""
@@ -194,7 +208,7 @@ class ReserveView(NavMenuMixin, PaymentLoginFormMixin, FormView):
     #         form_class = self.get_login_form_class()
     #     return form_class(**self.get_form_kwargs())
 
-    def get_context_data(self, slug=None, **kwargs):
+    def get_context_data(self, slug=None, form_type=None, **kwargs):
         context = super().get_context_data(**kwargs)
         # We filter() rather than get() because vehicle_marketing.slug is not unique (we may have multiple of the
         # same vehicle)
@@ -203,17 +217,21 @@ class ReserveView(NavMenuMixin, PaymentLoginFormMixin, FormView):
             raise Http404
         # context['payment_form'] = self.get_payment_form()
         # context['login_form'] = self.get_login_form()
+        context['form_type'] = form_type or 'details'
         return context
 
-    def get_success_url(self):
-        form = self.get_form()
-        # form.is_valid()
-        # vehicle_marketing = form.cleaned_data['vehicle_marketing']
-        if isinstance(form, ReservationRentalDetailsForm):
-            if form.customer:
-                return reverse('reserve-login-form', kwargs={'slug': form.vehicle.slug})
-            return reverse('reserve-payment-form', kwargs={'slug': form.vehicle.slug})
-        return reverse('reserve', kwargs={'slug': form.vehicle.slug})
+    # def get_success_url(self):
+    #     form = self.get_form()
+    #     # form.is_valid()
+    #     # vehicle_marketing = form.cleaned_data['vehicle_marketing']
+    #     if isinstance(form, ReservationRentalDetailsForm):
+    #         if form.customer:
+    #             return reverse('reserve-login', kwargs={'slug': form.vehicle.slug})
+    #         return reverse('reserve-payment', kwargs={'slug': form.vehicle.slug})
+    #     return reverse('reserve', kwargs={'slug': form.vehicle.slug})
+
+    def get_customer_site_url(self, confirmation_code):
+        return reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': confirmation_code})
 
 
 class ReserveLoginFormView(ReserveView):

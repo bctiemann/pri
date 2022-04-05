@@ -386,7 +386,13 @@ class ReservationRentalDetailsForm(forms.ModelForm):
 # 2nd-phase form; extends ReservationRentalDetailsForm with Customer fields so it inherits all the first form's validations
 class ReservationRentalPaymentForm(PaymentFormMixin, CardFormMixin, ReservationRentalDetailsForm):
     form_type = 'payment'
-    pass
+    # pass
+    # email = forms.EmailField(disabled=True)
+
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     self.fields['email'].disabled = True
+    #     self.fields['email'].widget.attrs['hidden'] = True
 
 
 # If the customer already exists, this form will be shown and processed instead of ReservationRentalPaymentForm

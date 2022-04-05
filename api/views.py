@@ -44,11 +44,6 @@ from sales.views import ReservationMixin
 
 logger = logging.getLogger(__name__)
 
-customer_fields = (
-    'first_name', 'last_name', 'mobile_phone', 'home_phone', 'work_phone', 'fax', 'cc_number', 'cc_exp_yr',
-    'cc_exp_mo', 'cc_cvv', 'cc_phone', 'address_line_1', 'address_line_2', 'city', 'state', 'zip'
-)
-
 
 class HasReservationsAccess(BasePermission):
 
@@ -106,6 +101,10 @@ class ValidateRentalDetailsView(APIView):
 class ValidateRentalPaymentView(ReservationMixin, APIView):
     form_class = ReservationRentalPaymentForm
     reservation_type = 'rental'
+
+    def post(self, request):
+        reservation_result = self.create_reservation(request)
+        return Response(reservation_result)
 
     def get_customer_site_url(self, confirmation_code):
         return reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': confirmation_code}),

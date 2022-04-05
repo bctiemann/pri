@@ -194,6 +194,7 @@
             </td>
         </tr>
 
+        {% if form_type == "details" %}
         <cfif NOT IsDefined("IdentityResult") OR NOT IdentityResult.success OR (IsDefined("LoginResult") AND NOT LoginResult.success)>
         <tr class="buttons">
             <td></td>
@@ -204,6 +205,7 @@
             </td>
         </tr>
         </cfif>
+        {% endif %}
     </table>
 
 </div>
