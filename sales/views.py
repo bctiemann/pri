@@ -1,5 +1,6 @@
 from django.views.generic import TemplateView, FormView, CreateView, UpdateView
 from django.http import Http404
+from django.shortcuts import reverse
 
 from rest_framework.response import Response
 
@@ -132,6 +133,7 @@ class ReserveView(NavMenuMixin, PaymentLoginFormMixin, FormView):
     form_class = ReservationRentalDetailsForm
     payment_form_class = ReservationRentalPaymentForm
     login_form_class = ReservationRentalLoginForm
+    form_type = 'details'
 
     def get(self, request, *args, **kwargs):
         """Handle GET requests: instantiate a blank version of the form."""
@@ -144,19 +146,37 @@ class ReserveView(NavMenuMixin, PaymentLoginFormMixin, FormView):
         """
         form = self.get_form()
         if form.is_valid():
+            if form.form_type == 'details':
+            # if isinstance(form, ReservationRentalDetailsForm):
+                # new_form = None
+                if form.customer:
+                    form_type = 'login'
+                #     new_form = ReservationRentalLoginForm(**self.get_form_kwargs())
+                # #     # return reverse('reserve-login-form', kwargs={'slug': form.vehicle.slug})
+                else:
+                    form_type = 'payment'
+                #     new_form = ReservationRentalPaymentForm(**self.get_form_kwargs())
+                return self.render_to_response(self.get_context_data(form=form, form_type=form_type, **kwargs))
+                # # return reverse('reserve-payment-form', kwargs={'slug': form.vehicle.slug})
+
             return self.form_valid(form)
         else:
             return self.form_invalid(form, **kwargs)
 
-    # def form_valid(self, form):
-    #     return super().form_valid(form)
+    # def get_form_class(self):
+    #     if self.form_type == 'details':
+    #         return self.form_class
+    #     elif self.form_type =
+
+    def form_valid(self, form):
+        return super().form_valid(form)
 
     def form_invalid(self, form, **kwargs):
         """If the form is invalid, render the invalid form."""
         for field in form.errors:
             form[field].field.widget.attrs.setdefault('class', '')
             form[field].field.widget.attrs['class'] += ' field-error'
-        return self.render_to_response(self.get_context_data(form=form, **kwargs))
+        return self.render_to_response(self.get_context_data(form=form, form_type=form.form_type, **kwargs))
 
     # def get_payment_form_class(self):
     #     return self.payment_form_class
@@ -185,6 +205,16 @@ class ReserveView(NavMenuMixin, PaymentLoginFormMixin, FormView):
         # context['login_form'] = self.get_login_form()
         return context
 
+    def get_success_url(self):
+        form = self.get_form()
+        # form.is_valid()
+        # vehicle_marketing = form.cleaned_data['vehicle_marketing']
+        if isinstance(form, ReservationRentalDetailsForm):
+            if form.customer:
+                return reverse('reserve-login-form', kwargs={'slug': form.vehicle.slug})
+            return reverse('reserve-payment-form', kwargs={'slug': form.vehicle.slug})
+        return reverse('reserve', kwargs={'slug': form.vehicle.slug})
+
 
 class ReserveLoginFormView(ReserveView):
     template_name = 'front_site/reserve/login_form.html'
@@ -193,7 +223,7 @@ class ReserveLoginFormView(ReserveView):
 
 class ReservePaymentFormView(ReserveView):
     template_name = 'front_site/reserve/payment_form.html'
-    form_class = ReservationRentalLoginForm
+    form_class = ReservationRentalPaymentForm
 
 
 class PerformanceExperienceView(NavMenuMixin, PaymentLoginFormMixin, FormView):

@@ -73,6 +73,7 @@ var populatePriceBreakdown = function(data, reservationType) {
         $('.price-tax-rate').html(data.price_data.tax_rate_as_percent);
         $('.price-total').html(data.price_data.total_with_tax.toFixed(2));
     }
+    /*
     if (data.customer_id) {
         // $('.price-breakdown').appendTo($('#price_breakdown_existing_user')).removeClass('hidden');
         // $('#reservation_payment').hide();
@@ -84,6 +85,7 @@ var populatePriceBreakdown = function(data, reservationType) {
         // $('#reservation_password_error').hide();
         // $('#reservation_payment').show();
     }
+     */
 };
 
 var reserveValidateForm = function(reservationType, section) {
@@ -112,7 +114,7 @@ var reserveValidateForm = function(reservationType, section) {
         $('#login_form_container').empty();
         $('#payment_form_container').empty();
     }
-    $.post(`/api/validate/${reservationType}/${section}/`, params, function(data) {
+    $.post(`/api/validate/${reservationType}/form/${section}/`, params, function(data) {
         console.log(data);
         $('.' + section + ' .field-error').removeClass('field-error');
         if (data.success) {

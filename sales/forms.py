@@ -139,6 +139,7 @@ class ReservationRentalDetailsForm(forms.ModelForm):
     discount = None
     customer = None
     vehicle = None
+    form_type = 'details'
 
     # It is not necessary to explicitly define form fields on this class if they are defined in the model class,
     # except to override certain default behaviors such as choice values or widget attributes. We must define
@@ -384,11 +385,13 @@ class ReservationRentalDetailsForm(forms.ModelForm):
 
 # 2nd-phase form; extends ReservationRentalDetailsForm with Customer fields so it inherits all the first form's validations
 class ReservationRentalPaymentForm(PaymentFormMixin, CardFormMixin, ReservationRentalDetailsForm):
+    form_type = 'payment'
     pass
 
 
 # If the customer already exists, this form will be shown and processed instead of ReservationRentalPaymentForm
 class ReservationRentalLoginForm(ReservationRentalDetailsForm):
+    form_type = 'login'
 
     password = forms.CharField(widget=forms.PasswordInput(), required=False)
 

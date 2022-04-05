@@ -131,7 +131,20 @@
         {% endfor %}
     </div>
 
-    <form method="POST" name="reservation_form" id="reservation_form" action="{% url "reserve" slug=vehicle.slug %}" onsubmit="return false;" autocomplete="on">
+    <form
+        method="POST"
+        name="reservation_form"
+        id="reservation_form"
+        {% if form_type == "login" %}
+            action="{% url "reserve-login" slug=vehicle.slug %}"
+        {% elif form_type == "payment" %}
+            action="{% url "reserve-payment" slug=vehicle.slug %}"
+        {% else %}
+            action="{% url "reserve" slug=vehicle.slug %}"
+        {% endif %}
+        onsubmit="return false;"
+        autocomplete="on"
+    >
     <cfoutput query="Vehicle">
 
         <div class="reservation-form-sidebar">
@@ -150,11 +163,15 @@
             </div>
 
             <div id="login_form_container">
-{#                {% include "front_site/reserve/login_form.html" %}#}
+                {% if form_type == "login" %}
+                    {% include "front_site/reserve/login_form.html" %}
+                {% endif %}
             </div>
 
             <div id="payment_form_container">
-{#                {% include "front_site/reserve/payment_form.html" %}#}
+                {% if form_type == "payment" %}
+                    {% include "front_site/reserve/payment_form.html" %}
+                {% endif %}
             </div>
 
         </div>
