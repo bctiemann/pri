@@ -55,6 +55,7 @@ urlpatterns = [
     path('vehicle/<str:slug>/reserve/payment/', sales_views.ReserveView.as_view(form_class=ReservationRentalPaymentForm), name='reserve-payment'),
     path('vehicle/<str:slug>/reserve/form/login/', sales_views.ReserveLoginFormView.as_view(), name='reserve-login-form'),
     path('vehicle/<str:slug>/reserve/form/payment/', sales_views.ReservePaymentFormView.as_view(), name='reserve-payment-form'),
+    path('vehicle/<str:slug>/reserve/complete/', sales_views.ReserveHoneypotView.as_view(), name='reserve-honeypot'),
 
     path('performance_experience/', sales_views.PerformanceExperienceView.as_view(), name='performance-experience'),
     path('joy_ride/', sales_views.JoyRideView.as_view(), name='joy-ride'),

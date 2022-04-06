@@ -21,49 +21,49 @@
         <tr>
             <td>Last Name</td>
             <td>
-                {{ form.last_name }}
+                {{ payment_form.last_name }}
 {#                <cfinput name="lname" value="#Reservation.lname#" maxlength="255" class="#StructKeyExists(fieldErrors,"lname") ? 'field-error' : ''#" />#}
             </td>
         </tr>
         <tr>
             <td>Mobile Phone</td>
             <td>
-                {{ form.mobile_phone }}
+                {{ payment_form.mobile_phone }}
 {#                <cfinput name="mphone" value="#Reservation.mphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"mphone") ? 'field-error' : ''#" />#}
             </td>
         </tr>
         <tr>
             <td>Home Phone</td>
             <td>
-                {{ form.home_phone }}
+                {{ payment_form.home_phone }}
 {#                <cfinput name="hphone" value="#Reservation.hphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"hphone") ? 'field-error' : ''#" />#}
             </td>
         </tr>
         <tr>
             <td>Work Phone</td>
             <td>
-                {{ form.work_phone }}
+                {{ payment_form.work_phone }}
 {#                <cfinput name="wphone" value="#Reservation.wphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"wphone") ? 'field-error' : ''#" />#}
             </td>
         </tr>
         <tr>
             <td>Fax</td>
             <td>
-                {{ form.fax }}
+                {{ payment_form.fax }}
 {#                <cfinput name="fax" value="#Reservation.fax#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"fax") ? 'field-error' : ''#" />#}
             </td>
         </tr>
         <tr>
             <td>Credit Card Number</td>
             <td>
-                {{ form.cc_number }}
+                {{ payment_form.cc_number }}
 {#                <cfinput name="ccnum" type="tel" value="#Reservation.ccnum#" class="cc-field #StructKeyExists(fieldErrors,"ccnum") ? 'field-error' : ''#" autocomplete="cc-number">#}
             </td>
         </tr>
         <tr>
             <td>Credit Card Expiration</td>
             <td>
-                {{ form.cc_exp_mo }}
+                {{ payment_form.cc_exp_mo }}
                 {% comment %}
                 <cfselect name="ccexpmo" class="#StructKeyExists(fieldErrors,"ccexpmo") ? 'field-error' : ''#">
                     <option value="01" <cfif Reservation.ccexpmo IS "01">selected</cfif>>January (01)</option>
@@ -81,7 +81,7 @@
                 </cfselect>
                 {% endcomment %}/
 
-                {{ form.cc_exp_yr }}
+                {{ payment_form.cc_exp_yr }}
                 {% comment %}
                 <cfset tyear = #Dateformat(Now(),"yyyy")#>
                 <cfset fyear = tyear+15>
@@ -103,14 +103,14 @@
         <tr>
             <td>CVV</td>
             <td>
-                {{ form.cc_cvv }}
+                {{ payment_form.cc_cvv }}
 {#                <cfinput name="cccvv" value="#Reservation.cccvv#" style="width: 70px;" class="#StructKeyExists(fieldErrors,"cccvv") ? 'field-error' : ''#" />#}
             </td>
         </tr>
         <tr>
             <td>Credit Card Bank Phone</td>
             <td>
-                {{ form.cc_phone }}
+                {{ payment_form.cc_phone }}
 {#                <cfinput name="cctel" value="#Reservation.cctel#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"cctel") ? 'field-error' : ''#" />#}
                 <small class="tooltip" title="We need the customer service contact phone number shown on the back of your card so that we can verify the card if necessary, and to refund the security deposit after the rental is over."><span class="ui-icon ui-icon-info"></span></small>
             </td>
@@ -118,27 +118,27 @@
         <tr>
             <td>Street Address Line 1</td>
             <td>
-                {{ form.address_line_1 }}
+                {{ payment_form.address_line_1 }}
 {#                    <cftextarea name="addr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#Reservation.addr#</cftextarea>#}
             </td>
         </tr>
         <tr>
             <td>Street Address Line 2</td>
             <td>
-                {{ form.address_line_2 }}
+                {{ payment_form.address_line_2 }}
             </td>
         </tr>
         <tr>
             <td>City</td>
             <td>
-                {{ form.city }}
+                {{ payment_form.city }}
 {#                <cfinput name="city" value="#Reservation.city#" maxlength="150" class="#StructKeyExists(fieldErrors,"city") ? 'field-error' : ''#" />#}
             </td>
         </tr>
         <tr>
             <td class="label">State</td>
             <td>
-                {{ form.state }}
+                {{ payment_form.state }}
                 {% comment %}
                 <cfselect name="state" data-stripe="address_state" class="#StructKeyExists(fieldErrors,"state") ? 'field-error' : ''#">
                 <CFLOOP ARRAY="#states#" INDEX="state">
@@ -151,7 +151,7 @@
         <tr>
             <td class="label">ZIP</td>
             <td>
-                {{ form.zip }}
+                {{ payment_form.zip }}
                 <cfinput name="zip" value="#Reservation.zip#" style="width: 100px;" maxlength="10" class="#StructKeyExists(fieldErrors,"zip") ? 'field-error' : ''#" />
             </td>
         </tr>
@@ -165,13 +165,13 @@
         <tr>
             <td class="label">Password</td>
             <td>
-                {{ form.password_new }}
+                {{ payment_form.password_new }}
             </td>
         </tr>
         <tr>
             <td class="label">Password (repeat)</td>
             <td>
-                {{ form.password_repeat }}
+                {{ payment_form.password_repeat }}
             </td>
         </tr>
 

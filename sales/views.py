@@ -14,7 +14,8 @@ from sales.forms import (
     JoyRideDetailsForm, JoyRidePaymentForm, JoyRideLoginForm,
     GiftCertificateForm,
 )
-from sales.models import GiftCertificate
+from sales.models import GiftCertificate, generate_code
+from sales.enums import ServiceType
 from marketing.views import NavMenuMixin
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
 
@@ -184,10 +185,12 @@ class ReserveView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, FormVie
     #     elif self.form_type =
 
     def form_valid(self, form):
-        reservation_result = self.create_reservation(self.request, form)
-        if reservation_result['success']:
-            return HttpResponseRedirect(reservation_result['customer_site_url'])
-        return self.render_to_response(self.get_context_data(form=form, form_type=self.form_type, slug=form.vehicle.slug))
+        success_url = reverse('reserve-honeypot', kwargs={'slug': form.vehicle.slug})
+        return HttpResponseRedirect(success_url)
+        # reservation_result = self.create_reservation(self.request, form)
+        # if reservation_result['success']:
+        #     return HttpResponseRedirect(reservation_result['customer_site_url'])
+        # return self.render_to_response(self.get_context_data(form=form, form_type=self.form_type, slug=form.vehicle.slug))
 
     def form_invalid(self, form, **kwargs):
         """If the form is invalid, render the invalid form."""
@@ -234,6 +237,9 @@ class ReserveView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, FormVie
     #         return reverse('reserve-payment', kwargs={'slug': form.vehicle.slug})
     #     return reverse('reserve', kwargs={'slug': form.vehicle.slug})
 
+    # def get_success_url(self):
+    #     return reverse('reserve-honeypot', kwargs={'slug': form.vehicle.slug})
+
     def get_customer_site_url(self, confirmation_code):
         return reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': confirmation_code})
 
@@ -246,6 +252,18 @@ class ReserveLoginFormView(ReserveView):
 class ReservePaymentFormView(ReserveView):
     template_name = 'front_site/reserve/payment_form.html'
     form_class = ReservationRentalPaymentForm
+
+
+class ReserveHoneypotView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/reserve/honeypot.html'
+
+    def get_context_data(self, slug=None, form_type=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['vehicle'] = VehicleMarketing.objects.filter(slug=slug, status=VehicleStatus.READY).first()
+        if not context['vehicle']:
+            raise Http404
+        context['confirmation_code'] = generate_code(ServiceType.RENTAL)
+        return context
 
 
 class PerformanceExperienceView(NavMenuMixin, PaymentLoginFormMixin, FormView):
