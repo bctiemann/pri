@@ -364,8 +364,8 @@ var refreshUI = function() {
     $('#id_backup_date').datepicker({});
 
     // Tooltips
-    $('.tooltip').off().tooltip();
-    $('.delivery-pricing').off().tooltip({
+    $('.tooltip').tooltip();
+    $('.delivery-pricing').tooltip({
         content: function() {
             return $('#delivery_pricing').html();
         },
@@ -377,11 +377,11 @@ var refreshUI = function() {
     });
 
     // Credit card input processing
-    $('input#id_cc_number').off().payment('formatCardNumber');
+    $('input#id_cc_number').payment('formatCardNumber');
     $('input#id_cc_cvv').payment('formatCardCVC');
-    $('input#id_cc_number').off().trigger($.Event( 'keyup', {which:$.ui.keyCode.SPACE, keyCode:$.ui.keyCode.SPACE}));
+    $('input#id_cc_number').trigger($.Event( 'keyup', {which:$.ui.keyCode.SPACE, keyCode:$.ui.keyCode.SPACE}));
 
-        $('.reserve-rental-details-btn').off().click(function() {
+    $('.reserve-rental-details-btn').off().click(function() {
         reserveValidateForm('rental', 'details');
     });
     $('.reserve-joyride-details-btn').off().click(function() {
