@@ -215,7 +215,7 @@ class ReserveView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, FormVie
     #         form_class = self.get_login_form_class()
     #     return form_class(**self.get_form_kwargs())
 
-    def get_context_data(self, slug=None, form_type=None, **kwargs):
+    def get_context_data(self, slug=None, form=None, form_type=None, **kwargs):
         context = super().get_context_data(**kwargs)
         # We filter() rather than get() because vehicle_marketing.slug is not unique (we may have multiple of the
         # same vehicle)
@@ -225,6 +225,8 @@ class ReserveView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, FormVie
         # context['payment_form'] = self.get_payment_form()
         # context['login_form'] = self.get_login_form()
         context['form_type'] = form_type or 'details'
+        if form:
+            context['price_data'] = form.price_data
         return context
 
     # def get_success_url(self):
@@ -252,6 +254,21 @@ class ReserveLoginFormView(ReserveView):
 class ReservePaymentFormView(ReserveView):
     template_name = 'front_site/reserve/payment_form.html'
     form_class = ReservationRentalPaymentForm
+
+
+class ReservePriceBreakdownView(FormView):
+    template_name = 'front_site/reserve/price_breakdown.html'
+    form_class = ReservationRentalDetailsForm
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.render_to_response(self.get_context_data(form=form, **kwargs))
+
+    def get_context_data(self, slug=None, form=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['price_data'] = form.price_data
+        return context
 
 
 class ReserveHoneypotView(NavMenuMixin, TemplateView):

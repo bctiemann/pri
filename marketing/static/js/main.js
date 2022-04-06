@@ -88,6 +88,13 @@ var populatePriceBreakdown = function(data, reservationType) {
      */
 };
 
+var loadPriceBreakdown = function(params) {
+  let url = `/vehicle/${params.vehicle_slug}/reserve/price_breakdown/`;
+  $.post(url, params, function(html) {
+      $('#price_breakdown_container').html(html);
+  })
+};
+
 var reserveValidateForm = function(reservationType, section) {
     var params = {};
     var formArray = $('#reservation_form').serializeArray();
@@ -124,7 +131,8 @@ var reserveValidateForm = function(reservationType, section) {
                     $('#login_form_container').load(formUrl, function() {
                         console.log('login form');
                         console.log(data);
-                        populatePriceBreakdown(data, reservationType);
+                        // populatePriceBreakdown(data, reservationType);
+                        loadPriceBreakdown(params);
                         refreshUI();
                     })
                 } else {
@@ -132,7 +140,8 @@ var reserveValidateForm = function(reservationType, section) {
                     $('#payment_form_container').load(formUrl, function() {
                         console.log('payment form');
                         console.log(data);
-                        populatePriceBreakdown(data, reservationType);
+                        // populatePriceBreakdown(data, reservationType);
+                        loadPriceBreakdown(params);
                         refreshUI();
                     })
                 }
