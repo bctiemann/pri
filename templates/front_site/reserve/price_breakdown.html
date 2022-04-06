@@ -1,42 +1,42 @@
 <table class="price-breakdown small-item-data">
     <tr>
-        <td>Rental total (<span class="price-numdays"></span>)</td>
-        <td>$<span class="price-rental-total"></span></td>
+        <td>Rental total (<span class="price-numdays">{{ form.price_data.num_days }} day{{ form.price_data.num_days|pluralize }}</span>)</td>
+        <td>$<span class="price-rental-total">{{ form.price_data.base_price }}</span></td>
         <td></td>
     </tr>
     <tr class="multiday">
-        <td>Multi-Day Discount (<span class="price-multi-day-discount-pct"></span>%)</td>
-        <td>- $<span class="price-multi-day-discount"></span></td>
+        <td>Multi-Day Discount (<span class="price-multi-day-discount-pct">{{ form.price_data.multi_day_discount_pct }}</span>%)</td>
+        <td>- $<span class="price-multi-day-discount">{{ form.price_data.multi_day_discount }}</span></td>
         <td></td>
     </tr>
     <tr class="specific-discount">
-        <td><span class="price-specific-discount-label"></span></td>
-        <td>- $<span class="price-specific-discount"></span></td>
+        <td><span class="price-specific-discount-label">{{ form.price_data.specific_discount_label }}</span></td>
+        <td>- $<span class="price-specific-discount">{{ form.price_data.specific_discount }}</span></td>
         <td></td>
     </tr>
     <tr>
-        <td>Extra Miles (<span class="price-extra-miles"></span>)</td>
-        <td>$<span class="price-extra-miles-cost"></span></td>
+        <td>Extra Miles (<span class="price-extra-miles">{{ form.price_data.extra_miles }}</span>)</td>
+        <td>$<span class="price-extra-miles-cost">{{ form.price_data.extra_miles_cost }}</span></td>
         <td></td>
     </tr>
     <tr>
         <td>Subtotal</td>
-        <td>$<span class="price-subtotal"></span></td>
+        <td>$<span class="price-subtotal">{{ form.price_data.subtotal }}</span></td>
         <td></td>
     </tr>
     <tr>
-        <td>Tax (<span class="price-tax-rate"></span>%)</td>
-        <td>$<span class="price-tax"></span></td>
+        <td>Tax (<span class="price-tax-rate">{{ form.price_data.tax_rate_as_percent }}</span>%)</td>
+        <td>$<span class="price-tax">{{ form.price_data.tax_amount }}</span></td>
         <td></td>
     </tr>
     <tr class="total">
         <td>Total</td>
-        <td>$<span class="price-total"></span></td>
+        <td>$<span class="price-total">{{ form.price_data.total_with_tax }}</span></td>
         <td></td>
     </tr>
     <tr class="deposit">
         <td>Reservation Deposit</td>
-        <td>$<span class="price-reservation-deposit"></span></td>
+        <td>$<span class="price-reservation-deposit">{{ form.price_data.reservation_deposit }}</span></td>
         <td class="tooltip" title="We will charge your card 50% of the rental total in order to secure your reservation. The remainder will be due at the time you receive the vehicle.">Amount to be charged now <span class="ui-icon ui-icon-info"></span></td>
     </tr>
     <tr class="smallprint">

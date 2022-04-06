@@ -355,66 +355,66 @@ var refreshUI = function() {
     $('#id_backup_date').datepicker({});
 
     // Tooltips
-    $('.tooltip').tooltip();
-    $('.delivery-pricing').tooltip({
+    $('.tooltip').off().tooltip();
+    $('.delivery-pricing').off().tooltip({
         content: function() {
             return $('#delivery_pricing').html();
         },
     });
 
     // Enforce formatting for phone numbers
-    $('.phone').on('keyup change', function() {
+    $('.phone').off().on('keyup change', function() {
         $(this).val(formatPhone($(this).val()));
     });
 
     // Credit card input processing
-    $('input#id_cc_number').payment('formatCardNumber');
+    $('input#id_cc_number').off().payment('formatCardNumber');
     $('input#id_cc_cvv').payment('formatCardCVC');
-    $('input#id_cc_number').trigger($.Event( 'keyup', {which:$.ui.keyCode.SPACE, keyCode:$.ui.keyCode.SPACE}));
+    $('input#id_cc_number').off().trigger($.Event( 'keyup', {which:$.ui.keyCode.SPACE, keyCode:$.ui.keyCode.SPACE}));
 
-        $('.reserve-rental-details-btn').click(function() {
+        $('.reserve-rental-details-btn').off().click(function() {
         reserveValidateForm('rental', 'details');
     });
-    $('.reserve-joyride-details-btn').click(function() {
+    $('.reserve-joyride-details-btn').off().click(function() {
         reserveValidateForm('joyride', 'details');
     });
-    $('.reserve-perfexp-details-btn').click(function() {
+    $('.reserve-perfexp-details-btn').off().click(function() {
         reserveValidateForm('perfexp', 'details');
     });
-    $('.reserve-createpass-btn').click(function() {
+    $('.reserve-createpass-btn').off().click(function() {
         reserveValidateForm('validatePassword', 'password');
     });
-    $('.reserve-rental-login-btn').click(function() {
+    $('.reserve-rental-login-btn').off().click(function() {
         reserveValidateForm('rental', 'login');
     });
-    $('.reserve-joyride-login-btn').click(function() {
+    $('.reserve-joyride-login-btn').off().click(function() {
         reserveValidateForm('joyride', 'login');
     });
-    $('.reserve-perfexp-login-btn').click(function() {
+    $('.reserve-perfexp-login-btn').off().click(function() {
         reserveValidateForm('perfexp', 'login');
     });
-    $('.reserve-rental-complete-btn').click(function() {
+    $('.reserve-rental-complete-btn').off().click(function() {
         reserveValidateForm('rental', 'payment');
     });
-    $('.reserve-joyride-complete-btn').click(function() {
+    $('.reserve-joyride-complete-btn').off().click(function() {
         reserveValidateForm('joyride', 'payment');
     });
-    $('.reserve-perfexp-complete-btn').click(function() {
+    $('.reserve-perfexp-complete-btn').off().click(function() {
         reserveValidateForm('perfexp', 'payment');
     });
-    $('.reserve-gift-complete-btn').click(function() {
+    $('.reserve-gift-complete-btn').off().click(function() {
         reserveValidateForm('gift', 'payment');
     });
-    $('.subscribe-complete-btn').click(function() {
+    $('.subscribe-complete-btn').off().click(function() {
         reserveValidateForm('newsletter', 'subscribe');
     });
-    $('.unsubscribe-complete-btn').click(function() {
+    $('.unsubscribe-complete-btn').off().click(function() {
         reserveValidateForm('unsubscribeNewsletter', 'payment');
     });
-    $('.subpay-complete-btn').click(function() {
+    $('.subpay-complete-btn').off().click(function() {
         reserveValidateForm('submitSubPay', 'payment');
     });
-    $('.survey-complete-btn').click(function() {
+    $('.survey-complete-btn').off().click(function() {
         reserveValidateForm('submitSurvey', 'payment');
     });
 }
@@ -575,7 +575,7 @@ $('document').ready(function() {
     });
 
     $('#reservation_payment').hide();
-    $('.inline-password').hide();
+    // $('.inline-password').hide();
     $('.vehicle-pick-buttons').show();
     $('.vehicle-choice').hide();
     $('#id_delivery_required').change(function() {

@@ -164,10 +164,12 @@
                 <cfinput name="email" value="#Reservation.email#" maxlength="255" class="#StructKeyExists(fieldErrors,"email") ? 'field-error' : ''#" />
             </td>
         </tr>
+        {% comment %}
         <tr class="inline-password">
             <td>Password</td>
             <td><cfinput name="inline_pass" type="password" value="#Reservation.inline_pass#" placeholder="(If returning customer)" class="#StructKeyExists(fieldErrors,"login_pass") ? 'field-error' : ''#" /></td>
         </tr>
+        {% endcomment %}
         <tr>
             <td>Discount/Coupon Code</td>
             <td>

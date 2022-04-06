@@ -316,6 +316,8 @@ class ReservationRentalDetailsForm(forms.ModelForm):
 
     @property
     def price_data(self):
+        if not self.is_bound:
+            return None
         price_calculator = RentalPriceCalculator(
             vehicle_marketing=self.cleaned_data['vehicle_marketing'],
             num_days=self.num_days,
