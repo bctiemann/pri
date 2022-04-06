@@ -1,3 +1,10 @@
+{% extends "front_site/includes/login_form.html" %}
+
+{% block price_breakdown_container %}
+    {% include "front_site/reserve/price_breakdown.html" %}
+{% endblock %}
+
+{% comment %}
 <div id="reservation_login" class="1hidden">
 
     <p class="reservation-info">
@@ -33,3 +40,4 @@
     <h3>An error occurred</h3>
     <p class="alert-message"></p>
 </div>
+{% endcomment %}

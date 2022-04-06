@@ -60,7 +60,11 @@ urlpatterns = [
     path('vehicle/<str:slug>/reserve/complete/', sales_views.ReserveHoneypotView.as_view(), name='reserve-honeypot'),
 
     path('performance_experience/', sales_views.PerformanceExperienceView.as_view(), name='performance-experience'),
+
     path('joy_ride/', sales_views.JoyRideView.as_view(), name='joy-ride'),
+    path('joy_ride/form/login/', sales_views.JoyRideLoginFormView.as_view(), name='joy-ride-login-form'),
+    path('joy_ride/form/payment/', sales_views.JoyRidePaymentFormView.as_view(), name='joy-ride-payment-form'),
+    path('joy_ride/price_breakdown/', sales_views.JoyRidePriceBreakdownView.as_view(), name='joy-ride-price-breakdown'),
 
     path('gift_certificate/', sales_views.GiftCertificateView.as_view(), name='gift-certificate'),
     path('gift_certificate/<str:tag>/', sales_views.GiftCertificateStatusView.as_view(), name='gift-certificate-status'),

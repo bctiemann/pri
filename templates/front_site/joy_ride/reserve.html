@@ -1,0 +1,226 @@
+{% extends "front_site/base.html" %}
+{% load static %}
+
+{% comment %}
+<!--- If a form was submitted, the user had JS turned off, so we have to process the sequential logic. --->
+<cfset fieldErrors = StructNew()>
+<cfset formError = "">
+<cfif IsDefined("Form.reservation_type")>
+
+    <!--- Validate the first page (identity and rental date/specs) --->
+    <cfset ret = StructAppend(Form, Variables)>
+    <cfinvoke
+        component="cfc/porknbeans"
+        method="validateJoyPerfIdentity"
+        returnVariable="IdentityResult"
+        argumentCollection="#Form#">
+    </cfinvoke>
+    <cfset fieldErrors = IdentityResult.fieldErrors>
+
+    <!--- If the user entered a recognized email address, validate it against the password --->
+    <cfif IsDefined("IdentityResult.customerid") AND IdentityResult.customerid GT 0>
+        <cfset Form.customerid = IdentityResult.customerid>
+        <cfset Form.login_pass = Form.inline_pass>
+        <cfinvoke
+            component="cfc/porknbeans"
+            method="validateLogin"
+            returnVariable="LoginResult"
+            argumentCollection="#Form#">
+        </cfinvoke>
+        <cfset ret = StructAppend(fieldErrors, LoginResult.fieldErrors)>
+    </cfif>
+
+    <!--- If the "Complete Reservation" button was pressed OR if the login (above) was successful, validate the payment form and create the reservation --->
+    <cfif IsDefined("Form.payment_btn") OR (IsDefined("LoginResult") AND LoginResult.success)>
+        <cfinvoke
+            component="cfc/porknbeans"
+            method="validateJoyPerfPayment"
+            returnVariable="ReservationResult"
+            argumentCollection="#Form#">
+        </cfinvoke>
+        <cfset ret = StructAppend(fieldErrors, ReservationResult.fieldErrors)>
+
+        <!--- Push to customer portal if successful --->
+        <cfif ReservationResult.success>
+            <cfset redirectUrl = ReservationResult.custsite & "joyride_confirm.cfm?confcode=" & ReservationResult.confcode>
+            <cflocation url=#redirectUrl#>
+        </cfif>
+
+    </cfif>
+
+    <!--- We're still here, so bind the form variables for redisplay --->
+    <cfset JoyPerf = Form>
+    <cfset formError = NOT IdentityResult.success ? IdentityResult.error :
+        IsDefined("LoginResult") AND NOT LoginResult.success ? LoginResult.error :
+        IsDefined("ReservationResult") AND NOT ReservationResult.success ? ReservationResult.error : "">
+
+<!--- If the user has JS on, pull a blank Reservation object to populate the form --->
+<cfelse>
+
+    <cfquery name="JoyPerf" datasource="#DSN#">
+        SELECT joyperfid,JoyPerf.customerid,nopax,nodrv,nominors,reqdate,bupdate,choice1,choice2,choice3,Customers.discount AS customer_discount,
+        fname,lname,email,hphone,wphone,mphone,fax,JoyPerf.notes,ournotes,JoyPerf.status,bigtall,coupon,rate,JoyPerf.type,
+        ccnum,ccexpmo,ccexpyr,cccvv,cctel,addr,city,state,zip,'' AS inline_pass,
+        V1.make AS v1_make,V1.model AS v1_model,V1.year AS v1_year,
+        V2.make AS v2_make,V2.model AS v2_model,V2.year AS v2_year,
+        V3.make AS v3_make,V3.model AS v3_model,V3.year AS v3_year
+        FROM JoyPerf
+        INNER JOIN Customers ON Customers.customerid=JoyPerf.customerid
+        LEFT JOIN Vehicles AS V1 ON V1.vehicleid = JoyPerf.choice1
+        LEFT JOIN Vehicles AS V2 ON V2.vehicleid = JoyPerf.choice2
+        LEFT JOIN Vehicles AS V3 ON V3.vehicleid = JoyPerf.choice3
+        WHERE joyperfid = 0
+    </cfquery>
+
+</cfif>
+
+<CFINCLUDE TEMPLATE="inc_states.cfm">
+<CFINCLUDE TEMPLATE="inc_header.cfm">
+<title>Performance Rentals</title>
+<CFINCLUDE TEMPLATE="inc_meta.cfm">
+<CFINCLUDE TEMPLATE="inc_styles.cfm">
+<CFINCLUDE TEMPLATE="inc_js.cfm">
+</head>
+<body>
+
+<cfquery name="Vehicles" datasource="#DSN#">
+    SELECT vehicleid,make,model,status,type FROM Vehicles
+    WHERE status = 1
+    ORDER BY weighting DESC
+</cfquery>
+
+<div class="wrapper">
+
+<CFINCLUDE TEMPLATE="inc_nav.cfm">
+
+<section class="l-content">
+{% endcomment %}
+
+{% block page %}Joy Ride{% endblock %}
+
+{% block content %}
+
+    <div class="reservation-pics-sidebar">
+        <img src="{% static "images/joyride.png" %}" />
+    </div>
+
+    <form method="POST" name="reservation_form" id="reservation_form" action="{% url "joy-ride" %}" onsubmit="return false;" autocomplete="on">
+
+        <div class="reservation-form-sidebar">
+
+            {% if form.errors %}
+            <cfif Len(formError) GT 0>
+            <div class="exception" id="reservation_form_error">
+                <h3>An error occurred</h3>
+                <p class="alert-message">#formError#</p>
+            </div>
+            </cfif>
+            {% endif %}
+
+            <div id="details_form_container">
+                {% include "front_site/joy_ride/details_form.html" %}
+            </div>
+
+            {% with reservation_type='joyride' %}
+                <div id="login_form_container">
+                    {% if form_type == "login" %}
+                        {% include "front_site/includes/login_form.html" %}
+                    {% endif %}
+                </div>
+
+                <div id="payment_form_container">
+                    {% if form_type == "payment" %}
+                        {% include "front_site/includes/payment_form.html" %}
+                    {% endif %}
+                </div>
+            {% endwith %}
+
+        </div>
+
+    </form>
+
+    {% include "global_includes/vehicle_picker.html" %}
+
+    <div class="dialog" id="dialog_reset_password" title="Reset Password">
+        <p>We will send you an email with a link to click on to receive your new password.</p>
+    </div>
+
+    <div class="dialog" id="dialog_reset_password_done" title="Reset Password">
+        <p>An email has been sent to you containing a link to follow to receive your new password. Afterwards, please return here to continue with your reservation.</p>
+    </div>
+
+{% endblock %}
+{% comment %}
+</section>
+
+
+<div class="dialog vehicle-picker" id="dialog_pick_vehicles" title="Choose Up to Three Vehicles">
+    <cfoutput query="Vehicles">
+        <div class="vehicle-picker-pick" vehicleid="#vehicleid#" type="<cfif type IS 1>car<cfelseif type IS 2>bike</cfif>">
+            <img src="#OnSite#images/#vehicleid#-thumb.jpg" />
+            <span class="offer-title overlay-text bottom">#make# #model#</span>
+        </div>
+    </cfoutput>
+</div>
+
+<div class="dialog" id="dialog_reset_password" title="Reset Password">
+<p>We will send you an email with a link to click on to receive your new password.</p>
+</div>
+
+<div class="dialog" id="dialog_reset_password_done" title="Reset Password">
+<p>An email has been sent to you containing a link to follow to receive your new password. Afterwards, please return here to continue with your reservation.</p>
+</div>
+
+{% include "global_includes/delivery_pricing.html" %}
+<div id="delivery_pricing" style="display: none;">
+    <p>We deliver our vehicles to most locations within the New York City tri-state area. Delivery rates are as follows:</p>
+    <table class="small-item-data delivery-pricing" style="margin-left: 0px;">
+        <tr>
+            <td>Rockland County</td>
+            <td>Free</td>
+       </tr>
+       <tr>
+            <td>Manhattan*</td>
+            <td>Free</td>
+       </tr>
+       <tr>
+            <td>Westchester Airport</td>
+            <td>Free</td>
+       </tr>
+       <tr>
+            <td>Orange County (south of Newburgh)</td>
+            <td>Free</td>
+       </tr>
+       <tr>
+            <td>Northern NJ / Bergen County</td>
+            <td>Free</td>
+       </tr>
+       <tr>
+            <td>Metro NYC / JFK / LGA*</td>
+            <td>$99 each way</td>
+       </tr>
+       <tr>
+            <td>Long Island / Connecticut</td>
+            <td>$139 each way</td>
+       </tr>
+       <tr>
+            <td>South NJ / Philadelphia</td>
+            <td>$159 each way</td>
+       </tr>
+       <tr>
+            <td>Other areas</td>
+            <td>$2.00 / mile</td>
+       </tr>
+    </table>
+    <p>
+* Due to the nature of Manhattan and the NYC metro area, some locations may be difficult for us to deliver a vehicle due to parking or
+standing regulations. In such case we may pick you up and transport you to a suitable location at which to conduct the vehicle
+familiarization process and any required paperwork.
+    </p>
+</div>
+
+    <div class="push"></div>
+</div>
+
+<CFINCLUDE TEMPLATE="inc_footer.cfm">
+{% endcomment %}

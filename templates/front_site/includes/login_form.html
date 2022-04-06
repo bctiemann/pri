@@ -1,10 +1,12 @@
-<div id="reservation_login" class="hidden">
+<div id="reservation_login" class="1hidden">
 
     <p class="reservation-info">
     Welcome back! Please enter your password and your reservation will be processed immediately.
     </p>
 
-    <div id="price_breakdown_existing_user"></div>
+    <div id="price_breakdown_container">
+        {% block price_breakdown_container %}{% endblock %}
+    </div>
 
     <table class="inputform password">
         <tr>

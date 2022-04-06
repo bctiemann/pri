@@ -89,11 +89,16 @@ var populatePriceBreakdown = function(data, reservationType) {
 };
 
 var loadPriceBreakdown = function(params) {
-  let url = `/vehicle/${params.vehicle_slug}/reserve/price_breakdown/`;
-  $.post(url, params, function(html) {
-      $('#price_breakdown_container').html(html);
-      refreshUI();
-  })
+    let url;
+    if (method === 'rental') {
+        url = `/vehicle/${params.vehicle_slug}/reserve/price_breakdown/`;
+    } else if (method === 'joyride') {
+        url = `/joy_ride/price_breakdown/`;
+    }
+    $.post(url, params, function(html) {
+        $('#price_breakdown_container').html(html);
+        refreshUI();
+    })
 };
 
 var reserveValidateForm = function(reservationType, section) {
@@ -127,8 +132,16 @@ var reserveValidateForm = function(reservationType, section) {
         $('.' + section + ' .field-error').removeClass('field-error');
         if (data.success) {
             if (section === 'details') {
+                let formUrl;
+                if (reservationType === 'rental') {
+                    formUrl = `/vehicle/${params.vehicle_slug}/reserve/`;
+                } else if (reservationType === 'joyride') {
+                    formUrl = `/joy_ride/`;
+                } else if (reservationType === 'perfexp') {
+                    formUrl = `/performance_experience/`;
+                }
                 if (data.customer_id) {
-                    let formUrl = `/vehicle/${params.vehicle_slug}/reserve/form/login/`;
+                    formUrl += `form/login/`;
                     $('#login_form_container').load(formUrl, function() {
                         console.log('login form');
                         console.log(data);
@@ -137,7 +150,7 @@ var reserveValidateForm = function(reservationType, section) {
                         refreshUI();
                     })
                 } else {
-                    let formUrl = `/vehicle/${params.vehicle_slug}/reserve/form/payment/`;
+                    formUrl += `form/payment/`;
                     $('#payment_form_container').load(formUrl, function() {
                         console.log('payment form');
                         console.log(data);

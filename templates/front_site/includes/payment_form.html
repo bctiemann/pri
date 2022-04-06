@@ -1,4 +1,4 @@
-<div id="reservation_payment" {# <cfif NOT IsDefined("IdentityResult") OR (IsDefined("IdentityResult") AND NOT IdentityResult.success) OR (IsDefined("LoginResult") AND NOT LoginResult.success)> #}class="hidden"{# </cfif> #}>
+<div id="reservation_payment" {# <cfif NOT IsDefined("IdentityResult") OR (IsDefined("IdentityResult") AND NOT IdentityResult.success) OR (IsDefined("LoginResult") AND NOT LoginResult.success)> #}class="1hidden"{# </cfif> #}>
 
     <p class="reservation-info">
     We'll need a credit card to secure your reservation. Once the reservation is confirmed, you'll get access to the
@@ -6,7 +6,9 @@
     your preferred methods of payment for the rental and the security deposit.
     </p>
 
-    <div id="price_breakdown_new_user"></div>
+    <div id="price_breakdown_container">
+        {% block price_breakdown_container %}{% endblock %}
+    </div>
 
     <table class="inputform payment">
         <tr>

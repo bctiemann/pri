@@ -286,8 +286,10 @@ class ReserveHoneypotView(NavMenuMixin, TemplateView):
         return context
 
 
+# Performance Experience
+
 class PerformanceExperienceView(NavMenuMixin, PaymentLoginFormMixin, FormView):
-    template_name = 'front_site/performance_experience.html'
+    template_name = 'front_site/performance_experience/reserve.html'
     form_class = PerformanceExperienceDetailsForm
     payment_form_class = PerformanceExperiencePaymentForm
     login_form_class = PerformanceExperienceLoginForm
@@ -298,8 +300,10 @@ class PerformanceExperienceView(NavMenuMixin, PaymentLoginFormMixin, FormView):
         return context
 
 
+# Joy Ride
+
 class JoyRideView(NavMenuMixin, PaymentLoginFormMixin, FormView):
-    template_name = 'front_site/joy_ride.html'
+    template_name = 'front_site/joy_ride/reserve.html'
     form_class = JoyRideDetailsForm
     payment_form_class = JoyRidePaymentForm
     login_form_class = JoyRideLoginForm
@@ -309,6 +313,31 @@ class JoyRideView(NavMenuMixin, PaymentLoginFormMixin, FormView):
         context['vehicle_type'] = VehicleType
         # context['payment_form'] = self.get_payment_form()
         # context['login_form'] = self.get_login_form()
+        return context
+
+
+class JoyRideLoginFormView(JoyRideView):
+    template_name = 'front_site/includes/login_form.html'
+    form_class = JoyRideLoginForm
+
+
+class JoyRidePaymentFormView(JoyRideView):
+    template_name = 'front_site/includes/payment_form.html'
+    form_class = JoyRidePaymentForm
+
+
+class JoyRidePriceBreakdownView(FormView):
+    template_name = 'front_site/joy_ride/price_breakdown.html'
+    form_class = JoyRideDetailsForm
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.render_to_response(self.get_context_data(form=form, **kwargs))
+
+    def get_context_data(self, slug=None, form=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['price_data'] = form.price_data
         return context
 
 
