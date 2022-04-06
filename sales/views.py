@@ -267,6 +267,9 @@ class ReservePriceBreakdownView(FormView):
 
     def get_context_data(self, slug=None, form=None, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['vehicle'] = VehicleMarketing.objects.filter(slug=slug, status=VehicleStatus.READY).first()
+        if not context['vehicle']:
+            raise Http404
         context['price_data'] = form.price_data
         return context
 

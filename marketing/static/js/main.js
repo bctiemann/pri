@@ -92,6 +92,7 @@ var loadPriceBreakdown = function(params) {
   let url = `/vehicle/${params.vehicle_slug}/reserve/price_breakdown/`;
   $.post(url, params, function(html) {
       $('#price_breakdown_container').html(html);
+      refreshUI();
   })
 };
 
