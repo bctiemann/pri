@@ -90,14 +90,6 @@ class ReservationMixin:
         return customer
 
     def create_reservation(self, request, form=None):
-        # TODO: kill switch
-        kill_switch = False
-        if kill_switch:
-            return {
-                'success': True,
-                'customer_site_url': self.get_honeypot_url(),
-            }
-
         form = form or self.form_class(request.POST)
         print(form.data)
         print(form.is_valid())
@@ -106,6 +98,15 @@ class ReservationMixin:
             return {
                 'success': False,
                 'errors': form.errors,
+            }
+
+        # TODO: kill switch
+        kill_switch = False
+        if kill_switch:
+            return {
+                'success': True,
+                'reservation_type': self.reservation_type,
+                'customer_site_url': self.get_honeypot_url(form=form),
             }
 
         # Create Customer or login existing user

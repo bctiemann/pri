@@ -109,6 +109,9 @@ class ValidateRentalPaymentView(ReservationMixin, APIView):
     def get_customer_site_url(self, confirmation_code):
         return reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': confirmation_code})
 
+    def get_honeypot_url(self, form=None, **kwargs):
+        return reverse('reserve-honeypot', kwargs={'slug': form.vehicle.slug})
+
 
 class ValidateRentalLoginView(ValidateRentalPaymentView):
     authentication_classes = (SessionAuthentication,)
@@ -197,6 +200,9 @@ class ValidateJoyRidePaymentView(ReservationMixin, APIView):
 
     def get_customer_site_url(self, confirmation_code):
         return reverse('customer_portal:joyride-confirm', kwargs={'confirmation_code': confirmation_code}),
+
+    def get_honeypot_url(self, **kwargs):
+        return reverse('joy-ride-honeypot')
 
 
 class ValidateJoyRideLoginView(ValidateJoyRidePaymentView):
