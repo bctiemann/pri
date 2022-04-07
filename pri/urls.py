@@ -26,7 +26,11 @@ from api import views as api_views
 from fleet import views as rentals_views
 from marketing import views as marketing_views
 from sales import views as sales_views
-from sales.forms import ReservationRentalLoginForm, ReservationRentalPaymentForm
+from sales.forms import (
+    ReservationRentalLoginForm, ReservationRentalPaymentForm,
+    JoyRideLoginForm, JoyRidePaymentForm,
+    PerformanceExperienceLoginForm, PerformanceExperiencePaymentForm,
+)
 from users import views as users_views
 from django.contrib.auth import views as auth_views
 
@@ -65,6 +69,10 @@ urlpatterns = [
     path('joy_ride/form/login/', sales_views.JoyRideLoginFormView.as_view(), name='joy-ride-login-form'),
     path('joy_ride/form/payment/', sales_views.JoyRidePaymentFormView.as_view(), name='joy-ride-payment-form'),
     path('joy_ride/price_breakdown/', sales_views.JoyRidePriceBreakdownView.as_view(), name='joy-ride-price-breakdown'),
+    # No-JS flow (honeypot)
+    path('joy_ride/login/', sales_views.JoyRideView.as_view(form_class=JoyRideLoginForm), name='joy-ride-login'),
+    path('joy_ride/payment/', sales_views.JoyRideView.as_view(form_class=JoyRidePaymentForm), name='joy-ride-payment'),
+    path('joy_ride/complete/', sales_views.JoyRideHoneypotView.as_view(), name='joy-ride-honeypot'),
 
     path('gift_certificate/', sales_views.GiftCertificateView.as_view(), name='gift-certificate'),
     path('gift_certificate/<str:tag>/', sales_views.GiftCertificateStatusView.as_view(), name='gift-certificate-status'),

@@ -157,8 +157,7 @@ class HoneypotMixin:
             return self.form_invalid(form, **kwargs)
 
     def form_valid(self, form):
-        success_url = reverse('reserve-honeypot', kwargs={'slug': form.vehicle.slug})
-        return HttpResponseRedirect(success_url)
+        return HttpResponseRedirect(self.get_success_url())
 
     def form_invalid(self, form, **kwargs):
         for field in form.errors:
@@ -289,8 +288,8 @@ class ReserveView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, Honeypo
     #         return reverse('reserve-payment', kwargs={'slug': form.vehicle.slug})
     #     return reverse('reserve', kwargs={'slug': form.vehicle.slug})
 
-    # def get_success_url(self):
-    #     return reverse('reserve-honeypot', kwargs={'slug': form.vehicle.slug})
+    def get_success_url(self):
+        return reverse('reserve-honeypot', kwargs={'slug': form.vehicle.slug})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -358,7 +357,7 @@ class PerformanceExperienceView(NavMenuMixin, PaymentLoginFormMixin, FormView):
 
 # Joy Ride
 
-class JoyRideView(NavMenuMixin, PaymentLoginFormMixin, FormView):
+class JoyRideView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, HoneypotMixin, FormView):
     template_name = 'front_site/joy_ride/reserve.html'
     form_class = JoyRideDetailsForm
     payment_form_class = JoyRidePaymentForm
@@ -369,6 +368,9 @@ class JoyRideView(NavMenuMixin, PaymentLoginFormMixin, FormView):
         context['vehicle_type'] = VehicleType
         context['reservation_type'] = ServiceType.JOY_RIDE
         return context
+
+    def get_success_url(self):
+        return reverse('joy-ride-honeypot')
 
 
 class JoyRideLoginFormView(JoyRideView):
@@ -395,6 +397,17 @@ class JoyRidePriceBreakdownView(FormView):
         context['price_data'] = form.price_data
         return context
 
+
+class JoyRideHoneypotView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/joy_ride/honeypot.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['confirmation_code'] = generate_code(ServiceType.JOY_RIDE)
+        return context
+
+
+# Gift Certificate
 
 class GiftCertificateView(NavMenuMixin, CreateView):
     template_name = 'front_site/gift_certificate.html'

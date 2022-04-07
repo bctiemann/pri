@@ -482,6 +482,7 @@ class GuidedDriveBaseDetailsForm(forms.Form):
 
 
 class JoyRideDetailsForm(GuidedDriveBaseDetailsForm, forms.ModelForm):
+    form_type = 'details'
 
     num_minors = forms.TypedChoiceField(coerce=lambda x: int(x), choices=get_numeric_choices(min_val=0, max_val=4))
 
@@ -491,7 +492,7 @@ class JoyRideDetailsForm(GuidedDriveBaseDetailsForm, forms.ModelForm):
 
 
 class JoyRidePaymentForm(PaymentFormMixin, CardFormMixin, JoyRideDetailsForm):
-    pass
+    form_type = 'payment'
 
     # customer_fields = (
     #     'first_name', 'last_name', 'mobile_phone', 'home_phone', 'work_phone', 'fax', 'cc_number', 'cc_exp_yr',
@@ -524,6 +525,7 @@ class JoyRidePaymentForm(PaymentFormMixin, CardFormMixin, JoyRideDetailsForm):
 
 
 class JoyRideLoginForm(JoyRideDetailsForm):
+    form_type = 'login'
 
     password = forms.CharField(widget=forms.PasswordInput(), required=False)
 

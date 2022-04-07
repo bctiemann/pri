@@ -1,0 +1,24 @@
+{% extends "front_site/base.html" %}
+{% load static %}
+
+{% block page_title %}Reserve Your Vehicle{% endblock %}
+
+{% block content %}
+
+    <div class="reservation-pics-sidebar">
+        <img src="{% static "images/joyride.png" %}" />
+    </div>
+
+    <h3>Reservation Complete</h3>
+
+    <div class="reservation-form-sidebar">
+        <p class="reservation-info">
+            Thank you for your reservation! Your confirmation code is: <b>{{ confirmation_code }}</b>
+        </p>
+        <p class="reservation-info">
+            A customer service representative will be in contact with you shortly to finalize your reservation.
+            Please feel free to <a href="{% url "contact" %}">contact us</a> at any time with any questions!
+        </p>
+    </div>
+
+{% endblock %}
