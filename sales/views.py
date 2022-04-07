@@ -91,6 +91,12 @@ class ReservationMixin:
 
     def create_reservation(self, request, form=None):
         # TODO: kill switch
+        kill_switch = False
+        if kill_switch:
+            return {
+                'success': True,
+                'customer_site_url': self.get_honeypot_url(),
+            }
 
         form = form or self.form_class(request.POST)
         print(form.data)
@@ -140,8 +146,11 @@ class ReservationMixin:
     def get_customer_site_url(self, **kwargs):
         raise NotImplementedError
 
+    def get_honeypot_url(self, **kwargs):
+        raise NotImplementedError
 
-class HoneypotMixin:
+
+class NoJSFlowMixin:
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -157,7 +166,11 @@ class HoneypotMixin:
             return self.form_invalid(form, **kwargs)
 
     def form_valid(self, form):
-        return HttpResponseRedirect(self.get_success_url())
+        # return HttpResponseRedirect(self.get_success_url())
+        reservation_result = self.create_reservation(self.request, form)
+        if reservation_result['success']:
+            return HttpResponseRedirect(reservation_result['customer_site_url'])
+        return self.form_invalid(form)
 
     def form_invalid(self, form, **kwargs):
         for field in form.errors:
@@ -193,7 +206,7 @@ class VehicleMixin:
 
 # This template is rendered with three forms: details (phase 1), payment (phase 2 for new user), and login (phase 2 for
 # returning user. All three forms have different validation needs and field sets
-class ReserveView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, HoneypotMixin, VehicleMixin, FormView):
+class ReserveView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, NoJSFlowMixin, VehicleMixin, FormView):
     template_name = 'front_site/reserve/reserve.html'
     form_class = ReservationRentalDetailsForm
     payment_form_class = ReservationRentalPaymentForm
@@ -288,8 +301,11 @@ class ReserveView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, Honeypo
     #         return reverse('reserve-payment', kwargs={'slug': form.vehicle.slug})
     #     return reverse('reserve', kwargs={'slug': form.vehicle.slug})
 
-    def get_success_url(self):
-        return reverse('reserve-honeypot', kwargs={'slug': form.vehicle.slug})
+    # def get_success_url(self):
+    #     return reverse('reserve-honeypot', kwargs={'slug': form.vehicle.slug})
+
+    def get_honeypot_url(self, **kwargs):
+        return reverse('reserve-honeypot')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -357,7 +373,7 @@ class PerformanceExperienceView(NavMenuMixin, PaymentLoginFormMixin, FormView):
 
 # Joy Ride
 
-class JoyRideView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, HoneypotMixin, FormView):
+class JoyRideView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, NoJSFlowMixin, FormView):
     template_name = 'front_site/joy_ride/reserve.html'
     form_class = JoyRideDetailsForm
     payment_form_class = JoyRidePaymentForm
@@ -369,7 +385,7 @@ class JoyRideView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, Honeypo
         context['reservation_type'] = ServiceType.JOY_RIDE
         return context
 
-    def get_success_url(self):
+    def get_honeypot_url(self, **kwargs):
         return reverse('joy-ride-honeypot')
 
 
