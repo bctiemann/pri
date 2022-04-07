@@ -154,9 +154,13 @@
             <div class="exception" id="reservation_form_error">
                 <h3>An error occurred</h3>
                 <p class="alert-message">#formError#</p>
+                {{ form.errors }}
             </div>
             </cfif>
             {% endif %}
+        p: {{ form.password }}
+        l: {{ login_form.password }}
+        {{ login_form.errors }}
 
             <div id="details_form_container">
                 {% include "front_site/reserve/details_form.html" %}

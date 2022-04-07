@@ -3,6 +3,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import reverse
 from django.db import IntegrityError
 from django.contrib.auth import authenticate, login
+from django import forms
 
 from rest_framework.response import Response
 from rest_framework.exceptions import APIException
@@ -45,8 +46,12 @@ class PaymentLoginFormMixin:
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['payment_form'] = self.get_payment_form()
-        context['login_form'] = self.get_login_form()
+        if kwargs.get('form_type') == 'details':
+            context['payment_form'] = self.get_payment_form()
+            context['login_form'] = self.get_login_form()
+        else:
+            context['payment_form'] = context['form']
+            context['login_form'] = context['form']
         # context['form_type'] = self.form_type
         return context
 
@@ -171,6 +176,8 @@ class NoJSFlowMixin:
         reservation_result = self.create_reservation(self.request, form)
         if reservation_result['success']:
             return HttpResponseRedirect(reservation_result['customer_site_url'])
+        for field, error in reservation_result['errors'].items():
+            form.add_error(field, forms.ValidationError(error))
         return self.form_invalid(form)
 
     def form_invalid(self, form, **kwargs):
@@ -196,7 +203,7 @@ class VehicleMixin:
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        slug = kwargs.get('slug')
+        slug = self.kwargs.get('slug')
         # We filter() rather than get() because vehicle_marketing.slug is not unique (we may have multiple of the
         # same vehicle)
         context['vehicle'] = VehicleMarketing.objects.filter(slug=slug, status=VehicleStatus.READY).first()
