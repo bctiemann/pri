@@ -46,12 +46,8 @@ class PaymentLoginFormMixin:
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if kwargs.get('form_type') == 'details':
-            context['payment_form'] = self.get_payment_form()
-            context['login_form'] = self.get_login_form()
-        else:
-            context['payment_form'] = context['form']
-            context['login_form'] = context['form']
+        context['payment_form'] = self.get_payment_form()
+        context['login_form'] = self.get_login_form()
         # context['form_type'] = self.form_type
         return context
 
@@ -181,10 +177,13 @@ class NoJSFlowMixin:
         return self.form_invalid(form)
 
     def form_invalid(self, form, **kwargs):
+        context = self.get_context_data(form=form, form_type=form.form_type, **kwargs)
+        context['login_form'] = form
+        context['payment_form'] = form
         for field in form.errors:
             form[field].field.widget.attrs.setdefault('class', '')
             form[field].field.widget.attrs['class'] += ' field-error'
-        return self.render_to_response(self.get_context_data(form=form, form_type=form.form_type, **kwargs))
+        return self.render_to_response(context)
 
     def get_context_data(self, **kwargs):
         form = kwargs.get('form')
@@ -219,7 +218,7 @@ class ReserveView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, NoJSFlo
     form_class = ReservationRentalDetailsForm
     payment_form_class = ReservationRentalPaymentForm
     login_form_class = ReservationRentalLoginForm
-    form_type = 'details'
+    form_type = 'details1'
     reservation_type = ServiceType.RENTAL
 
     # def get(self, request, *args, **kwargs):
@@ -320,8 +319,8 @@ class ReserveView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, NoJSFlo
         context['reservation_type'] = ServiceType.RENTAL
         return context
 
-    # def get_customer_site_url(self, confirmation_code):
-    #     return reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': confirmation_code})
+    def get_customer_site_url(self, confirmation_code):
+        return reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': confirmation_code})
 
 
 class ReserveLoginFormView(ReserveView):
@@ -386,12 +385,16 @@ class JoyRideView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, NoJSFlo
     form_class = JoyRideDetailsForm
     payment_form_class = JoyRidePaymentForm
     login_form_class = JoyRideLoginForm
+    reservation_type = ServiceType.JOY_RIDE
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['vehicle_type'] = VehicleType
         context['reservation_type'] = ServiceType.JOY_RIDE
         return context
+
+    def get_customer_site_url(self, confirmation_code):
+        return reverse('customer_portal:joyride-confirm', kwargs={'confirmation_code': confirmation_code})
 
     def get_honeypot_url(self, **kwargs):
         return reverse('joy-ride-honeypot')

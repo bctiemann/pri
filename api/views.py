@@ -199,7 +199,7 @@ class ValidateJoyRidePaymentView(ReservationMixin, APIView):
         return Response(reservation_result)
 
     def get_customer_site_url(self, confirmation_code):
-        return reverse('customer_portal:joyride-confirm', kwargs={'confirmation_code': confirmation_code}),
+        return reverse('customer_portal:joyride-confirm', kwargs={'confirmation_code': confirmation_code})
 
     def get_honeypot_url(self, **kwargs):
         return reverse('joy-ride-honeypot')
