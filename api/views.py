@@ -32,7 +32,7 @@ from customer_portal.forms import ReservationCustomerInfoForm
 from sales.models import BaseReservation, Reservation, Rental, TaxRate, generate_code
 from sales.tasks import send_email
 from sales.calculators import PriceCalculator
-from sales.enums import CC2_ERROR_PARAM_MAP
+from sales.enums import CC2_ERROR_PARAM_MAP, ServiceType
 from sales.models import Card
 from users.models import User, Customer, Employee, generate_password
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture
@@ -100,14 +100,14 @@ class ValidateRentalDetailsView(APIView):
 
 class ValidateRentalPaymentView(ReservationMixin, APIView):
     form_class = ReservationRentalPaymentForm
-    reservation_type = 'rental'
+    reservation_type = ServiceType.RENTAL
 
     def post(self, request):
         reservation_result = self.create_reservation(request)
         return Response(reservation_result)
 
     def get_customer_site_url(self, confirmation_code):
-        return reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': confirmation_code}),
+        return reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': confirmation_code})
 
 
 class ValidateRentalLoginView(ValidateRentalPaymentView):
@@ -189,7 +189,11 @@ class ValidateJoyRideDetailsView(APIView):
 
 class ValidateJoyRidePaymentView(ReservationMixin, APIView):
     form_class = JoyRidePaymentForm
-    reservation_type = 'joyride'
+    reservation_type = ServiceType.JOY_RIDE
+
+    def post(self, request):
+        reservation_result = self.create_reservation(request)
+        return Response(reservation_result)
 
     def get_customer_site_url(self, confirmation_code):
         return reverse('customer_portal:joyride-confirm', kwargs={'confirmation_code': confirmation_code}),
@@ -225,7 +229,11 @@ class ValidatePerformanceExperienceDetailsView(APIView):
 
 class ValidatePerformanceExperiencePaymentView(ReservationMixin, APIView):
     form_class = PerformanceExperiencePaymentForm
-    reservation_type = 'perfexp'
+    reservation_type = ServiceType.PERFORMANCE_EXPERIENCE
+
+    def post(self, request):
+        reservation_result = self.create_reservation(request)
+        return Response(reservation_result)
 
     def get_customer_site_url(self, confirmation_code):
         return reverse('customer_portal:perfexp-confirm', kwargs={'confirmation_code': confirmation_code}),

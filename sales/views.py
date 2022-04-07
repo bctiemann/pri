@@ -43,7 +43,7 @@ class PaymentLoginFormMixin:
             form_class = self.get_login_form_class()
         return form_class(**self.get_form_kwargs())
 
-    def get_context_data(self, slug=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['payment_form'] = self.get_payment_form()
         context['login_form'] = self.get_login_form()
@@ -141,63 +141,113 @@ class ReservationMixin:
         raise NotImplementedError
 
 
+class HoneypotMixin:
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            if form.form_type == 'details':
+                if form.customer:
+                    form_type = 'login'
+                else:
+                    form_type = 'payment'
+                return self.render_to_response(self.get_context_data(form=form, form_type=form_type, **kwargs))
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form, **kwargs)
+
+    def form_valid(self, form):
+        success_url = reverse('reserve-honeypot', kwargs={'slug': form.vehicle.slug})
+        return HttpResponseRedirect(success_url)
+
+    def form_invalid(self, form, **kwargs):
+        for field in form.errors:
+            form[field].field.widget.attrs.setdefault('class', '')
+            form[field].field.widget.attrs['class'] += ' field-error'
+        return self.render_to_response(self.get_context_data(form=form, form_type=form.form_type, **kwargs))
+
+    def get_context_data(self, **kwargs):
+        form = kwargs.get('form')
+        form_type = kwargs.get('form_type')
+        context = super().get_context_data(**kwargs)
+        context['form_type'] = form_type or 'details'
+        if form:
+            context['price_data'] = form.price_data
+        return context
+
+
+class VehicleMixin:
+
+    def get(self, request, *args, **kwargs):
+        return self.render_to_response(self.get_context_data(**kwargs))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        slug = kwargs.get('slug')
+        # We filter() rather than get() because vehicle_marketing.slug is not unique (we may have multiple of the
+        # same vehicle)
+        context['vehicle'] = VehicleMarketing.objects.filter(slug=slug, status=VehicleStatus.READY).first()
+        if not context['vehicle']:
+            raise Http404
+        return context
+
+
 # This template is rendered with three forms: details (phase 1), payment (phase 2 for new user), and login (phase 2 for
 # returning user. All three forms have different validation needs and field sets
-class ReserveView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, FormView):
+class ReserveView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, HoneypotMixin, VehicleMixin, FormView):
     template_name = 'front_site/reserve/reserve.html'
     form_class = ReservationRentalDetailsForm
     payment_form_class = ReservationRentalPaymentForm
     login_form_class = ReservationRentalLoginForm
     form_type = 'details'
-    reservation_type = 'rental'
+    reservation_type = ServiceType.RENTAL
 
-    def get(self, request, *args, **kwargs):
-        """Handle GET requests: instantiate a blank version of the form."""
-        return self.render_to_response(self.get_context_data(**kwargs))
+    # def get(self, request, *args, **kwargs):
+    #     return self.render_to_response(self.get_context_data(**kwargs))
 
-    def post(self, request, *args, **kwargs):
-        """
-        Handle POST requests: instantiate a form instance with the passed
-        POST variables and then check if it's valid.
-        """
-        form = self.get_form()
-        if form.is_valid():
-            if form.form_type == 'details':
-            # if isinstance(form, ReservationRentalDetailsForm):
-                # new_form = None
-                if form.customer:
-                    form_type = 'login'
-                #     new_form = ReservationRentalLoginForm(**self.get_form_kwargs())
-                # #     # return reverse('reserve-login-form', kwargs={'slug': form.vehicle.slug})
-                else:
-                    form_type = 'payment'
-                #     new_form = ReservationRentalPaymentForm(**self.get_form_kwargs())
-                return self.render_to_response(self.get_context_data(form=form, form_type=form_type, **kwargs))
-                # # return reverse('reserve-payment-form', kwargs={'slug': form.vehicle.slug})
-
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form, **kwargs)
+    # def post(self, request, *args, **kwargs):
+    #     """
+    #     Handle POST requests: instantiate a form instance with the passed
+    #     POST variables and then check if it's valid.
+    #     """
+    #     form = self.get_form()
+    #     if form.is_valid():
+    #         if form.form_type == 'details':
+    #         # if isinstance(form, ReservationRentalDetailsForm):
+    #             # new_form = None
+    #             if form.customer:
+    #                 form_type = 'login'
+    #             #     new_form = ReservationRentalLoginForm(**self.get_form_kwargs())
+    #             # #     # return reverse('reserve-login-form', kwargs={'slug': form.vehicle.slug})
+    #             else:
+    #                 form_type = 'payment'
+    #             #     new_form = ReservationRentalPaymentForm(**self.get_form_kwargs())
+    #             return self.render_to_response(self.get_context_data(form=form, form_type=form_type, **kwargs))
+    #             # # return reverse('reserve-payment-form', kwargs={'slug': form.vehicle.slug})
+    #
+    #         return self.form_valid(form)
+    #     else:
+    #         return self.form_invalid(form, **kwargs)
 
     # def get_form_class(self):
     #     if self.form_type == 'details':
     #         return self.form_class
     #     elif self.form_type =
 
-    def form_valid(self, form):
-        success_url = reverse('reserve-honeypot', kwargs={'slug': form.vehicle.slug})
-        return HttpResponseRedirect(success_url)
-        # reservation_result = self.create_reservation(self.request, form)
-        # if reservation_result['success']:
-        #     return HttpResponseRedirect(reservation_result['customer_site_url'])
-        # return self.render_to_response(self.get_context_data(form=form, form_type=self.form_type, slug=form.vehicle.slug))
+    # def form_valid(self, form):
+    #     success_url = reverse('reserve-honeypot', kwargs={'slug': form.vehicle.slug})
+    #     return HttpResponseRedirect(success_url)
+    #     # reservation_result = self.create_reservation(self.request, form)
+    #     # if reservation_result['success']:
+    #     #     return HttpResponseRedirect(reservation_result['customer_site_url'])
+    #     # return self.render_to_response(self.get_context_data(form=form, form_type=self.form_type, slug=form.vehicle.slug))
 
-    def form_invalid(self, form, **kwargs):
-        """If the form is invalid, render the invalid form."""
-        for field in form.errors:
-            form[field].field.widget.attrs.setdefault('class', '')
-            form[field].field.widget.attrs['class'] += ' field-error'
-        return self.render_to_response(self.get_context_data(form=form, form_type=form.form_type, **kwargs))
+    # def form_invalid(self, form, **kwargs):
+    #     """If the form is invalid, render the invalid form."""
+    #     for field in form.errors:
+    #         form[field].field.widget.attrs.setdefault('class', '')
+    #         form[field].field.widget.attrs['class'] += ' field-error'
+    #     return self.render_to_response(self.get_context_data(form=form, form_type=form.form_type, **kwargs))
 
     # def get_payment_form_class(self):
     #     return self.payment_form_class
@@ -215,19 +265,19 @@ class ReserveView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, FormVie
     #         form_class = self.get_login_form_class()
     #     return form_class(**self.get_form_kwargs())
 
-    def get_context_data(self, slug=None, form=None, form_type=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # We filter() rather than get() because vehicle_marketing.slug is not unique (we may have multiple of the
-        # same vehicle)
-        context['vehicle'] = VehicleMarketing.objects.filter(slug=slug, status=VehicleStatus.READY).first()
-        if not context['vehicle']:
-            raise Http404
-        # context['payment_form'] = self.get_payment_form()
-        # context['login_form'] = self.get_login_form()
-        context['form_type'] = form_type or 'details'
-        if form:
-            context['price_data'] = form.price_data
-        return context
+    # def get_context_data(self, slug=None, form=None, form_type=None, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     # We filter() rather than get() because vehicle_marketing.slug is not unique (we may have multiple of the
+    #     # same vehicle)
+    #     context['vehicle'] = VehicleMarketing.objects.filter(slug=slug, status=VehicleStatus.READY).first()
+    #     if not context['vehicle']:
+    #         raise Http404
+    #     # context['payment_form'] = self.get_payment_form()
+    #     # context['login_form'] = self.get_login_form()
+    #     context['form_type'] = form_type or 'details'
+    #     if form:
+    #         context['price_data'] = form.price_data
+    #     return context
 
     # def get_success_url(self):
     #     form = self.get_form()
@@ -242,8 +292,13 @@ class ReserveView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, FormVie
     # def get_success_url(self):
     #     return reverse('reserve-honeypot', kwargs={'slug': form.vehicle.slug})
 
-    def get_customer_site_url(self, confirmation_code):
-        return reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': confirmation_code})
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['reservation_type'] = ServiceType.RENTAL
+        return context
+
+    # def get_customer_site_url(self, confirmation_code):
+    #     return reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': confirmation_code})
 
 
 class ReserveLoginFormView(ReserveView):
@@ -256,7 +311,7 @@ class ReservePaymentFormView(ReserveView):
     form_class = ReservationRentalPaymentForm
 
 
-class ReservePriceBreakdownView(FormView):
+class ReservePriceBreakdownView(VehicleMixin, FormView):
     template_name = 'front_site/reserve/price_breakdown.html'
     form_class = ReservationRentalDetailsForm
 
@@ -265,23 +320,24 @@ class ReservePriceBreakdownView(FormView):
         if form.is_valid():
             return self.render_to_response(self.get_context_data(form=form, **kwargs))
 
-    def get_context_data(self, slug=None, form=None, **kwargs):
+    def get_context_data(self, **kwargs):
+        form = kwargs.get('form')
         context = super().get_context_data(**kwargs)
-        context['vehicle'] = VehicleMarketing.objects.filter(slug=slug, status=VehicleStatus.READY).first()
-        if not context['vehicle']:
-            raise Http404
+        # context['vehicle'] = VehicleMarketing.objects.filter(slug=slug, status=VehicleStatus.READY).first()
+        # if not context['vehicle']:
+        #     raise Http404
         context['price_data'] = form.price_data
         return context
 
 
-class ReserveHoneypotView(NavMenuMixin, TemplateView):
+class ReserveHoneypotView(NavMenuMixin, VehicleMixin, TemplateView):
     template_name = 'front_site/reserve/honeypot.html'
 
-    def get_context_data(self, slug=None, form_type=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['vehicle'] = VehicleMarketing.objects.filter(slug=slug, status=VehicleStatus.READY).first()
-        if not context['vehicle']:
-            raise Http404
+        # context['vehicle'] = VehicleMarketing.objects.filter(slug=slug, status=VehicleStatus.READY).first()
+        # if not context['vehicle']:
+        #     raise Http404
         context['confirmation_code'] = generate_code(ServiceType.RENTAL)
         return context
 
@@ -294,7 +350,7 @@ class PerformanceExperienceView(NavMenuMixin, PaymentLoginFormMixin, FormView):
     payment_form_class = PerformanceExperiencePaymentForm
     login_form_class = PerformanceExperienceLoginForm
 
-    def get_context_data(self, slug=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['vehicle_type'] = VehicleType
         return context
@@ -308,11 +364,10 @@ class JoyRideView(NavMenuMixin, PaymentLoginFormMixin, FormView):
     payment_form_class = JoyRidePaymentForm
     login_form_class = JoyRideLoginForm
 
-    def get_context_data(self, slug=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['vehicle_type'] = VehicleType
-        # context['payment_form'] = self.get_payment_form()
-        # context['login_form'] = self.get_login_form()
+        context['reservation_type'] = ServiceType.JOY_RIDE
         return context
 
 
