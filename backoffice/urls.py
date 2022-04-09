@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, reverse_lazy
 from django.conf.urls import static
 from django.conf import settings
 from django.views.generic.base import RedirectView
@@ -22,7 +22,7 @@ urlpatterns = [
 
     path('landing/', views.LandingView.as_view(), name='landing'),
     path('login/', views.LoginView.as_view(), name='login'),
-    path('logout/', views.LogoutView.as_view(), name='logout'),
+    path('logout/', views.LogoutView.as_view(next_page=reverse_lazy('backoffice:login')), name='logout'),
 
     path('track_activity/', views.TrackActivityView.as_view(), name='track-activity'),
 
