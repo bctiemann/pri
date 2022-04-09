@@ -25,3 +25,5 @@ pytest-django==4.4.0
 pytest-mock==3.6.1
 pdfkit==1.0.0
 stripe==2.64.0
+redis==4.2.2
+hiredis==2.0.0

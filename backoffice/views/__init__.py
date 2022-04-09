@@ -13,6 +13,7 @@ from django.contrib.auth.views import LogoutView
 from django.db.models import Q, Sum
 from django.http import Http404, HttpResponseRedirect
 from django.core.exceptions import FieldError
+from django.core.cache import cache
 
 from users.views import LoginView
 from users.models import User, Customer
@@ -26,33 +27,45 @@ from marketing.models import NewsletterSubscription
 # Home and login/logout views
 
 class AdminViewMixin:
+    MENU_CONTEXT_CACHE_KEY = 'menu_context'
+    MENU_CONTEXT_CACHE_TIMEOUT = 300  # 300 (5m) is Django default
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['admin_users'] = User.objects.filter(is_backoffice=True)
-        context['now'] = timezone.now()
-        context['vehicles'] = VehicleMarketing.objects.filter(status=VehicleStatus.READY).order_by('vehicle_type', 'id')
 
-        context['todo_list_rentals'] = Rental.objects.filter(status__in=(
+        cached_context = cache.get(self.MENU_CONTEXT_CACHE_KEY)
+        if cached_context:
+            context.update(cached_context)
+            return context
+
+        menu_context = {}
+        menu_context['admin_users'] = User.objects.filter(is_backoffice=True)
+        menu_context['now'] = timezone.now()
+        menu_context['vehicles'] = VehicleMarketing.objects.filter(status=VehicleStatus.READY).order_by('vehicle_type', 'id')
+
+        menu_context['todo_list_rentals'] = Rental.objects.filter(status__in=(
             Rental.Status.INCOMPLETE,
             Rental.Status.CONFIRMED,
             Rental.Status.IN_PROGRESS,
             Rental.Status.COMPLETE,
         )).select_related('customer')
-        context['todo_item_count'] = sum([r.todo_item_count for r in context['todo_list_rentals']])
+        menu_context['todo_item_count'] = sum([r.todo_item_count for r in menu_context['todo_list_rentals']])
 
-        context['reservations'] = Reservation.objects.filter(status=Reservation.Status.UNCONFIRMED)
-        context['rentals'] = Rental.objects.filter(status__in=(
+        menu_context['reservations'] = Reservation.objects.filter(status=Reservation.Status.UNCONFIRMED)
+        menu_context['rentals'] = Rental.objects.filter(status__in=(
             Rental.Status.INCOMPLETE,
             Rental.Status.CONFIRMED,
             Rental.Status.IN_PROGRESS,
         ))
-        context['performance_experiences'] = PerformanceExperience.objects.filter(status=PerformanceExperience.Status.PENDING)
-        context['joy_rides'] = JoyRide.objects.filter(status=JoyRide.Status.PENDING)
-        context['maintenances'] = ScheduledService.objects.filter(is_due=True)
-        context['damages'] = Damage.objects.filter(is_repaired=False)
-        context['gift_certificates'] = GiftCertificate.objects.filter(is_paid=False)
-        context['adhoc_payments'] = AdHocPayment.objects.filter(is_paid=False, is_submitted=True)
+        menu_context['performance_experiences'] = PerformanceExperience.objects.filter(status=PerformanceExperience.Status.PENDING)
+        menu_context['joy_rides'] = JoyRide.objects.filter(status=JoyRide.Status.PENDING)
+        menu_context['maintenances'] = ScheduledService.objects.filter(is_due=True)
+        menu_context['damages'] = Damage.objects.filter(is_repaired=False)
+        menu_context['gift_certificates'] = GiftCertificate.objects.filter(is_paid=False)
+        menu_context['adhoc_payments'] = AdHocPayment.objects.filter(is_paid=False, is_submitted=True)
+
+        cache.set(self.MENU_CONTEXT_CACHE_KEY, menu_context, self.MENU_CONTEXT_CACHE_TIMEOUT)
+        context.update(menu_context)
         return context
 
 
