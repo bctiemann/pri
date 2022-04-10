@@ -35,7 +35,7 @@ class LoginView(LoginView):
     @method_decorator(ensure_csrf_cookie)
     def dispatch(self, request, *args, **kwargs):
         logger.info(f'{request.resolver_match.app_name} login: {request.user} {request.method} '
-                    f'{request.POST.get("auth-username")} {request.META.get("REMOTE_ADDR")} '
+                    f'{request.POST.get("auth-username")} {request.remote_ip} '
                     f'{request.POST.get("csrfmiddlewaretoken")}')
         if settings.LOG_AUTH:
             auth_logger.info(f'{request.user} {request.POST}')

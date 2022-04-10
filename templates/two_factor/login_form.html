@@ -34,12 +34,14 @@
     {% include "two_factor/_wizard_forms.html" %}
 </ul>
 
+{% comment %}
 {% if wizard.steps.current == 'auth' %}
     <a href="{% url "customer_portal:password_reset" %}">Forgot password?</a>
 {% endif %}
+{% endcomment %}
 
 {# hidden submit button to enable [enter] key #}
-<div style="margin-left: -9999px"><input type="submit" value=""/></div>
+<div style="margin-left: -9999px; height: 0px;"><input type="submit" value=""/></div>
 
 {% if other_devices %}
     <p>{% trans "Or, alternatively, use one of your backup phones:" %}</p>

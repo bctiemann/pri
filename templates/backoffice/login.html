@@ -36,6 +36,7 @@
 
 <h1>Performance Rentals - Administration Login</h1>
 
+{% comment %}
 <CFIF IsDefined("AccessDenied")>
     <div class="loginerror">
         <h3>ACCESS DENIED</h3>
@@ -77,6 +78,7 @@
         <p>Your 2-factor key has expired.</p>
     </div>
 </CFIF>
+{% endcomment %}
 
     <div class="login-form-container">
 
@@ -96,11 +98,11 @@
 <table class="loginhostinfo">
     <tr>
         <td>IP</td>
-        <td>#realip#</td>
+        <td>{{ request.remote_ip }}</td>
     </tr>
     <tr>
         <td>HOST</td>
-        <td>#CGI.REMOTE_HOST#</td>
+        <td>{{ request.remote_host }}</td>
     </tr>
 </table>
 </CFOUTPUT>

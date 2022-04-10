@@ -78,11 +78,10 @@ class ReservationMixin:
                 return None
             user = User.objects.create_user(form.cleaned_data['email'], password=new_password)
             customer_kwargs = {key: form.cleaned_data.get(key) for key in customer_fields}
-            remote_addr = request.META.get('REMOTE_ADDR') or request.META.get("HTTP_X_FORWARDED_FOR")
             # Create the customer object. Stripe cards are not registered until the Customer has an id (has been saved).
             customer = Customer.objects.create(
                 user=user,
-                registration_ip=remote_addr,
+                registration_ip=request.remote_ip,
                 **customer_kwargs,
             )
             # Save a second time to register Stripe cards

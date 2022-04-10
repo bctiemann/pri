@@ -73,3 +73,10 @@ class LastAccessMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         request.session['last_access'] = timezone.now().isoformat()
+
+
+class RemoteHostMiddleware(MiddlewareMixin):
+
+    def process_request(self, request):
+        request.remote_ip = request.META.get('REMOTE_ADDR') or request.META.get('HTTP_X_FORWARDED_FOR')
+        request.remote_host = request.META.get('REMOTE_HOST') or request.remote_ip

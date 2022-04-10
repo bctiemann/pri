@@ -589,13 +589,20 @@ table.inputform td {
 	line-height: 32px;
 	position: relative;
 }
-table.inputform td:first-child {
+table.inputform td:first-child, .loginform table th {
         text-align: right;
         width: 200px;
         padding-right: 10px;
         font-weight: normal;
         vertical-align: middle;
+	background: none;
 	line-height: 16px;
+}
+.loginform table.inputform td:first-child {
+	text-align: inherit;
+}
+.loginform .button-row {
+	text-align: center;
 }
 table.inputform td:nth-child(2) {
 	padding-left: 10px;
@@ -885,7 +892,7 @@ div.logincontent h1 {
 	text-align: center;
 }
 table.loginhostinfo {
-	margin: 0px auto;
+	margin: 10px auto;
 	font-size: 11px;
 }
 table.loginhostinfo td.label {
@@ -894,15 +901,19 @@ table.loginhostinfo td.label {
 div.loginwarning {
 	text-align: center;
 }
-div.loginerror {
+/*div.loginerror, .errorlist {*/
+div.loginerror, .loginform .errorlist {
 	background-color: #eef0f0;
 	border-radius: 10px;
 	padding: 10px;
 	border: 2px solid #ff7777;
 }
-div.loginerror h3 {
+div.loginerror h3, .loginform .errorlist h3 {
 	margin: 0px;
 	font-weight: bold;
+}
+.loginform .errorlist {
+	list-style-type: none;
 }
 
 #map {
