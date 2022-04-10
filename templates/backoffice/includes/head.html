@@ -16,6 +16,9 @@
     <script type="text/javascript">
         // var stripe = Stripe('{{ stripe_publishable_key }}');
         Stripe.setPublishableKey('{{ stripe_publishable_key }}');
+        {% if user.is_authenticated %}
+            setInterval('trackActivity()', 5000);
+        {% endif %}
     </script>
     <script src="https://cdn.tiny.cloud/1/{{ tinymce_api_key }}/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
 </head>

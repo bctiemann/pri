@@ -976,7 +976,7 @@ $(document).ready(function() {
     refreshDrivers();
     refreshMedia();
 
-    setInterval('trackActivity()', 5000);
+    // setInterval('trackActivity()', 5000);
     lastActivity = new Date();
     addEventListener('mousemove', function() {
         lastActivity = new Date();
