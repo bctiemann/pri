@@ -89,10 +89,20 @@ class MakeReservationView(SidebarMixin, CreateView):
     model = Reservation
     form_class = ReservationDetailsForm
 
+    def form_valid(self, form):
+        reservation = form.save(commit=False)
+        reservation.customer = self.request.user.customer
+        reservation.vehicle = form.cleaned_data['vehicle_marketing'].vehicle
+        reservation.save()
+        return HttpResponseRedirect(self.get_success_url())
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['vehicle'] = VehicleMarketing.objects.get(slug=self.kwargs['slug'])
         return context
+
+    def get_success_url(self):
+        return reverse('customer_portal:upcoming-reservations')
 
 
 class ConfirmReservationView(SidebarMixin, UpdateView):
@@ -155,12 +165,21 @@ class JoyRideReserveView(SidebarMixin, CreateView):
     model = JoyRide
     form_class = JoyRideDetailsForm
 
+    def form_valid(self, form):
+        reservation = form.save(commit=False)
+        reservation.customer = self.request.user.customer
+        reservation.save()
+        return HttpResponseRedirect(self.get_success_url())
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['ready_vehicles'] = VehicleMarketing.objects.filter(status=VehicleStatus.READY).order_by('-weighting')
         context['cars'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.CAR)
         context['bikes'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.BIKE)
         return context
+
+    def get_success_url(self):
+        return reverse('customer_portal:joyride-upcoming')
 
 
 class JoyRideConfirmView(SidebarMixin, UpdateView):
@@ -197,12 +216,21 @@ class PerformanceExperienceReserveView(SidebarMixin, CreateView):
     model = PerformanceExperience
     form_class = PerformanceExperienceDetailsForm
 
+    def form_valid(self, form):
+        reservation = form.save(commit=False)
+        reservation.customer = self.request.user.customer
+        reservation.save()
+        return HttpResponseRedirect(self.get_success_url())
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['ready_vehicles'] = VehicleMarketing.objects.filter(status=VehicleStatus.READY).order_by('-weighting')
         context['cars'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.CAR)
         context['bikes'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.BIKE)
         return context
+
+    def get_success_url(self):
+        return reverse('customer_portal:perfexp-upcoming')
 
 
 class PerformanceExperienceConfirmView(SidebarMixin, UpdateView):

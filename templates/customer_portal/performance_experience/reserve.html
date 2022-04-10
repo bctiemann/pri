@@ -11,14 +11,16 @@
     </cfquery>
     {% endcomment %}
 
-    <form method="POST" name="reservation_form" id="reservation_form" action="perfexp.cfm" onsubmit="return false;" autocomplete="on">
+    <form method="POST" name="reservation_form" id="reservation_form" action="{% url "customer_portal:perfexp-reserve" %}" onsubmit="return false;" autocomplete="on">
     <cfoutput>
 
         {% if form.errors %}
         <cfif Len(formError) GT 0>
         <div class="exception" id="reservation_form_error">
             <h3>An error occurred</h3>
-            <p class="alert-message">#formError#</p>
+            {% for field, error in form.errors.items %}
+                <p class="alert-message">{{ field }}: {{ error }}</p>
+            {% endfor %}
         </div>
         </cfif>
         {% endif %}

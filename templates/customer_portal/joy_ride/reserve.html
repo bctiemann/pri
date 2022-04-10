@@ -18,7 +18,9 @@
         <cfif Len(formError) GT 0>
         <div class="exception" id="reservation_form_error">
             <h3>An error occurred</h3>
-            <p class="alert-message">#formError#</p>
+            {% for field, error in form.errors.items %}
+                <p class="alert-message">{{ field }}: {{ error }}</p>
+            {% endfor %}
         </div>
         </cfif>
         {% endif %}
