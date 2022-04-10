@@ -259,6 +259,9 @@
         <a class="tnav" href="{% url "admin:users_user_changelist" %}">Accounts</a>
     </li>
     {% endif %}
+    <li>
+        <a class="tnav" href="{% url "two_factor:setup" %}">Two-factor</a>
+    </li>
     {% if user.employee.admin_access %}
     <CFIF YourID.acclev IS 1>
     <li>
