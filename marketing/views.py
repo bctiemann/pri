@@ -109,6 +109,9 @@ class NewsletterConfirmView(NavMenuMixin, TemplateView):
     #     return context
 
 
+# TODO: Newsletter unsubscribe view
+
+
 class ServicesView(NavMenuMixin, TemplateView):
     template_name = 'front_site/services.html'
 
