@@ -1,9 +1,15 @@
+import datetime
+import hashlib
+
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.conf import settings
 from django.urls import resolve, reverse, reverse_lazy
 from django.core.exceptions import PermissionDenied
 from django.utils.deprecation import MiddlewareMixin
+from django.contrib.sessions.models import Session
 from django.utils import timezone
+
+from users.models import SessionVisit
 
 import logging
 logger = logging.getLogger(__name__)
@@ -69,14 +75,22 @@ class PermissionsMiddleware(object):
         return self.get_response(request)
 
 
-class LastAccessMiddleware(MiddlewareMixin):
-
-    def process_request(self, request):
-        request.session['last_access'] = timezone.now().isoformat()
-
-
 class RemoteHostMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
+        # Resolve the remote_ip and remote_host and store in session for tracking and reflection in templates
         request.remote_ip = request.META.get('REMOTE_ADDR') or request.META.get('HTTP_X_FORWARDED_FOR')
         request.remote_host = request.META.get('REMOTE_HOST') or request.remote_ip
+        request.session['remote_ip'] = request.remote_ip
+        request.session['user_agent_hash'] = hashlib.md5(request.META.get('HTTP_USER_AGENT').encode('utf-8')).hexdigest()
+        request.session['last_access'] = timezone.now().isoformat()
+
+        # If this session has not visited in the past hour, record a SessionVisit
+        one_hour_ago = timezone.now() - datetime.timedelta(hours=1)
+        visited_within_hour = SessionVisit.objects.filter(
+            session__session_key=request.session.session_key,
+            visited_at__gte=one_hour_ago,
+        )
+        if not visited_within_hour.exists():
+            session = Session.objects.get(session_key=request.session.session_key)
+            SessionVisit.objects.create(session=session)

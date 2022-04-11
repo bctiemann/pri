@@ -8,6 +8,7 @@ from english_words import english_words_lower_set
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.contrib.sessions.models import Session
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
@@ -454,3 +455,8 @@ class MusicGenre(models.Model):
 
     class Meta:
         ordering = ('name',)
+
+
+class SessionVisit(models.Model):
+    session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    visited_at = models.DateTimeField(auto_now_add=True)
