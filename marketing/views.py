@@ -85,6 +85,10 @@ class NewsletterView(NavMenuMixin, FormView):
         context['recaptcha_site_key'] = settings.RECAPTCHA_SITE_KEY
         return context
 
+    # If form is submitted without JS, just push to the success page as a honeypot
+    def get_success_url(self):
+        return reverse('newsletter-done')
+
 
 class NewsletterDoneView(NavMenuMixin, TemplateView):
     template_name = 'front_site/newsletter_done.html'
