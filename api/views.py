@@ -45,6 +45,17 @@ from sales.views import ReservationMixin
 logger = logging.getLogger(__name__)
 
 
+class ReCAPTCHAMixin:
+
+    @staticmethod
+    def verify_recaptcha(recaptcha_response):
+        payload = {
+            'secret': settings.RECAPTCHA_SECRET_KEY,
+            'response': recaptcha_response,
+        }
+        return requests.post(settings.RECAPTCHA_VERIFY_URL, data=payload)
+
+
 class HasReservationsAccess(BasePermission):
 
     def has_permission(self, request, view):
@@ -252,20 +263,13 @@ class ValidatePerformanceExperienceLoginView(ValidatePerformanceExperiencePaymen
 
 # Newsletter
 
-class ValidateNewsletterSubscriptionView(APIView):
+class ValidateNewsletterSubscriptionView(ReCAPTCHAMixin, APIView):
 
     # authentication_classes = ()
     # permission_classes = ()
 
     # form_type is passed in via the url pattern in urls.py as a kwarg to .as_view()
     form_type = None
-
-    def verify_recaptcha(self, recaptcha_response):
-        payload = {
-            'secret': settings.RECAPTCHA_SECRET_KEY,
-            'response': recaptcha_response,
-        }
-        return requests.post(settings.RECAPTCHA_VERIFY_URL, data=payload)
 
     def post(self, request):
         # form_class = self._get_form_class()
@@ -295,6 +299,7 @@ class ValidateNewsletterSubscriptionView(APIView):
         email_context = {
             'subscription': newsletter_subscription,
         }
+        # TODO: Format confirm emails and point to correct URL
         send_email(
             [form.cleaned_data['email']], email_subject, email_context,
             text_template='front_site/email/newsletter_subscribe_confirm.txt',

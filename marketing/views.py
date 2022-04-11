@@ -95,6 +95,7 @@ class NewsletterDoneView(NavMenuMixin, TemplateView):
     #     return context
 
 
+# TODO: Newsletter confirm page and functionality
 class NewsletterConfirmView(NavMenuMixin, TemplateView):
     template_name = 'front_site/newsletter_confirm.html'
 
