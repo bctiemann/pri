@@ -92,5 +92,8 @@ class RemoteHostMiddleware(MiddlewareMixin):
             visited_at__gte=one_hour_ago,
         )
         if not visited_within_hour.exists():
-            session = Session.objects.get(session_key=request.session.session_key)
-            SessionVisit.objects.create(session=session)
+            try:
+                session = Session.objects.get(session_key=request.session.session_key)
+                SessionVisit.objects.create(session=session)
+            except Session.DoesNotExist:
+                pass

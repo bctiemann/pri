@@ -80,10 +80,10 @@ class NewsletterView(NavMenuMixin, FormView):
 
         return result
 
-    def get_context_data(self, slug=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['recaptcha_site_key'] = settings.RECAPTCHA_SITE_KEY
-        return context
+    # def get_context_data(self, slug=None, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['recaptcha_site_key'] = settings.RECAPTCHA_SITE_KEY
+    #     return context
 
     # If form is submitted without JS, just push to the success page as a honeypot
     def get_success_url(self):
