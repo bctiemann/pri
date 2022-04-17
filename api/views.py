@@ -45,17 +45,6 @@ from sales.views import ReservationMixin
 logger = logging.getLogger(__name__)
 
 
-class ReCAPTCHAMixin:
-
-    @staticmethod
-    def verify_recaptcha(recaptcha_response):
-        payload = {
-            'secret': settings.RECAPTCHA_SECRET_KEY,
-            'response': recaptcha_response,
-        }
-        return requests.post(settings.RECAPTCHA_VERIFY_URL, data=payload)
-
-
 class HasReservationsAccess(BasePermission):
 
     def has_permission(self, request, view):
@@ -263,7 +252,7 @@ class ValidatePerformanceExperienceLoginView(ValidatePerformanceExperiencePaymen
 
 # Newsletter
 
-class ValidateNewsletterSubscriptionView(ReCAPTCHAMixin, APIView):
+class ValidateNewsletterSubscriptionView(APIView):
 
     # authentication_classes = ()
     # permission_classes = ()
@@ -285,13 +274,13 @@ class ValidateNewsletterSubscriptionView(ReCAPTCHAMixin, APIView):
                 'errors': form.errors,
             })
 
-        recaptcha_response = self.verify_recaptcha(form.data.get('g-recaptcha-response'))
-        recaptcha_result = recaptcha_response.json()
-        if not recaptcha_result['success']:
-            return Response({
-                'success': False,
-                'errors': ['ReCAPTCHA failure.'],
-            })
+        # recaptcha_response = self.verify_recaptcha(form)
+        # recaptcha_result = recaptcha_response.json()
+        # if not recaptcha_result['success']:
+        #     return Response({
+        #         'success': False,
+        #         'errors': ['ReCAPTCHA failure.'],
+        #     })
 
         newsletter_subscription = form.save()
 

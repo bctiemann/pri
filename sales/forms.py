@@ -1,6 +1,7 @@
 import datetime
 import pytz
 import math
+import requests
 from localflavor.us.forms import USZipCodeField, USStateField, USStateSelect
 
 from phonenumber_field.formfields import PhoneNumberField
@@ -28,6 +29,30 @@ class CardFormMixin(forms.Form):
     cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices())
     cc_cvv = forms.CharField()
     cc_phone = PhoneNumberField()
+
+
+# This mixin can be added to any form to enforce checking a g-recaptcha-response field included in the form.data.
+class ReCAPTCHAFormMixin(forms.Form):
+    recaptcha = forms.CharField(required=False)
+
+    @staticmethod
+    def verify_recaptcha(recaptcha_response):
+        payload = {
+            'secret': settings.RECAPTCHA_SECRET_KEY,
+            'response': recaptcha_response,
+        }
+        return requests.post(settings.RECAPTCHA_VERIFY_URL, data=payload)
+
+    def clean(self):
+        response = super().clean()
+        # TODO: Option to redirect failing captcha submissions to honeypot success page
+        if settings.RECAPTCHA_ENABLED:
+            recaptcha_response = self.data.get('g-recaptcha-response')
+            recaptcha_verify_response = self.verify_recaptcha(recaptcha_response)
+            recaptcha_result = recaptcha_verify_response.json()
+            if not recaptcha_result['success']:
+                self.add_error('recaptcha', forms.ValidationError(_("CAPTCHA failure.")))
+        return response
 
 
 # Reusable mixin for collecting all customer and payment data for the 2nd-phase form, used in reservations, joy rides,
@@ -491,7 +516,7 @@ class JoyRideDetailsForm(GuidedDriveBaseDetailsForm, forms.ModelForm):
         exclude = ('confirmation_code', 'status',)
 
 
-class JoyRidePaymentForm(PaymentFormMixin, CardFormMixin, JoyRideDetailsForm):
+class JoyRidePaymentForm(PaymentFormMixin, CardFormMixin, ReCAPTCHAFormMixin, JoyRideDetailsForm):
     form_type = 'payment'
 
     # customer_fields = (

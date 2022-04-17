@@ -26,6 +26,8 @@ customer_fields = (
 )
 
 
+# All 2-part forms (where the first phase collects the reservation details, and the second phase is either a login form
+# or a payment details/new user creation form depending on the email address given in the first phase) use this mixin.
 class PaymentLoginFormMixin:
 
     def get_payment_form_class(self):
@@ -53,7 +55,8 @@ class PaymentLoginFormMixin:
 
 
 # Mixin to get the resolved and authenticated customer from the reservation form, creating it new if necessary;
-# also to provide a consolidated post() method which creates a reservation of any type attached to the customer
+# also to provide a consolidated post() method which creates a reservation of any type attached to the customer.
+# ReCAPTCHA is checked in the form's clean() method provided by ReCAPTCHAFormMixin.
 class ReservationMixin:
 
     @staticmethod
