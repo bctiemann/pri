@@ -435,7 +435,7 @@ var refreshUI = function() {
         reserveValidateForm('newsletter', 'unsubscribe');
     });
     $('.subpay-complete-btn').off().click(function() {
-        reserveValidateForm('submitSubPay', 'payment');
+        reserveValidateForm('adhoc', 'payment');
     });
     $('.survey-complete-btn').off().click(function() {
         reserveValidateForm('submitSurvey', 'payment');

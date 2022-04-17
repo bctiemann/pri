@@ -104,22 +104,22 @@
         <img src="{% static "images/joyride.png" %}" />
     </div>
 
-    <form
-        method="POST"
-        name="reservation_form"
-        id="reservation_form"
-        {% if form_type == "login" %}
-            action="{% url "joy-ride-login" %}"
-        {% elif form_type == "payment" %}
-            action="{% url "joy-ride-payment" %}"
-        {% else %}
-            action="{% url "joy-ride" %}"
-        {% endif %}
-        onsubmit="return false;"
-        autocomplete="on"
-    >
+    <div class="reservation-form-sidebar">
 
-        <div class="reservation-form-sidebar">
+        <form
+            method="POST"
+            name="reservation_form"
+            id="reservation_form"
+            {% if form_type == "login" %}
+                action="{% url "joy-ride-login" %}"
+            {% elif form_type == "payment" %}
+                action="{% url "joy-ride-payment" %}"
+            {% else %}
+                action="{% url "joy-ride" %}"
+            {% endif %}
+            onsubmit="return false;"
+            autocomplete="on"
+        >
 
             {% if form.errors %}
             <cfif Len(formError) GT 0>
@@ -149,10 +149,10 @@
                 </div>
             {% endwith %}
 
-        </div>
+            {% csrf_token %}
+        </form>
 
-        {% csrf_token %}
-    </form>
+    </div>
 
     {% include "global_includes/vehicle_picker.html" %}
 

@@ -13,9 +13,9 @@ from sales.forms import (
     ReservationRentalDetailsForm, ReservationRentalPaymentForm, ReservationRentalLoginForm,
     PerformanceExperienceDetailsForm, PerformanceExperiencePaymentForm, PerformanceExperienceLoginForm,
     JoyRideDetailsForm, JoyRidePaymentForm, JoyRideLoginForm,
-    GiftCertificateForm,
+    GiftCertificateForm, AdHocPaymentForm
 )
-from sales.models import GiftCertificate, generate_code
+from sales.models import GiftCertificate, AdHocPayment, generate_code
 from sales.enums import ServiceType
 from marketing.views import NavMenuMixin
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
@@ -459,3 +459,21 @@ class GiftCertificateStatusView(NavMenuMixin, UpdateView):
             self.object = GiftCertificate.objects.get(tag=self.kwargs['tag'])
         except GiftCertificate.DoesNotExist:
             raise Http404
+
+
+# AdHoc Payments (SubPay)
+
+class AdHocPaymentView(NavMenuMixin, UpdateView):
+    template_name = 'front_site/payment/payment.html'
+    model = AdHocPayment
+    form_class = AdHocPaymentForm
+
+    def get_object(self, queryset=None):
+        try:
+            return AdHocPayment.objects.get(confirmation_code=self.kwargs['confirmation_code'])
+        except AdHocPayment.DoesNotExist:
+            raise Http404
+
+
+class AdHocPaymentDoneView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/payment/done.html'

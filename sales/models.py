@@ -55,9 +55,6 @@ class ConfirmationCodeMixin:
             raise IntegrityError('Failed to generate a unique confirmation code.')
 
     def save(self, *args, **kwargs):
-        self.coupon_code = self.coupon_code.upper()
-        if self.id:
-            self.final_price_data = json.loads(json.dumps(self.get_price_data(), cls=DjangoJSONEncoder))
         self.save_with_unique_confirmation_code(*args, **kwargs)
 
 
@@ -154,7 +151,7 @@ class BaseReservation(ConfirmationCodeMixin, models.Model):
     coupon_code = models.CharField(max_length=30, blank=True)
     is_military = models.BooleanField(default=False)
     deposit_amount = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
-    confirmation_code = models.CharField(max_length=10, blank=True, unique=True)
+    confirmation_code = models.CharField(max_length=10, blank=True, unique=True, db_index=True)
     app_channel = models.CharField(max_length=20, choices=AppChannel.choices, blank=True, default=AppChannel.WEB)
     delivery_required = models.BooleanField(default=False)
     delivery_zip = USZipCodeField(blank=True)
@@ -226,6 +223,11 @@ class BaseReservation(ConfirmationCodeMixin, models.Model):
             one_time_discount_pct=getattr(self, 'rental_discount_pct', None),
         )
         return price_calculator.get_price_data()
+
+    def save(self, *args, **kwargs):
+        self.coupon_code = self.coupon_code.upper()
+        if self.id:
+            self.final_price_data = json.loads(json.dumps(self.get_price_data(), cls=DjangoJSONEncoder))
 
     class Meta:
         abstract = False
@@ -342,7 +344,7 @@ class GuidedDrive(ConfirmationCodeMixin, models.Model):
     big_and_tall = models.BooleanField(default=False)
     coupon_code = models.CharField(max_length=30, blank=True)
     event_type = models.IntegerField(choices=EventType.choices, default=EventType.JOY_RIDE, blank=True)
-    confirmation_code = models.CharField(max_length=10, blank=True, unique=True)
+    confirmation_code = models.CharField(max_length=10, blank=True, unique=True, db_index=True)
     override_subtotal = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
     final_price_data = models.JSONField(null=True, blank=True)
 
@@ -367,6 +369,11 @@ class GuidedDrive(ConfirmationCodeMixin, models.Model):
         if self.coupon_code and self.requested_date:
             return Coupon.objects.filter(models.Q(end_date__isnull=True) | models.Q(end_date__gte=self.requested_date), code=self.coupon_code).first()
         return None
+
+    def save(self, *args, **kwargs):
+        self.coupon_code = self.coupon_code.upper()
+        if self.id:
+            self.final_price_data = json.loads(json.dumps(self.get_price_data(), cls=DjangoJSONEncoder))
 
     class Meta:
         abstract = True
@@ -551,7 +558,9 @@ class IPBan(models.Model):
         return self.cidr_address.network_address
 
 
-class AdHocPayment(models.Model):
+class AdHocPayment(ConfirmationCodeMixin, models.Model):
+    service_type = ServiceType.AD_HOC_PAYMENT.value
+
     full_name = models.CharField(max_length=100, blank=True)
     email = models.EmailField(blank=True)
     amount = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
@@ -575,6 +584,7 @@ class AdHocPayment(models.Model):
     phone = PhoneNumberField(blank=True, verbose_name='CC contact phone')
     foreign_region = models.CharField(max_length=100, blank=True)
     country = CountryField(blank=True, countries=AllCountries)
+    confirmation_code = models.CharField(max_length=10, blank=True, unique=True, db_index=True)
 
     def save(self, *args, **kwargs):
         self.cc_number = format_cc_number(self.cc_number)

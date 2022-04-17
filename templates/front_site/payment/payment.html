@@ -1,0 +1,209 @@
+{% extends "front_site/base.html" %}
+{% load static %}
+
+{% block page_title %}Substitute Payment{% endblock %}
+
+{% block content %}
+
+    <div class="reservation-pics-sidebar">
+        <img src="{% static "images/joyride.png" %}" />
+    </div>
+
+    <div class="reservation-form-sidebar">
+
+        <form
+            method="POST"
+            name="reservation_form"
+            id="reservation_form"
+            action="{% url "adhoc-payment" confirmation_code=adhocpayment.confirmation_code %}"
+            onsubmit="return false;"
+            autocomplete="on"
+        >
+
+            <cfoutput>
+
+            <cfif Len(formError) GT 0>
+            <div class="exception" id="subpay_form_error">
+                <h3>An error occurred</h3>
+                <p class="alert-message">#formError#</p>
+            </div>
+            </cfif>
+
+            <div id="subpay_payment">
+
+                <p class="reservation-info">
+                Substitute Payments are a method of submitting payment information to PRI in a manner that is
+                not otherwise covered by our reservation and purchasing system.
+                </p>
+
+                <p class="reservation-info">
+                Welcome, <CFOUTPUT>#subpay.fullname#</CFOUTPUT>! Please fill out the following required
+                information, and we'll process your payment. You will receive a confirmation email once your
+                payment is processed.
+                </p>
+
+                <p class="reservation-info">
+                <script src="https://siteseal.thawte.com/cgi/server/thawte_seal_generator.exe"></script>
+                </p>
+
+                <p class="reservation-info">
+                <small>For your protection, all sensitive information submitted to PRI is encrypted.</small>
+                </p>
+
+                <table class="inputform payment">
+                    <tr>
+                        <td>Your Name</td>
+                        <td>
+                            {{ form.full_name }}
+                            <cfinput name="fullname" value="#SubPay.fullname#" class="#StructKeyExists(fieldErrors,"fullname") ? 'field-error' : ''#" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Your Email</td>
+                        <td>
+                            {{ form.email }}
+                            <cfinput name="email" value="#SubPay.email#" class="#StructKeyExists(fieldErrors,"email") ? 'field-error' : ''#" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Contact Phone Number</td>
+                        <td><cfinput name="tel" value="#SubPay.tel#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"tel") ? 'field-error' : ''#" /></td>
+                    </tr>
+                    <tr>
+                        <td>Item</td>
+                        <td>
+                            #subpay.item#
+                            <cfinput type="hidden" name="item" value="#SubPay.item#">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Amount</td>
+                        <td>
+                            #NumberFormat(subpay.amount,"$,.__")#
+                            <cfinput type="hidden" name="amount" value="#SubPay.amount#">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="align-top">Additional Instructions</td>
+                        <td class="prefilled-text">
+                            #parseNewlines(SubPay.mesg)#
+                            <cfinput type="hidden" name="mesg" value="#SubPay.mesg#">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="align-top">Billing Address</td>
+                        <td><cftextarea name="addr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#SubPay.addr#</cftextarea></td>
+                    </tr>
+                    <tr>
+                        <td>Billing City</td>
+                        <td><cfinput name="city" value="#SubPay.city#" class="#StructKeyExists(fieldErrors,"city") ? 'field-error' : ''#" /></td>
+                    </tr>
+                    <tr>
+                        <td>Billing State</td>
+                        <td>
+                            <cfselect name="state" class="#StructKeyExists(fieldErrors,"state") ? 'field-error' : ''#">
+                                <cfloop array="#states#" index="state">
+                                    <option value="#state.abbr#" <CFIF SubPay.state IS state.abbr>selected</CFIF>>#state.name#</option>
+                                </cfloop>
+                            </cfselect>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Non-US State/Prov</td>
+                        <td><cfinput name="ostate" value="#SubPay.ostate#" maxlength="100" class="#StructKeyExists(fieldErrors,"ostate") ? 'field-error' : ''#" /></td>
+                    </tr>
+                    <tr>
+                        <td>Billing Zip</td>
+                        <td><cfinput name="zip" value="#SubPay.zip#" maxlength="10" class="#StructKeyExists(fieldErrors,"zip") ? 'field-error' : ''#" /></td>
+                    </tr>
+                    <tr>
+                        <td>Credit Card Number</td>
+                        <td><cfinput name="ccnum" value="#SubPay.ccnum#" maxlength="30" class="cc-field #StructKeyExists(fieldErrors,"ccnum") ? 'field-error' : ''#" /></td>
+                    </tr>
+                    <tr>
+                        <td>Credit Card Expiration</td>
+                        <td>
+                            <cfselect name="ccexpmo" class="#StructKeyExists(fieldErrors,"ccexpmo") ? 'field-error' : ''#">
+                                <option value="01" <cfif SubPay.ccexpmo IS "01">selected</cfif>>January (01)</option>
+                                <option value="02" <cfif SubPay.ccexpmo IS "02">selected</cfif>>February (02)</option>
+                                <option value="03" <cfif SubPay.ccexpmo IS "03">selected</cfif>>March (03)</option>
+                                <option value="04" <cfif SubPay.ccexpmo IS "04">selected</cfif>>April (04)</option>
+                                <option value="05" <cfif SubPay.ccexpmo IS "05">selected</cfif>>May (05)</option>
+                                <option value="06" <cfif SubPay.ccexpmo IS "06">selected</cfif>>June (06)</option>
+                                <option value="07" <cfif SubPay.ccexpmo IS "07">selected</cfif>>July (07)</option>
+                                <option value="08" <cfif SubPay.ccexpmo IS "08">selected</cfif>>August (08)</option>
+                                <option value="09" <cfif SubPay.ccexpmo IS "09">selected</cfif>>September (09)</option>
+                                <option value="10" <cfif SubPay.ccexpmo IS "10">selected</cfif>>October (10)</option>
+                                <option value="11" <cfif SubPay.ccexpmo IS "11">selected</cfif>>November (11)</option>
+                                <option value="12" <cfif SubPay.ccexpmo IS "12">selected</cfif>>December (12)</option>
+                            </cfselect> /
+
+                            <cfset tyear = #Dateformat(Now(),"yyyy")#>
+                            <cfset fyear = tyear+15>
+                            <cfset ynow=#LSDateFormat(Now(),"yyyy")#>
+                            <cfset ythen=(#ynow# + 11)>
+                            <cfset mnow=#LSDateFormat(Now(),"mm")#>
+                            <cfset dyear=ynow>
+                            <cfselect name="ccexpyr" class="#StructKeyExists(fieldErrors,"ccexpyr") ? 'field-error' : ''#">
+                                <cfoutput>
+                                <cfloop index="year" from="#ynow#" to="#ythen#">
+                                    <option value="#dyear#" <cfif SubPay.ccexpyr IS dyear>selected</cfif>>#dyear#</option>>
+                                    <cfset dyear = dyear + 1>
+                                </cfloop>
+                                </cfoutput>
+                            </cfselect>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>CVV</td>
+                        <td><cfinput name="cccvv" value="#SubPay.cccvv#" maxlength="5" class="#StructKeyExists(fieldErrors,"cccvv") ? 'field-error' : ''#" /></td>
+                    </tr>
+
+                    <tr>
+                        <td class="align-top">Additional Comments</td>
+                        <td><cftextarea name="comments"></cftextarea></td>
+                    </tr>
+                    <tr class="smallprint">
+                        <td></td>
+                        <td><small class="subtext">If you have any additional information, such as a shipping address or contact info, please enter it above.</small></td>
+                    </tr>
+
+                    <tr class="buttons">
+                        <td></td>
+                        <td>
+                            <button type="submit" name="payment_btn" class="btn subpay-complete-btn">Submit Payment</button>
+                            <div class="spinner next-form-spinner payment-spinner"></div>
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+
+            <div class="exception hidden" id="reservation_payment_error">
+                <h3>An error occurred</h3>
+                <p class="alert-message"></p>
+            </div>
+
+            </cfoutput>
+            {% comment %}
+            <cfinput type="hidden" name="subpid" value="#SubPay.subpid#" />
+            <cfinput type="hidden" name="reservation_type" value="subpay" />
+            {% endcomment %}
+            <input type="hidden" name="confirmation_code" value="{{ adhocpayment.confirmation_code }}" />
+            {% csrf_token %}
+        </form>
+
+        <cfcatch type="Any">
+            <div class="exception">
+                <cfoutput>
+                <h3>An error occurred</h3>
+                <p class="alert-message">#cfcatch.message#</p>
+                </cfoutput>
+            </div>
+        </cfcatch>
+    </cftry>
+
+    </div>
+
+{% endblock %}

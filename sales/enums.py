@@ -83,12 +83,14 @@ class ServiceType(models.TextChoices):
     PERFORMANCE_EXPERIENCE = ('perfexp', 'Performance Experience')
     JOY_RIDE = ('joyride', 'Joy Ride')
     GIFT_CERTIFICATE = ('giftcert', 'Gift Certificate')
+    AD_HOC_PAYMENT = ('subpay', 'Ad-hoc Payment')
 
 
 SERVICE_TYPE_CODE_MAP = {
     ServiceType.RENTAL.value: 'P',
     ServiceType.PERFORMANCE_EXPERIENCE.value: 'X',
     ServiceType.JOY_RIDE.value: 'Y',
+    ServiceType.AD_HOC_PAYMENT: 'Q',
 }
 
 CC_ERROR_PARAM_MAP = {

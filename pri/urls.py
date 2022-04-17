@@ -77,6 +77,9 @@ urlpatterns = [
     path('gift_certificate/', sales_views.GiftCertificateView.as_view(), name='gift-certificate'),
     path('gift_certificate/<str:tag>/', sales_views.GiftCertificateStatusView.as_view(), name='gift-certificate-status'),
 
+    path('payment/<str:confirmation_code>/', sales_views.AdHocPaymentView.as_view(), name='adhoc-payment'),
+    path('payment/<str:confirmation_code>/done/', sales_views.AdHocPaymentDoneView.as_view(), name='adhoc-payment-done'),
+
     path('newsletter/', marketing_views.NewsletterView.as_view(), name='newsletter'),
     path('newsletter/done/', marketing_views.NewsletterDoneView.as_view(), name='newsletter-done'),
     path('newsletter/confirm/', marketing_views.NewsletterSubscribeConfirmView.as_view(), name='newsletter-subscribe-confirm'),
@@ -115,6 +118,8 @@ urlpatterns = [
     path('api/validate/newsletter/unsubscribe/', api_views.ValidateNewsletterUnsubscriptionView.as_view(), name='validate-newsletter-unsubscribe'),
 
     path('api/validate/gift/payment/', api_views.ValidateGiftCertificateView.as_view(), name='validate-gift-certificate'),
+
+    path('api/validate/adhoc/payment/', api_views.ValidateAdHocPaymentView.as_view(), name='validate-adhoc-payment'),
 
     path('api/customers/search/', api_views.SearchCustomersView.as_view(), name='search-customers'),
     path('api/tax_rate/', api_views.TaxRateByZipView.as_view(), name='tax-rate-by-zip'),

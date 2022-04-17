@@ -14,7 +14,7 @@ from django.utils.translation import gettext_lazy as _, ngettext_lazy
 from django.contrib.auth import password_validation
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleStatus
-from sales.models import Reservation, Coupon, PerformanceExperience, JoyRide, GiftCertificate
+from sales.models import Reservation, Coupon, PerformanceExperience, JoyRide, GiftCertificate, AdHocPayment
 from users.models import Customer
 from sales.calculators import RentalPriceCalculator, PerformanceExperiencePriceCalculator, JoyRidePriceCalculator
 from sales.enums import get_service_hours, TRUE_FALSE_CHOICES, get_exp_year_choices, get_exp_month_choices, get_numeric_choices
@@ -636,4 +636,11 @@ class GiftCertificateForm(CSSClassMixin, CardFormMixin, forms.ModelForm):
 
     class Meta:
         model = GiftCertificate
+        fields = '__all__'
+
+
+class AdHocPaymentForm(forms.ModelForm):
+
+    class Meta:
+        model = AdHocPayment
         fields = '__all__'

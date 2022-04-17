@@ -25,11 +25,11 @@ from sales.forms import (
     ReservationRentalDetailsForm, ReservationRentalPaymentForm, ReservationRentalLoginForm,
     PerformanceExperienceDetailsForm, PerformanceExperiencePaymentForm, PerformanceExperienceLoginForm,
     JoyRideDetailsForm, JoyRidePaymentForm, JoyRideLoginForm,
-    GiftCertificateForm,
+    GiftCertificateForm, AdHocPaymentForm
 )
 from marketing.forms import NewsletterSubscribeForm, NewsletterUnsubscribeForm
 from customer_portal.forms import ReservationCustomerInfoForm
-from sales.models import BaseReservation, Reservation, Rental, TaxRate, generate_code
+from sales.models import BaseReservation, Reservation, Rental, TaxRate, AdHocPayment, generate_code
 from sales.tasks import send_email
 from sales.calculators import PriceCalculator
 from sales.enums import CC2_ERROR_PARAM_MAP, ServiceType
@@ -361,6 +361,40 @@ class ValidateGiftCertificateView(APIView):
             'errors_html': form.errors.as_ul(),
             'reservation_type': 'gift',
             'success_url': reverse('gift-certificate-status', kwargs={'tag': gift_certificate.tag}),
+        }
+        return Response(response)
+
+
+# Ad-hoc Payment
+
+class ValidateAdHocPaymentView(APIView):
+
+    form_type = None
+
+    def post(self, request):
+        # form_class = self._get_form_class()
+        payment = AdHocPayment.objects.get(confirmation_code=request.POST['confirmation_code'])
+        form_kwargs = {'instance': payment, 'data': request.POST}
+        form = AdHocPaymentForm(**form_kwargs)
+        print(form.data)
+        print(self.form_type)
+        print(form.is_valid())
+        print(form.errors.as_json())
+        if not form.is_valid():
+            return Response({
+                'success': False,
+                'errors': form.errors,
+            })
+
+        # TODO: Save AdHocPayment data
+        # adhoc_payment = form.save()
+
+        response = {
+            'success': form.is_valid(),
+            'errors': form.errors,
+            'errors_html': form.errors.as_ul(),
+            'reservation_type': 'gift',
+            'success_url': reverse('adhoc-payment-done', kwargs={'confirmation_code': form.instance.confirmation_code}),
         }
         return Response(response)
 
