@@ -27,7 +27,7 @@ from sales.forms import (
     JoyRideDetailsForm, JoyRidePaymentForm, JoyRideLoginForm,
     GiftCertificateForm,
 )
-from marketing.forms import NewsletterSubscribeForm
+from marketing.forms import NewsletterSubscribeForm, NewsletterUnsubscribeForm
 from customer_portal.forms import ReservationCustomerInfoForm
 from sales.models import BaseReservation, Reservation, Rental, TaxRate, generate_code
 from sales.tasks import send_email
@@ -252,6 +252,7 @@ class ValidatePerformanceExperienceLoginView(ValidatePerformanceExperiencePaymen
 
 # Newsletter
 
+# TODO: create subscribe_newsletter method in marketing.views, and call here and in NewsletterView
 class ValidateNewsletterSubscriptionView(APIView):
 
     # authentication_classes = ()
@@ -300,6 +301,34 @@ class ValidateNewsletterSubscriptionView(APIView):
             'errors': form.errors,
             'errors_html': form.errors.as_ul(),
             'success_url': reverse('newsletter-done'),
+        }
+        return Response(response)
+
+
+class ValidateNewsletterUnsubscriptionView(APIView):
+
+    form_type = None
+
+    # TODO: Unsubscribe here and in NewsletterUnsubscribeView
+    def post(self, request):
+        # form_class = self._get_form_class()
+        form = NewsletterUnsubscribeForm(request.POST)
+        # form = form_class(request.POST)
+        print(form.data)
+        print(self.form_type)
+        print(form.is_valid())
+        print(form.errors.as_json())
+        if not form.is_valid():
+            return Response({
+                'success': False,
+                'errors': form.errors,
+            })
+
+        response = {
+            'success': form.is_valid(),
+            'errors': form.errors,
+            'errors_html': form.errors.as_ul(),
+            'success_url': reverse('newsletter-unsubscribe-done'),
         }
         return Response(response)
 

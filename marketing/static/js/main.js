@@ -262,7 +262,7 @@ var reserveValidateForm = function(reservationType, section) {
             } else if (section === 'subscribe') {
                 window.location.href = data.success_url;
             } else if (section === 'unsubscribe') {
-
+                window.location.href = data.success_url;
             }
         } else {
             $('.' + section + ' .btn').prop('disabled', false);
@@ -432,7 +432,7 @@ var refreshUI = function() {
         reserveValidateForm('newsletter', 'subscribe');
     });
     $('.unsubscribe-complete-btn').off().click(function() {
-        reserveValidateForm('unsubscribeNewsletter', 'payment');
+        reserveValidateForm('newsletter', 'unsubscribe');
     });
     $('.subpay-complete-btn').off().click(function() {
         reserveValidateForm('submitSubPay', 'payment');

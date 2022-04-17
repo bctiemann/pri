@@ -9,3 +9,7 @@ class NewsletterSubscribeForm(ReCAPTCHAFormMixin, forms.ModelForm):
     class Meta:
         model = NewsletterSubscription
         fields = ('email', 'full_name',)
+
+
+class NewsletterUnsubscribeForm(forms.Form):
+    email = forms.EmailField()

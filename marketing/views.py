@@ -1,11 +1,11 @@
 from django.conf import settings
-from django.views.generic import TemplateView, FormView, CreateView
+from django.views.generic import TemplateView, FormView, CreateView, DeleteView
 from django.http import Http404
 from django.urls import reverse
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
-from marketing.models import NewsItem, SiteContent
-from marketing.forms import NewsletterSubscribeForm
+from marketing.models import NewsItem, SiteContent, NewsletterSubscription
+from marketing.forms import NewsletterSubscribeForm, NewsletterUnsubscribeForm
 
 
 # This mixin allows us to include the common query for cars and bikes into every view, for the nav menu
@@ -67,49 +67,6 @@ class VehicleView(NavMenuMixin, TemplateView):
         if not context['vehicle']:
             raise Http404
         return context
-
-
-class NewsletterView(NavMenuMixin, FormView):
-    template_name = 'front_site/newsletter.html'
-    form_class = NewsletterSubscribeForm
-
-    def form_valid(self, form):
-        result = super().form_valid(form)
-
-        # TODO: Save email on session as "newsletter_email" or some such
-
-        return result
-
-    # def get_context_data(self, slug=None, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context['recaptcha_site_key'] = settings.RECAPTCHA_SITE_KEY
-    #     return context
-
-    # If form is submitted without JS, just push to the success page as a honeypot
-    def get_success_url(self):
-        return reverse('newsletter-done')
-
-
-class NewsletterDoneView(NavMenuMixin, TemplateView):
-    template_name = 'front_site/newsletter_done.html'
-
-    # def get_context_data(self, slug=None, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context['recaptcha_site_key'] = settings.RECAPTCHA_SITE_KEY
-    #     return context
-
-
-# TODO: Newsletter confirm page and functionality
-class NewsletterConfirmView(NavMenuMixin, TemplateView):
-    template_name = 'front_site/newsletter_confirm.html'
-
-    # def get_context_data(self, slug=None, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context['recaptcha_site_key'] = settings.RECAPTCHA_SITE_KEY
-    #     return context
-
-
-# TODO: Newsletter unsubscribe view
 
 
 class ServicesView(NavMenuMixin, TemplateView):
@@ -190,3 +147,64 @@ class PrivacyPolicyView(NavMenuMixin, TemplateView):
 
 class MediaInquiriesView(NavMenuMixin, TemplateView):
     template_name = 'front_site/media.html'
+
+
+# Newsletter subscribe/unsubscribe views
+# These also handle no-JS functionality of form POSTs
+
+class NewsletterView(NavMenuMixin, FormView):
+    template_name = 'front_site/newsletter/subscribe.html'
+    form_class = NewsletterSubscribeForm
+
+    def form_valid(self, form):
+        result = super().form_valid(form)
+
+        # TODO: Save email on session as "newsletter_email" or some such, for user tracking/analytics
+
+        return result
+
+    # def get_context_data(self, slug=None, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['recaptcha_site_key'] = settings.RECAPTCHA_SITE_KEY
+    #     return context
+
+    # If form is submitted without JS, just push to the success page as a honeypot
+    def get_success_url(self):
+        return reverse('newsletter-done')
+
+
+class NewsletterDoneView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/newsletter/subscribe_done.html'
+
+    # def get_context_data(self, slug=None, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['recaptcha_site_key'] = settings.RECAPTCHA_SITE_KEY
+    #     return context
+
+
+# TODO: Newsletter confirm page and functionality
+class NewsletterSubscribeConfirmView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/newsletter/subscribe_confirm.html'
+
+    # def get_context_data(self, slug=None, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['recaptcha_site_key'] = settings.RECAPTCHA_SITE_KEY
+    #     return context
+
+
+class NewsletterUnsubscribeView(NavMenuMixin, FormView):
+    template_name = 'front_site/newsletter/unsubscribe.html'
+    form_class = NewsletterUnsubscribeForm
+    model = NewsletterSubscription
+
+    def form_valid(self, form):
+        result = super().form_valid(form)
+        return result
+
+    def get_success_url(self):
+        return reverse('newsletter-unsubscribe-done')
+
+
+class NewsletterUnsubscribeDoneView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/newsletter/unsubscribe_done.html'
+

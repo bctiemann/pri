@@ -79,7 +79,9 @@ urlpatterns = [
 
     path('newsletter/', marketing_views.NewsletterView.as_view(), name='newsletter'),
     path('newsletter/done/', marketing_views.NewsletterDoneView.as_view(), name='newsletter-done'),
-    path('newsletter/confirm/', marketing_views.NewsletterConfirmView.as_view(), name='newsletter-confirm'),
+    path('newsletter/confirm/', marketing_views.NewsletterSubscribeConfirmView.as_view(), name='newsletter-subscribe-confirm'),
+    path('newsletter/unsubscribe/', marketing_views.NewsletterUnsubscribeView.as_view(), name='newsletter-unsubscribe'),
+    path('newsletter/unsubscribe/done/', marketing_views.NewsletterUnsubscribeDoneView.as_view(), name='newsletter-unsubscribe-done'),
 
     path('services/', marketing_views.ServicesView.as_view(), name='services'),
     path('specials/', marketing_views.SpecialsView.as_view(), name='specials'),
@@ -110,6 +112,7 @@ urlpatterns = [
     path('api/validate/perfexp/login/', api_views.ValidatePerformanceExperienceLoginView.as_view(), name='validate-perfexp-login'),
 
     path('api/validate/newsletter/subscribe/', api_views.ValidateNewsletterSubscriptionView.as_view(), name='validate-newsletter-subscription'),
+    path('api/validate/newsletter/unsubscribe/', api_views.ValidateNewsletterUnsubscriptionView.as_view(), name='validate-newsletter-unsubscribe'),
 
     path('api/validate/gift/payment/', api_views.ValidateGiftCertificateView.as_view(), name='validate-gift-certificate'),
 

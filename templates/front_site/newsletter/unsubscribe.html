@@ -1,0 +1,53 @@
+{% extends "front_site/newsletter/subscribe.html" %}
+
+{% block newsletter_content %}
+
+    <form method="POST" name="reservation_form" id="reservation_form" action="{% url "newsletter-unsubscribe" %}" onsubmit="return false;" autocomplete="on">
+        <cfoutput>
+
+        {% if form.errors %}
+        <cfif Len(formError) GT 0>
+        <div class="exception" id="reservation_form_error">
+            <h3>An error occurred</h3>
+            <p class="alert-message">#formError#</p>
+        </div>
+        </cfif>
+        {% endif %}
+
+            <div id="subscribe_payment">
+
+                <p class="reservation-info">
+                If you'd like to unsubscribe from our newsletter, simply enter your address below.
+                </p>
+
+                <table class="inputform payment">
+                    <tr>
+                        <td>Your Email</td>
+                        <td>
+                            {{ form.email }}
+                            <cfinput name="email" value="#Newsletter.email#" class="#StructKeyExists(fieldErrors,"email") ? 'field-error' : ''#" />
+                        </td>
+                    </tr>
+
+                    <tr class="buttons">
+                        <td></td>
+                        <td>
+                            <button type="submit" name="unsubscribe_btn" class="btn unsubscribe-complete-btn">Unsubscribe</button>
+                            <div class="spinner next-form-spinner payment-spinner"></div>
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+
+        <div class="exception hidden" id="reservation_payment_error">
+            <h3>An error occurred</h3>
+            <p class="alert-message"></p>
+        </div>
+
+        </cfoutput>
+        <cfinput type="hidden" name="reservation_type" value="unsubscribe" />
+        {% csrf_token %}
+    </form>
+
+{% endblock %}
