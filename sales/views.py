@@ -97,6 +97,8 @@ class ReservationMixin:
         print(form.data)
         print(form.is_valid())
         print(form.errors.as_json())
+
+        # CAPTCHA is checked as part of the form validation; if that fails, errors are returned here
         if not form.is_valid():
             return {
                 'success': False,
@@ -104,6 +106,7 @@ class ReservationMixin:
             }
 
         # TODO: kill switch
+        # IP-based block list will send client to the honeypot success page and short-circuit all further processing
         kill_switch = False
         if kill_switch:
             return {

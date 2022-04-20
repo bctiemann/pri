@@ -48,8 +48,11 @@ class ReCAPTCHAFormMixin(forms.Form):
         # TODO: Option to redirect failing captcha submissions to honeypot success page
         if settings.RECAPTCHA_ENABLED:
             recaptcha_response = self.data.get('g-recaptcha-response')
-            recaptcha_verify_response = self.verify_recaptcha(recaptcha_response)
-            recaptcha_result = recaptcha_verify_response.json()
+            if recaptcha_response:
+                recaptcha_verify_response = self.verify_recaptcha(recaptcha_response)
+                recaptcha_result = recaptcha_verify_response.json()
+            else:
+                recaptcha_result = {'success': False}
             if not recaptcha_result['success']:
                 self.add_error('recaptcha', forms.ValidationError(_("CAPTCHA failure.")))
         return response
@@ -66,11 +69,6 @@ class PaymentFormMixin(CSSClassMixin, forms.Form):
     cc_fields = ('cc_number',)
     phone_fields = ('mobile_phone', 'work_phone', 'home_phone', 'fax', 'cc_phone',)
 
-    # TODO: Add these fields and let this be a Reservation form to avoid confusion
-    # customer_fields = (
-    #     'first_name', 'last_name', 'mobile_phone', 'home_phone', 'work_phone', 'fax', 'cc_number', 'cc_exp_yr',
-    #     'cc_exp_mo', 'cc_cvv', 'cc_phone', 'address_line_1', 'address_line_2', 'city', 'state', 'zip'
-    # )
     first_name = forms.CharField()
     last_name = forms.CharField()
     mobile_phone = PhoneNumberField(required=False)
@@ -85,45 +83,6 @@ class PaymentFormMixin(CSSClassMixin, forms.Form):
 
     password_new = forms.CharField(widget=forms.PasswordInput())
     password_repeat = forms.CharField(widget=forms.PasswordInput())
-
-    # EXP_MONTH_CHOICES = (
-    #     ('01', 'January (01)'),
-    #     ('02', 'February (02)'),
-    #     ('03', 'March (03)'),
-    #     ('04', 'April (04)'),
-    #     ('05', 'May (05)'),
-    #     ('06', 'June (06)'),
-    #     ('07', 'July (07)'),
-    #     ('08', 'August (08)'),
-    #     ('09', 'September (09)'),
-    #     ('10', 'October (10)'),
-    #     ('11', 'November (11)'),
-    #     ('12', 'December (12)'),
-    # )
-    # EXP_YEAR_CHOICES = ((year, year) for year in range(current_year, current_year + 11))
-
-    # first_name = forms.CharField()
-    # last_name = forms.CharField()
-    # mobile_phone = PhoneNumberField()
-    # home_phone = PhoneNumberField()
-    # work_phone = PhoneNumberField()
-    # fax = PhoneNumberField()
-    # cc_number = forms.CharField()
-    # cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices())
-    # cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices())
-    # cc_cvv = forms.CharField()
-    # cc_phone = PhoneNumberField()
-    # password = forms.CharField(widget=forms.PasswordInput(), required=False)
-
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-        # current_year = timezone.now().year
-        # self.fields['cc_exp_yr'].choices = get_exp_year_choices()
-        # self.fields['extra_miles'].choices = ((k, v['label']) for k, v in settings.EXTRA_MILES_PRICES.items())
-
-    # class Meta:
-    #     model = Customer
-    #     fields = '__all__'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -168,9 +127,12 @@ class ReservationRentalDetailsForm(forms.ModelForm):
 
     # It is not necessary to explicitly define form fields on this class if they are defined in the model class,
     # except to override certain default behaviors such as choice values or widget attributes. We must define
-    # additional fields here if they do not exist in the model referenced in Meta (Reservation).
+    # additional fields here if they do not exist in the model referenced in Meta (i.e. Reservation).
 
-    vehicle_marketing = forms.ModelChoiceField(widget=forms.HiddenInput(), queryset=VehicleMarketing.objects.filter(status=VehicleStatus.READY))
+    vehicle_marketing = forms.ModelChoiceField(
+        widget=forms.HiddenInput(),
+        queryset=VehicleMarketing.objects.filter(status=VehicleStatus.READY)
+    )
     out_date = forms.DateField(widget=forms.DateInput(
         attrs={'placeholder': 'MM/DD/YYYY', 'class': 'short'}),
         error_messages={'required': 'Please specify the date of the rental.'},
@@ -287,58 +249,6 @@ class ReservationRentalDetailsForm(forms.ModelForm):
     def tax_zip(self):
         return self.cleaned_data.get('delivery_zip') or settings.DEFAULT_TAX_ZIP
 
-    # @property
-    # def raw_cost(self):
-    #     return self.cleaned_data['vehicle_marketing'].price_per_day * self.num_days
-    #
-    # def coupon_discount(self, value):
-    #     if not self.discount:
-    #         coupon_code = self.cleaned_data['coupon_code']
-    #         if not coupon_code:
-    #             return 0
-    #         try:
-    #             self.discount = Coupon.objects.get(code=coupon_code)
-    #         except Discount.DoesNotExist:
-    #             return 0
-    #     return self.discount.get_discount_value(value)
-    #
-    # def customer_discount(self, value):
-    #     print(self.customer)
-    #     if self.customer:
-    #         return value * self.customer.discount_pct / 100
-    #     return 0
-    #
-    # @property
-    # def sales_tax(self):
-    #     return 0
-    #
-    # @property
-    # def subtotal(self):
-    #     subtotal = self.raw_cost
-    #     print(subtotal)
-    #
-    #     # Multi-day discount
-    #
-    #     # Coupon discount
-    #     coupon_discount = self.coupon_discount(subtotal)
-    #     subtotal -= coupon_discount
-    #     print(subtotal)
-    #
-    #     # Customer discount
-    #     customer_discount = self.customer_discount(subtotal)
-    #     subtotal -= customer_discount
-    #     print(subtotal)
-    #
-    #     # Extra miles
-    #
-    #     # Sales tax
-    #
-    #     return subtotal
-    #
-    # @property
-    # def total_with_tax(self):
-    #     return 0
-
     @property
     def price_data(self):
         if not self.is_bound:
@@ -354,55 +264,6 @@ class ReservationRentalDetailsForm(forms.ModelForm):
             is_military=self.cleaned_data.get('is_military'),
         )
         return price_calculator.get_price_data()
-        # subtotal = self.subtotal
-        # return dict(
-        #     rental_duration=self.rental_duration,
-        #     num_days=self.num_days,
-        #     sales_tax=self.sales_tax,
-        #     customer_id=None,
-        #     num_drivers=None,
-        #     total_cost_raw=self.raw_cost,
-        #     total_cost=None,
-        #     coupon_discount=self.coupon_discount(self.raw_cost),
-        #     customer_discount=self.customer_discount(self.raw_cost),
-        #     customer_discount_pct=None,
-        #     multi_day_discount=0,
-        #     multi_day_discount_pct=None,
-        #     extra_miles=None,
-        #     extra_miles_cost=0,
-        #     subtotal=self.subtotal,
-        #     total_with_tax=self.total_with_tax,
-        #     reservation_deposit=0,
-        #     tax_amount=0,
-        #     delivery=None,
-        #     deposit=0,
-        # )
-        """
-        <cfset numdays = (rental_duration - 1) / 24>
-
-        <cfset result['rental_duration'] = rental_duration>
-        <cfset result['salesTax'] = salesTax>
-        <cfset result['tax_rate'] = totalTax>
-        <cfset result['customerid'] = Customer.customerid>
-
-        <cfset result['numdays'] = Ceiling(numdays)>
-        <cfset result['numdrivers'] = IsDefined("drivers") ? drivers : "">
-        <cfset result['tcostRaw'] = tcostRaw>
-        <cfset result['tcost'] = tcost>
-        <cfset result['car_discount'] = ds1>
-        <cfset result['customer_discount'] = ds2>
-        <cfset result['customer_discount_pct'] = d2>
-        <cfset result['multi_day_discount_pct'] = dMultiDay>
-        <cfset result['multi_day_discount'] = dMultiDay ? (Round(tcostRaw * 100) - Round(tcost * 100)) / 100 : 0>
-        <cfset result['extra_miles'] = extramiles>
-        <cfset result['extra_miles_cost'] = xmi>
-        <cfset result['subtotal'] = s2>
-        <cfset result['total_w_tax'] = taxtot>
-        <cfset result['reservation_deposit'] = taxtot/2>
-        <cfset result['tax_amt'] = taxmt>
-        <cfset result['delivery'] = delivery>
-        <cfset result['deposit'] = VFront.deposit>
-        """
 
     class Meta:
         model = Reservation
@@ -410,16 +271,10 @@ class ReservationRentalDetailsForm(forms.ModelForm):
         exclude = ('confirmation_code', 'status',)
 
 
-# 2nd-phase form; extends ReservationRentalDetailsForm with Customer fields so it inherits all the first form's validations
+# 2nd-phase form; extends ReservationRentalDetailsForm (with PaymentFormMixin which includes all the Customer fields)
+# so it inherits all the first form's validations
 class ReservationRentalPaymentForm(PaymentFormMixin, CardFormMixin, ReservationRentalDetailsForm):
     form_type = 'payment'
-    # pass
-    # email = forms.EmailField(disabled=True)
-
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     self.fields['email'].disabled = True
-    #     self.fields['email'].widget.attrs['hidden'] = True
 
 
 # If the customer already exists, this form will be shown and processed instead of ReservationRentalPaymentForm
@@ -429,7 +284,7 @@ class ReservationRentalLoginForm(ReservationRentalDetailsForm):
     password = forms.CharField(widget=forms.PasswordInput(), required=False)
 
 
-# Joy Ride
+# GuidedDrive 1st-phase form; used for both Joy Ride and Performance Experience (both are subclassed below)
 
 class GuidedDriveBaseDetailsForm(forms.Form):
 
@@ -492,10 +347,21 @@ class GuidedDriveBaseDetailsForm(forms.Form):
 
     @property
     def price_data(self):
+        raise NotImplementedError
+
+
+# Joy Ride
+
+class JoyRideDetailsForm(GuidedDriveBaseDetailsForm, forms.ModelForm):
+    form_type = 'details'
+
+    num_minors = forms.TypedChoiceField(coerce=lambda x: int(x), choices=get_numeric_choices(min_val=0, max_val=4))
+
+    @property
+    def price_data(self):
+        if not self.is_bound:
+            return None
         price_calculator = JoyRidePriceCalculator(
-            # vehicle_marketing=self.cleaned_data['vehicle_marketing'],
-            # num_days=self.num_days,
-            # extra_miles=self.cleaned_data['extra_miles'],
             num_passengers=self.cleaned_data.get('num_passengers'),
             coupon_code=self.cleaned_data.get('coupon_code'),
             email=self.cleaned_data.get('email'),
@@ -505,12 +371,6 @@ class GuidedDriveBaseDetailsForm(forms.Form):
         )
         return price_calculator.get_price_data()
 
-
-class JoyRideDetailsForm(GuidedDriveBaseDetailsForm, forms.ModelForm):
-    form_type = 'details'
-
-    num_minors = forms.TypedChoiceField(coerce=lambda x: int(x), choices=get_numeric_choices(min_val=0, max_val=4))
-
     class Meta:
         model = JoyRide
         exclude = ('confirmation_code', 'status',)
@@ -518,35 +378,6 @@ class JoyRideDetailsForm(GuidedDriveBaseDetailsForm, forms.ModelForm):
 
 class JoyRidePaymentForm(PaymentFormMixin, CardFormMixin, ReCAPTCHAFormMixin, JoyRideDetailsForm):
     form_type = 'payment'
-
-    # customer_fields = (
-    #     'first_name', 'last_name', 'mobile_phone', 'home_phone', 'work_phone', 'fax', 'cc_number', 'cc_exp_yr',
-    #     'cc_exp_mo', 'cc_cvv', 'cc_phone', 'address_line_1', 'address_line_2', 'city', 'state', 'zip'
-    # )
-    # first_name = forms.CharField()
-    # last_name = forms.CharField()
-    # mobile_phone = PhoneNumberField(required=False)
-    # work_phone = PhoneNumberField(required=False)
-    # home_phone = PhoneNumberField(required=False)
-    # fax = PhoneNumberField(required=False)
-    # address_line_1 = forms.CharField()
-    # address_line_2 = forms.CharField(required=False)
-    # city = forms.CharField()
-    # state = USStateField(widget=USStateSelect())
-    # zip = USZipCodeField()
-    #
-    # password_new = forms.CharField(widget=forms.PasswordInput())
-    # password_repeat = forms.CharField(widget=forms.PasswordInput())
-    #
-    # cc_number = forms.CharField()
-    # cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices())
-    # cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices())
-    # cc_cvv = forms.CharField()
-    # cc_phone = PhoneNumberField()
-
-    # class Meta:
-    #     model = Customer
-    #     fields = '__all__'
 
 
 class JoyRideLoginForm(JoyRideDetailsForm):
@@ -581,10 +412,9 @@ class PerformanceExperienceDetailsForm(GuidedDriveBaseDetailsForm, forms.ModelFo
 
     @property
     def price_data(self):
+        if not self.is_bound:
+            return None
         price_calculator = PerformanceExperiencePriceCalculator(
-            # vehicle_marketing=self.cleaned_data['vehicle_marketing'],
-            # num_days=self.num_days,
-            # extra_miles=self.cleaned_data['extra_miles'],
             num_drivers=self.cleaned_data.get('num_drivers'),
             num_passengers=self.cleaned_data.get('num_passengers'),
             coupon_code=self.cleaned_data.get('coupon_code'),

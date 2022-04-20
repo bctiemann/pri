@@ -1,28 +1,31 @@
-{{ price_data }}
+{% load humanize %}
+
 <table class="price-breakdown small-item-data">
     <tr>
-        <td><span class="price-nopax"></span></td>
-        <td>$<span class="price-paxcost"></span></td>
+        <td><span class="price-nopax">{{ price_data.num_passengers }} passenger{{ price_data.num_passengers|pluralize }}</span></td>
+        <td>$<span class="price-paxcost">{{ price_data.passenger_cost|intcomma }}</span></td>
         <td></td>
     </tr>
+    {% if price_data.specific_discount %}
     <tr class="specific-discount">
-        <td><span class="price-specific-discount-label"></span></td>
-        <td>- $<span class="price-specific-discount"></span></td>
+        <td><span class="price-specific-discount-label">{{ price_data.specific_discount_label }}</span></td>
+        <td>- $<span class="price-specific-discount">{{ price_data.specific_discount|intcomma }}</span></td>
         <td></td>
     </tr>
+    {% endif %}
     <tr>
         <td>Subtotal</td>
-        <td>$<span class="price-subtotal"></span></td>
+        <td>$<span class="price-subtotal">{{ price_data.subtotal|intcomma }}</span></td>
         <td></td>
     </tr>
     <tr>
-        <td>Tax (<span class="price-tax-rate"></span>%)</td>
-        <td>$<span class="price-tax"></span></td>
+        <td>Tax (<span class="price-tax-rate">{{ price_data.tax_rate_as_percent }}</span>%)</td>
+        <td>$<span class="price-tax">{{ price_data.tax_amount|intcomma }}</span></td>
         <td></td>
     </tr>
     <tr class="total">
         <td>Total</td>
-        <td>$<span class="price-total"></span></td>
+        <td>$<span class="price-total">{{ price_data.total_with_tax|intcomma }}</span></td>
         <td></td>
     </tr>
 </table>

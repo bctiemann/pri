@@ -1,48 +1,50 @@
+{% load humanize %}
+
 <table class="price-breakdown small-item-data">
     <tr>
         <td>Rental total (<span class="price-numdays">{{ price_data.num_days }} day{{ price_data.num_days|pluralize }}</span>)</td>
-        <td>$<span class="price-rental-total">{{ price_data.base_price }}</span></td>
+        <td>$<span class="price-rental-total">{{ price_data.base_price|intcomma }}</span></td>
         <td></td>
     </tr>
     {% if price_data.multi_day_discount %}
     <tr class="multiday">
         <td>Multi-Day Discount (<span class="price-multi-day-discount-pct">{{ price_data.multi_day_discount_pct }}</span>%)</td>
-        <td>- $<span class="price-multi-day-discount">{{ price_data.multi_day_discount }}</span></td>
+        <td>- $<span class="price-multi-day-discount">{{ price_data.multi_day_discount|intcomma }}</span></td>
         <td></td>
     </tr>
     {% endif %}
     {% if price_data.specific_discount %}
     <tr class="specific-discount">
         <td><span class="price-specific-discount-label">{{ price_data.specific_discount_label }}</span></td>
-        <td>- $<span class="price-specific-discount">{{ price_data.specific_discount }}</span></td>
+        <td>- $<span class="price-specific-discount">{{ price_data.specific_discount|intcomma }}</span></td>
         <td></td>
     </tr>
     {% endif %}
     {% if price_data.extra_miles %}
     <tr>
         <td>Extra Miles (<span class="price-extra-miles">{{ price_data.extra_miles }}</span>)</td>
-        <td>$<span class="price-extra-miles-cost">{{ price_data.extra_miles_cost }}</span></td>
+        <td>$<span class="price-extra-miles-cost">{{ price_data.extra_miles_cost|intcomma }}</span></td>
         <td></td>
     </tr>
     {% endif %}
     <tr>
         <td>Subtotal</td>
-        <td>$<span class="price-subtotal">{{ price_data.subtotal }}</span></td>
+        <td>$<span class="price-subtotal">{{ price_data.subtotal|intcomma }}</span></td>
         <td></td>
     </tr>
     <tr>
         <td>Tax (<span class="price-tax-rate">{{ price_data.tax_rate_as_percent }}</span>%)</td>
-        <td>$<span class="price-tax">{{ price_data.tax_amount }}</span></td>
+        <td>$<span class="price-tax">{{ price_data.tax_amount|intcomma }}</span></td>
         <td></td>
     </tr>
     <tr class="total">
         <td>Total</td>
-        <td>$<span class="price-total">{{ price_data.total_with_tax }}</span></td>
+        <td>$<span class="price-total">{{ price_data.total_with_tax|intcomma }}</span></td>
         <td></td>
     </tr>
     <tr class="deposit">
         <td>Reservation Deposit</td>
-        <td>$<span class="price-reservation-deposit">{{ price_data.reservation_deposit }}</span></td>
+        <td>$<span class="price-reservation-deposit">{{ price_data.reservation_deposit|intcomma }}</span></td>
         <td class="tooltip" title="We will charge your card 50% of the rental total in order to secure your reservation. The remainder will be due at the time you receive the vehicle.">Amount to be charged now <span class="ui-icon ui-icon-info"></span></td>
     </tr>
     <tr class="smallprint">
@@ -52,7 +54,7 @@
     </tr>
     <tr class="security-deposit">
         <td>Security Deposit</td>
-        <td>$<span class="price-security-deposit">{{ vehicle.security_deposit }}</span></td>
+        <td>$<span class="price-security-deposit">{{ vehicle.security_deposit|intcomma }}</span></td>
         <td class="tooltip" title="We require a security deposit of some form of collateral with rentals of our vehicles. This typically is done by placing an authorization (&quot;hold&quot;) on a credit card. This hold is performed 1-2 days prior to the rental date, and is released right after the rental is over. If you would like to use different cards for your rental and your security deposit, you will be able to submit a card for the security deposit after you complete the reservation.">Refundable collateral amount <span class="ui-icon ui-icon-info"></span></td>
     </tr>
 </table>
