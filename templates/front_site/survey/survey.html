@@ -34,7 +34,7 @@
                 <cfthrow message="Thanks! We've already received your survey responses.">
             </cfif>
 
-            <cfform method="POST" name="reservation_form" action="survey.cfm" onsubmit="return false;" autocomplete="on">
+            <form method="POST" name="reservation_form" id="reservation_form" action="{% url "survey" tag=customer.survey_tag %}" 1onsubmit="return false;" autocomplete="on">
             <cfoutput>
 
             <cfif Len(formError) GT 0>
@@ -191,7 +191,8 @@
             </cfoutput>
             <cfinput type="hidden" name="c" value="#URL.c#" />
             <cfinput type="hidden" name="reservation_type" value="survey" />
-            </cfform>
+            {% csrf_token %}
+            </form>
 
             <cfcatch type="Any">
                 <div class="exception <cfif Survey.surveydone IS 1>alert</cfif>">

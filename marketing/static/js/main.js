@@ -437,9 +437,9 @@ var refreshUI = function() {
     $('.subpay-complete-btn').off().click(function() {
         reserveValidateForm('adhoc', 'payment');
     });
-    $('.survey-complete-btn').off().click(function() {
-        reserveValidateForm('submitSurvey', 'payment');
-    });
+    // $('.survey-complete-btn').off().click(function() {
+    //     reserveValidateForm('survey', 'submit');
+    // });
 }
 
 $('document').ready(function() {

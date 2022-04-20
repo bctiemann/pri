@@ -399,6 +399,21 @@ class ValidateAdHocPaymentView(APIView):
         return Response(response)
 
 
+class ValidateSurveyResponseView(APIView):
+
+    form_type = None
+
+    def post(self, request):
+        response = {
+            'success': form.is_valid(),
+            'errors': form.errors,
+            'errors_html': form.errors.as_ul(),
+            'reservation_type': 'gift',
+            'success_url': reverse('adhoc-payment-done', kwargs={'confirmation_code': form.instance.confirmation_code}),
+        }
+        return Response(response)
+
+
 # Consignment
 
 class ConsignmentReserveView(APIView):

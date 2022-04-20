@@ -17,6 +17,10 @@ class NewsletterUnsubscribeForm(forms.Form):
 
 class SurveyResponseForm(forms.ModelForm):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['general_rating'].empty_label = None
+
     class Meta:
         model = SurveyResponse
         fields = '__all__'

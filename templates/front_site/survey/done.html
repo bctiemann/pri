@@ -1,0 +1,28 @@
+{% extends "front_site/base.html" %}
+{% load static %}
+
+{% block page %}Customer Survey{% endblock %}
+
+{% block content %}
+
+    <div class="reservation-pics-sidebar">
+        <img src="{% static "images/survey1.jpg" %}" />
+        <img src="{% static "images/survey2.jpg" %}" />
+    </div>
+
+    <div class="reservation-form-sidebar">
+
+
+    <cfif IsDefined("URL.done")>
+
+        <h3>Thanks!</h3>
+
+        <p class="reservation-info">
+        Thank you for completing the customer survey!
+        </p>
+
+    <cfelse>
+
+    </cfif>
+
+{% endblock %}

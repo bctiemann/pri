@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.views.generic import TemplateView, FormView, CreateView, DeleteView, UpdateView
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse
 
 from users.models import Customer
@@ -215,6 +215,21 @@ class SurveyView(NavMenuMixin, UpdateView):
     model = SurveyResponse
     form_class = SurveyResponseForm
 
+    # get_object resolves to a Customer, but the form will be manually bound to a SurveyResponse object and saved
+    # in a customized form_valid rather than updating the Customer
     def get_object(self, queryset=None):
         email = Customer.survey_tag_to_email(self.kwargs['tag'])
         return Customer.objects.get(user__email=email)
+
+    def form_valid(self, form):
+        survey_response = self.model.objects.create(**form.cleaned_data)
+        survey_response.customer = self.object
+        survey_response.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('survey-done', kwargs={'tag': self.object.survey_tag})
+
+
+class SurveyDoneView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/survey/done.html'
