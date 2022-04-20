@@ -1,0 +1,198 @@
+{% extends "front_site/base.html" %}
+{% load static %}
+
+{% block page %}Customer Survey{% endblock %}
+
+{% block content %}
+
+    <div class="reservation-pics-sidebar">
+        <img src="{% static "images/survey1.jpg" %}" />
+        <img src="{% static "images/survey2.jpg" %}" />
+    </div>
+
+    <div class="reservation-form-sidebar">
+
+
+    <cfif IsDefined("URL.done")>
+
+        <h3>Thanks!</h3>
+
+        <p class="reservation-info">
+        Thank you for completing the customer survey!
+        </p>
+
+    <cfelse>
+
+        {{ customer }}
+        <cftry>
+
+            <cfif NOT IsDefined("Survey") OR Survey.recordCount IS NOT 1>
+                <cfthrow message="You seem to have followed an invalid link, or have not entered the URL completely. Please enter the survey URL exactly as specified.">
+            </cfif>
+
+            <cfif Survey.surveydone IS 1>
+                <cfthrow message="Thanks! We've already received your survey responses.">
+            </cfif>
+
+            <cfform method="POST" name="reservation_form" action="survey.cfm" onsubmit="return false;" autocomplete="on">
+            <cfoutput>
+
+            <cfif Len(formError) GT 0>
+            <div class="exception" id="survey_form_error">
+                <h3>An error occurred</h3>
+                <p class="alert-message">#formError#</p>
+            </div>
+            </cfif>
+
+            <div id="survey_payment">
+
+                <p class="reservation-info">
+                Welcome, <CFOUTPUT>#Survey.fname#!</CFOUTPUT> Please take a moment to answer the following ten questions. Upon completing the
+                survey, you will be elegible for an additional 5% discount<sup>1</sup> on future rentals.
+                </p>
+
+                <table class="inputform payment long-labels">
+                    <tr>
+                        <td class="align-top">How did you hear about us?</td>
+                        <td><cftextarea name="hearabout" cols="40" rows="4" wrap="virtual" maxlength="2000"></cftextarea></td>
+                    </tr>
+                    <tr>
+                        <td>How would you rate your overall experience with PRI?</td>
+                        <td>
+                            <cfselect name="prirating">
+                                <option value="5">Awesome!</option>
+                                <option value="4">Good</option>
+                                <option value="3">Average</option>
+                                <option value="2">Fair</option>
+                                <option value="1">Poor</option>
+                            </cfselect>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>How many times a year do you rent an exotic vehicle?</td>
+                        <td>
+                            <cfselect name="howmany">
+                                <option value="4">10+</option>
+                                <option value="3">5-10</option>
+                                <option value="2">2-5</option>
+                                <option value="1">This was my first</option>
+                            </cfselect>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>How would you rate your the vehicle you rented?</td>
+                        <td>
+                            <cfselect name="vehiclerating">
+                                <option value="5">Awesome!</option>
+                                <option value="4">Good</option>
+                                <option value="3">Average</option>
+                                <option value="2">Fair</option>
+                                <option value="1">Poor</option>
+                            </cfselect>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Would you recommend PRI to a friend or relative?</td>
+                        <td>
+                            <cfselect name="recommend">
+                                <option value="3">Yes</option>
+                                <option value="2">Maybe</option>
+                                <option value="1">No</option>
+                            </cfselect>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>How would you rate PRI's rental pricing as compares with other exotic rental companies?</td>
+                        <td>
+                            <cfselect name="pricing">
+                                <option value="5">Excellent Value</option>
+                                <option value="4">Good Value</option>
+                                <option value="3">Average</option>
+                                <option value="2">Somewhat High</option>
+                                <option value="1">Very High</option>
+                                <option value="0">No experience with other firms</option>
+                            </cfselect>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>How often would you like to receive emails about products and services from PRI?</td>
+                        <td>
+                            <cfselect name="email">
+                                <option value="5">Very often</option>
+                                <option value="4">A few times per month</option>
+                                <option value="3">Every month</option>
+                                <option value="2">A few times per year</option>
+                                <option value="1">Rarely or not at all</option>
+                            </cfselect>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>What types of vehicles are you primarily interested in?</td>
+                        <td>
+                            <cfselect name="types">
+                                <option value="7">Exotics (Ferrari, Lamborghini, etc)</option>
+                                <option value="6">Race Cars (Track Driving)</option>
+                                <option value="5">Sports Cars (Lotus, Corvette, etc)</option>
+                                <option value="4">Grand Touring Cars</option>
+                                <option value="3">Performance Luxury Cars</option>
+                                <option value="2">Muscle Cars</option>
+                                <option value="1">Modified/Custom Cars</option>
+                                <option value="8">Sportbikes</option>
+                                <option value="9">Touring bikes</option>
+                                <option value="10">Cruising bikes</option>
+                                <option value="11">Off-road bikes/Supermoto/Adventure</option>
+                            </cfselect>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="align-top">Are there any new vehicles you would like to see from PRI?</td>
+                        <td><cftextarea name="newvehicles"></cftextarea></td>
+                    </tr>
+                    <tr>
+                        <td class="align-top">Any other comments?</td>
+                        <td><cftextarea name="comments"></cftextarea></td>
+                    </tr>
+
+                    <tr class="buttons">
+                        <td></td>
+                        <td>
+                            <button type="submit" name="payment_btn" class="btn survey-complete-btn">Submit Responses</button>
+                            <div class="spinner next-form-spinner payment-spinner"></div>
+                        </td>
+                    </tr>
+                </table>
+
+                <small><sup>1</sup> Discounts may not be combined with any other discount. In the event of more than one discount
+                being applicable, you will receive the single largest applicable discount.</small>
+
+            </div>
+
+            <div class="exception hidden" id="reservation_payment_error">
+                <h3>An error occurred</h3>
+                <p class="alert-message"></p>
+            </div>
+
+            </cfoutput>
+            <cfinput type="hidden" name="c" value="#URL.c#" />
+            <cfinput type="hidden" name="reservation_type" value="survey" />
+            </cfform>
+
+            <cfcatch type="Any">
+                <div class="exception <cfif Survey.surveydone IS 1>alert</cfif>">
+                    <cfoutput>
+                    <h3>
+                    <cfif Survey.surveydone IS 1>
+                        Survey Completed
+                    <cfelse>
+                        An error occurred
+                    </cfif>
+                    </h3>
+                    <p class="alert-message">#cfcatch.message#</p>
+                    </cfoutput>
+                </div>
+            </cfcatch>
+        </cftry>
+
+    </cfif>
+
+{% endblock %}

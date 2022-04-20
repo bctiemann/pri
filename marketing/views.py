@@ -1,11 +1,12 @@
 from django.conf import settings
-from django.views.generic import TemplateView, FormView, CreateView, DeleteView
+from django.views.generic import TemplateView, FormView, CreateView, DeleteView, UpdateView
 from django.http import Http404
 from django.urls import reverse
 
+from users.models import Customer
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
-from marketing.models import NewsItem, SiteContent, NewsletterSubscription
-from marketing.forms import NewsletterSubscribeForm, NewsletterUnsubscribeForm
+from marketing.models import NewsItem, SiteContent, NewsletterSubscription, SurveyResponse
+from marketing.forms import NewsletterSubscribeForm, NewsletterUnsubscribeForm, SurveyResponseForm
 
 
 # This mixin allows us to include the common query for cars and bikes into every view, for the nav menu
@@ -208,3 +209,12 @@ class NewsletterUnsubscribeView(NavMenuMixin, FormView):
 class NewsletterUnsubscribeDoneView(NavMenuMixin, TemplateView):
     template_name = 'front_site/newsletter/unsubscribe_done.html'
 
+
+class SurveyView(NavMenuMixin, UpdateView):
+    template_name = 'front_site/survey/survey.html'
+    model = SurveyResponse
+    form_class = SurveyResponseForm
+
+    def get_object(self, queryset=None):
+        email = Customer.survey_tag_to_email(self.kwargs['tag'])
+        return Customer.objects.get(user__email=email)

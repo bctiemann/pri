@@ -86,6 +86,8 @@ urlpatterns = [
     path('newsletter/unsubscribe/', marketing_views.NewsletterUnsubscribeView.as_view(), name='newsletter-unsubscribe'),
     path('newsletter/unsubscribe/done/', marketing_views.NewsletterUnsubscribeDoneView.as_view(), name='newsletter-unsubscribe-done'),
 
+    path('survey/<str:tag>/', marketing_views.SurveyView.as_view(), name='survey'),
+
     path('services/', marketing_views.ServicesView.as_view(), name='services'),
     path('specials/', marketing_views.SpecialsView.as_view(), name='specials'),
     path('about/', marketing_views.AboutView.as_view(), name='about'),

@@ -11,10 +11,13 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, Permis
 from django.contrib.sessions.models import Session
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.urls import reverse
 
 from users.enums import AdminIdleTimeCSSClass
 from sales.utils import EncryptedUSSocialSecurityNumberField, format_cc_number
 from sales.stripe import Stripe
+from pri.cipher import AESCipher
+from sales.tasks import send_email
 
 stripe = Stripe()
 
@@ -415,6 +418,32 @@ class Customer(models.Model):
     @property
     def card_2(self):
         return self.card_set.filter(is_primary=False).first()
+
+    # Produces a base64-encoded and encrypted reversible hash of the email
+    def generate_survey_tag(self, key):
+        aes = AESCipher(key)
+        return aes.encrypt(self.email)
+
+    @classmethod
+    def survey_tag_to_email(cls, tag):
+        aes = AESCipher(settings.GLOBAL_KEY_LEGACY)
+        return aes.decrypt(tag, is_base64=True)
+
+    @property
+    def survey_tag(self):
+        return self.generate_survey_tag(settings.GLOBAL_KEY_LEGACY)
+
+    def send_survey_email(self):
+        email_subject = 'Performance Rentals Customer Survey'
+        email_context = {
+            'customer': self,
+            'survey_url': reverse('survey', kwargs={'tag': self.survey_tag})
+        }
+        send_email(
+            [self.email], email_subject, email_context,
+            text_template='front_site/email/customer_survey.txt',
+            html_template='front_site/email/customer_survey.html'
+        )
 
     def add_to_stripe(self):
         stripe_customer = stripe.add_stripe_customer(self.full_name, self.email, self.phone)

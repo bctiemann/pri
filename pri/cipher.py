@@ -18,8 +18,11 @@ class AESCipher(object):
         encoded = base64.b64encode(encrypted)
         return str(encoded, 'utf-8')
 
-    def decrypt(self, raw):
-        decoded = bytes.fromhex(raw)
+    def decrypt(self, raw, is_base64=False):
+        if is_base64:
+            decoded = base64.b64decode(raw)
+        else:
+            decoded = bytes.fromhex(raw)
         decrypted = self.cipher.decrypt(decoded)
         return self._remove_control_chars(str(self._unpad(decrypted), 'utf-8'))
 
