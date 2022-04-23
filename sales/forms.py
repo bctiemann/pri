@@ -484,4 +484,4 @@ class AdHocPaymentForm(CardFormMixin, CSSClassMixin, forms.ModelForm):
 
     class Meta:
         model = AdHocPayment
-        exclude = ('is_paid', 'is_submitted', 'item', 'amount', 'message',)
+        exclude = ('confirmation_code', 'is_paid', 'is_submitted', 'item', 'amount', 'message',)
