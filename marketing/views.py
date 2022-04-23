@@ -210,6 +210,8 @@ class NewsletterUnsubscribeDoneView(NavMenuMixin, TemplateView):
     template_name = 'front_site/newsletter/unsubscribe_done.html'
 
 
+# Survey views (unique link emailed to a recent customer for a followup; see Customer.send_survey_email)
+
 class SurveyView(NavMenuMixin, UpdateView):
     template_name = 'front_site/survey/survey.html'
     model = SurveyResponse
@@ -219,6 +221,8 @@ class SurveyView(NavMenuMixin, UpdateView):
     # in a customized form_valid rather than updating the Customer
     def get_object(self, queryset=None):
         email = Customer.survey_tag_to_email(self.kwargs['tag'])
+        if not email:
+            raise Http404
         return Customer.objects.get(user__email=email)
 
     def form_valid(self, form):

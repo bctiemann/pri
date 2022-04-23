@@ -4,6 +4,7 @@ from localflavor.us.models import USStateField, USZipCodeField, USSocialSecurity
 from phonenumber_field.modelfields import PhoneNumberField
 from encrypted_fields import fields
 from english_words import english_words_lower_set
+from binascii import Error as Base64Error
 
 from django.conf import settings
 from django.db import models
@@ -427,17 +428,28 @@ class Customer(models.Model):
     @classmethod
     def survey_tag_to_email(cls, tag):
         aes = AESCipher(settings.GLOBAL_KEY_LEGACY)
-        return aes.decrypt(tag, is_base64=True)
+        try:
+            return aes.decrypt(tag, is_base64=True)
+        except (Base64Error, ValueError):
+            # Handle any malformed survey tag strings
+            return None
 
     @property
     def survey_tag(self):
         return self.generate_survey_tag(settings.GLOBAL_KEY_LEGACY)
 
+    # Cron job calls this method to solicit a survey response from all recent customers who have survey_done=False
+    # TODO: Change survey_done to a DateTimeField and/or track multiple surveys per customer? Maybe unnecessary
     def send_survey_email(self):
         email_subject = 'Performance Rentals Customer Survey'
         email_context = {
             'customer': self,
-            'survey_url': reverse('survey', kwargs={'tag': self.survey_tag})
+            'survey_url': reverse('survey', kwargs={'tag': self.survey_tag}),
+            'site_url': settings.SERVER_BASE_URL,
+            'company_name': settings.COMPANY_NAME,
+            'company_phone': settings.COMPANY_PHONE,
+            'company_email': settings.SITE_EMAIL,
+            'survey_discount_pct': settings.SURVEY_DISCOUNT_PCT,
         }
         send_email(
             [self.email], email_subject, email_context,

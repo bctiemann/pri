@@ -1,13 +1,14 @@
 Dear {{ customer.full_name }},
 
-As a Performance Rentals customer, we would like to invite you to complete our customer satisfaction survey for your recent rental. It only takes a moment and will help us to develop our fleet and services based on your input!
+As a {{ company_name }} customer, we would like to invite you to complete our customer satisfaction survey for your
+recent rental. It only takes a moment and will help us to develop our fleet and services based on your input!
 
-As a thanks for completing the survey, we'll add a 5% discount to your next rental with us.
+As a thanks for completing the survey, we'll add a {{ survey_discount_pct }}% discount to your next rental with us.
 
 To take the survey, visit the following link:
 
-https://secure.performancerentals.us/survey.cfm?c={{ tag }}
+{{ site_url }}{{ survey_url }}
 
-If you have any questions, please feel free to call us at (866) 607-0084 or email info@performancerentals.us
+If you have any questions, please feel free to call us at {{ company_phone }} or email {{ company_email }}
 
 This e-mail has been automatically generated. Please do not reply to this address.
