@@ -256,8 +256,8 @@ var reserveValidateForm = function(reservationType, section) {
                 //     window.location.href = 'unsubscribe.cfm?done=1';
                 } else if (data.reservation_type == 'subpay') {
                     window.location.href = 'subpay.cfm?done=1';
-                } else if (data.reservation_type == 'survey') {
-                    window.location.href = 'survey.cfm?done=1';
+                // } else if (data.reservation_type == 'survey') {
+                //     window.location.href = 'survey.cfm?done=1';
                 }
             } else if (section === 'subscribe') {
                 window.location.href = data.success_url;

@@ -229,6 +229,8 @@ class SurveyView(NavMenuMixin, UpdateView):
         survey_response = self.model.objects.create(**form.cleaned_data)
         survey_response.customer = self.object
         survey_response.save()
+        self.object.survey_done = True
+        self.object.save()
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):

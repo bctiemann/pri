@@ -124,7 +124,7 @@ urlpatterns = [
 
     path('api/validate/adhoc/payment/', api_views.ValidateAdHocPaymentView.as_view(), name='validate-adhoc-payment'),
 
-    path('api/validate/survey/submit/', api_views.ValidateAdHocPaymentView.as_view(), name='validate-adhoc-payment'),
+    # path('api/validate/survey/submit/', api_views.ValidateAdHocPaymentView.as_view(), name='validate-adhoc-payment'),
 
     path('api/customers/search/', api_views.SearchCustomersView.as_view(), name='search-customers'),
     path('api/tax_rate/', api_views.TaxRateByZipView.as_view(), name='tax-rate-by-zip'),
