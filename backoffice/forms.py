@@ -24,13 +24,27 @@ from marketing.utils import RECIPIENT_CLASS_METHOD_MAP, RECIPIENT_CLASS_LABEL_MA
 
 
 class CSSClassMixin:
+    cc_fields = ()
+    phone_fields = ()
+    short_fields = ()
 
     def add_widget_css_class(self, field, css_class_name):
+        if not self.fields.get(field):
+            return
         widget_css_class = self.fields[field].widget.attrs.get('class')
         widget_css_classes = widget_css_class.split(' ') if widget_css_class else []
         widget_css_classes.append(css_class_name)
         css_class_string = ' '.join(list(set(widget_css_classes)))
         self.fields[field].widget.attrs['class'] = css_class_string
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.cc_fields:
+            self.add_widget_css_class(field, 'cc-field')
+        for field in self.phone_fields:
+            self.add_widget_css_class(field, 'phone')
+        for field in self.short_fields:
+            self.add_widget_css_class(field, 'short')
 
 
 class CustomerSearchMixin:
@@ -60,18 +74,21 @@ class CustomerSearchMixin:
 # TODO: Add slug to the visible form fields and set on both models
 
 class VehicleForm(CSSClassMixin, forms.ModelForm):
+    phone_fields = ('policy_phone',)
+    short_fields = ('year', 'plate', 'mileage',)
+
     external_owner = forms.ModelChoiceField(queryset=Consigner.objects.all(), empty_label='PRI', required=False)
     toll_tag = forms.ModelChoiceField(queryset=TollTag.objects.all(), required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.add_widget_css_class('policy_phone', 'phone')
-
-        for field in [
-            'year', 'plate', 'mileage',
-        ]:
-            self.add_widget_css_class(field, 'short')
+        # self.add_widget_css_class('policy_phone', 'phone')
+        #
+        # for field in [
+        #     'year', 'plate', 'mileage',
+        # ]:
+        #     self.add_widget_css_class(field, 'short')
 
         self.fields['toll_tag'].initial = TollTag.objects.filter(vehicle=self.instance).first()
 
@@ -81,6 +98,10 @@ class VehicleForm(CSSClassMixin, forms.ModelForm):
 
 
 class VehicleMarketingForm(CSSClassMixin, forms.ModelForm):
+    short_fields = (
+        'horsepower', 'torque', 'top_speed', 'gears', 'price_per_day',
+        'discount_2_day', 'discount_3_day', 'discount_7_day', 'security_deposit', 'miles_included',
+    )
 
     WEIGHTING_CHOICES = (
         (0, '0 - Normal'),
@@ -92,14 +113,14 @@ class VehicleMarketingForm(CSSClassMixin, forms.ModelForm):
     tight_fit = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
     weighting = forms.ChoiceField(choices=WEIGHTING_CHOICES)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        for field in [
-            'horsepower', 'torque', 'top_speed', 'gears', 'price_per_day',
-            'discount_2_day', 'discount_3_day', 'discount_7_day', 'security_deposit', 'miles_included',
-        ]:
-            self.add_widget_css_class(field, 'short')
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #
+    #     for field in [
+    #         'horsepower', 'torque', 'top_speed', 'gears', 'price_per_day',
+    #         'discount_2_day', 'discount_3_day', 'discount_7_day', 'security_deposit', 'miles_included',
+    #     ]:
+    #         self.add_widget_css_class(field, 'short')
 
     class Meta:
         model = VehicleMarketing
@@ -178,6 +199,7 @@ class ReservationDateTimeMixin:
 
 
 class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, CustomerSearchMixin, forms.ModelForm):
+    short_fields = ('drivers', 'delivery_zip', 'tax_percent', 'miles_included', 'coupon_code',)
 
     customer = forms.ModelChoiceField(queryset=Customer.objects.all(), widget=forms.HiddenInput())
     reservation = forms.IntegerField(widget=forms.HiddenInput(), required=False)
@@ -210,8 +232,8 @@ class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, CustomerSearchMix
 
         self.init_reservation_date_time()
 
-        for field in ['drivers', 'delivery_zip', 'tax_percent', 'miles_included', 'coupon_code']:
-            self.add_widget_css_class(field, 'short')
+        # for field in ['drivers', 'delivery_zip', 'tax_percent', 'miles_included', 'coupon_code']:
+        #     self.add_widget_css_class(field, 'short')
 
         # self.fields['tax_percent'].initial = decimal.Decimal(settings.DEFAULT_TAX_RATE) * 100
         if self.instance.id:
@@ -225,6 +247,11 @@ class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, CustomerSearchMix
 
 
 class RentalForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):
+    short_fields = (
+        'delivery_zip', 'miles_included', 'mileage_out', 'mileage_back', 'coupon_code',
+        'deposit_amount', 'deposit_charged_on', 'deposit_refund_amount', 'deposit_refunded_on',
+        'rental_discount_pct', 'tax_percent'
+    )
 
     out_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
     out_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
@@ -249,12 +276,12 @@ class RentalForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):
             if self.instance.status == Rental.Status.COMPLETE:
                 self.add_widget_css_class(field, 'dont-edit')
 
-        for field in [
-            'delivery_zip', 'miles_included', 'mileage_out', 'mileage_back', 'coupon_code',
-            'deposit_amount', 'deposit_charged_on', 'deposit_refund_amount', 'deposit_refunded_on',
-            'rental_discount_pct', 'tax_percent'
-        ]:
-            self.add_widget_css_class(field, 'short')
+        # for field in [
+        #     'delivery_zip', 'miles_included', 'mileage_out', 'mileage_back', 'coupon_code',
+        #     'deposit_amount', 'deposit_charged_on', 'deposit_refund_amount', 'deposit_refunded_on',
+        #     'rental_discount_pct', 'tax_percent'
+        # ]:
+        #     self.add_widget_css_class(field, 'short')
 
         self.fields['tax_percent'].initial = self.instance.get_price_data()['tax_rate'] * 100
         self.fields['override_subtotal'].widget.attrs['placeholder'] = 'Override'
@@ -295,13 +322,12 @@ class EmployeeForm(forms.ModelForm):
 
 
 class CardForm(CSSClassMixin, forms.ModelForm):
+    cc_fields = ('number',)
 
-    cc_fields = ['number']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.cc_fields:
-            self.fields[field].widget.attrs['class'] = 'cc-field'
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     for field in self.cc_fields:
+    #         self.fields[field].widget.attrs['class'] = 'cc-field'
 
     class Meta:
         model = Card
@@ -310,6 +336,9 @@ class CardForm(CSSClassMixin, forms.ModelForm):
 
 
 class CustomerForm(CSSClassMixin, forms.ModelForm):
+    cc_fields = ('cc_number', 'cc2_number',)
+    phone_fields = ('home_phone', 'work_phone', 'mobile_phone', 'fax', 'insurance_company_phone', 'cc_phone', 'cc2_phone',)
+    short_fields = ('zip', 'fax', 'insurance_company_phone', 'discount_pct', 'cc_cvv', 'cc_phone', 'cc2_cvv', 'cc2_phone',)
 
     email = forms.EmailField(required=True)
     receive_email = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
@@ -335,18 +364,18 @@ class CustomerForm(CSSClassMixin, forms.ModelForm):
 
         if self.instance.user:
             self.fields['email'].initial = self.instance.user.email
-        phone_fields = ['home_phone', 'work_phone', 'mobile_phone', 'fax', 'insurance_company_phone', 'cc_phone', 'cc2_phone']
-        for field in phone_fields:
-            self.fields[field].widget.attrs['class'] = 'phone'
-        cc_fields = ['cc_number', 'cc2_number']
-        for field in cc_fields:
-            self.fields[field].widget.attrs['class'] = 'cc-field'
-        short_fields = [
-            'zip', 'fax', 'insurance_company_phone', 'discount_pct',
-            'cc_cvv', 'cc_phone', 'cc2_cvv', 'cc2_phone',
-        ]
-        for field in short_fields:
-            self.add_widget_css_class(field, 'short')
+        # phone_fields = ['home_phone', 'work_phone', 'mobile_phone', 'fax', 'insurance_company_phone', 'cc_phone', 'cc2_phone']
+        # for field in phone_fields:
+        #     self.fields[field].widget.attrs['class'] = 'phone'
+        # cc_fields = ['cc_number', 'cc2_number']
+        # for field in cc_fields:
+        #     self.fields[field].widget.attrs['class'] = 'cc-field'
+        # short_fields = [
+        #     'zip', 'fax', 'insurance_company_phone', 'discount_pct',
+        #     'cc_cvv', 'cc_phone', 'cc2_cvv', 'cc2_phone',
+        # ]
+        # for field in short_fields:
+        #     self.add_widget_css_class(field, 'short')
 
         # Set initial values on CC fields from linked Card models
         if self.instance.card_1:
@@ -412,7 +441,10 @@ class CouponForm(forms.ModelForm):
         fields = '__all__'
 
 
-class AdHocPaymentForm(forms.ModelForm):
+class AdHocPaymentForm(CSSClassMixin, forms.ModelForm):
+    cc_fields = ('cc_number',)
+    phone_fields = ('phone',)
+
     is_paid = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
     is_submitted = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
 
@@ -424,7 +456,7 @@ class AdHocPaymentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['cc_number'].widget.attrs['class'] = 'cc-field'
+        # self.fields['cc_number'].widget.attrs['class'] = 'cc-field'
 
         # Set initial values on CC fields from linked Card models
         if self.instance.card:
@@ -436,7 +468,7 @@ class AdHocPaymentForm(forms.ModelForm):
     class Meta:
         model = AdHocPayment
         # fields = '__all__'
-        exclude = ('submitted_at', 'is_submitted', 'paid_at', 'is_paid', 'card',)
+        exclude = ('submitted_at', 'paid_at', 'card', 'confirmation_code',)
 
 
 class TollTagForm(forms.ModelForm):
@@ -452,14 +484,16 @@ class TollTagForm(forms.ModelForm):
 
 
 class TaxRateForm(CSSClassMixin, forms.ModelForm):
+    short_fields = ('postal_code', 'total_rate_as_percent',)
+
     total_rate_as_percent = forms.DecimalField()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.fields['total_rate_as_percent'].initial = self.instance.total_rate_as_percent
-        for field in ['postal_code', 'total_rate_as_percent']:
-            self.add_widget_css_class(field, 'short')
+        # for field in ['postal_code', 'total_rate_as_percent']:
+        #     self.add_widget_css_class(field, 'short')
 
     class Meta:
         model = TaxRate
@@ -474,6 +508,9 @@ class TaxRateForm(CSSClassMixin, forms.ModelForm):
 
 
 class GuidedDriveForm(CSSClassMixin, CustomerSearchMixin, forms.ModelForm):
+    short_fields = (
+        'requested_date_picker', 'backup_date_picker', 'num_drivers', 'num_passengers', 'num_minors', 'coupon_code',
+    )
 
     requested_date_picker = forms.DateField(required=False)
     backup_date_picker = forms.DateField(required=False)
@@ -499,14 +536,14 @@ class GuidedDriveForm(CSSClassMixin, CustomerSearchMixin, forms.ModelForm):
             self.fields['backup_date_picker'].initial = self.instance.backup_date.strftime('%m/%d/%Y')
         self.fields['override_subtotal'].widget.attrs['placeholder'] = 'Override'
 
-        short_fields = [
-            'requested_date_picker', 'backup_date_picker', 'num_drivers', 'num_passengers', 'num_minors', 'coupon_code'
-        ]
-        for field in short_fields:
-            try:
-                self.add_widget_css_class(field, 'short')
-            except KeyError:
-                pass
+        # short_fields = [
+        #     'requested_date_picker', 'backup_date_picker', 'num_drivers', 'num_passengers', 'num_minors', 'coupon_code'
+        # ]
+        # for field in short_fields:
+        #     try:
+        #         self.add_widget_css_class(field, 'short')
+        #     except KeyError:
+        #         pass
 
         self.style_customer_search_fields()
 
@@ -541,6 +578,7 @@ class ConsignerForm(forms.ModelForm):
 
 
 class ConsignmentPaymentForm(CSSClassMixin, forms.ModelForm):
+    short_fields = ('amount', 'paid_on_picker',)
 
     paid_on_picker = forms.DateField(required=False)
 
@@ -550,11 +588,11 @@ class ConsignmentPaymentForm(CSSClassMixin, forms.ModelForm):
         if self.instance.paid_at:
             self.fields['paid_on_picker'].initial = self.instance.paid_at.strftime('%m/%d/%Y')
 
-        short_fields = [
-            'amount', 'paid_on_picker'
-        ]
-        for field in short_fields:
-            self.add_widget_css_class(field, 'short')
+        # short_fields = [
+        #     'amount', 'paid_on_picker'
+        # ]
+        # for field in short_fields:
+        #     self.add_widget_css_class(field, 'short')
 
     def clean(self):
         super().clean()
@@ -582,7 +620,10 @@ class SiteContentForm(forms.ModelForm):
         exclude = ('page', 'name',)
 
 
-class GiftCertificateForm(forms.ModelForm):
+class GiftCertificateForm(CSSClassMixin, forms.ModelForm):
+    cc_fields = ('cc_number',)
+    phone_fields = ('cc_phone',)
+
     is_paid = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
     is_used = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
 
@@ -596,7 +637,7 @@ class GiftCertificateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['cc_number'].widget.attrs['class'] = 'cc-field'
+        # self.fields['cc_number'].widget.attrs['class'] = 'cc-field'
 
         # Set initial values on CC fields from linked Card models
         if self.instance.card:
@@ -613,7 +654,13 @@ class GiftCertificateForm(forms.ModelForm):
         exclude = ('tag', 'card',)
 
 
-class StripeChargeForm(forms.ModelForm):
+class StripeChargeForm(CSSClassMixin, forms.ModelForm):
+    cc_fields = ('cc_number',)
+    phone_fields = ('phone',)
+    short_fields = (
+        'zip', 'home_phone', 'mobile_phone', 'work_phone', 'fax', 'insurance_company_phone', 'discount_pct',
+        'cc_cvv', 'cc_phone', 'cc2_cvv', 'cc2_phone',
+    )
 
     CHARGE_TYPE_CHOICES = (
         (True, 'Charge'),
@@ -630,12 +677,12 @@ class StripeChargeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['phone'].widget.attrs['class'] = 'phone'
-        self.fields['cc_number'].widget.attrs['class'] = 'cc-field'
-        short_fields = [
-            'zip', 'home_phone', 'mobile_phone', 'work_phone', 'fax', 'insurance_company_phone', 'discount_pct',
-            'cc_cvv', 'cc_phone', 'cc2_cvv', 'cc2_phone',
-        ]
+        # self.fields['phone'].widget.attrs['class'] = 'phone'
+        # self.fields['cc_number'].widget.attrs['class'] = 'cc-field'
+        # short_fields = [
+        #     'zip', 'home_phone', 'mobile_phone', 'work_phone', 'fax', 'insurance_company_phone', 'discount_pct',
+        #     'cc_cvv', 'cc_phone', 'cc2_cvv', 'cc2_phone',
+        # ]
         # for field in short_fields:
         #     self.add_widget_css_class(field, 'short')
 
@@ -689,6 +736,7 @@ class IPBanForm(forms.ModelForm):
 
 
 class DamageForm(CSSClassMixin, forms.ModelForm):
+    short_fields = ('damaged_on', 'repaired_on', 'cost', 'customer_billed_amount', 'customer_paid_amount',)
 
     damaged_on = forms.DateField(widget=forms.DateInput(), required=False)
     repaired_on = forms.DateField(widget=forms.DateInput(), required=False)
@@ -707,11 +755,11 @@ class DamageForm(CSSClassMixin, forms.ModelForm):
             repaired_at_localized = self.instance.repaired_at.astimezone(pytz.timezone(settings.TIME_ZONE))
             self.fields['repaired_on'].initial = repaired_at_localized.strftime('%m/%d/%Y')
 
-        short_fields = [
-            'damaged_on', 'repaired_on', 'cost', 'customer_billed_amount', 'customer_paid_amount',
-        ]
-        for field in short_fields:
-            self.add_widget_css_class(field, 'short')
+        # short_fields = [
+        #     'damaged_on', 'repaired_on', 'cost', 'customer_billed_amount', 'customer_paid_amount',
+        # ]
+        # for field in short_fields:
+        #     self.add_widget_css_class(field, 'short')
 
     def clean(self):
         super().clean()
@@ -725,6 +773,7 @@ class DamageForm(CSSClassMixin, forms.ModelForm):
 
 
 class ScheduledServiceForm(CSSClassMixin, forms.ModelForm):
+    short_fields = ('done_on', 'done_mileage', 'next_on', 'next_mileage',)
 
     done_on = forms.DateField(widget=forms.DateInput(), required=False)
     next_on = forms.DateField(widget=forms.DateInput(), required=False)
@@ -741,11 +790,11 @@ class ScheduledServiceForm(CSSClassMixin, forms.ModelForm):
             next_at_localized = self.instance.next_at.astimezone(pytz.timezone(settings.TIME_ZONE))
             self.fields['next_on'].initial = next_at_localized.strftime('%m/%d/%Y')
 
-        short_fields = [
-            'done_on', 'done_mileage', 'next_on', 'next_mileage',
-        ]
-        for field in short_fields:
-            self.add_widget_css_class(field, 'short')
+        # short_fields = [
+        #     'done_on', 'done_mileage', 'next_on', 'next_mileage',
+        # ]
+        # for field in short_fields:
+        #     self.add_widget_css_class(field, 'short')
 
     def clean(self):
         super().clean()
@@ -759,6 +808,7 @@ class ScheduledServiceForm(CSSClassMixin, forms.ModelForm):
 
 
 class IncidentalServiceForm(CSSClassMixin, forms.ModelForm):
+    short_fields = ('done_on', 'mileage',)
 
     done_on = forms.DateField(widget=forms.DateInput(), required=False)
 
@@ -770,11 +820,11 @@ class IncidentalServiceForm(CSSClassMixin, forms.ModelForm):
             done_at_localized = self.instance.done_at.astimezone(pytz.timezone(settings.TIME_ZONE))
             self.fields['done_on'].initial = done_at_localized.strftime('%m/%d/%Y')
 
-        short_fields = [
-            'done_on', 'mileage',
-        ]
-        for field in short_fields:
-            self.add_widget_css_class(field, 'short')
+        # short_fields = [
+        #     'done_on', 'mileage',
+        # ]
+        # for field in short_fields:
+        #     self.add_widget_css_class(field, 'short')
 
     def clean(self):
         super().clean()

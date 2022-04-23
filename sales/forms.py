@@ -84,12 +84,12 @@ class PaymentFormMixin(CSSClassMixin, forms.Form):
     password_new = forms.CharField(widget=forms.PasswordInput())
     password_repeat = forms.CharField(widget=forms.PasswordInput())
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.cc_fields:
-            self.add_widget_css_class(field, 'cc-field')
-        for field in self.phone_fields:
-            self.add_widget_css_class(field, 'phone')
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     for field in self.cc_fields:
+    #         self.add_widget_css_class(field, 'cc-field')
+    #     for field in self.phone_fields:
+    #         self.add_widget_css_class(field, 'phone')
 
     def clean_password_repeat(self):
         password1 = self.cleaned_data.get('password_new')
@@ -457,20 +457,31 @@ class GiftCertificateForm(CSSClassMixin, CardFormMixin, forms.ModelForm):
     amount = forms.TypedChoiceField(coerce=lambda x: int(x), choices=AMOUNT_CHOICES)
     message = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': '(Optional)'}))
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.cc_fields:
-            self.add_widget_css_class(field, 'cc-field')
-        for field in self.phone_fields:
-            self.add_widget_css_class(field, 'phone')
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     for field in self.cc_fields:
+    #         self.add_widget_css_class(field, 'cc-field')
+    #     for field in self.phone_fields:
+    #         self.add_widget_css_class(field, 'phone')
 
     class Meta:
         model = GiftCertificate
         fields = '__all__'
 
 
-class AdHocPaymentForm(forms.ModelForm):
+class AdHocPaymentForm(CardFormMixin, CSSClassMixin, forms.ModelForm):
+    cc_fields = ('cc_number',)
+    phone_fields = ('phone',)
+
+    cc_phone = PhoneNumberField(required=False)
+
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     for field in self.cc_fields:
+    #         self.add_widget_css_class(field, 'cc-field')
+    #     for field in self.phone_fields:
+    #         self.add_widget_css_class(field, 'phone')
 
     class Meta:
         model = AdHocPayment
-        fields = '__all__'
+        exclude = ('is_paid', 'is_submitted', 'item', 'amount', 'message',)

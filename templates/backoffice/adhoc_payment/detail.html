@@ -18,6 +18,11 @@
     <table class="inputform adhocpayments">
         <cfif subpid GT 0>
         <tr>
+            <tr>
+                <td>Conf Code</td>
+                <td>{{ adhocpayment.confirmation_code }}
+                </td>
+            </tr>
             <td>Is Paid</td>
             <td>
                 {{ form.is_paid }}

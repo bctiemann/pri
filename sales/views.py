@@ -4,6 +4,7 @@ from django.shortcuts import reverse
 from django.db import IntegrityError
 from django.contrib.auth import authenticate, login
 from django import forms
+from django.utils import timezone
 
 from rest_framework.response import Response
 from rest_framework.exceptions import APIException
@@ -476,6 +477,17 @@ class AdHocPaymentView(NavMenuMixin, UpdateView):
             return AdHocPayment.objects.get(confirmation_code=self.kwargs['confirmation_code'])
         except AdHocPayment.DoesNotExist:
             raise Http404
+
+    # Should not be called -- only on non-JS flow
+    def form_valid(self, form):
+        payment = form.save(commit=False)
+        payment.is_submitted = True
+        payment.submitted_at = timezone.now()
+        payment.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('adhoc-payment', kwargs={'confirmation_code': self.object.confirmation_code})
 
 
 class AdHocPaymentDoneView(NavMenuMixin, TemplateView):

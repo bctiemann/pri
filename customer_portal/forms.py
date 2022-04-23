@@ -44,13 +44,13 @@ class CustomerCardPrimaryForm(CSSClassMixin, forms.ModelForm):
     cc_cvv = forms.CharField()
     cc_phone = PhoneNumberField(region='US')
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        for field in self.cc_fields:
-            self.add_widget_css_class(field, 'cc-field')
-        for field in self.phone_fields:
-            self.add_widget_css_class(field, 'phone')
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #
+    #     for field in self.cc_fields:
+    #         self.add_widget_css_class(field, 'cc-field')
+    #     for field in self.phone_fields:
+    #         self.add_widget_css_class(field, 'phone')
 
     # TODO: clean_cc_number
 
@@ -70,13 +70,13 @@ class CustomerCardSecondaryForm(CSSClassMixin, forms.ModelForm):
     cc2_cvv = forms.CharField()
     cc2_phone = PhoneNumberField(region='US')
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        for field in self.cc_fields:
-            self.add_widget_css_class(field, 'cc-field')
-        for field in self.phone_fields:
-            self.add_widget_css_class(field, 'phone')
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #
+    #     for field in self.cc_fields:
+    #         self.add_widget_css_class(field, 'cc-field')
+    #     for field in self.phone_fields:
+    #         self.add_widget_css_class(field, 'phone')
 
     # TODO: clean_cc2_number
 
@@ -118,10 +118,10 @@ class ReservationCustomerInfoForm(CSSClassMixin, forms.ModelForm):
         if self.instance.date_of_birth:
             self.fields['date_of_birth_date'].initial = self.instance.date_of_birth.strftime('%m/%d/%Y')
 
-        for field in self.cc_fields:
-            self.add_widget_css_class(field, 'cc-field')
-        for field in self.phone_fields:
-            self.add_widget_css_class(field, 'phone')
+        # for field in self.cc_fields:
+        #     self.add_widget_css_class(field, 'cc-field')
+        # for field in self.phone_fields:
+        #     self.add_widget_css_class(field, 'phone')
 
     def clean(self):
         if not any((

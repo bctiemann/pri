@@ -20,6 +20,7 @@ from django.db.models import Q
 from django.contrib.auth import authenticate, login
 from django.http import Http404, HttpResponseRedirect
 from django.forms.models import model_to_dict
+from django.utils import timezone
 
 from sales.forms import (
     ReservationRentalDetailsForm, ReservationRentalPaymentForm, ReservationRentalLoginForm,
@@ -386,14 +387,16 @@ class ValidateAdHocPaymentView(APIView):
                 'errors': form.errors,
             })
 
-        # TODO: Save AdHocPayment data
-        # adhoc_payment = form.save()
+        payment = form.save(commit=False)
+        payment.is_submitted = True
+        payment.submitted_at = timezone.now()
+        payment.save()
 
         response = {
             'success': form.is_valid(),
             'errors': form.errors,
             'errors_html': form.errors.as_ul(),
-            'reservation_type': 'gift',
+            'reservation_type': 'subpay',
             'success_url': reverse('adhoc-payment-done', kwargs={'confirmation_code': form.instance.confirmation_code}),
         }
         return Response(response)
