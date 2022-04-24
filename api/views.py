@@ -612,7 +612,38 @@ class SendInsuranceAuthView(APIView):
         except Customer.DoesNotExist:
             raise Http404
 
-        # TODO: Send templated email
+        # Send email with PDF attachment to customer
+        email_subject = 'Performance Rentals Insurance Authorization Form'
+        email_context = {
+            'customer': customer,
+            'company_phone': settings.COMPANY_PHONE,
+            'company_fax': settings.COMPANY_FAX,
+            'site_email': settings.SITE_EMAIL,
+        }
+
+        # TODO: Update PDF with current address/info, and make editable
+        attachments = []
+        with open(f'{settings.BASE_DIR}/templates/attachments/PRI-infoauth.pdf', 'rb') as file:
+            attachment_data = file.read()
+        attachments.append({'filename': 'PRI-infoauth.pdf', 'content': attachment_data, 'mimetype': 'application/pdf'})
+
+        send_email(
+            [customer.email], email_subject, email_context,
+            text_template='email/reservation_insurance.txt',
+            html_template='email/reservation_insurance.html',
+            attachments=attachments,
+        )
+
+        # Send echo email to administration
+        email_from = f'{settings.RESERVATIONS_EMAIL} (Performance Rentals Reservations)'
+        email_subject = 'Insurance Form Sent'
+
+        send_email(
+            [settings.SITE_EMAIL], email_subject, email_context,
+            from_address=email_from,
+            text_template='email/reservation_insurance_echo.txt',
+            html_template='email/reservation_insurance_echo.txt',
+        )
 
         return Response({
             'success': True,

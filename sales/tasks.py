@@ -30,6 +30,7 @@ def send_email(
         html_template=HTML_TEMPLATE,
         attachments=None,
         bcc=None,
+        from_address=FROM_ADDRESS,
 ):
     if settings.DEBUG:
         recipients = [settings.DEBUG_EMAIL]
@@ -41,7 +42,7 @@ def send_email(
     for recipient in recipients:
         text_content = plaintext.render(context)
         html_content = htmly.render(context)
-        msg = mail.EmailMultiAlternatives(subject, text_content, FROM_ADDRESS, [recipient], bcc=bcc)
+        msg = mail.EmailMultiAlternatives(subject, text_content, from_address, [recipient], bcc=bcc)
         msg.attach_alternative(html_content, "text/html")
         if attachments:
             for attachment in attachments:

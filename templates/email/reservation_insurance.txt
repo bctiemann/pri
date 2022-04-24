@@ -1,0 +1,10 @@
+Dear {{ customer.full_name }},
+
+You've recently submitted a reservation request to Performance Rentals, and in order to verify your insurance coverage,
+we need you to fill out the attached form and fax it back to us at {{ company_fax }}. Alternatively, you can e-mail a
+scanned copy to us at {{ site_email }}.
+
+Please note: This e-mail has been automatically generated. Do not reply to this address as it is not monitored.
+
+If you need to contact us regarding this reservation, please call {{ company_phone }}.
+
