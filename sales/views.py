@@ -143,6 +143,8 @@ class ReservationMixin:
         except IntegrityError as e:
             raise APIException(detail=e, code='collision')
 
+        self.send_welcome_email()
+
         return {
             'success': form.is_valid(),
             'errors': form.errors,
@@ -155,6 +157,9 @@ class ReservationMixin:
         raise NotImplementedError
 
     def get_honeypot_url(self, **kwargs):
+        raise NotImplementedError
+
+    def send_welcome_email(self):
         raise NotImplementedError
 
 

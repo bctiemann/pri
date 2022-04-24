@@ -113,6 +113,10 @@ class ValidateRentalPaymentView(ReservationMixin, APIView):
     def get_honeypot_url(self, form=None, **kwargs):
         return reverse('reserve-honeypot', kwargs={'slug': form.vehicle.slug})
 
+    def send_welcome_email(self):
+        # TODO: Send welcome email here
+        pass
+
 
 class ValidateRentalLoginView(ValidateRentalPaymentView):
     authentication_classes = (SessionAuthentication,)
@@ -205,6 +209,10 @@ class ValidateJoyRidePaymentView(ReservationMixin, APIView):
     def get_honeypot_url(self, **kwargs):
         return reverse('joy-ride-honeypot')
 
+    def send_welcome_email(self):
+        # TODO: Send welcome email here
+        pass
+
 
 class ValidateJoyRideLoginView(ValidateJoyRidePaymentView):
     authentication_classes = (SessionAuthentication,)
@@ -244,6 +252,10 @@ class ValidatePerformanceExperiencePaymentView(ReservationMixin, APIView):
 
     def get_customer_site_url(self, confirmation_code):
         return reverse('customer_portal:perfexp-confirm', kwargs={'confirmation_code': confirmation_code}),
+
+    def send_welcome_email(self):
+        # TODO: Send welcome email here
+        pass
 
 
 class ValidatePerformanceExperienceLoginView(ValidatePerformanceExperiencePaymentView):
@@ -356,6 +368,8 @@ class ValidateGiftCertificateView(APIView):
 
         gift_certificate = form.save()
 
+        # TODO: Send templated email
+
         response = {
             'success': form.is_valid(),
             'errors': form.errors,
@@ -391,6 +405,8 @@ class ValidateAdHocPaymentView(APIView):
         payment.is_submitted = True
         payment.submitted_at = timezone.now()
         payment.save()
+
+        # TODO: Send templated email
 
         response = {
             'success': form.is_valid(),
@@ -614,6 +630,7 @@ class SendInsuranceAuthView(APIView):
 
         # Send email with PDF attachment to customer
         email_subject = 'Performance Rentals Insurance Authorization Form'
+        email_from = f'{settings.RESERVATIONS_EMAIL} (Performance Rentals Reservations)'
         email_context = {
             'customer': customer,
             'company_phone': settings.COMPANY_PHONE,
@@ -629,13 +646,13 @@ class SendInsuranceAuthView(APIView):
 
         send_email(
             [customer.email], email_subject, email_context,
+            from_address=email_from,
             text_template='email/reservation_insurance.txt',
             html_template='email/reservation_insurance.html',
             attachments=attachments,
         )
 
         # Send echo email to administration
-        email_from = f'{settings.RESERVATIONS_EMAIL} (Performance Rentals Reservations)'
         email_subject = 'Insurance Form Sent'
 
         send_email(
@@ -662,7 +679,7 @@ class SendWelcomeEmailView(APIView):
         except Reservation.DoesNotExist:
             raise Http404
 
-        # TODO: Send templated email
+        reservation.send_welcome_email()
 
         return Response({
             'success': True,

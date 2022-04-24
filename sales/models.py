@@ -23,6 +23,7 @@ from django.shortcuts import reverse
 
 from sales.enums import SERVICE_TYPE_CODE_MAP, ServiceType
 from sales.utils import EncryptedUSSocialSecurityNumberField, format_cc_number
+from sales.tasks import send_email
 from pri.cipher import AESCipher
 
 logger = logging.getLogger(__name__)
@@ -206,6 +207,24 @@ class BaseReservation(ConfirmationCodeMixin, models.Model):
     @property
     def transaction_time(self):
         return self.out_at
+
+    def send_welcome_email(self):
+        email_subject = 'PRI Reservation Confirmation'
+        email_from = f'{settings.RESERVATIONS_EMAIL} (Performance Rentals Reservations)'
+        email_context = {
+            'reservation': self,
+            'company_phone': settings.COMPANY_PHONE,
+            'company_fax': settings.COMPANY_FAX,
+            'site_email': settings.SITE_EMAIL,
+            'site_url': settings.SERVER_BASE_URL,
+        }
+
+        send_email(
+            [self.customer.email], email_subject, email_context,
+            from_address=email_from,
+            text_template='email/reservation_confirm.txt',
+            html_template='email/reservation_confirm.txt',
+        )
 
     def get_price_data(self):
         # TODO: Refactor sales.models classes to avoid this nested import
