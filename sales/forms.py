@@ -23,6 +23,7 @@ from backoffice.forms import CSSClassMixin
 current_year = timezone.now().year
 
 
+# This mixin adds credit card form fields to any other form. Reservation 2nd-phase, gift cert, ad-hoc paymnt, etc.
 class CardFormMixin(forms.Form):
     cc_number = forms.CharField()
     cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices())

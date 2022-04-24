@@ -23,6 +23,9 @@ from service.models import Damage, ScheduledService, IncidentalService
 from marketing.utils import RECIPIENT_CLASS_METHOD_MAP, RECIPIENT_CLASS_LABEL_MAP
 
 
+# This mixin provides a method for adding CSS classes to arbitrary form fields. Also a form class can define a tuple or
+# list of cc_fields, phone_fields, or short_fields and they will automatically be given "cc-field", "phone", and "short"
+# classes accordingly.
 class CSSClassMixin:
     cc_fields = ()
     phone_fields = ()
@@ -47,6 +50,7 @@ class CSSClassMixin:
             self.add_widget_css_class(field, 'short')
 
 
+# Provides styling and initial value formatting for the customer search fields in Reservation etc. forms.
 class CustomerSearchMixin:
 
     def style_customer_search_fields(self):
@@ -69,6 +73,10 @@ class CustomerSearchMixin:
                         pass
                 else:
                     self.fields[field].initial = getattr(self.instance.customer, field, None) or getattr(self.instance.customer.user, field, None)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.style_customer_search_fields()
 
 
 # TODO: Add slug to the visible form fields and set on both models
@@ -173,7 +181,15 @@ class VehicleVideoForm(forms.ModelForm):
         fields = ('video_mp4', 'video_webm', 'poster', 'thumbnail', 'length', 'title', 'blurb',)
 
 
-class ReservationDateTimeMixin:
+# Because the model fields are out_at and back_at, but we want to provide split date/time widgets for picking the
+# out_date and out_time separately, we provide these additional fields and clean() and init() methods for handling them
+# in Reservation and Rental forms.
+class ReservationDateTimeMixin(forms.ModelForm):
+
+    out_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
+    out_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
+    back_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
+    back_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
 
     def init_reservation_date_time(self):
         if self.instance.out_at and self.instance.back_at:
@@ -210,10 +226,10 @@ class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, CustomerSearchMix
     work_phone = PhoneNumberField(required=False)
     mobile_phone = PhoneNumberField(required=False)
 
-    out_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
-    out_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
-    back_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
-    back_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
+    # out_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
+    # out_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
+    # back_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
+    # back_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
 
     delivery_required = forms.ChoiceField(choices=DELIVERY_REQUIRED_CHOICES)
     extra_miles = forms.ChoiceField(choices=get_extra_miles_choices())
@@ -228,7 +244,7 @@ class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, CustomerSearchMix
         self.fields['vehicle'].choices = get_vehicle_choices()
         self.fields['vehicle'].widget.attrs['class'] = 'check-conflict'
 
-        self.style_customer_search_fields()
+        # self.style_customer_search_fields()
 
         self.init_reservation_date_time()
 
@@ -253,10 +269,10 @@ class RentalForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):
         'rental_discount_pct', 'tax_percent'
     )
 
-    out_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
-    out_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
-    back_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
-    back_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
+    # out_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
+    # out_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
+    # back_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
+    # back_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
 
     delivery_required = forms.ChoiceField(choices=DELIVERY_REQUIRED_CHOICES)
     extra_miles = forms.ChoiceField(choices=get_extra_miles_choices())
@@ -545,7 +561,7 @@ class GuidedDriveForm(CSSClassMixin, CustomerSearchMixin, forms.ModelForm):
         #     except KeyError:
         #         pass
 
-        self.style_customer_search_fields()
+        # self.style_customer_search_fields()
 
     def clean(self):
         super().clean()

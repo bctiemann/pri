@@ -228,6 +228,7 @@ class BaseReservation(ConfirmationCodeMixin, models.Model):
         self.coupon_code = self.coupon_code.upper()
         if self.id:
             self.final_price_data = json.loads(json.dumps(self.get_price_data(), cls=DjangoJSONEncoder))
+        super().save(*args, **kwargs)
 
     class Meta:
         abstract = False
@@ -374,6 +375,7 @@ class GuidedDrive(ConfirmationCodeMixin, models.Model):
         self.coupon_code = self.coupon_code.upper()
         if self.id:
             self.final_price_data = json.loads(json.dumps(self.get_price_data(), cls=DjangoJSONEncoder))
+        super().save(*args, **kwargs)
 
     class Meta:
         abstract = True
