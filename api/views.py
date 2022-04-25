@@ -627,6 +627,7 @@ class SendInsuranceAuthView(APIView):
         }
 
         # TODO: Update PDF with current address/info, and make editable
+        # TODO: Generate PDF dynamically
         attachments = []
         with open(f'{settings.BASE_DIR}/templates/attachments/PRI-infoauth.pdf', 'rb') as file:
             attachment_data = file.read()
