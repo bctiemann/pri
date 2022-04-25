@@ -1,0 +1,16 @@
+Dear {{ reservation.customer.full_name }},
+
+This message confirms your Performance Experience booking on {{ reservation.requested_date|date:"m/d/Y" }}. We will be contacting you
+shortly to confirm your booking and take care of any additional requests you may have.
+
+Your confirmation code is: {{ reservation.confirmation_code }}
+
+You may now log in to the Customer Service Portal at: {{ site_url }}{% url "customer_portal:perfexp-confirm" confirmation_code=reservation.confirmation_code %}
+
+The Customer Service Portal can be used to rapidly add future reservation requests without the need
+to re-enter all of your information. You may also update your billing information securely.
+
+PLEASE DO NOT E-MAIL SENSITIVE INFORMATION.
+
+This message has been automatically generated. If you need to contact a representative regarding
+your booking, please call us at {{ company_phone }} or e-mail us at {{ site_email }}

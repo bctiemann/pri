@@ -113,10 +113,6 @@ class ValidateRentalPaymentView(ReservationMixin, APIView):
     def get_honeypot_url(self, form=None, **kwargs):
         return reverse('reserve-honeypot', kwargs={'slug': form.vehicle.slug})
 
-    def send_welcome_email(self):
-        # TODO: Send welcome email here
-        pass
-
 
 class ValidateRentalLoginView(ValidateRentalPaymentView):
     authentication_classes = (SessionAuthentication,)
@@ -209,10 +205,6 @@ class ValidateJoyRidePaymentView(ReservationMixin, APIView):
     def get_honeypot_url(self, **kwargs):
         return reverse('joy-ride-honeypot')
 
-    def send_welcome_email(self):
-        # TODO: Send welcome email here
-        pass
-
 
 class ValidateJoyRideLoginView(ValidateJoyRidePaymentView):
     authentication_classes = (SessionAuthentication,)
@@ -252,10 +244,6 @@ class ValidatePerformanceExperiencePaymentView(ReservationMixin, APIView):
 
     def get_customer_site_url(self, confirmation_code):
         return reverse('customer_portal:perfexp-confirm', kwargs={'confirmation_code': confirmation_code}),
-
-    def send_welcome_email(self):
-        # TODO: Send welcome email here
-        pass
 
 
 class ValidatePerformanceExperienceLoginView(ValidatePerformanceExperiencePaymentView):

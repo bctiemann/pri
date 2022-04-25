@@ -59,6 +59,29 @@ class ConfirmationCodeMixin:
         self.save_with_unique_confirmation_code(*args, **kwargs)
 
 
+class EmailConfirmationMixin:
+    email_from = f'{settings.RESERVATIONS_EMAIL} (Performance Rentals Reservations)'
+    email_subject = None
+    email_text_template = None
+    email_html_template = None
+
+    def send_welcome_email(self):
+        email_context = {
+            'reservation': self,
+            'company_phone': settings.COMPANY_PHONE,
+            'company_fax': settings.COMPANY_FAX,
+            'site_email': settings.SITE_EMAIL,
+            'site_url': settings.SERVER_BASE_URL,
+        }
+
+        send_email(
+            [self.customer.email], self.email_subject, email_context,
+            from_address=self.email_from,
+            text_template=self.email_text_template,
+            html_template=self.email_html_template,
+        )
+
+
 class AllCountries(Countries):
     only = []
     first = ['US', 'CA']
@@ -127,8 +150,11 @@ class Coupon(Promotion):
 # Concrete base model class which is used to supply common fields to both the Reservation and Rental model classes.
 # Don't want to use an abstract model class because we want to be able to query both tables simultaneously in a union
 
-class BaseReservation(ConfirmationCodeMixin, models.Model):
+class BaseReservation(ConfirmationCodeMixin, EmailConfirmationMixin, models.Model):
     service_type = ServiceType.RENTAL.value
+    email_subject = 'PRI Reservation Confirmation'
+    email_text_template = 'email/reservation_confirm.txt'
+    email_html_template = 'email/reservation_confirm.txt'
 
     class AppChannel(models.TextChoices):
         WEB = ('web', 'Web')
@@ -207,24 +233,6 @@ class BaseReservation(ConfirmationCodeMixin, models.Model):
     @property
     def transaction_time(self):
         return self.out_at
-
-    def send_welcome_email(self):
-        email_subject = 'PRI Reservation Confirmation'
-        email_from = f'{settings.RESERVATIONS_EMAIL} (Performance Rentals Reservations)'
-        email_context = {
-            'reservation': self,
-            'company_phone': settings.COMPANY_PHONE,
-            'company_fax': settings.COMPANY_FAX,
-            'site_email': settings.SITE_EMAIL,
-            'site_url': settings.SERVER_BASE_URL,
-        }
-
-        send_email(
-            [self.customer.email], email_subject, email_context,
-            from_address=email_from,
-            text_template='email/reservation_confirm.txt',
-            html_template='email/reservation_confirm.txt',
-        )
 
     def get_price_data(self):
         # TODO: Refactor sales.models classes to avoid this nested import
@@ -400,8 +408,11 @@ class GuidedDrive(ConfirmationCodeMixin, models.Model):
         abstract = True
 
 
-class JoyRide(GuidedDrive):
+class JoyRide(EmailConfirmationMixin, GuidedDrive):
     service_type = ServiceType.JOY_RIDE.value
+    email_subject = 'PRI Joy Ride Confirmation'
+    email_text_template = 'email/joyride_confirm.txt'
+    email_html_template = 'email/joyride_confirm.txt'
 
     def get_price_data(self):
         # TODO: Refactor sales.models classes to avoid this nested import
@@ -423,8 +434,11 @@ class JoyRide(GuidedDrive):
         super().save(*args, **kwargs)
 
 
-class PerformanceExperience(GuidedDrive):
+class PerformanceExperience(EmailConfirmationMixin, GuidedDrive):
     service_type = ServiceType.PERFORMANCE_EXPERIENCE.value
+    email_subject = 'PRI Performance Experience Confirmation'
+    email_text_template = 'email/perfexp_confirm.txt'
+    email_html_template = 'email/perfexp_confirm.txt'
 
     num_drivers = models.IntegerField(null=True, blank=True)
 
