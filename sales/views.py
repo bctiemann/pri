@@ -373,19 +373,60 @@ class ReserveHoneypotView(NavMenuMixin, VehicleMixin, TemplateView):
 
 
 # Performance Experience
+# TODO: Complete view classes to match Joy Ride
 
-class PerformanceExperienceView(NavMenuMixin, PaymentLoginFormMixin, FormView):
+class PerformanceExperienceView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, NoJSFlowMixin, FormView):
     template_name = 'front_site/performance_experience/reserve.html'
     form_class = PerformanceExperienceDetailsForm
     payment_form_class = PerformanceExperiencePaymentForm
     login_form_class = PerformanceExperienceLoginForm
+    reservation_type = ServiceType.PERFORMANCE_EXPERIENCE
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['vehicle_type'] = VehicleType
+        context['reservation_type'] = self.reservation_type
         return context
 
-    # TODO: Complete view class to match Joy Ride
+    def get_customer_site_url(self, confirmation_code):
+        return reverse('customer_portal:perfexp-confirm', kwargs={'confirmation_code': confirmation_code})
+
+    def get_honeypot_url(self, **kwargs):
+        return reverse('performance-experience-honeypot')
+
+
+class PerformanceExperienceLoginFormView(PerformanceExperienceView):
+    template_name = 'front_site/includes/login_form.html'
+    form_class = PerformanceExperienceLoginForm
+
+
+class PerformanceExperiencePaymentFormView(PerformanceExperienceView):
+    template_name = 'front_site/includes/payment_form.html'
+    form_class = PerformanceExperiencePaymentForm
+
+
+class PerformanceExperiencePriceBreakdownView(FormView):
+    template_name = 'front_site/performance_experience/price_breakdown.html'
+    form_class = PerformanceExperienceDetailsForm
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.render_to_response(self.get_context_data(form=form, **kwargs))
+
+    def get_context_data(self, slug=None, form=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['price_data'] = form.price_data
+        return context
+
+
+class PerformanceExperienceHoneypotView(NavMenuMixin, TemplateView):
+    template_name = 'front_site/performance_experience/honeypot.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['confirmation_code'] = generate_code(ServiceType.PERFORMANCE_EXPERIENCE)
+        return context
 
 
 # Joy Ride
@@ -400,7 +441,7 @@ class JoyRideView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, NoJSFlo
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['vehicle_type'] = VehicleType
-        context['reservation_type'] = ServiceType.JOY_RIDE
+        context['reservation_type'] = self.reservation_type
         return context
 
     def get_customer_site_url(self, confirmation_code):

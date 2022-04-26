@@ -390,6 +390,7 @@ class JoyRideLoginForm(JoyRideDetailsForm):
 # Performance Experience
 
 class PerformanceExperienceDetailsForm(GuidedDriveBaseDetailsForm, forms.ModelForm):
+    form_type = 'details'
 
     DRIVERS_CHOICES = (
         (1, '1'),
@@ -432,10 +433,11 @@ class PerformanceExperienceDetailsForm(GuidedDriveBaseDetailsForm, forms.ModelFo
 
 
 class PerformanceExperiencePaymentForm(PaymentFormMixin, CardFormMixin, PerformanceExperienceDetailsForm):
-    pass
+    form_type = 'payment'
 
 
 class PerformanceExperienceLoginForm(PerformanceExperienceDetailsForm):
+    form_type = 'login'
 
     password = forms.CharField(widget=forms.PasswordInput(), required=False)
 

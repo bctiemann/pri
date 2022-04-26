@@ -106,7 +106,20 @@
 
     <div class="reservation-form-sidebar">
 
-    <form method="POST" name="reservation_form" id="reservation_form" action="perfexp.cfm" onsubmit="return false;" autocomplete="on">
+    <form
+        method="POST"
+        name="reservation_form"
+        id="reservation_form"
+        {% if form_type == "login" %}
+            action="{% url "performance-experience-login" %}"
+        {% elif form_type == "payment" %}
+            action="{% url "performance-experience-payment" %}"
+        {% else %}
+            action="{% url "performance-experience" %}"
+        {% endif %}
+        onsubmit="return false;"
+        autocomplete="on"
+    >
 
         {% if form.errors %}
         <cfif Len(formError) GT 0>

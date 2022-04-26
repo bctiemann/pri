@@ -64,6 +64,13 @@ urlpatterns = [
     path('vehicle/<str:slug>/reserve/complete/', sales_views.ReserveHoneypotView.as_view(), name='reserve-honeypot'),
 
     path('performance_experience/', sales_views.PerformanceExperienceView.as_view(), name='performance-experience'),
+    path('performance_experience/form/login/', sales_views.PerformanceExperienceLoginFormView.as_view(), name='performance-experience-login-form'),
+    path('performance_experience/form/payment/', sales_views.PerformanceExperiencePaymentFormView.as_view(), name='performance-experience-payment-form'),
+    path('performance_experience/price_breakdown/', sales_views.PerformanceExperiencePriceBreakdownView.as_view(), name='performance-experience-price-breakdown'),
+    # No-JS flow (honeypot)
+    path('performance_experience/login/', sales_views.PerformanceExperienceView.as_view(form_class=JoyRideLoginForm), name='performance-experience-login'),
+    path('performance_experience/payment/', sales_views.PerformanceExperienceView.as_view(form_class=JoyRidePaymentForm), name='performance-experience-payment'),
+    path('performance_experience/complete/', sales_views.PerformanceExperienceHoneypotView.as_view(), name='performance-experience-honeypot'),
 
     path('joy_ride/', sales_views.JoyRideView.as_view(), name='joy-ride'),
     path('joy_ride/form/login/', sales_views.JoyRideLoginFormView.as_view(), name='joy-ride-login-form'),

@@ -27,13 +27,11 @@
         >
 
             {% if form.errors %}
-            <cfif Len(formError) GT 0>
-            <div class="exception" id="reservation_form_error">
-                <h3>An error occurred</h3>
-                <p class="alert-message">#formError#</p>
-                {{ form.errors }}
-            </div>
-            </cfif>
+                <div class="exception" id="reservation_form_error">
+                    <h3>An error occurred</h3>
+                    <p class="alert-message">#formError#</p>
+                    {{ form.errors }}
+                </div>
             {% endif %}
 
             <div id="details_form_container">
