@@ -359,9 +359,17 @@
         </table>
 
         {% with reservation_type='perfexp' %}
-            {% include "front_site/includes/login_form.html" %}
+            <div id="login_form_container">
+                {% if form_type == "login" %}
+                    {% include "front_site/performance_experience/login_form.html" %}
+                {% endif %}
+            </div>
 
-            {% include "front_site/includes/payment_form.html" %}
+            <div id="payment_form_container">
+                {% if form_type == "payment" %}
+                    {% include "front_site/performance_experience/payment_form.html" %}
+                {% endif %}
+            </div>
         {% endwith %}
 
         </form>

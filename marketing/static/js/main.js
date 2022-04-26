@@ -88,12 +88,14 @@ var populatePriceBreakdown = function(data, reservationType) {
      */
 };
 
-var loadPriceBreakdown = function(params) {
+var loadPriceBreakdown = function(method, params) {
     let url;
     if (method === 'rental') {
         url = `/vehicle/${params.vehicle_slug}/reserve/price_breakdown/`;
     } else if (method === 'joyride') {
         url = `/joy_ride/price_breakdown/`;
+    } else if (method === 'perfexp') {
+        url = `/performance_experience/price_breakdown/`;
     }
     $.post(url, params, function(html) {
         $('#price_breakdown_container').html(html);
@@ -146,7 +148,7 @@ var reserveValidateForm = function(reservationType, section) {
                         console.log('login form');
                         console.log(data);
                         // populatePriceBreakdown(data, reservationType);
-                        loadPriceBreakdown(params);
+                        loadPriceBreakdown(reservationType, params);
                         refreshUI();
                     })
                 } else {
@@ -155,7 +157,7 @@ var reserveValidateForm = function(reservationType, section) {
                         console.log('payment form');
                         console.log(data);
                         // populatePriceBreakdown(data, reservationType);
-                        loadPriceBreakdown(params);
+                        loadPriceBreakdown(reservationType, params);
                         refreshUI();
                     })
                 }
