@@ -1,4 +1,4 @@
-<div id="reservation_payment" {# <cfif NOT IsDefined("IdentityResult") OR (IsDefined("IdentityResult") AND NOT IdentityResult.success) OR (IsDefined("LoginResult") AND NOT LoginResult.success)> #}class="1hidden"{# </cfif> #}>
+<div id="reservation_payment" class="1hidden">
 
     <p class="reservation-info">
     We'll need a credit card to secure your reservation. Once the reservation is confirmed, you'll get access to the
@@ -15,140 +15,96 @@
             <td>First Name</td>
             <td>
                 {{ payment_form.first_name }}
-                <cfinput name="fname" value="#JoyPerf.fname#" maxlength="255" class="#StructKeyExists(fieldErrors,"fname") ? 'field-error' : ''#" />
             </td>
         </tr>
         <tr>
             <td>Last Name</td>
             <td>
                 {{ payment_form.last_name }}
-                <cfinput name="lname" value="#JoyPerf.lname#" maxlength="255" class="#StructKeyExists(fieldErrors,"lname") ? 'field-error' : ''#" />
             </td>
         </tr>
         <tr>
             <td>Mobile Phone</td>
             <td>
                 {{ payment_form.mobile_phone }}
-                <cfinput name="mphone" value="#JoyPerf.mphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"mphone") ? 'field-error' : ''#" />
             </td>
         </tr>
         <tr>
             <td>Home Phone</td>
             <td>
                 {{ payment_form.home_phone }}
-                <cfinput name="hphone" value="#JoyPerf.hphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"hphone") ? 'field-error' : ''#" />
             </td>
         </tr>
         <tr>
             <td>Work Phone</td>
             <td>
                 {{ payment_form.work_phone }}
-                <cfinput name="wphone" value="#JoyPerf.wphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"wphone") ? 'field-error' : ''#" />
             </td>
         </tr>
         <tr>
             <td>Fax</td>
             <td>
                 {{ payment_form.fax }}
-                <cfinput name="fax" value="#JoyPerf.fax#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"fax") ? 'field-error' : ''#" />
             </td>
         </tr>
         <tr>
             <td>Credit Card Number</td>
             <td>
                 {{ payment_form.cc_number }}
-                <cfinput name="ccnum" value="#JoyPerf.ccnum#" class="cc-field #StructKeyExists(fieldErrors,"ccnum") ? 'field-error' : ''#" autocomplete="cc-number">
             </td>
         </tr>
         <tr>
             <td>Credit Card Expiration</td>
             <td>
                 {{ payment_form.cc_exp_mo }} / {{ payment_form.cc_exp_yr }}
-                {% comment %}
-                <cfselect name="ccexpmo" class="#StructKeyExists(fieldErrors,"ccexpmo") ? 'field-error' : ''#">
-                    <option value="01" <cfif JoyPerf.ccexpmo IS "01">selected</cfif>>January (01)</option>
-                    <option value="02" <cfif JoyPerf.ccexpmo IS "02">selected</cfif>>February (02)</option>
-                    <option value="03" <cfif JoyPerf.ccexpmo IS "03">selected</cfif>>March (03)</option>
-                    <option value="04" <cfif JoyPerf.ccexpmo IS "04">selected</cfif>>April (04)</option>
-                    <option value="05" <cfif JoyPerf.ccexpmo IS "05">selected</cfif>>May (05)</option>
-                    <option value="06" <cfif JoyPerf.ccexpmo IS "06">selected</cfif>>June (06)</option>
-                    <option value="07" <cfif JoyPerf.ccexpmo IS "07">selected</cfif>>July (07)</option>
-                    <option value="08" <cfif JoyPerf.ccexpmo IS "08">selected</cfif>>August (08)</option>
-                    <option value="09" <cfif JoyPerf.ccexpmo IS "09">selected</cfif>>September (09)</option>
-                    <option value="10" <cfif JoyPerf.ccexpmo IS "10">selected</cfif>>October (10)</option>
-                    <option value="11" <cfif JoyPerf.ccexpmo IS "11">selected</cfif>>November (11)</option>
-                    <option value="12" <cfif JoyPerf.ccexpmo IS "12">selected</cfif>>December (12)</option>
-                </cfselect> /
-
-                <cfset tyear = #Dateformat(Now(),"yyyy")#>
-                <cfset fyear = tyear+15>
-                <cfset ynow=#LSDateFormat(Now(),"yyyy")#>
-                <cfset ythen=(#ynow# + 11)>
-                <cfset mnow=#LSDateFormat(Now(),"mm")#>
-                <cfset dyear=ynow>
-                <cfselect name="ccexpyr" class="#StructKeyExists(fieldErrors,"ccexpyr") ? 'field-error' : ''#">
-                    <cfoutput>
-                    <cfloop index="year" from="#ynow#" to="#ythen#">
-                        <option value="#dyear#" <cfif JoyPerf.ccexpyr IS "#dyear#">selected</cfif>>#dyear#</option>>
-                        <cfset dyear = dyear + 1>
-                    </cfloop>
-                    </cfoutput>
-                </cfselect>
-                {% endcomment %}
             </td>
         </tr>
         <tr>
             <td>CVV</td>
             <td>
                 {{ payment_form.cc_cvv }}
-                <cfinput name="cccvv" value="#JoyPerf.cccvv#" style="width: 70px;" class="#StructKeyExists(fieldErrors,"cccvv") ? 'field-error' : ''#" />
             </td>
         </tr>
         <tr>
             <td>Credit Card Bank Phone</td>
             <td>
                 {{ payment_form.cc_phone }}
-                <cfinput name="cctel" value="#JoyPerf.cctel#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"cctel") ? 'field-error' : ''#" />
-                <small class="tooltip" title="We need the customer service contact phone number shown on the back of your card so that we can verify the card if necessary, and to refund the security deposit after the rental is over.">Why do we need this?</small>
+                <small
+                    class="tooltip"
+                    title="We need the customer service contact phone number shown on the back of your card so that we can verify the card if necessary, and to refund the security deposit after the rental is over."
+                >
+                    Why do we need this?
+                </small>
             </td>
         </tr>
         <tr>
             <td>Street Address Line 1</td>
             <td>
                 {{ payment_form.address_line_1 }}
-    {#                    <cftextarea name="addr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#JoyPerf.addr#</cftextarea>#}
             </td>
         </tr>
         <tr>
             <td>Street Address Line 2</td>
             <td>
                 {{ payment_form.address_line_2 }}
-    {#                    <cftextarea name="addr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#JoyPerf.addr#</cftextarea>#}
             </td>
         </tr>
         <tr>
             <td>City</td>
             <td>
                 {{ payment_form.city }}
-                <cfinput name="city" value="#JoyPerf.city#" maxlength="150" class="#StructKeyExists(fieldErrors,"city") ? 'field-error' : ''#" />
             </td>
         </tr>
         <tr>
             <td class="label">State</td>
             <td>
                 {{ payment_form.state }}
-                <cfselect name="state" data-stripe="address_state" class="#StructKeyExists(fieldErrors,"state") ? 'field-error' : ''#">
-                <CFLOOP ARRAY="#states#" INDEX="state">
-                    <CFOUTPUT><option value="#state.abbr#" <cfif JoyPerf.state IS "#state.abbr#">selected</cfif>>#state.name#</option></CFOUTPUT>
-                </CFLOOP>
-                </cfselect>
             </td>
         </tr>
         <tr>
             <td class="label">ZIP</td>
             <td>
                 {{ payment_form.zip }}
-                <cfinput name="zip" value="#JoyPerf.zip#" style="width: 100px;" maxlength="10" class="#StructKeyExists(fieldErrors,"zip") ? 'field-error' : ''#" />
             </td>
         </tr>
 
