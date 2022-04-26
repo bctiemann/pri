@@ -2,6 +2,11 @@
 
 <table class="price-breakdown small-item-data">
     <tr>
+        <td><span class="price-nodrv">{{ price_data.num_drivers }} driver{{ price_data.num_drivers|pluralize }}</span></td>
+        <td>$<span class="price-drvcost">{{ price_data.driver_cost|intcomma }}</span></td>
+        <td></td>
+    </tr>
+    <tr>
         <td><span class="price-nopax">{{ price_data.num_passengers }} passenger{{ price_data.num_passengers|pluralize }}</span></td>
         <td>$<span class="price-paxcost">{{ price_data.passenger_cost|intcomma }}</span></td>
         <td></td>
