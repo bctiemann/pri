@@ -1,15 +1,3 @@
-{% comment %}
-<CFIF NOT (Login IS False AND YourID.adminid GT 0)>
-    Invalid access.
-    <CFABORT>
-</CFIF>
-
-<cfif NOT (IsDefined("URL.vehicleid") AND IsNumeric(URL.vehicleid))>
-    Invalid vehicle ID.
-    <cfabort>
-</cfif>
-{% endcomment %}
-
 <h3>Showcase (front page, 1600x800)</h3>
 
 {% if vehiclemarketing.showcase_image %}

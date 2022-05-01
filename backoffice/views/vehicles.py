@@ -169,6 +169,9 @@ class VehiclePicturesView(CreateView):
         vehicle_picture.save()
         return HttpResponseRedirect(self.get_success_url())
 
+    def form_invalid(self, form):
+        return HttpResponseRedirect(reverse('backoffice:vehicle-detail', kwargs={'pk': self.vehicle_marketing.id}))
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['vehicle_marketing'] = self.vehicle_marketing

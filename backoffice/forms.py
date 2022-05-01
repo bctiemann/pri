@@ -1,7 +1,9 @@
 import datetime
 import pytz
+import imghdr
 import decimal
 import ipaddress
+import logging
 
 from django.conf import settings
 from django import forms
@@ -21,6 +23,8 @@ from sales.enums import (
 from marketing.models import NewsItem, SiteContent, EmailImage
 from service.models import Damage, ScheduledService, IncidentalService
 from marketing.utils import RECIPIENT_CLASS_METHOD_MAP, RECIPIENT_CLASS_LABEL_MAP
+
+logger = logging.getLogger(__name__)
 
 
 # This mixin provides a method for adding CSS classes to arbitrary form fields. Also a form class can define a tuple or
@@ -165,7 +169,22 @@ class VehicleMobileThumbForm(forms.ModelForm):
 
 class VehiclePictureForm(forms.ModelForm):
 
-    # TODO: validate image and thumbnail (prevent saving if nothing uploaded)
+    ALLOWED_IMAGE_FORMATS = ['jpg', 'png']
+
+    def clean_image(self):
+        if not self.cleaned_data.get('image'):
+            error_message = 'No image uploaded.'
+            logger.info(error_message)
+            raise forms.ValidationError(error_message)
+
+        image_ext = imghdr.what(self.cleaned_data['image'])
+        if image_ext not in self.ALLOWED_IMAGE_FORMATS:
+            allowed_formats = ', '.join(self.ALLOWED_IMAGE_FORMATS)
+            error_message = f'Image format {image_ext} not allowed. Only {allowed_formats} allowed.'
+            logger.info(error_message)
+            raise forms.ValidationError(error_message)
+
+        return self.cleaned_data['image']
 
     class Meta:
         model = VehiclePicture
