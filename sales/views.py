@@ -189,8 +189,9 @@ class NoJSFlowMixin:
         context['login_form'] = form
         context['payment_form'] = form
         for field in form.errors:
-            form[field].field.widget.attrs.setdefault('class', '')
-            form[field].field.widget.attrs['class'] += ' field-error'
+            if field in form.fields:
+                form[field].field.widget.attrs.setdefault('class', '')
+                form[field].field.widget.attrs['class'] += ' field-error'
         return self.render_to_response(context)
 
     def get_context_data(self, **kwargs):
