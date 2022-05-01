@@ -31,12 +31,9 @@
         </ul>
 
         {% if form.errors %}
-        <div class="exception" id="customer_form_error">
-            <h3>An error occurred</h3>
-            {% for fieldname, error_list in form.errors.items %}
-                <p class="alert-message">{{ error_list }}</p>
-            {% endfor %}
-        </div>
+            {% with form_id="customer_form_error" %}
+                {% include "global_includes/form_errors.html" %}
+            {% endwith %}
         {% endif %}
 
         {% block subpage_pane %}{% endblock %}

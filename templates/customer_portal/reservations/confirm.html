@@ -236,15 +236,9 @@
                 </div>
 
                 {% if form.errors %}
-                <cfoutput>
-                <cfif Len(formError) GT 0>
-                <div class="exception" id="customer_form_error">
-                    <h3>An error occurred</h3>
-                    <p class="alert-message"></p>
-                    {{ form.errors }}
-                </div>
-                </cfif>
-                </cfoutput>
+                   {% with form_id="customer_form_error" %}
+                        {% include "global_includes/form_errors.html" %}
+                    {% endwith %}
                 {% endif %}
 
                 <cfoutput>

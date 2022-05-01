@@ -1904,7 +1904,7 @@ span.inline-text {
 	margin-left: 10px;
 }
 
-.exception p, .exception ul {
+.exception p, .exception div, .exception ul {
 	font-size: 16px;
 	margin: 20px;
 }

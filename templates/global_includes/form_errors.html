@@ -1,8 +1,10 @@
 <div class="exception {{ hidden }}" id="{{ form_id }}">
     <h3>An error occurred</h3>
-    <p class="alert-message">
+    <div class="alert-message">
     {% for field, error in form.errors.items %}
-        <p>{{ error }}</p>
+        {% if forloop.counter0 == 0 %}
+            <p>{{ error }}</p>
+        {% endif %}
     {% endfor %}
-    </p>
+    </div>
 </div>

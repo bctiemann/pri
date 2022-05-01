@@ -1844,7 +1844,7 @@ table.inputform tr.buttons td {
 	margin-left: 10px;
 }
 
-.exception p, .exception ul {
+.exception p, .exception div, .exception ul {
 	font-size: 16px;
 	margin: 20px;
 }
@@ -2244,7 +2244,7 @@ ul.form-page-nav.two-col li {
 .reservation .exception h3 {
 	margin-left: 100px;
 }
-.reservation .exception p {
+.reservation .exception p, .reservation .exception div {
 	margin: 20px 10px 0px 80px;
 }
 .reservation p.reservation-status {

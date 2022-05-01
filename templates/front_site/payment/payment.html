@@ -31,12 +31,9 @@
                 <cfoutput>
 
                 {% if form.errors %}
-                <cfif Len(formError) GT 0>
-                <div class="exception" id="subpay_form_error">
-                    <h3>An error occurred</h3>
-                    <p class="alert-message">#formError#</p>
-                </div>
-                </cfif>
+                    {% with form_id="subpay_form_error" %}
+                        {% include "global_includes/form_errors.html" %}
+                    {% endwith %}
                 {% endif %}
 
                 <div id="subpay_payment">
@@ -218,10 +215,9 @@
 
                 </div>
 
-                <div class="exception hidden" id="reservation_payment_error">
-                    <h3>An error occurred</h3>
-                    <p class="alert-message"></p>
-                </div>
+                {% with hidden="hidden" form_id="reservation_payment_error" %}
+                    {% include "global_includes/form_errors.html" %}
+                {% endwith %}
 
                 </cfoutput>
                 {% comment %}
