@@ -10,14 +10,10 @@
             <span class="vvid-makefirst ui-icon ui-icon-star" vvidsid="{{ video.id }}"></span>
         {% endif %}
         {% if video.video_mp4 %}
-        <cfif FileExists("#VideoUploads#PRI-#vvidsid#.mp4")>
             <a href="{{ video.video_mp4.url }}" target="_blank"><span class="vvid-video vvid-mp4" vvidsid="{{ video.id }}">MP4</span></a>
-        </cfif>
         {% endif %}
         {% if video.video_webm %}
-        <cfif FileExists("#VideoUploads#PRI-#vvidsid#.webm")>
             <a href="{{ video.video_webm.url }}" target="_blank"><span class="vvid-video vvid-webm" vvidsid="{{ video.id }}">WebM</span></a>
-        </cfif>
         {% endif %}
 
         <h4>{{ video.title }}</h4>
@@ -69,8 +65,6 @@
                 </td>
             </tr>
         </table>
-        <cfinput type="hidden" name="vehicleid" value="#URL.vehicleid#" />
-        <cfinput type="hidden" name="vvidsid" value="" />
         {% csrf_token %}
     </form>
 </div>

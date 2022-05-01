@@ -1,19 +1,12 @@
 <h3>Thumbnail (Fleet page, 300x125)</h3>
 
 {% if vehiclemarketing.thumbnail_image %}
-<cfif FileExists("#ThumbUploads##URL.vehicleid#-thumb.jpg")>
-    <cfoutput>
-    <CFSET unix_time = DateDiff("s", CreateDate(1970,1,1), Now()) />
     <img class="thumbnail" src="{{ vehiclemarketing.thumbnail_image.url }}" />
-    </cfoutput>
-</cfif>
 {% endif %}
 
 <div class="upload-form" id="thumbnail_upload">
     <form method="POST" action="{% url "backoffice:vehicle-thumbnail" pk=vehiclemarketing.vehicle.id %}" enctype="multipart/form-data" id="thumbnail_form">
         {{ form.thumbnail_image }}
-        <cfinput type="file" name="thumbnailup" />
-        <cfinput type="hidden" name="vehicleid" value="#URL.vehicleid#" />
         <button type="submit" name="upload_thumbnail" class="btn">Upload</button>
         <div class="spinner floatright" id="spinner-thumbnail" method="uploadThumbnail"></div>
         {% csrf_token %}

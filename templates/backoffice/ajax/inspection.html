@@ -1,19 +1,12 @@
 <h3>Inspection Outlines (Contract, 700x480)</h3>
 
 {% if vehiclemarketing.inspection_image %}
-<cfif FileExists("#InspectionUploads##URL.vehicleid#.png")>
-    <cfoutput>
-    <CFSET unix_time = DateDiff("s", CreateDate(1970,1,1), Now()) />
     <img class="inspection" src="{{ vehiclemarketing.inspection_image.url }}" />
-    </cfoutput>
-</cfif>
 {% endif %}
 
 <div class="upload-form" id="inspection_upload">
     <form method="POST" action="{% url "backoffice:vehicle-inspection" pk=vehiclemarketing.vehicle.id %}" enctype="multipart/form-data" id="inspection_form">
         {{ form.inspection_image }}
-        <cfinput type="file" name="inspectionup" />
-        <cfinput type="hidden" name="vehicleid" value="#URL.vehicleid#" />
         <button type="submit" name="upload_inspection" class="btn">Upload</button>
         <div class="spinner floatright" id="spinner-inspection" method="uploadInspection"></div>
         {% csrf_token %}
