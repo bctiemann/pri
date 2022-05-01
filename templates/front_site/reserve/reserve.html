@@ -1,248 +1,71 @@
 {% extends "front_site/base.html" %}
 {% load static %}
 
-<cfif NOT (IsDefined("URL.vid") AND IsNumeric(URL.vid)) AND NOT IsDefined("Form.vehicleid")>
-    <cflocation url="#OnSite#fleet.cfm">
-    <CFABORT>
-</cfif>
-
-<!--- If a form was submitted, the user had JS turned off, so we have to process the sequential logic. --->
-<cfset fieldErrors = StructNew()>
-<cfset formError = "">
-<cfif IsDefined("Form.reservation_type")>
-
-    <!--- Validate the first page (identity and rental date/specs) --->
-    <cfset ret = StructAppend(Form, Variables)>
-    <cfinvoke
-        component="cfc/porknbeans"
-        method="validateRentalIdentity"
-        returnVariable="IdentityResult"
-        argumentCollection="#Form#">
-    </cfinvoke>
-    <cfset fieldErrors = IdentityResult.fieldErrors>
-    <cfset Form.taxpct = IdentityResult.success ? IdentityResult.tax_rate : "">
-
-    <!--- If the user entered a recognized email address, validate it against the password --->
-    <cfif IsDefined("IdentityResult.customerid") AND IdentityResult.customerid GT 0>
-        <cfset Form.customerid = IdentityResult.customerid>
-        <cfset Form.login_pass = Form.inline_pass>
-        <cfinvoke
-            component="cfc/porknbeans"
-            method="validateLogin"
-            returnVariable="LoginResult"
-            argumentCollection="#Form#">
-        </cfinvoke>
-        <cfset ret = StructAppend(fieldErrors, LoginResult.fieldErrors)>
-    </cfif>
-
-    <!--- If the "Complete Reservation" button was pressed OR if the login (above) was successful, validate the payment form and create the reservation --->
-    <cfif IsDefined("Form.payment_btn") OR (IsDefined("LoginResult") AND LoginResult.success)>
-        <cfinvoke
-            component="cfc/porknbeans"
-            method="validateRentalPayment"
-            returnVariable="ReservationResult"
-            argumentCollection="#Form#">
-        </cfinvoke>
-        <cfset ret = StructAppend(fieldErrors, ReservationResult.fieldErrors)>
-
-        <!--- Push to customer portal if successful --->
-        <cfif ReservationResult.success>
-            <cfset redirectUrl = ReservationResult.custsite & "reserve_confirm.cfm?confcode=" & ReservationResult.confcode>
-            <cflocation url=#redirectUrl#>
-        </cfif>
-
-    </cfif>
-
-    <!--- We're still here, so bind the form variables for redisplay --->
-    <cfset Reservation = Form>
-    <cfset formError = NOT IdentityResult.success ? IdentityResult.error :
-        IsDefined("LoginResult") AND NOT LoginResult.success ? LoginResult.error :
-        IsDefined("ReservationResult") AND NOT ReservationResult.success ? ReservationResult.error : "">
-
-<!--- If the user has JS on, pull a blank Reservation object to populate the form --->
-<cfelse>
-
-    <cfquery name="Reservation" datasource="#DSN#">
-        SELECT reservationid,Reservations.customerid,fname,lname,email,hphone,wphone,mphone,fax,
-        Reservations.vehicleid,make,model,year,reservdate,numdays,dateout,dateback,delivery,
-        rate,drivers,milesinc,xtramiles,Reservations.notes,coupon,Reservations.status,depamount,confcode,
-        Reservations.reglong,Reservations.reglat,iphone,markid,discount,0 as extramiles,
-        ccnum,ccexpmo,ccexpyr,cccvv,cctel,addr,city,state,zip,'' AS inline_pass,'' AS deliveryzip,
-        dateout AS dateouttime,dateback AS datebacktime FROM Reservations
-        INNER JOIN Customers ON Customers.customerid=Reservations.customerid
-        INNER JOIN Vehicles ON Vehicles.vehicleid=Reservations.vehicleid
-        WHERE reservationid = 0
-    </cfquery>
-
-</cfif>
-
-<cfset vid = IsDefined("Form.vehicleid") ? Form.vehicleid : URL.vid>
-
-<cfquery name="Vehicle" datasource="#DSN#">
-    SELECT vehicleid,make,model,status,redirect FROM Vehicles
-    WHERE vehicleid = <CFQUERYPARAM value="#vid#" CFSQLType="CF_SQL_INTEGER">
-    AND status = 1
-</cfquery>
-<CFIF Vehicle.redirect GT 0>
-    <CFLOCATION URL="reserve.cfm?vid=#Vehicle.redirect#">
-    <CFABORT>
-</CFIF>
-
-<cfquery name="VehicleFront" datasource="#FDSN#">
-    SELECT milesinc,deposit FROM VehiclesFront
-    WHERE vehicleid = <CFQUERYPARAM value="#vid#" CFSQLType="CF_SQL_INTEGER">
-</cfquery>
-
-<CFIF Vehicle.recordCount IS 0>
-    <CFLOCATION URL="#OnSite#fleet.cfm">
-    <CFABORT>
-</CFIF>
-
-<CFINCLUDE TEMPLATE="inc_states.cfm">
-<CFINCLUDE TEMPLATE="inc_header.cfm">
-<title>Performance Rentals</title>
-<CFINCLUDE TEMPLATE="inc_meta.cfm">
-<CFINCLUDE TEMPLATE="inc_styles.cfm">
-<CFINCLUDE TEMPLATE="inc_js.cfm">
-</head>
-<body>
-
-<div class="wrapper">
-
-<CFINCLUDE TEMPLATE="inc_nav.cfm">
-
-<section class="l-content">
-
 {% block page_title %}Reserve Your Vehicle{% endblock %}
 
 {% block content %}
 
-    {% comment %}
-    <CFQUERY NAME="tPics" DATASOURCE="#FDSN#">
-        SELECT vpicsid,vehicleid,fext,isfirst FROM VPics
-        WHERE vehicleid = <CFQUERYPARAM value="#Vehicle.vehicleid#" CFSQLType="CF_SQL_INTEGER">
-        ORDER BY RAND()
-        LIMIT 5
-    </CFQUERY>
-    {% endcomment %}
     <div class="reservation-pics-sidebar">
         {% for picture in vehicle.pics.all %}
             <img src="{{ picture.image.url }}" />
         {% endfor %}
     </div>
 
-    <form
-        method="POST"
-        name="reservation_form"
-        id="reservation_form"
-        {% if form_type == "login" %}
-            action="{% url "reserve-login" slug=vehicle.slug %}"
-        {% elif form_type == "payment" %}
-            action="{% url "reserve-payment" slug=vehicle.slug %}"
-        {% else %}
-            action="{% url "reserve" slug=vehicle.slug %}"
-        {% endif %}
-        onsubmit="return false;"
-        autocomplete="on"
-    >
-    <cfoutput query="Vehicle">
+    <div class="reservation-form-sidebar">
 
-        <div class="reservation-form-sidebar">
-
-            {% if form.errors %}
-                {% with form_id="reservation_form_error" %}
-                    {% include "global_includes/form_errors.html" %}
-                {% endwith %}
+        <form
+            method="POST"
+            name="reservation_form"
+            id="reservation_form"
+            {% if form_type == "login" %}
+                action="{% url "reserve-login" slug=vehicle.slug %}"
+            {% elif form_type == "payment" %}
+                action="{% url "reserve-payment" slug=vehicle.slug %}"
+            {% else %}
+                action="{% url "reserve" slug=vehicle.slug %}"
             {% endif %}
+            onsubmit="return false;"
+            autocomplete="on"
+        >
 
-            <div id="details_form_container">
-                {% include "front_site/reserve/details_form.html" %}
-            </div>
-
-            <div id="login_form_container">
-                {% if form_type == "login" %}
-                    {% include "front_site/reserve/login_form.html" %}
+                {% if form.errors %}
+                    {% with form_id="reservation_form_error" %}
+                        {% include "global_includes/form_errors.html" %}
+                    {% endwith %}
                 {% endif %}
-            </div>
 
-            <div id="payment_form_container">
-                {% if form_type == "payment" %}
-                    {% include "front_site/reserve/payment_form.html" %}
-                {% endif %}
-            </div>
+                <div id="details_form_container">
+                    {% include "front_site/reserve/details_form.html" %}
+                </div>
 
-        </div>
+                <div id="login_form_container">
+                    {% if form_type == "login" %}
+                        {% include "front_site/reserve/login_form.html" %}
+                    {% endif %}
+                </div>
 
-        </cfoutput>
-{#        <cfinput name="customerid" type="hidden" value="" />#}
-{#        <cfinput name="reservation_type" type="hidden" value="rental" />#}
-{#        <cfinput name="taxpct" type="hidden" value="" />#}
-{#        <input type="hidden" name="form_type" value="{{ form_type }}" />#}
-        {% csrf_token %}
-    </form>
+                <div id="payment_form_container">
+                    {% if form_type == "payment" %}
+                        {% include "front_site/reserve/payment_form.html" %}
+                    {% endif %}
+                </div>
+
+            {% csrf_token %}
+        </form>
+
+    </div>
 
     <div class="dialog" id="dialog_reset_password" title="Reset Password">
-    <p>We will send you an email with a link to click on to receive your new password.</p>
+        <p>We will send you an email with a link to click on to receive your new password.</p>
     </div>
 
     <div class="dialog" id="dialog_reset_password_done" title="Reset Password">
-    <p>An email has been sent to you containing a link to follow to receive your new password. Afterwards, please return here to continue with your reservation.</p>
+        <p>
+            An email has been sent to you containing a link to follow to receive your new password. Afterwards, please
+            return here to continue with your reservation.
+        </p>
     </div>
 
     {% include "global_includes/delivery_pricing.html" %}
-{% comment %}
-<div id="delivery_pricing" style="display: none;">
-    <p>We deliver our vehicles to most locations within the New York City tri-state area. Delivery rates are as follows:</p>
-    <table class="small-item-data delivery-pricing" style="margin-left: 0px;">
-        <tr>
-            <td>Rockland County</td>
-            <td>Free</td>
-       </tr>
-       <tr>
-            <td>Manhattan*</td>
-            <td>Free</td>
-       </tr>
-       <tr>
-            <td>Westchester Airport</td>
-            <td>Free</td>
-       </tr>
-       <tr>
-            <td>Orange County (south of Newburgh)</td>
-            <td>Free</td>
-       </tr>
-       <tr>
-            <td>Northern NJ / Bergen / Passaic County</td>
-            <td>Free</td>
-       </tr>
-       <tr>
-            <td>Metro NYC / JFK / LGA*</td>
-            <td>$99 each way</td>
-       </tr>
-       <tr>
-            <td>Long Island / Connecticut</td>
-            <td>$139 each way</td>
-       </tr>
-       <tr>
-            <td>South NJ / Philadelphia</td>
-            <td>$159 each way</td>
-       </tr>
-       <tr>
-            <td>Other areas</td>
-            <td>$2.00 / mile</td>
-       </tr>
-    </table>
-    <p>
-* Due to the nature of Manhattan and the NYC metro area, some locations may be difficult for us to deliver a vehicle due to parking or
-standing regulations. In such case we may pick you up and transport you to a suitable location at which to conduct the vehicle
-familiarization process and any required paperwork.
-    </p>
-</div>
-{% endcomment %}
 
 {% endblock %}
-</section>
-
-    <div class="push"></div>
-</div>
-
-<CFINCLUDE TEMPLATE="inc_footer.cfm">
