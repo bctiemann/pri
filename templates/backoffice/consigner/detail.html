@@ -113,7 +113,8 @@
     </cfif>
     {% endif %}
 
-    {{ form.errors }}
+    {% include "backoffice/includes/form_error.html" %}
+
     {% if consigner %}
         <form method="POST" action="{% url "backoffice:consigner-detail" pk=consigner.id %}">
     {% else %}

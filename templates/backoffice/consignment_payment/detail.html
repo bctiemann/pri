@@ -9,7 +9,8 @@
         <h2>Add Payment</h2>
     {% endif %}
 
-    {{ form.errors }}
+    {% include "backoffice/includes/form_error.html" %}
+
     {% if consignmentpayment %}
         <form method="POST" action="{% url "backoffice:consignmentpayment-detail" pk=consignmentpayment.id %}">
     {% else %}

@@ -22,7 +22,8 @@
         </iframe>
     {% endif %}
 
-    {{ form.errors }}
+    {% include "backoffice/includes/form_error.html" %}
+
     {% if customer %}
         <form method="POST" action="{% url "backoffice:customer-detail" pk=customer.id %}">
     {% else %}

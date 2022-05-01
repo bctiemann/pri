@@ -8,7 +8,8 @@
         <h2>Add Discount Code</h2>
     {% endif %}
 
-    {{ form.errors }}
+    {% include "backoffice/includes/form_error.html" %}
+
     {% if coupon %}
         <form method="POST" action="{% url "backoffice:coupon-detail" pk=coupon.id %}">
     {% else %}

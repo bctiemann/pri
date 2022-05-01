@@ -8,7 +8,8 @@
         <h2>Add Toll Tag</h2>
     {% endif %}
 
-    {{ form.errors }}
+    {% include "backoffice/includes/form_error.html" %}
+
     {% if tolltag %}
         <form method="POST" action="{% url "backoffice:tolltag-detail" pk=tolltag.id %}">
     {% else %}

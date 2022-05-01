@@ -9,7 +9,8 @@
         <h2>Add {{ event_type.label }}</h2>
     {% endif %}
 
-    {{ form.errors }}
+    {% include "backoffice/includes/form_error.html" %}
+
     {% if event_type == event_types.JOY_RIDE %}
         {% if event %}
             <form method="POST" action="{% url "backoffice:joyride-detail" pk=event.id %}">

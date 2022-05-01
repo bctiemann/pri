@@ -19,7 +19,8 @@
         </iframe>
     {% endif %}
 
-    {{ form.errors }}
+    {% include "backoffice/includes/form_error.html" %}
+
     {% if rental %}
         <form method="POST" action="{% url "backoffice:rental-detail" pk=rental.id %}">
     {% else %}

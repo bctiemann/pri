@@ -5,7 +5,8 @@
     <h2>Edit Content Page</h2>
     <h3><cfoutput>{{ sitecontent.name }}</cfoutput></h3>
 
-    {{ form.errors }}
+    {% include "backoffice/includes/form_error.html" %}
+
     <form method="POST" action="{% url "backoffice:sitecontent-detail" page=sitecontent.page %}">
 
     <table class="inputform sitecontent">

@@ -8,7 +8,8 @@
         <h2>Add News</h2>
     {% endif %}
 
-    {{ form.errors }}
+    {% include "backoffice/includes/form_error.html" %}
+
     {% if newsitem %}
         <form method="POST" action="{% url "backoffice:news-detail" pk=newsitem.id %}">
     {% else %}

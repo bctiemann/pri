@@ -4,7 +4,8 @@
 
     <h2>Add Email Image</h2>
 
-    {{ form.errors }}
+    {% include "backoffice/includes/form_error.html" %}
+
     <form method="POST" action="{% url "backoffice:massemail-image-create" %}" enctype="multipart/form-data">
 
     <table class="inputform emailpic">

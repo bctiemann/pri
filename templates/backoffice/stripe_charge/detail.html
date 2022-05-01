@@ -8,7 +8,8 @@
         <h2>Add Charge</h2>
     {% endif %}
 
-    {{ form.errors }}
+    {% include "backoffice/includes/form_error.html" %}
+
     {% if charge %}
         <form method="POST" action="{% url "backoffice:charge-detail" pk=charge.id %}">
     {% else %}

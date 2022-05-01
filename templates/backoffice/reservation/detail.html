@@ -9,7 +9,8 @@
         <h2>Add Reservation</h2>
     {% endif %}
 
-    {{ form.errors }}
+    {% include "backoffice/includes/form_error.html" %}
+
     {% if reservation %}
         <form method="POST" action="{% url "backoffice:reservation-detail" pk=reservation.id %}">
     {% else %}

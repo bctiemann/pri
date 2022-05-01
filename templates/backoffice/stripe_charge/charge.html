@@ -4,7 +4,8 @@
 
     <h2>Charge Card</h2>
 
-    {{ form.errors }}
+    {% include "backoffice/includes/form_error.html" %}
+
     <form method="POST" action="{% url "backoffice:charge-charge" %}" id="stripe_form">
     <table class="inputform stripecharge">
         <tr>

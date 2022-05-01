@@ -9,7 +9,8 @@
         <h2>Add Gift Certificate</h2>
     {% endif %}
 
-    {{ form.errors }}
+    {% include "backoffice/includes/form_error.html" %}
+
     {% if giftcertificate %}
         <form method="POST" action="{% url "backoffice:giftcert-detail" pk=giftcertificate.id %}">
     {% else %}

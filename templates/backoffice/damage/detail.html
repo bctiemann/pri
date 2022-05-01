@@ -8,7 +8,8 @@
         <h2>Add Damage</h2>
     {% endif %}
 
-    {{ form.errors }}
+    {% include "backoffice/includes/form_error.html" %}
+
     {% if damage %}
         <form method="POST" action="{% url "backoffice:damage-detail" pk=damage.id %}">
     {% else %}
