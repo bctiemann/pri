@@ -2,6 +2,7 @@ from django.conf import settings
 
 from fleet.models import VehicleType, VehicleStatus
 
+
 def settings_constants(request):
 
     context = {

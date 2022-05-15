@@ -855,6 +855,7 @@ div.pager {
 td.statistics {
 	width: 360px;
         font-size: 11pt;
+	vertical-align: top;
 }
 
 div.bbsnote {

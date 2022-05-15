@@ -330,6 +330,8 @@ EXTEND_THRESHOLD_HOURS = 6
 # Backoffice site seconds of idle until push to "sleeping" page
 ADMIN_SLEEP_TIMEOUT_SECS = 1500
 
+FIELD_ENCRYPTION_KEYS = None
+
 # Sales tax calculation API
 AVALARA_ACCOUNT_ID = None
 AVALARA_API_KEY = None

@@ -169,7 +169,7 @@ class VehicleMobileThumbForm(forms.ModelForm):
 
 class VehiclePictureForm(forms.ModelForm):
 
-    ALLOWED_IMAGE_FORMATS = ['jpg', 'png']
+    ALLOWED_IMAGE_FORMATS = ['jpg', 'jpeg', 'png']
 
     def clean_image(self):
         if not self.cleaned_data.get('image'):
