@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.views.generic import TemplateView, FormView, CreateView, UpdateView
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import reverse
@@ -214,7 +215,10 @@ class VehicleMixin:
         slug = self.kwargs.get('slug')
         # We filter() rather than get() because vehicle_marketing.slug is not unique (we may have multiple of the
         # same vehicle)
-        context['vehicle'] = VehicleMarketing.objects.filter(slug=slug, status=VehicleStatus.READY).first()
+        ready_vehicles = VehicleMarketing.objects.filter(slug=slug, status=VehicleStatus.READY)
+        if not settings.BIKES_ENABLED:
+            ready_vehicles = ready_vehicles.filter(vehicle_type=VehicleType.CAR)
+        context['vehicle'] = ready_vehicles.first()
         if not context['vehicle']:
             raise Http404
         return context

@@ -362,6 +362,8 @@ RECAPTCHA_SITE_KEY = None
 RECAPTCHA_SECRET_KEY = None
 RECAPTCHA_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
 
+# Show the bike fleet?
+BIKES_ENABLED = True
 
 # Local overrides from env.yaml
 with open(os.path.join(BASE_DIR, 'env.yaml')) as f:

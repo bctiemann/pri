@@ -10,6 +10,7 @@ def settings_constants(request):
         'title_bar_line_2': settings.TITLE_BAR_LINE_2,
         'vehicle_type': VehicleType,
         'vehicle_status': VehicleStatus,
+        'bikes_enabled': settings.BIKES_ENABLED,
         'recaptcha_enabled': settings.RECAPTCHA_ENABLED,
         'recaptcha_site_key': settings.RECAPTCHA_SITE_KEY,
         'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,

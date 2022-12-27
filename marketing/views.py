@@ -28,7 +28,10 @@ class HomeView(NavMenuMixin, TemplateView):
     # super() in turn which does invoke TemplateView.get_context_data to build the initial context object.
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['showcase_vehicle'] = context['ready_vehicles'].order_by('?').first()
+        showcase_vehicles = context['ready_vehicles'].order_by('?')
+        if not settings.BIKES_ENABLED:
+            showcase_vehicles = showcase_vehicles.filter(vehicle_type=VehicleType.CAR)
+        context['showcase_vehicle'] = showcase_vehicles.first()
         return context
 
 
@@ -64,7 +67,10 @@ class VehicleView(NavMenuMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         # We filter() rather than get() because vehicle_marketing.slug is not unique (we may have multiple of the
         # same vehicle)
-        context['vehicle'] = VehicleMarketing.objects.filter(slug__iexact=slug, status=VehicleStatus.READY).first()
+        ready_vehicles = VehicleMarketing.objects.filter(slug__iexact=slug, status=VehicleStatus.READY)
+        if not settings.BIKES_ENABLED:
+            ready_vehicles = ready_vehicles.filter(vehicle_type=VehicleType.CAR)
+        context['vehicle'] = ready_vehicles.first()
         if not context['vehicle']:
             raise Http404
         return context
