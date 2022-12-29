@@ -663,8 +663,8 @@ class GiftCertificateForm(CSSClassMixin, forms.ModelForm):
     cc_fields = ('cc_number',)
     phone_fields = ('cc_phone',)
 
-    is_paid = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
-    is_used = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False)
+    is_paid = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False, required=False)
+    is_used = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, initial=False, required=False)
 
     cc_name = forms.CharField(required=False)
     cc_number = forms.CharField(required=False)
@@ -673,10 +673,12 @@ class GiftCertificateForm(CSSClassMixin, forms.ModelForm):
     cc_cvv = forms.CharField(required=False)
     cc_phone = PhoneNumberField(region='US', required=False)
 
+    value_message = forms.CharField(widget=forms.Textarea(), required=False)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # self.fields['cc_number'].widget.attrs['class'] = 'cc-field'
+        self.fields['amount'].initial = 100.00
 
         # Set initial values on CC fields from linked Card models
         if self.instance.card:

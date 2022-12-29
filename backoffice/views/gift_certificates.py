@@ -7,6 +7,7 @@ from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.utils import timezone
 
 from . import ListViewMixin, AdminViewMixin
 from backoffice.forms import GiftCertificateForm, CardForm
@@ -35,9 +36,22 @@ class GiftCertificateDetailView(AdminViewMixin, GiftCertificateViewMixin, ListVi
     template_name = 'backoffice/gift_certificate/detail.html'
     form_class = GiftCertificateForm
 
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.initial_object = self.object
+        return super().post(request, *args, **kwargs)
+
     def form_valid(self, form):
         stripe = Stripe()
         gift_certificate = form.save()
+
+        if not self.initial_object.is_paid and form.cleaned_data['is_paid']:
+            gift_certificate.issued_at = timezone.now()
+            gift_certificate.save()
+
+        if not self.initial_object.is_used and form.cleaned_data['is_used']:
+            gift_certificate.used_on = timezone.now()
+            gift_certificate.save()
 
         # Update primary and secondary card. If any data has changed since the last saved Card object, refresh the
         # Stripe object as well.
@@ -73,6 +87,8 @@ class GiftCertificateDetailView(AdminViewMixin, GiftCertificateViewMixin, ListVi
                 card.state = form.cleaned_data['cc_state']
                 card.zip = form.cleaned_data['cc_zip']
                 card.save()
+
+        # TODO: set issued_on and used_on if changing is_paid or is_used
 
         return HttpResponseRedirect(self.get_success_url())
 
