@@ -88,8 +88,6 @@ class GiftCertificateDetailView(AdminViewMixin, GiftCertificateViewMixin, ListVi
                 card.zip = form.cleaned_data['cc_zip']
                 card.save()
 
-        # TODO: set issued_on and used_on if changing is_paid or is_used
-
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
