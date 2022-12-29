@@ -1,12 +1,5 @@
 {% load vehicle_tags humanize %}
 
-{% comment %}
-<CFQUERY NAME="Vehicles" DATASOURCE="#DSN#">
-    SELECT vehicleid,make,model FROM Vehicles
-    ORDER BY type,vehicleid ASC
-</CFQUERY>
-{% endcomment %}
-
 <table class="pricestable">
     <tr>
         <th class="align-center">Vehicle</th>
@@ -16,43 +9,28 @@
         <th>7-day</th>
         <th>Miles</th>
     </tr>
-{% if vehicles.exists %}
-<CFIF Vehicles.recordcount GT 0>
-    {% for vehicle in vehicles %}
-    <CFLOOP QUERY="Vehicles">
-        {% comment %}
-        <CFQUERY NAME="thisVehicle" DATASOURCE="#FDSN#">
-            SELECT price,disc2day,disc3day,disc7day,milesinc,status,type FROM VehiclesFront
-            WHERE vehicleid = #Vehicles.vehicleid#
-        </CFQUERY>
-        {% endcomment %}
-
-        <CFOUTPUT>
-        <tr>
-            <td>{{ vehicle.make }} {{ vehicle.model }}</td>
-            <td>
-                <span class="price">${{ vehicle.price_per_day|floatformat:0|intcomma }}{# #NumberFormat(thisVehicle.price,"$,")# #}</span>
-            </td>
-            <td>
-                <span class="price">${{ vehicle|multi_day_discounted_price:2|floatformat:0|intcomma }}{# #NumberFormat(thisVehicle.price * 2 * (1 - thisVehicle.disc2day/100),"$,")# #}</span> ({{ vehicle.discount_2_day }}%)
-            </td>
-            <td>
-                <span class="price">${{ vehicle|multi_day_discounted_price:3|floatformat:0|intcomma }}{# #NumberFormat(thisVehicle.price * 3 * (1 - thisVehicle.disc3day/100),"$,")# #}</span> ({{ vehicle.discount_3_day }}%)
-            </td>
-            <td>
-                <span class="price">${{ vehicle|multi_day_discounted_price:7|floatformat:0|intcomma }}{# #NumberFormat(thisVehicle.price * 3 * (1 - thisVehicle.disc3day/100),"$,")# #}</span> ({{ vehicle.discount_7_day }}%)
-            </td>
-            <td>{{ vehicle.miles_included }}</td>
-        </tr>
-        </CFOUTPUT>
-
-    </CFLOOP>
-    {% endfor %}
-<CFELSE>
-{% else %}
-    Aaaaah. No cars.
-</CFIF>
-{% endif %}
+    {% if vehicles.exists %}
+        {% for vehicle in vehicles %}
+            <tr>
+                <td>{{ vehicle.make }} {{ vehicle.model }}</td>
+                <td>
+                    <span class="price">${{ vehicle.price_per_day|floatformat:0|intcomma }}</span>
+                </td>
+                <td>
+                    <span class="price">${{ vehicle|multi_day_discounted_price:2|floatformat:0|intcomma }}</span> ({{ vehicle.discount_2_day }}%)
+                </td>
+                <td>
+                    <span class="price">${{ vehicle|multi_day_discounted_price:3|floatformat:0|intcomma }}</span> ({{ vehicle.discount_3_day }}%)
+                </td>
+                <td>
+                    <span class="price">${{ vehicle|multi_day_discounted_price:7|floatformat:0|intcomma }}</span> ({{ vehicle.discount_7_day }}%)
+                </td>
+                <td>{{ vehicle.miles_included }}</td>
+            </tr>
+        {% endfor %}
+    {% else %}
+        Aaaaah. No cars.
+    {% endif %}
 </table>
 
 <table class="pricestable">
@@ -60,43 +38,41 @@
         <th colspan="2" class="align-center">Joy Ride</th>
         <th colspan="2" class="align-center">Performance Experience</th>
     </tr>
-    <CFOUTPUT>
     <tr>
     <tr>
         <td>1 passenger</td>
-        <td>${{ joy_ride_prices.1_pax|intcomma }}{# #NumberFormat(joyRidePrices["1_pax"],"$,")# #}</td>
+        <td>${{ joy_ride_prices.1_pax|intcomma }}</td>
         <td>1 driver</td>
-        <td>${{ performance_experience_prices.1_drv|intcomma }}{# #NumberFormat(perfExpPrices["1_drv"],"$,")# #}</td>
+        <td>${{ performance_experience_prices.1_drv|intcomma }}</td>
     </tr>
     <tr>
         <td>2 passengers</td>
-        <td>${{ joy_ride_prices.2_pax|intcomma }}{# #NumberFormat(joyRidePrices["2_pax"],"$,")# #}</td>
+        <td>${{ joy_ride_prices.2_pax|intcomma }}</td>
         <td>2 drivers</td>
-        <td>${{ performance_experience_prices.2_drv|intcomma }}{# #NumberFormat(perfExpPrices["2_drv"],"$,")# #}</td>
+        <td>${{ performance_experience_prices.2_drv|intcomma }}</td>
     </tr>
     <tr>
         <td>3 passengers</td>
-        <td>${{ joy_ride_prices.3_pax|intcomma }}{# #NumberFormat(joyRidePrices["3_pax"],"$,")# #}</td>
+        <td>${{ joy_ride_prices.3_pax|intcomma }}</td>
         <td>3 drivers</td>
-        <td>${{ performance_experience_prices.3_drv|intcomma }}{# #NumberFormat(perfExpPrices["3_drv"],"$,")# #}</td>
+        <td>${{ performance_experience_prices.3_drv|intcomma }}</td>
     </tr>
     <tr>
         <td>4 passengers</td>
-        <td>${{ joy_ride_prices.4_pax|intcomma }}{# #NumberFormat(joyRidePrices["4_pax"],"$,")# #}</td>
+        <td>${{ joy_ride_prices.4_pax|intcomma }}</td>
         <td>4 drivers</td>
-        <td>${{ performance_experience_prices.4_drv|intcomma }}{# #NumberFormat(perfExpPrices["4_drv"],"$,")# #}</td>
+        <td>${{ performance_experience_prices.4_drv|intcomma }}</td>
     </tr>
     <tr>
         <td>>4 passengers</td>
-        <td>${{ joy_ride_prices.cost_per_pax_gt_4|intcomma }}{# #NumberFormat(joyRidePrices["cost_per_pax_gt_4"],"$,")# #} each</td>
+        <td>${{ joy_ride_prices.cost_per_pax_gt_4|intcomma }} each</td>
         <td>>4 drivers</td>
-        <td>${{ performance_experience_prices.cost_per_drv_gt_4|intcomma }}{# #NumberFormat(perfExpPrices["cost_per_drv_gt_4"],"$,")# #} each</td>
+        <td>${{ performance_experience_prices.cost_per_drv_gt_4|intcomma }} each</td>
     </tr>
     <tr>
         <td></td>
         <td></td>
         <td>Passengers</td>
-        <td>${{ performance_experience_prices.cost_per_pax|intcomma }}{# #NumberFormat(perfExpPrices["cost_per_pax"],"$,")# #} each</td>
+        <td>${{ performance_experience_prices.cost_per_pax|intcomma }} each</td>
     </tr>
-    </CFOUTPUT>
 </table>

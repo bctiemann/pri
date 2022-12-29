@@ -1,0 +1,34 @@
+<div class="toolmenu">
+    {% if user.employee.reservations_access %}
+        {% include "backoffice/includes/todo_list.html" %}
+
+        <div class="popupbox" id="prices">
+            {% include "backoffice/includes/price_list.html" %}
+        </div>
+
+        <a class="headermenu" id="priceslink" href="javascript:nop()">Prices</a>
+        <a class="headermenu" id="todolistlink" href="javascript:nop()">To-Do List
+            {% if todo_list_rentals.exists %}
+                <span class="badgebubble">{{ todo_item_count }}</span>
+            {% endif %}
+        </a>
+    {% endif %}
+
+	<a class="headermenu" id="logoutlink" href="{% url "backoffice:logout" %}">Logout [{{ user.full_name }}]</a>
+</div>
+
+<div class="menus">
+    <a id="vehiclesmenulink" class="headermenu">Vehicles</a>
+
+    {% include "backoffice/includes/menu/menu_vehicles.html" %}
+
+    <a id="opsmenulink" class="headermenu">Operations</a>
+
+    {% include "backoffice/includes/menu/menu_ops.html" %}
+
+    <a id="adminmenulink" class="headermenu">Administration</a>
+
+    {% include "backoffice/includes/menu/menu_admin.html" %}
+</div>
+
+{% include "backoffice/includes/menu/legend.html" %}

@@ -1,0 +1,124 @@
+<div id="menu_ops" class="popupbox">
+    <ul class="navmenu">
+        {% if user.employee.reservations_access %}
+            <li>
+                <a
+                    class="tnav {% if page_group == 'customers' %}selected{% endif %}"
+                    href="{% url "backoffice:customer-list" %}"
+                >
+                    Customers
+                </a>
+            </li>
+        {% endif %}
+        {% if user.employee.maintenance_access %}
+            <li>
+                <a
+                    class="tnav {% if page_group == 'service' %}selected{% endif %}"
+                    href="{% url "backoffice:service-list-due" %}"
+                >
+                    Service
+                </a>
+            </li>
+        {% endif %}
+        {% if user.employee.maintenance_access %}
+            <li>
+                <a
+                    class="tnav {% if page_group == 'damage' %}selected{% endif %}"
+                    href="{% url "backoffice:damage-list" %}"
+                >
+                    Damage
+                </a>
+            </li>
+        {% endif %}
+        {% if user.employee.admin_access %}
+            <li>
+                <a
+                    class="tnav {% if page_group == 'gift_certificates' %}selected{% endif %}"
+                    href="{% url "backoffice:giftcert-list" %}"
+                >
+                    Gift Certificates
+                </a>
+            </li>
+        {% endif %}
+        {% if user.employee.admin_access %}
+            <li>
+                <a
+                    class="tnav {% if page_group == 'coupons' %}selected{% endif %}"
+                    href="{% url "backoffice:coupon-list" %}"
+                >
+                    Discount Codes
+                </a>
+            </li>
+        {% endif %}
+        {% if user.employee.admin_access %}
+            <li>
+                <a
+                    class="tnav {% if page_group == 'adhoc_payments' %}selected{% endif %}"
+                    href="{% url "backoffice:adhocpayment-list" %}"
+                >
+                    Substitute Payments
+                </a>
+            </li>
+        {% endif %}
+        {% if user.employee.admin_access %}
+            <li>
+                <a
+                    class="tnav {% if page_group == 'consigmnent_payments' %}selected{% endif %}"
+                    href="{% url "backoffice:consignmentpayment-list" %}"
+                >
+                    Special Use Owner Payments
+                </a>
+            </li>
+        {% endif %}
+        {% if user.employee.admin_access %}
+            <li>
+                <a
+                    class="tnav {% if page_group == 'stripe_charges' %}selected{% endif %}"
+                    href="{% url "backoffice:charge-list" %}"
+                >
+                    Stripe Charges
+                </a>
+            </li>
+        {% endif %}
+        {% if user.employee.marketing_access %}
+            <li>
+                <a
+                    class="tnav {% if page_group == 'survey_responses' %}selected{% endif %}"
+                    href="{% url "backoffice:surveyresponse-list" %}"
+                >
+                    Survey Results
+                </a>
+            </li>
+        {% endif %}
+        {% if user.employee.admin_access %}
+            <li>
+                <a
+                    class="tnav {% if page_group == 'red_flags' %}selected{% endif %}"
+                    href="{% url "backoffice:redflag-list" %}"
+                >
+                    Tards
+                </a>
+            </li>
+        {% endif %}
+        {% if user.employee.admin_access %}
+            <li>
+                <a
+                    class="tnav {% if page_group == 'ip_bans' %}selected{% endif %}"
+                    href="{% url "backoffice:ipban-list" %}"
+                >
+                    IP Bans
+                </a>
+            </li>
+        {% endif %}
+        {% if user.employee.admin_access %}
+            <li>
+                <a
+                    class="tnav {% if page_group == 'tolltags' %}selected{% endif %}"
+                    href="{% url "backoffice:tolltag-list" %}"
+                >
+                    Toll Tags (E-ZPass)
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+</div>

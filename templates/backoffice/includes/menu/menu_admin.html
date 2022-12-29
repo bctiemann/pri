@@ -1,0 +1,110 @@
+<div id="menu_admin" class="popupbox">
+    <ul class="navmenu">
+        {% if user.employee.admin_access %}
+            <li>
+                <a
+                    class="tnav"
+                    href="{% url "admin:users_user_changelist" %}"
+                >
+                    Accounts
+                </a>
+            </li>
+        {% endif %}
+        <li>
+            <a
+                class="tnav"
+                href="{% url "two_factor:setup" %}"
+            >
+                Two-factor
+            </a>
+        </li>
+        {% if user.employee.admin_access %}
+            <li>
+                <a
+                    class="tnav {% if page_group == 'consigners' %}selected{% endif %}"
+                    href="{% url "backoffice:consigner-list" %}"
+                >
+                    Special Use Owners
+                </a>
+            </li>
+        {% endif %}
+        {% if user.employee.admin_access %}
+            <li>
+                <a
+                    class="tnav {% if page_group == 'employees' %}>selected{% endif %}"
+                    href="{% url "backoffice:employee-list" %}"
+                >
+                    Employees
+                </a>
+            </li>
+        {% endif %}
+        {% if user.employee.marketing_access %}
+            <li>
+                <a
+                    class="tnav {% if page_group == 'mass_email' %}selected{% endif %}"
+                    href="{% url "backoffice:massemail-compose-plaintext" %}"
+                >
+                    Mass Email
+                </a>
+            </li>
+        {% endif %}
+        {% if user.employee.marketing_access %}
+            <li>
+                <a
+                    class="tnav {% if page_group == 'news' %}selected{% endif %}"
+                    href="{% url "backoffice:news-list" %}"
+                >
+                    News
+                </a>
+            </li>
+        {% endif %}
+        {% if user.employee.marketing_access %}
+            <li>
+                <a
+                    class="tnav {% if page_group == 'site_content' %}selected{% endif %}"
+                    href="{% url "backoffice:sitecontent-list" %}"
+                >
+                    Content
+                </a>
+            </li>
+        {% endif %}
+        {% if user.employee.marketing_access %}
+            <li>
+                <a
+                    class="tnav {% if page_group == 'newsletter_subscriptions' %}selected{% endif %}"
+                    href="{% url "backoffice:subscription-list" %}"
+                >
+                    Newsletter Subscriptions
+                </a>
+            </li>
+        {% endif %}
+        {% if user.employee.admin_access %}
+            <li>
+                <a
+                    class="tnav {% if page_group == 'taxrates' %}selected{% endif %}"
+                    href="{% url "backoffice:taxrate-list" %}"
+                >
+                    Sales Tax
+                </a>
+            </li>
+        {% endif %}
+            <li>
+                <a
+                    class="tnav {% if page_group == 'bbs' %}>selected{% endif %}"
+                    href="{% url "backoffice:bbs-list" %}"
+                >
+                    BBS
+                </a>
+            </li>
+        {% if user.employee.admin_access %}
+            <li>
+                <a
+                    class="tnav"
+                    href="{% url "admin:index" %}"
+                >
+                    Admin Backend
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+</div>

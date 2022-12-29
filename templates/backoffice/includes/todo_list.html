@@ -1,0 +1,46 @@
+<div class="popupbox" id="todolist">
+    <ul class="navmenu">
+        {% for rental in todo_list_rentals %}
+            {% if rental.needs_deposit_charged %}
+                <li>
+                    <a
+                        class="tnav"
+                        href="{% url "backoffice:rental-detail" pk=rental.id %}"
+                    >
+                        Charge deposit on {{ rental.id }} ({{ rental.customer.full_name }})
+                    </a>
+                </li>
+            {% endif %}
+            {% if rental.needs_deposit_refunded %}
+                <li>
+                    <a
+                        class="tnav"
+                        href="{% url "backoffice:rental-detail" pk=rental.id %}"
+                    >
+                        Refund deposit on {{ rental.id }} ({{ rental.customer.full_name }})
+                    </a>
+                </li>
+            {% endif %}
+            {% if rental.needs_insurance_verified %}
+                <li>
+                    <a
+                        class="tnav"
+                        href="{% url "backoffice:rental-detail" pk=rental.id %}"
+                    >
+                        Verify insurance on {{ rental.id }} ({{ rental.customer.full_name }})
+                    </a>
+                </li>
+            {% endif %}
+            {% if rental.needs_background_check %}
+                <li>
+                    <a
+                        class="tnav"
+                        href="{% url "backoffice:rental-detail" pk=rental.id %}"
+                    >
+                        Background check on {{ rental.id }} ({{ rental.customer.full_name }})
+                    </a>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>
