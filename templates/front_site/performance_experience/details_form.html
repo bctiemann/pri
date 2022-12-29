@@ -21,7 +21,9 @@
             <td class="align-top">Pick Your Vehicles</td>
             <td>
                 <button class="btn pick-vehicles-btn" type="car" style="margin-right: 16px;">Cars</button>
-                <button class="btn pick-vehicles-btn" type="bike">Bikes</button>
+                {% if bikes_enabled %}
+                    <button class="btn pick-vehicles-btn" type="bike">Bikes</button>
+                {% endif %}
                 <span class="vehicles-picked" style="margin-left: 20px;"></span>
             </td>
         </tr>
