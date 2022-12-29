@@ -17,215 +17,142 @@
     {% endif %}
 
     <table class="inputform adhocpayments">
-        <cfif subpid GT 0>
-        <tr>
+        {% if adhocpayment %}
             <tr>
-                <td>Conf Code</td>
-                <td>{{ adhocpayment.confirmation_code }}
+                <tr>
+                    <td>Conf Code</td>
+                    <td>{{ adhocpayment.confirmation_code }}</td>
+                </tr>
+                <td>Is Paid</td>
+                <td>
+                    {{ form.is_paid }}
+                    (If setting paid, payer will be emailed)
                 </td>
             </tr>
-            <td>Is Paid</td>
-            <td>
-                {{ form.is_paid }}
-                {% comment %}
-                <select name="ispaid">
-                    <option value="0" <CFIF SubPay.ispaid IS 0>selected</CFIF>>No</option>
-                    <option value="1" <CFIF SubPay.ispaid IS 1>selected</CFIF>>Yes</option>
-                </select>
-                {% endcomment %}
-                (If setting paid, payer will be emailed)
-            </td>
-        </tr>
-        <tr>
-            <td>Payment Submitted</td>
-            <td>
-                {{ form.is_submitted }}
-                {% comment %}
-                <select name="issub">
-                    <option value="0" <CFIF SubPay.issub IS 0>selected</CFIF>>No</option>
-                    <option value="1" <CFIF SubPay.issub IS 1>selected</CFIF>>Yes</option>
-                </select>
-                {% endcomment %}
-                (has been submitted by payer)
-            </td>
-        </tr>
-        <tr>
-            <td>Payment Requested</td>
-            <td>{{ adhocpayment.created_at|date:"m/d/Y" }}
-{#                #DateFormat(SubPay.stamp,"MM/DD/YYYY")##}
-            </td>
-        </tr>
-        <tr>
-            <td>Payment Submitted</td>
-            <td>
-                {{ adhocpayment.submitted_at|date:"m/d/Y"|default_if_none:"Not." }}
-{#                <CFIF SubPay.issub IS 1>#DateFormat(SubPay.stamp,"MM/DD/YYYY")#<CFELSE>Not.</CFIF>#}
-            </td>
-        </tr>
-        </cfif>
+            <tr>
+                <td>Payment Submitted</td>
+                <td>
+                    {{ form.is_submitted }}
+                    (has been submitted by payer)
+                </td>
+            </tr>
+            <tr>
+                <td>Payment Requested</td>
+                <td>{{ adhocpayment.created_at|date:"m/d/Y" }}
+                </td>
+            </tr>
+            <tr>
+                <td>Payment Submitted</td>
+                <td>
+                    {{ adhocpayment.submitted_at|date:"m/d/Y"|default_if_none:"Not." }}
+                </td>
+            </tr>
+        {% endif %}
 
         <tr>
             <td>Payer Name</td>
             <td>
                 {{ form.full_name }}
-                <cfinput name="fullname" value="#SubPay.fullname#" required="yes" message="Enter payer name." maxlength="40" />
             </td>
         </tr>
         <tr>
             <td>Payer E-mail</td>
             <td>
                 {{ form.email }}
-                <cfinput name="email" value="#SubPay.email#" required="yes" validate="email" message="You must enter a valid email address." />
             </td>
         </tr>
         <tr>
             <td>Contact Phone Number</td>
             <td>
                 {{ form.phone }}
-                <cfinput name="tel" class="phone short" value="#SubPay.tel#" maxlength="20" />
             </td>
         </tr>
         <tr>
             <td>Payment Amount<br /><small>Decimal format. 100.00</small></td>
-            {% comment %}
-            <cfset amount = 100.00>
-            <cfif SubPay.amount GT 0>
-                <cfset amount = SubPay.amount>
-            </cfif>
-            {% endcomment %}
             <td class="currency">
                 <span class="currency-prefix">$</span>{{ form.amount }}
-                <cfinput name="amount" value="#amount#" class="short" />
             </td>
         </tr>
         <tr>
             <td>Item Billing For</td>
             <td>
                 {{ form.item }}
-                <cfinput type="text" name="item" value="#SubPay.item#" required="yes" message="You must enter an item name." />
             </td>
         </tr>
         <tr>
             <td class="align-top">Message to Payer</td>
             <td>
                 {{ form.message }}
-{#                <cftextarea name="mesg">#SubPay.mesg#</cftextarea>#}
             </td>
         </tr>
 
         {% if adhocpayment %}
-        <cfif subpid GT 0>
-        <tr>
-            <td class="align-top">Comments from Payer</td>
-            <td>
-                {{ form.comments }}
-{#                <cftextarea name="comments">#SubPay.comments#</cftextarea>#}
-            </td>
-        </tr>
-        <tr>
-            <td>Billing Address</td>
-            <td>
-                {{ form.cc_address }}
-                <cfinput name="addr" value="#addr_dec#" maxlength="255" />
-            </td>
-        </tr>
-        <tr>
-            <td>Billing City</td>
-            <td>
-                {{ form.cc_city }}
-                <cfinput name="city" value="#SubPay.city#" maxlength="150" />
-            </td>
-        </tr>
-        <tr>
-            <td>Billing State</td>
-            <td>
-                {{ form.cc_state }}
-                <cfselect name="state">
-                    <cfloop array="#states#" index="state">
-                        <option value="#state.abbr#" <CFIF SubPay.state IS state.abbr>selected</CFIF>>#state.name#</option>
-                    </cfloop>
-                </cfselect>
-            </td>
-        </tr>
-        <tr>
-            <td>Other State</td>
-            <td>
-                {{ form.foreign_region }}
-                <cfinput name="ostate" value="#SubPay.ostate#" maxlength="150" /> <small>(Non-US state/prov)</small>
-            </td>
-        </tr>
-        <tr>
-            <td>Billing Country</td>
-            <td>
-                {{ form.country }}
-                <cfinput name="country" value="#SubPay.country#" maxlength="2" />
-            </td>
-        </tr>
-        <tr>
-            <td>Billing Zip</td>
-            <td>
-                {{ form.cc_zip }}
-                <cfinput name="zip" value="#SubPay.zip#" maxlength="10" />
-            </td>
-        </tr>
-        <tr>
-            <td>Card</td>
-            <td>
-                {{ adhocpayment.card.stripe_card }}
-            </td>
-        </tr>
-        <tr>
-            <td>Credit Card Number</td>
-            <td>
-                {{ form.cc_number }}
-                <cfinput name="ccnum" class="cc-field" value="#formatCCNumber(ccnum_dec)#" maxlength="30" />
-            </td>
-        </tr>
-        <tr>
-            <td>Credit Card Expiration</td>
-            <td>
-                {{ form.cc_exp_mo }} / {{ form.cc_exp_yr }}
-                {% comment %}
-                <cfselect name="ccexpmo">
-                    <option value="01" <cfif SubPay.ccexpmo IS "01">selected</cfif>>January (01)</option>
-                    <option value="02" <cfif SubPay.ccexpmo IS "02">selected</cfif>>February (02)</option>
-                    <option value="03" <cfif SubPay.ccexpmo IS "03">selected</cfif>>March (03)</option>
-                    <option value="04" <cfif SubPay.ccexpmo IS "04">selected</cfif>>April (04)</option>
-                    <option value="05" <cfif SubPay.ccexpmo IS "05">selected</cfif>>May (05)</option>
-                    <option value="06" <cfif SubPay.ccexpmo IS "06">selected</cfif>>June (06)</option>
-                    <option value="07" <cfif SubPay.ccexpmo IS "07">selected</cfif>>July (07)</option>
-                    <option value="08" <cfif SubPay.ccexpmo IS "08">selected</cfif>>August (08)</option>
-                    <option value="09" <cfif SubPay.ccexpmo IS "09">selected</cfif>>September (09)</option>
-                    <option value="10" <cfif SubPay.ccexpmo IS "10">selected</cfif>>October (10)</option>
-                    <option value="11" <cfif SubPay.ccexpmo IS "11">selected</cfif>>November (11)</option>
-                    <option value="12" <cfif SubPay.ccexpmo IS "12">selected</cfif>>December (12)</option>
-                </cfselect> /
-
-                <cfset tyear = #Dateformat(Now(),"yyyy")#>
-                <cfset fyear = tyear+15>
-                <cfset ynow=#LSDateFormat(Now(),"yyyy")#>
-                <cfset ythen=(#ynow# + 11)>
-                <cfset mnow=#LSDateFormat(Now(),"mm")#>
-                <cfset dyear=ynow>
-                <cfselect name="ccexpyr">
-                    <cfoutput>
-                    <cfloop index="year" from="#ynow#" to="#ythen#">
-                        <option value="#dyear#" <cfif SubPay.ccexpyr IS dyear>selected</cfif>>#dyear#</option>>
-                        <cfset dyear = dyear + 1>
-                    </cfloop>
-                    </cfoutput>
-                </cfselect>
-                {% endcomment %}
-            </td>
-        </tr>
-        <tr>
-            <td>Credit Card<br> Security Code (CVV)</td>
-            <td>
-                {{ form.cc_cvv }}
-                <cfinput name="cccvv" value="#SubPay.cccvv#" maxlength="5" message="Enter a valid CVV number for the credit card." />
-            </td>
-        </tr>
-        </cfif>
+            <tr>
+                <td class="align-top">Comments from Payer</td>
+                <td>
+                    {{ form.comments }}
+                </td>
+            </tr>
+            <tr>
+                <td>Billing Address</td>
+                <td>
+                    {{ form.cc_address }}
+                </td>
+            </tr>
+            <tr>
+                <td>Billing City</td>
+                <td>
+                    {{ form.cc_city }}
+                </td>
+            </tr>
+            <tr>
+                <td>Billing State</td>
+                <td>
+                    {{ form.cc_state }}
+                </td>
+            </tr>
+            <tr>
+                <td>Other State</td>
+                <td>
+                    {{ form.foreign_region }}
+                </td>
+            </tr>
+            <tr>
+                <td>Billing Country</td>
+                <td>
+                    {{ form.country }}
+                </td>
+            </tr>
+            <tr>
+                <td>Billing Zip</td>
+                <td>
+                    {{ form.cc_zip }}
+                </td>
+            </tr>
+            <tr>
+                <td>Card</td>
+                <td>
+                    {{ adhocpayment.card.stripe_card }}
+                </td>
+            </tr>
+            <tr>
+                <td>Credit Card Number</td>
+                <td>
+                    {{ form.cc_number }}
+                </td>
+            </tr>
+            <tr>
+                <td>Credit Card Expiration</td>
+                <td>
+                    {{ form.cc_exp_mo }} / {{ form.cc_exp_yr }}
+                </td>
+            </tr>
+            <tr>
+                <td>Credit Card<br> Security Code (CVV)</td>
+                <td>
+                    {{ form.cc_cvv }}
+                </td>
+            </tr>
         {% endif %}
 
         <tr>
@@ -239,7 +166,6 @@
                     {% endif %}
                 </button>
                 {% if adhocpayment %}
-                <cfif tolltagid>
                     <button
                         class="btn delete"
                         type="submit"
@@ -248,7 +174,6 @@
                     >
                         Delete Substitute Payment
                     </button>
-                </cfif>
                 {% endif %}
             </td>
         </tr>

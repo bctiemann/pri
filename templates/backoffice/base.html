@@ -5,17 +5,14 @@
 {% include "backoffice/includes/head.html" %}
 <body>
 
-    <CFINCLUDE TEMPLATE="inc_lib.cfm">
-    <CFIF IsDefined("Login") AND Login IS false>
-
     {% if user.is_authenticated %}
-    <div class="header">
-        <div id="header_logo">
-            <a href="{% url "backoffice:home" %}"><img src="{% static "backoffice/images/PRI_logo_header.png" %}" /></a>
-        </div>
+        <div class="header">
+            <div id="header_logo">
+                <a href="{% url "backoffice:home" %}"><img src="{% static "backoffice/images/PRI_logo_header.png" %}" /></a>
+            </div>
 
-        {% include "backoffice/includes/menu.html" %}
-    </div>
+            {% include "backoffice/includes/menu.html" %}
+        </div>
     {% endif %}
 
     {% block nav %}{% endblock %}

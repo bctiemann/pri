@@ -22,12 +22,11 @@ from fleet.models import (
 )
 from users.models import Customer, Employee, User, MusicGenre
 from sales.models import (
-    Promotion, Coupon, BaseReservation, Reservation, Rental, Driver, JoyRide, PerformanceExperience, GiftCertificate,
+    Coupon, GuidedDrive, Reservation, Rental, Driver, JoyRide, PerformanceExperience, GiftCertificate,
     AdHocPayment, Charge, RedFlag, generate_code
 )
 from consignment.models import Consigner, ConsignmentPayment
 from service.models import Damage, ServiceItem, ScheduledService, IncidentalService
-from sales.enums import ReservationType
 from pri.cipher import AESCipher
 
 logger = logging.getLogger(__name__)
@@ -45,8 +44,8 @@ LOCATION_MAP = {
 }
 
 GUIDED_DRIVE_TYPE_MAP = {
-    1: ReservationType.JOY_RIDE.value,
-    2: ReservationType.PERFORMANCE_EXPERIENCE.value,
+    1: GuidedDrive.EventType.JOY_RIDE.value,
+    2: GuidedDrive.EventType.PERFORMANCE_EXPERIENCE.value,
 }
 
 GUIDED_DRIVE_MODEL_MAP = {
@@ -68,7 +67,7 @@ class Command(BaseCommand):
         # 'do_customers': True,
         # 'do_reservations': True,
         # 'do_rentals': True,
-        # 'do_drivers': True,
+        'do_drivers': True,
         # 'do_consigners': True,
         # 'do_consignmentvehicles': True,
         # 'do_consignmentpayments': True,
@@ -88,7 +87,7 @@ class Command(BaseCommand):
         # 'do_serviceitems': True,
         # 'do_scheduledservices': True,
         # 'do_incidentalservices': True,
-        'do_emailimages': True,
+        # 'do_emailimages': True,
     }
 
     def add_arguments(self, parser):

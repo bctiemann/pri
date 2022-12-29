@@ -4,10 +4,8 @@
 {% block nav %}
     <h1 class="pageheader">Status (Waiting Room)
         <ul class="nav_subpage" style="left: 340px;">
-            <cfoutput>
             <a href="{% url "backoffice:home-add-post" %}"><li>Post to BBS</li></a>
             <a href="{% url "backoffice:home" %}"><li>BBS (Recent)</li></a>
-            </cfoutput>
         </ul>
     </h1>
 {% endblock %}
@@ -16,155 +14,29 @@
 
 {% block content %}
     <table border=0 cellspacing=0 cellpadding=5 width=100%>
-    <tr>
-
+        <tr>
             <td valign=top class="clear" rowspan=3>
                 {% block bbs %}
                     {% include "backoffice/includes/bbs/list_waiting_room.html" %}
                 {% endblock %}
-            <CFINCLUDE TEMPLATE="inc_bbs.cfm">
             </td>
 
             <td class="statistics">
-                {% comment %}
-        <CFQUERY NAME="customers" DATASOURCE="#DSN#"
-    cachedWithin="#CreateTimeSpan(0,0,30,0)#">
-        SELECT count(*) as TotalOf FROM Customers
-        </CFQUERY>
-            <CFQUERY NAME="rentals" DATASOURCE="#DSN#"
-    cachedWithin="#CreateTimeSpan(0,0,30,0)#">
-        SELECT count(*) as TotalOf FROM Rentals
-        WHERE dateout > Now()
-        </CFQUERY>
-        <CFQUERY NAME="newsletter" DATASOURCE="#FDSN#" cachedWithin="#CreateTimeSpan(0,0,30,0)#">
-        SELECT count(*) as TotalOf FROM Newsletter
-        where confirmed=1
-        </CFQUERY>
-    <!---
-        <CFQUERY NAME="marks" DATASOURCE="#FDSN#" cachedWithin="#CreateTimeSpan(0,0,30,0)#">
-        SELECT count(*) as TotalOf FROM Marketeers
-        where confirm=1
-        </CFQUERY>
-    --->
-        <CFQUERY NAME="marktot" DATASOURCE="PRIAds" cachedWithin="#CreateTimeSpan(0,0,30,0)#">
-        SELECT sum(clicks) as clicks, sum(rents) as rents FROM traffic
-        </CFQUERY>
-        <CFQUERY NAME="gifttot" DATASOURCE="#DSN#" cachedWithin="#CreateTimeSpan(0,0,30,0)#">
-        SELECT sum(amount) as TotalOf FROM GiftCerts
-        WHERE ispaid = 1
-        </CFQUERY>
-        <CFIF gifttot.totalof GT 0>
-        <CFSET gtot = gifttot.totalof>
-        <CFELSE>
-        <CFSET gtot = 0.00>
-        </CFIF>
-        <CFQUERY NAME="subtot" DATASOURCE="#DSN#" cachedWithin="#CreateTimeSpan(0,0,30,0)#">
-        SELECT sum(amount) as TotalOf FROM subp
-        WHERE ispaid = 1
-        </CFQUERY>
-        <CFIF subtot.totalof GT 0>
-        <CFSET stot = subtot.totalof>
-        <CFELSE>
-        <CFSET stot = 0.00>
-        </CFIF>
-        <CFQUERY NAME="joytot" DATASOURCE="#DSN#" cachedWithin="#CreateTimeSpan(0,0,30,0)#">
-        SELECT sum(rate) as TotalOf FROM JoyPerf
-        WHERE status = 1
-            AND type = 1
-        </CFQUERY>
-        <CFQUERY NAME="perftot" DATASOURCE="#DSN#" cachedWithin="#CreateTimeSpan(0,0,30,0)#">
-        SELECT sum(rate) as TotalOf FROM JoyPerf
-        WHERE status = 1
-            AND type = 2
-        </CFQUERY>
-        <CFIF perftot.totalof GT 0>
-        <CFSET ptot = perftot.totalof>
-        <CFELSE>
-        <CFSET ptot = 0.00>
-        </CFIF>
-        <CFIF joytot.totalof GT 0>
-        <CFSET jtot = joytot.totalof>
-        <CFELSE>
-        <CFSET jtot = 0.00>
-        </CFIF>
-        <CFSET joyperftot = jtot + ptot>
-        <CFQUERY NAME="renttot" DATASOURCE="#DSN#" cachedWithin="#CreateTimeSpan(0,0,30,0)#">
-        SELECT sum(rate) as totalof FROM Rentals
-        WHERE status = 3
-        </CFQUERY>
-        <CFIF renttot.totalof GT 0>
-        <CFSET rtot = renttot.totalof>
-        <CFELSE>
-        <CFSET rtot = 0.00>
-        </CFIF>
-        <CFSET allbucks = gtot + joyperftot + stot + rtot>
-            <!-- -->
-            <CFQUERY NAME="Administration" DATASOURCE="#DSN#">
-                    SELECT fullname,stamp,sleeping,authority,founder FROM admin
-                    ORDER BY Stamp DESC,AdminID
-            </CFQUERY>
-            {% endcomment %}
+                {% include "backoffice/includes/admin_table.html" %}
 
-            {% include "backoffice/includes/admin_table.html" %}
-            {% comment %}
-            <table class="data alternating admins" style="width: 400px;">
-                <tr>
-                    <th></th>
-                    <th>Administrator</th>
-                    <th class="right">Last On</th>
-                    <th>Asleep?</th>
-                </tr>
-                {% for admin_user in admin_users %}
-                <tr>
-                    <td align=right class="small">
-                        <CFIF founder is 1>@</CFIF>
-                        <CFIF Authority IS 1>!</CFIF>
-                    </td>
-                    <td>{{ admin_user.full_name }}</td>
-                    <td class="numeric small {{ admin_user.last_activity_class }}">
-                        {{ admin_user.admin_last_activity|date:"M d y h:iA" }}
-                    </td>
-                    <td>
-                        {% if admin_user.is_sleeping %}Zzz...{% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-            {% if not admin_users.exists %}
-                <p>Problem. No Administrative Accounts. (So, how'd you get in here?)</p>
-            {% endif %}
+                <small><b>fact:</b> we have ({{ customers.count }}) <a href="{% url "backoffice:customer-list" %}">customer{{ customers.count|pluralize }}</a></small><br>
+                <small><b>fact:</b> we have ({{ upcoming_rentals.count }}) upcoming <a href="{% url "backoffice:rental-list" %}">rental{{ upcoming_rentals.count|pluralize }}</a></small><br>
+                <small><b>fact:</b> we have ({{ newsletter_subscriptions.count }}) <a href="{% url "backoffice:massemail-compose-plaintext" %}">newsletter sub{{ newsletter_subscriptions.count|pluralize }}</a></small><br>
 
-            <div align=right class="small">
-                ! = Authority to Create Accounts<br>
-                @ = Autoregen<br>
-                <b><span class="less-than-1-hour">Red</span></b>, less than 1hr<br>
-                <b><span class="less-than-2-days">Black</span></b>, less than 2days<br>
-            </div>
-            {% endcomment %}
-
-                <small><b>fact:</b> we have
-    (<CFOUTPUT>{{ customers.count }}</CFOUTPUT>) <a
-    href="{% url "backoffice:customer-list" %}">customer{{ customers.count|pluralize }}</a></small><br>
-                <small><b>fact:</b> we have
-    (<CFOUTPUT>{{ upcoming_rentals.count }}</CFOUTPUT>) upcoming <a
-    href="{% url "backoffice:rental-list" %}">rental{{ upcoming_rentals.count|pluralize }}</a></small><br>
-    <small><b>fact:</b> we have
-    (<CFOUTPUT>{{ newsletter_subscriptions.count }}</CFOUTPUT>) <a
-    href="{% url "backoffice:massemail-compose-plaintext" %}">newsletter sub{{ newsletter_subscriptions.count|pluralize }}</a></small><br>
-    <CFIF YourID.acclev IS 1>
-    <small><b>fact:</b> we've made
-    (<CFOUTPUT>${{ gift_certificate_total|floatformat:2|intcomma }}{# #NumberFormat(gtot,"$___,___.__")# #}</CFOUTPUT>) from gift certificates</small><br>
-    <small><b>fact:</b> we've hoovered up
-    (<CFOUTPUT>${{ ad_hoc_payment_total|floatformat:2|intcomma }}{# #NumberFormat(stot,"$___,___.__")# #}</CFOUTPUT>) in substitute payments</small><br>
-    <small><b>fact:</b> we've acquired
-    (<CFOUTPUT>${{ guided_drive_total|floatformat:2|intcomma }}{# #NumberFormat(joyperftot,"$___,___.__")# #}</CFOUTPUT>) from joyrides and perf exps</small><br>
-    <small><b>fact:</b> we've absconded with
-    (<CFOUTPUT>${{ rental_total|floatformat:2|intcomma }}{# #NumberFormat(rtot,"$___,___.__")# #}</CFOUTPUT>) from rentals</small><br>
-    <small><b>fact:</b> all told we've made
-    (<CFOUTPUT>${{ all_bucks|floatformat:2|intcomma }}{# #NumberFormat(allbucks,"$___,___.__")# #}</CFOUTPUT>) since ever</small><br>
-    </CFIF>
-    </td>
-    </tr>
+                {% if user.employee.admin_access %}
+                    <small><b>fact:</b> we've made (${{ gift_certificate_total|floatformat:2|intcomma }}) from gift certificates</small><br>
+                    <small><b>fact:</b> we've hoovered up (${{ ad_hoc_payment_total|floatformat:2|intcomma }}) in substitute payments</small><br>
+                    <small><b>fact:</b> we've acquired (${{ guided_drive_total|floatformat:2|intcomma }}) from joyrides and perf exps</small><br>
+                    <small><b>fact:</b> we've absconded with (${{ rental_total|floatformat:2|intcomma }}) from rentals</small><br>
+                    <small><b>fact:</b> all told we've made (${{ all_bucks|floatformat:2|intcomma }}) since ever</small><br>
+                {% endif %}
+            </td>
+        </tr>
     </table>
 
     <div id="livecalendar">

@@ -4,76 +4,30 @@
 {% block content_class %}{% endblock %}
 
 {% block content %}
-    <CFINCLUDE TEMPLATE="inc_header.cfm">
 
-<h1 class="pageheader" style="background-color: #fff">
-</h1>
+    <h1 class="pageheader" style="background-color: #fff"></h1>
 
-<div id="content">
+    <div id="content">
 
-<div id="admlist">
-
-        {% include "backoffice/includes/admin_table.html" %}
-
-        {% comment %}
-        <CFQUERY NAME="Administration" DATASOURCE="#DSN#">
-                SELECT fullname,stamp,sleeping,authority,founder FROM admin
-                ORDER BY Stamp DESC,AdminID
-        </CFQUERY>
-        <table class="data">
-        <tr>
-                <th></th>
-                <th>Administrator</th>
-                <th class="right">Last On</th>
-                <th>Asleep?</th>
-        </tr>
-        <CFOUTPUT QUERY="Administration"><tr style="background-color: ###iif(currentrow MOD 2,DE('#row1color#'),DE('#row2color#'))#">
-                <td align=right><small><CFIF founder is 1>@</CFIF>
-<CFIF Authority IS 1>!</CFIF></small></td>
-                <td>#FullName#</td>
-                <td class="numeric"><small><CFSET x = Now() - Stamp><CFIF x LT 0.05>
-<font color=##ff0000><CFELSEIF x LT 1><font><CFELSE><font
-color=##808080></CFIF>
-#DateFormat(Stamp,"mmm dd y")#
-#TimeFormat(Stamp,"hh:mmTT")#</font></small></td>
-                <td><CFIF Sleeping IS 1>Zzz...</CFIF></td>
-        </tr></CFOUTPUT>
-        </table>
-        <CFIF Administration.RecordCount IS 0>
-                <p>Problem. No Administrative Accounts. (So, how'd you get in here?)</p>
-        </CFIF>
-        <div align=right>
-        <small>
-                ! = Authority to Create Accounts<br>
-                @ = Autoregen<br>
-        <font color=#202020>
-        <b><font color=#ff0000>Red</font></b>, less than 1hr<Br>
-        <b><font color=#000000>Black</font></b>, less than 2days<br>
-        </font>
-        </small>
+        <div id="admlist">
+            {% include "backoffice/includes/admin_table.html" %}
         </div>
-        {% endcomment %}
-   </div>
 
+        <a href="{% url "backoffice:home" %}"><img src="{% static "backoffice/images/PRI_logo_adm.jpg" %}" width="500" height="131" border=0 hspace=0 vspace=0 alt="PRI Administration"></a>
 
-        <a href="{% url "backoffice:home" %}"><img src="{% static "backoffice/images/PRI_logo_adm.jpg" %}" width="500"
-height="131" border=0 hspace=0 vspace=0 alt="PRI Administration"></a>
+        <br />
 
-<br />
+        <p>
+            Performance Rentals Administration Tool. All access to this area is <b>restricted and logged</b>.
+        </p>
+        <p>
+            You are responsible for data security. Do not leave logged in sessions unattended for any reason.
+        </p>
+        <p>
+            <b>Do not access this area from foreign/insecure networks.</b>
+        </p>
 
-<p>
-Performance Rentals Administration Tool. All access to this area is <b>restricted and logged</b>.
-</p>
-<p>
-You are responsible for data security. Do not leave logged in sessions unattended for any reason.
-</p>
-<p>
-<b>Do not access this area from foreign/insecure networks.</b>
-</p>
-
-
-</div>
-<CFINCLUDE TEMPLATE="inc_footer.cfm">
+    </div>
 
     <script type="text/javascript">
     activityTrackerExempt = true;

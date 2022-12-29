@@ -228,6 +228,7 @@ class ReservationRentalDetailsForm(forms.ModelForm):
     def clean(self):
         print('cleaned:')
         print(self.cleaned_data)
+        # TODO: Handle KeyError better
         try:
             self.customer = Customer.objects.get(user__email=self.cleaned_data['email'])
         except (Customer.DoesNotExist, KeyError):
@@ -325,6 +326,7 @@ class GuidedDriveBaseDetailsForm(forms.Form):
     def clean(self):
         print('cleaned:')
         print(self.cleaned_data)
+        # TODO: Handle KeyError better
         try:
             self.customer = Customer.objects.get(user__email=self.cleaned_data['email'])
         except (Customer.DoesNotExist, KeyError):

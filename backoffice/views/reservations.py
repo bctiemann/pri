@@ -110,6 +110,8 @@ class ReservationConvertToRentalView(UpdateView):
         # )
         self.rental = rental
 
+        # TODO: Add primary driver to Driver model
+
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
