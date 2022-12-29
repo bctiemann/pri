@@ -45,6 +45,8 @@ class FleetView(NavMenuMixin, TemplateView):
         vehicle_type = vehicle_type or self.vehicle_type
         if vehicle_type and vehicle_type not in ['cars', 'bikes']:
             raise Http404
+        if vehicle_type == 'bikes' and not settings.BIKES_ENABLED:
+            raise Http404
         return super().get(request, *args, vehicle_type=vehicle_type, **kwargs)
 
     def get_context_data(self, vehicle_type=None, **kwargs):
