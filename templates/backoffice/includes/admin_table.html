@@ -8,8 +8,8 @@
     {% for admin_user in admin_users %}
         <tr>
             <td align=right class="small">
-                <CFIF founder is 1>@</CFIF>
-                <CFIF Authority IS 1>!</CFIF>
+                {% if admin_user.is_founder %}@{% endif %}
+                {% if admin_user.is_authority %}!{% endif %}
             </td>
             <td>{{ admin_user.full_name }}</td>
             <td class="numeric small {{ admin_user.last_activity_css_class }}">

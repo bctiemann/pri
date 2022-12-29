@@ -138,6 +138,16 @@ class User(PermissionsMixin, AbstractBaseUser):
     def is_superuser(self):
         return self.is_admin
 
+    # Synonym for legacy "auto-regenerating" (note, these users do not "auto-regenerate")
+    @property
+    def is_founder(self):
+        return self.is_superuser
+
+    # Synonym for legacy "can manage user accounts"
+    @property
+    def is_authority(self):
+        return self.employee.admin_access
+
     @property
     def is_sleeping(self):
         if not self.admin_last_activity:
