@@ -505,10 +505,11 @@ var sendWelcomeEmail = function(reservationid) {
 
 var sendGiftCertEmail = function(giftcertid) {
     if (confirm('An email will be sent notifying the customer of the download link for the completed gift certificate. Proceed?')) {
-        $.post('ajax_post.cfm', {
+        let url = '/api/send_gift_cert_email/';
+        $.post(url, {
             component: 'giftcert',
             method: 'sendGiftCertEmail',
-            giftcertid: giftcertid,
+            giftcertificate_id: giftcertid,
         },
         function(data) {
             if (data.success) {

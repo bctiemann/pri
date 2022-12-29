@@ -505,6 +505,22 @@ class GiftCertificate(models.Model):
             hash_str += self.get_random_character()
         return hash_str
 
+    def send_download_email(self):
+        email_context = {
+            'giftcertificate': self,
+            'company_phone': settings.COMPANY_PHONE,
+            'company_fax': settings.COMPANY_FAX,
+            'site_email': settings.SITE_EMAIL,
+            'site_url': settings.SERVER_BASE_URL,
+        }
+
+        send_email(
+            [self.email], 'Performance Rentals Gift Certificate', email_context,
+            from_address=f'{settings.SALES_EMAIL} (Performance Rentals)',
+            text_template='email/gift_cert_download.txt',
+            html_template='email/gift_cert_download.txt',
+        )
+
     def save(self, *args, **kwargs):
         self.cc_number = format_cc_number(self.cc_number)
         if not self.tag:

@@ -30,7 +30,7 @@ from sales.forms import (
 )
 from marketing.forms import NewsletterSubscribeForm, NewsletterUnsubscribeForm
 from customer_portal.forms import ReservationCustomerInfoForm
-from sales.models import BaseReservation, Reservation, Rental, TaxRate, AdHocPayment, generate_code
+from sales.models import BaseReservation, Reservation, Rental, TaxRate, AdHocPayment, GiftCertificate, generate_code
 from sales.tasks import send_email
 from sales.calculators import PriceCalculator
 from sales.enums import CC2_ERROR_PARAM_MAP, ServiceType
@@ -673,4 +673,23 @@ class SendWelcomeEmailView(APIView):
         return Response({
             'success': True,
             'confirmation_code': reservation.confirmation_code,
+        })
+
+
+class SendGiftCertEmailView(APIView):
+
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (HasReservationsAccess,)
+
+    def post(self, request):
+        giftcertificate_id = request.POST.get('giftcertificate_id')
+        try:
+            giftcertificate = GiftCertificate.objects.get(pk=giftcertificate_id)
+        except GiftCertificate.DoesNotExist:
+            raise Http404
+
+        giftcertificate.send_download_email()
+
+        return Response({
+            'success': True,
         })

@@ -82,7 +82,8 @@ urlpatterns = [
     path('joy_ride/complete/', sales_views.JoyRideHoneypotView.as_view(), name='joy-ride-honeypot'),
 
     path('gift_certificate/', sales_views.GiftCertificateView.as_view(), name='gift-certificate'),
-    path('gift_certificate/<str:tag>/', sales_views.GiftCertificateStatusView.as_view(), name='gift-certificate-status'),
+    path('gift_certificate/<str:tag>/status/', sales_views.GiftCertificateStatusView.as_view(), name='gift-certificate-status'),
+    path('gift_certificate/<str:tag>/pdf/', sales_views.GiftCertificatePDFView.as_view(), name='gift-certificate-pdf'),
 
     path('payment/<str:confirmation_code>/', sales_views.AdHocPaymentView.as_view(), name='adhoc-payment'),
     path('payment/<str:confirmation_code>/done/', sales_views.AdHocPaymentDoneView.as_view(), name='adhoc-payment-done'),
@@ -138,6 +139,7 @@ urlpatterns = [
     path('api/check_schedule_conflict/', api_views.CheckScheduleConflictView.as_view(), name='check-schedule-conflict'),
     path('api/send_insurance_auth/', api_views.SendInsuranceAuthView.as_view(), name='send-insurance-auth'),
     path('api/send_welcome_email/', api_views.SendWelcomeEmailView.as_view(), name='send-welcome-email'),
+    path('api/send_gift_cert_email/', api_views.SendGiftCertEmailView.as_view(), name='send-gift-cert-email'),
 
     # Handle legacy calls from mobile app
     path('ajax_post.cfm', api_views.LegacyPostView.as_view(), name='legacy-post'),

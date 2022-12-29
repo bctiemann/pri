@@ -21,6 +21,7 @@ from sales.models import GiftCertificate, AdHocPayment, generate_code
 from sales.enums import ServiceType
 from marketing.views import NavMenuMixin
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
+from pri.pdf import PDFView
 
 customer_fields = (
     'first_name', 'last_name', 'mobile_phone', 'home_phone', 'work_phone', 'fax', 'cc_number', 'cc_exp_yr',
@@ -513,6 +514,19 @@ class GiftCertificateStatusView(NavMenuMixin, UpdateView):
             self.object = GiftCertificate.objects.get(tag=self.kwargs['tag'])
         except GiftCertificate.DoesNotExist:
             raise Http404
+
+
+class GiftCertificatePDFView(PDFView):
+    template_name = 'pdf/gift_certificate.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            context['gift_certificate'] = GiftCertificate.objects.get(tag=self.kwargs['tag'], is_paid=True)
+        except GiftCertificate.DoesNotExist:
+            raise Http404
+        context['company_phone'] = settings.COMPANY_PHONE
+        return context
 
 
 # AdHoc Payments (SubPay)

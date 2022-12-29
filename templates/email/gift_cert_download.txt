@@ -1,0 +1,16 @@
+Dear {{ giftcertificate.cc_name }},
+
+The gift certificate you have purchased for {{ giftcertificate.beneficiary_name }} is now available for download.
+Please visit the following URL in order to download and print your gift certificate.
+
+{{ site_url }}{% url "gift-certificate-pdf" tag=giftcertificate.tag %}?inline
+
+Your gift certificate is in PDF format and should be viewable by any current web browser.
+If you are having difficulty viewing the certificate, make sure you have Adobe Acrobat viewer
+installed, available at no cost from adobe.com
+
+Thank you for choosing Performance Rentals!
+
+If you have any questions, please feel free to call us at {{ company_phone }} or email {{ site_email }}
+
+This e-mail has been automatically generated. Please do not reply to this address.

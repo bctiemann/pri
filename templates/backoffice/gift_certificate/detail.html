@@ -18,20 +18,17 @@
     {% endif %}
 
     <table class="inputform giftcerts">
-        <cfif giftcertid GT 0>
+        {% if giftcertificate %}
         <tr>
             <td>Created</td>
             <td>{{ giftcertificate.created_at|date:"m/d/Y" }}</td>
         </tr>
-        {% if giftcertificate %}
         <tr>
             <td>Tag</td>
             <td>
                 <a href="{% url "backoffice:giftcert-pdf" tag=giftcertificate.tag %}?inline" target="_blank">{{ giftcertificate.tag }}</a>
-                <cfinput type="hidden" name="tag" value="#GiftCert.tag#" />
             </td>
         </tr>
-        {% endif %}
         <tr>
             <td>Is Paid/Issued</td>
             <td>
@@ -41,10 +38,12 @@
                     <option value="0" <CFIF GiftCert.ispaid IS 0>selected</CFIF>>No</option>
                     <option value="1" <CFIF GiftCert.ispaid IS 1>selected</CFIF>>Yes</option>
                 </select>
-                <cfif GiftCert.ispaid IS 1>
-                    <button class="btn" type="button" name="send_cert" onclick="sendGiftCertEmail(#GiftCert.giftcertid#)">Send Download Email</button>
-                </cfif>
                 {% endcomment %}
+                {% if giftcertificate.is_paid %}
+                <cfif GiftCert.ispaid IS 1>
+                    <button class="btn" type="button" name="send_cert" onclick="sendGiftCertEmail({{ giftcertificate.id }})">Send Download Email</button>
+                </cfif>
+                {% endif %}
             </td>
         </tr>
         <tr>
@@ -90,6 +89,7 @@
             </td>
         </tr>
         </cfif>
+        {% endif %}
 
         <tr>
             <td>Customer Name</td>

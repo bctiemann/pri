@@ -346,7 +346,10 @@ class EmployeeForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data['email']
-        if User.objects.filter(email=email).exclude(pk=self.instance.user.id).exists():
+        matching_users = User.objects.filter(email=email)
+        if self.instance.id:
+            matching_users = matching_users.exclude(pk=self.instance.user.id)
+        if matching_users.exists():
             raise forms.ValidationError(f'A user with email {email} already exists.')
         return email
 
