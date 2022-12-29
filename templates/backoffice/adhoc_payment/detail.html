@@ -16,169 +16,169 @@
         <form method="POST" action="{% url "backoffice:adhocpayment-create" %}">
     {% endif %}
 
-    <table class="inputform adhocpayments">
-        {% if adhocpayment %}
-            <tr>
+        <table class="inputform adhocpayments">
+            {% if adhocpayment %}
                 <tr>
-                    <td>Conf Code</td>
-                    <td>{{ adhocpayment.confirmation_code }}</td>
+                    <tr>
+                        <td>Conf Code</td>
+                        <td>{{ adhocpayment.confirmation_code }}</td>
+                    </tr>
+                    <td>Is Paid</td>
+                    <td>
+                        {{ form.is_paid }}
+                        (If setting paid, payer will be emailed)
+                    </td>
                 </tr>
-                <td>Is Paid</td>
-                <td>
-                    {{ form.is_paid }}
-                    (If setting paid, payer will be emailed)
-                </td>
-            </tr>
-            <tr>
-                <td>Payment Submitted</td>
-                <td>
-                    {{ form.is_submitted }}
-                    (has been submitted by payer)
-                </td>
-            </tr>
-            <tr>
-                <td>Payment Requested</td>
-                <td>{{ adhocpayment.created_at|date:"m/d/Y" }}
-                </td>
-            </tr>
-            <tr>
-                <td>Payment Submitted</td>
-                <td>
-                    {{ adhocpayment.submitted_at|date:"m/d/Y"|default_if_none:"Not." }}
-                </td>
-            </tr>
-        {% endif %}
+                <tr>
+                    <td>Payment Submitted</td>
+                    <td>
+                        {{ form.is_submitted }}
+                        (has been submitted by payer)
+                    </td>
+                </tr>
+                <tr>
+                    <td>Payment Requested</td>
+                    <td>{{ adhocpayment.created_at|date:"m/d/Y" }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Payment Submitted</td>
+                    <td>
+                        {{ adhocpayment.submitted_at|date:"m/d/Y"|default_if_none:"Not." }}
+                    </td>
+                </tr>
+            {% endif %}
 
-        <tr>
-            <td>Payer Name</td>
-            <td>
-                {{ form.full_name }}
-            </td>
-        </tr>
-        <tr>
-            <td>Payer E-mail</td>
-            <td>
-                {{ form.email }}
-            </td>
-        </tr>
-        <tr>
-            <td>Contact Phone Number</td>
-            <td>
-                {{ form.phone }}
-            </td>
-        </tr>
-        <tr>
-            <td>Payment Amount<br /><small>Decimal format. 100.00</small></td>
-            <td class="currency">
-                <span class="currency-prefix">$</span>{{ form.amount }}
-            </td>
-        </tr>
-        <tr>
-            <td>Item Billing For</td>
-            <td>
-                {{ form.item }}
-            </td>
-        </tr>
-        <tr>
-            <td class="align-top">Message to Payer</td>
-            <td>
-                {{ form.message }}
-            </td>
-        </tr>
+            <tr>
+                <td>Payer Name</td>
+                <td>
+                    {{ form.full_name }}
+                </td>
+            </tr>
+            <tr>
+                <td>Payer E-mail</td>
+                <td>
+                    {{ form.email }}
+                </td>
+            </tr>
+            <tr>
+                <td>Contact Phone Number</td>
+                <td>
+                    {{ form.phone }}
+                </td>
+            </tr>
+            <tr>
+                <td>Payment Amount<br /><small>Decimal format. 100.00</small></td>
+                <td class="currency">
+                    <span class="currency-prefix">$</span>{{ form.amount }}
+                </td>
+            </tr>
+            <tr>
+                <td>Item Billing For</td>
+                <td>
+                    {{ form.item }}
+                </td>
+            </tr>
+            <tr>
+                <td class="align-top">Message to Payer</td>
+                <td>
+                    {{ form.message }}
+                </td>
+            </tr>
 
-        {% if adhocpayment %}
-            <tr>
-                <td class="align-top">Comments from Payer</td>
-                <td>
-                    {{ form.comments }}
-                </td>
-            </tr>
-            <tr>
-                <td>Billing Address</td>
-                <td>
-                    {{ form.cc_address }}
-                </td>
-            </tr>
-            <tr>
-                <td>Billing City</td>
-                <td>
-                    {{ form.cc_city }}
-                </td>
-            </tr>
-            <tr>
-                <td>Billing State</td>
-                <td>
-                    {{ form.cc_state }}
-                </td>
-            </tr>
-            <tr>
-                <td>Other State</td>
-                <td>
-                    {{ form.foreign_region }}
-                </td>
-            </tr>
-            <tr>
-                <td>Billing Country</td>
-                <td>
-                    {{ form.country }}
-                </td>
-            </tr>
-            <tr>
-                <td>Billing Zip</td>
-                <td>
-                    {{ form.cc_zip }}
-                </td>
-            </tr>
-            <tr>
-                <td>Card</td>
-                <td>
-                    {{ adhocpayment.card.stripe_card }}
-                </td>
-            </tr>
-            <tr>
-                <td>Credit Card Number</td>
-                <td>
-                    {{ form.cc_number }}
-                </td>
-            </tr>
-            <tr>
-                <td>Credit Card Expiration</td>
-                <td>
-                    {{ form.cc_exp_mo }} / {{ form.cc_exp_yr }}
-                </td>
-            </tr>
-            <tr>
-                <td>Credit Card<br> Security Code (CVV)</td>
-                <td>
-                    {{ form.cc_cvv }}
-                </td>
-            </tr>
-        {% endif %}
+            {% if adhocpayment %}
+                <tr>
+                    <td class="align-top">Comments from Payer</td>
+                    <td>
+                        {{ form.comments }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Billing Address</td>
+                    <td>
+                        {{ form.cc_address }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Billing City</td>
+                    <td>
+                        {{ form.cc_city }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Billing State</td>
+                    <td>
+                        {{ form.cc_state }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Other State</td>
+                    <td>
+                        {{ form.foreign_region }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Billing Country</td>
+                    <td>
+                        {{ form.country }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Billing Zip</td>
+                    <td>
+                        {{ form.cc_zip }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Card</td>
+                    <td>
+                        {{ adhocpayment.card.stripe_card }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Credit Card Number</td>
+                    <td>
+                        {{ form.cc_number }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Credit Card Expiration</td>
+                    <td>
+                        {{ form.cc_exp_mo }} / {{ form.cc_exp_yr }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Credit Card<br> Security Code (CVV)</td>
+                    <td>
+                        {{ form.cc_cvv }}
+                    </td>
+                </tr>
+            {% endif %}
 
-        <tr>
-            <td></td>
-            <td>
-                <button class="btn" type="submit" name="edit">
-                    {% if adhocpayment %}
-                        Edit
-                    {% else %}
-                        Add
-                    {% endif %}
-                </button>
-                {% if adhocpayment %}
-                    <button
-                        class="btn delete"
-                        type="submit"
-                        name="delete"
-                        onclick="return confirmDelete(this.form, '{% url "backoffice:adhocpayment-delete" pk=adhocpayment.id %}', 'substitute payment')"
-                    >
-                        Delete Substitute Payment
+            <tr>
+                <td></td>
+                <td>
+                    <button class="btn" type="submit" name="edit">
+                        {% if adhocpayment %}
+                            Edit
+                        {% else %}
+                            Add
+                        {% endif %}
                     </button>
-                {% endif %}
-            </td>
-        </tr>
-    </table>
-    {% csrf_token %}
+                    {% if adhocpayment %}
+                        <button
+                            class="btn delete"
+                            type="submit"
+                            name="delete"
+                            onclick="return confirmDelete(this.form, '{% url "backoffice:adhocpayment-delete" pk=adhocpayment.id %}', 'substitute payment')"
+                        >
+                            Delete Substitute Payment
+                        </button>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+        {% csrf_token %}
     </form>
 
 {% endblock %}

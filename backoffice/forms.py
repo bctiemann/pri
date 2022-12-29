@@ -469,7 +469,8 @@ class CloneCustomerForm(forms.ModelForm):
         fields = ('clone_first_name', 'clone_last_name', 'clone_email', 'clone_duplicate_license',)
 
 
-class CouponForm(forms.ModelForm):
+class CouponForm(CSSClassMixin, forms.ModelForm):
+    short_fields = ('percent',)
 
     class Meta:
         model = Coupon

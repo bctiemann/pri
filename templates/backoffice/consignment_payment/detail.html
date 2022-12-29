@@ -17,77 +17,56 @@
         <form method="POST" action="{% url "backoffice:consignmentpayment-create" %}">
     {% endif %}
 
-    <table class="inputform consignmentpayments">
-        <tr>
-            <td>Owner/Recipient</td>
-            <td>
-                {{ form.consigner }}
-                {% comment %}
-                <cfquery name="Consigners" datasource="#DSN#">
-                    SELECT consignerid,fname,lname FROM Consigners
-                    ORDER BY lname
-                </cfquery>
-                <cfselect name="consignerid">
-                    <option value="0">(Select)</option>
-                    <cfloop query="#Consigners#">
-                        <option value="#consignerid#" <CFIF ConsignmentPayment.consignerid IS consignerid>selected</CFIF>>#fname# #lname#</option>
-                    </cfloop>
-                </cfselect>
-                {% endcomment %}
-            </td>
-        </tr>
-        <tr>
-            <td>Payment Amount<br /><small>Decimal format. 100.00</small></td>
-            <cfset amount = 100.00>
-            <cfif ConsignmentPayment.amount GT 0>
-                <cfset amount = ConsignmentPayment.amount>
-            </cfif>
-            <td class="currency">
-                <span class="currency-prefix">$</span>{{ form.amount }}
-{#                <cfinput name="amount" value="#amount#" class="short" />#}
-            </td>
-        </tr>
-        <tr>
-            <td>Payment Date</td>
-            <td>
-                {{ form.paid_on_picker }}
-                <cfinput name="stamp" value="#DateFormat(ConsignmentPayment.stamp,"MM/DD/YYYY")#" maxlength="20" class="short" />
-            </td>
-        </tr>
-        <tr>
-            <td>Method</td>
-            <td>
-                {{ form.method }}
-                <cfinput type="text" name="method" value="#ConsignmentPayment.method#" />
-            </td>
-        </tr>
+        <table class="inputform consignmentpayments">
+            <tr>
+                <td>Owner/Recipient</td>
+                <td>
+                    {{ form.consigner }}
+                </td>
+            </tr>
+            <tr>
+                <td>Payment Amount<br /><small>Decimal format. 100.00</small></td>
+                <td class="currency">
+                    <span class="currency-prefix">$</span>{{ form.amount }}
+                </td>
+            </tr>
+            <tr>
+                <td>Payment Date</td>
+                <td>
+                    {{ form.paid_on_picker }}
+                </td>
+            </tr>
+            <tr>
+                <td>Method</td>
+                <td>
+                    {{ form.method }}
+                </td>
+            </tr>
 
-        <tr>
-            <td></td>
-            <td>
-                <button class="btn" type="submit" name="edit">
-                    {% if consignmentpayment %}
-                        Edit
-                    {% else %}
-                        Add
-                    {% endif %}
-                </button>
-                {% if consignmentpayment %}
-                <cfif tolltagid>
-                    <button
-                        class="btn delete"
-                        type="submit"
-                        name="delete"
-                        onclick="return confirmDelete(this.form, '{% url "backoffice:consignmentpayment-delete" pk=consignmentpayment.id %}', 'payment')"
-                    >
-                        Delete Payment
+            <tr>
+                <td></td>
+                <td>
+                    <button class="btn" type="submit" name="edit">
+                        {% if consignmentpayment %}
+                            Edit
+                        {% else %}
+                            Add
+                        {% endif %}
                     </button>
-                </cfif>
-                {% endif %}
-            </td>
-        </tr>
-    </table>
-    {% csrf_token %}
+                    {% if consignmentpayment %}
+                        <button
+                            class="btn delete"
+                            type="submit"
+                            name="delete"
+                            onclick="return confirmDelete(this.form, '{% url "backoffice:consignmentpayment-delete" pk=consignmentpayment.id %}', 'payment')"
+                        >
+                            Delete Payment
+                        </button>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+        {% csrf_token %}
     </form>
 
 {% endblock %}

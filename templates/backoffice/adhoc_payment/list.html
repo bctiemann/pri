@@ -8,27 +8,26 @@
     {% include "backoffice/includes/search_form.html" %}
 
     <table class="data alternating" sortedby="{{ sortby }}">
-    <tr>
-        <th col="id" default-sort="desc">ID</th>
-        <th col="full_name">Billing Name</th>
-        <th>Email</th>
-        <th>Phone</th>
-        <th>Amount</th>
-        <th>Is Paid</th>
-        <th>Is Submitted</th>
-    </tr>
-    {% for adhocpayment in adhocpayment_list %}
-        <tr class="clickable click-to-edit" destination="{% url "backoffice:adhocpayment-detail" pk=adhocpayment.id %}">
-            <td><a href="{% url "backoffice:adhocpayment-detail" pk=adhocpayment.id %}">{{ adhocpayment.id }}</a></td>
-            <td>{{ adhocpayment.full_name }}</td>
-            <td>{{ adhocpayment.email }}</td>
-            <td>{{ adhocpayment.phone.as_national }}</td>
-            <td>${{ adhocpayment.amount|intcomma }}</td>
-            <td>{% if adhocpayment.is_paid %}&#10003;{% endif %}</td>
-            <td>{% if adhocpayment.is_submitted %}&#10003;{% endif %}</td>
+        <tr>
+            <th col="id" default-sort="desc">ID</th>
+            <th col="full_name">Billing Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Amount</th>
+            <th>Is Paid</th>
+            <th>Is Submitted</th>
         </tr>
-
-    {% endfor %}
+        {% for adhocpayment in adhocpayment_list %}
+            <tr class="clickable click-to-edit" destination="{% url "backoffice:adhocpayment-detail" pk=adhocpayment.id %}">
+                <td><a href="{% url "backoffice:adhocpayment-detail" pk=adhocpayment.id %}">{{ adhocpayment.id }}</a></td>
+                <td>{{ adhocpayment.full_name }}</td>
+                <td>{{ adhocpayment.email }}</td>
+                <td>{{ adhocpayment.phone.as_national }}</td>
+                <td>${{ adhocpayment.amount|intcomma }}</td>
+                <td>{% if adhocpayment.is_paid %}&#10003;{% endif %}</td>
+                <td>{% if adhocpayment.is_submitted %}&#10003;{% endif %}</td>
+            </tr>
+        {% endfor %}
     </table>
 
 {% endblock %}

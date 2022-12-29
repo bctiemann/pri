@@ -2,15 +2,11 @@
 
 {% block content %}
 
-{#    <script type="text/javascript" src="https://maps.google.com/maps/api/js"></script>#}
-
     {% if customer %}
         <h2>Edit Customer</h2>
     {% else %}
         <h2>Add Customer</h2>
     {% endif %}
-
-{#    <div id="map"></div>#}
 
     {% if customer and customer.has_mappable_address %}
         <iframe
@@ -30,606 +26,394 @@
         <form method="POST" action="{% url "backoffice:customer-create" %}">
     {% endif %}
 
-    <table class="inputform customers">
-        <tr>
-            <td>First Name</td>
-            <td>
-                {{ form.first_name }}
-                <cfinput name="fname" value="#Customer.fname#" required="yes" maxlength="255" />
-            </td>
-        </tr>
-        <tr>
-            <td>Last Name</td>
-            <td>
-                {{ form.last_name }}
-                <cfinput name="lname" value="#Customer.lname#" required="yes" maxlength="255" />
-            </td>
-        </tr>
-        <tr>
-            <td>Email</td>
-            <td>
-                {{ form.email }}
-                <cfinput type="email" name="email" value="#Customer.email#" required="yes" validate="email" maxlength="255" />
-            </td>
-        </tr>
-        <tr>
-            <td>Receive Email</td>
-            <td>
-                {{ form.receive_email }}
-                <cfselect name="nomail">
-                    <option value="1" <cfif Customer.nomail IS 1>selected</cfif>>No</option>
-                    <option value="0" <cfif Customer.nomail IS 0>selected</cfif>>Yes</option>
-                </cfselect>
-            </td>
-        </tr>
-        <tr>
-            <td>Customer Since</td>
-            <td>{{ customer.created_at|date:"m/d/Y" }}</td>
-        </tr>
-        <tr>
-            <td>Number of Rentals</td>
-            <td><span class="past-rentals">{{ customer.rentals_count }}</span></td>
-        </tr>
-        {% if customer.registration_ip %}
-        <cfif len(Customer.regip) GT 0>
-        {% comment %}
-        <cftry>
-            <cfhttp url="http://ip-api.com/json/#Customer.regip#" method="get" result="geoInfo" timeout="3" throwonerror="yes">
-            <cfscript>
-                geoJSON = deserializeJSON(geoInfo.fileContent);
-                country = geoJSON.country;
-            </cfscript>
-            <cfset hostip_good = 1>
-            <cfcatch type="any">
-                <cfset hostip_good = 0>
-            </cfcatch>
-        </cftry>
-        {% endcomment %}
-        <tr>
-            <td>Reg IP</td>
-            <td>{{ customer.registration_ip }} {% if customer.ip_country %}(Country: {{ customer.ip_country }}){% endif %}</td>
-        </tr>
-        </cfif>
-        {% endif %}
-        <tr>
-            <td>Address Line 1</td>
-            <td>
-                {{ form.address_line_1 }}
-            </td>
-        </tr>
-        <tr>
-            <td>Address Line 2</td>
-            <td>
-                {{ form.address_line_2 }}
-            </td>
-        </tr>
-        <tr>
-            <td>City</td>
-            <td>
-                {{ form.city }}
-                <cfinput name="city" value="#Customer.city#" maxlength="255" />
-            </td>
-        </tr>
-        <tr>
-            <td>State</td>
-            <td>
-                {{ form.state }}
-                <cfselect name="state">
-                    <option value="">(Select state)</option>
-                    <cfloop array="#states#" index="state">
-                        <option value="#state.abbr#" <CFIF Customer.state IS state.abbr>selected</CFIF>>#state.name#</option>
-                    </cfloop>
-                </cfselect>
-            </td>
-        </tr>
-        <tr>
-            <td>ZIP</td>
-            <td>
-                {{ form.zip }}
-                <cfinput name="zip" value="#Customer.zip#" maxlength="10" class="short" />
-            </td>
-        </tr>
-        <tr>
-            <td>Home Phone</td>
-            <td>
-                {{ form.home_phone }}
-                <cfinput name="hphone" class="phone short" value="#Customer.hphone#" maxlength="20" />
-            </td>
-        </tr>
-        <tr>
-            <td>Work Phone</td>
-            <td>
-                {{ form.work_phone }}
-                <cfinput name="wphone" class="phone short" value="#Customer.wphone#" maxlength="20" />
-            </td>
-        </tr>
-        <tr>
-            <td>Mobile Phone</td>
-            <td>
-                {{ form.mobile_phone }}
-                <cfinput name="mphone" class="phone short" value="#Customer.mphone#" maxlength="20" />
-            </td>
-        </tr>
-        <tr>
-            <td>Fax</td>
-            <td>
-                {{ form.fax }}
-                <cfinput name="fax" class="phone short" value="#Customer.fax#" maxlength="20" />
-            </td>
-        </tr>
-        <tr>
-            <td>Date of Birth</td>
-            {% comment %}
-            <cftry>
-                <cfset dob = DateFormat(Customer.dob,"MM/DD/YYYY")>
-                <cfcatch type="Any">
-                    <cfset dob = "">
-                </cfcatch>
-            </cftry>
-            {% endcomment %}
-            <td>
-                {{ form.date_of_birth }}
-                <cfinput name="dob" class="dob short" value="#dob#" maxlength="20" />
-            </td>
-        </tr>
-        <tr>
-            <td>License Number</td>
-            <td>
-                {{ form.license_number }}
-                <cfinput name="licenseno" value="#Customer.licenseno#" maxlength="30" />
-            </td>
-        </tr>
-        <tr>
-            <td>License State</td>
-            <td>
-                {{ form.license_state }}
-                {% comment %}
-                <cfselect name="licensestate">
-                    <option value="">(Select state)</option>
-                    <cfloop array="#states#" index="state">
-                        <option value="#state.abbr#" <CFIF Customer.licensestate IS state.abbr>selected</CFIF>>#state.name#</option>
-                    </cfloop>
-                </cfselect>
-                {% endcomment %}
-            </td>
-        </tr>
-        <tr>
-            <td class="align-top">License History</td>
-            <td>
-                {{ form.license_history }}
-{#                <cftextarea name="licensehist" style="height: 40px;">#Customer.licensehist#</cftextarea>#}
-            </td>
-        </tr>
-        <tr>
-            <td>Insurance Company</td>
-            <td>
-                {{ form.insurance_company }}
-                <cfinput name="insco" value="#Customer.insco#" maxlength="255" />
-            </td>
-        </tr>
-        <tr>
-            <td>Insurance Policy Number</td>
-            <td>
-                {{ form.insurance_policy_number }}
-                <cfinput name="inspolnum" value="#Customer.inspolnum#" maxlength="255" />
-            </td>
-        </tr>
-        <tr>
-            <td>Insurance Policy Telephone</td>
-            <td>
-                {{ form.insurance_company_phone }}
-                <cfinput name="inscotel" class="phone short" value="#Customer.inscotel#" maxlength="20" />
-            </td>
-        </tr>
-        <tr>
-            <td>Insurance Coverage</td>
-            <td>
-                {{ form.coverage_verified }}
-                <cfselect name="coverage">
-                    <option value="0" <cfif Customer.coverage IS 0>selected</cfif>>Unverified</option>
-                    <option value="1" <cfif Customer.coverage IS 1>selected</cfif>>Verified</option>
-                </cfselect>
-            </td>
-        </tr>
-        <tr>
-            <td class="align-top">Remarks</td>
-            <td>
-                {{ form.remarks }}
-{#                <cftextarea name="remarks">#remarks_dec#</cftextarea>#}
-            </td>
-        </tr>
-        <tr>
-            <td>Drivers' Club</td>
-            <td>
-                {{ form.drivers_club }}
-                <cfselect name="DriversClub">
-                    <option value="0" <cfif Customer.DriversClub IS 0>selected</cfif>>No</option>
-                    <option value="1" <cfif Customer.DriversClub IS 1>selected</cfif>>Silver</option>
-                    <option value="2" <cfif Customer.DriversClub IS 2>selected</cfif>>Gold</option>
-                    <option value="3" <cfif Customer.DriversClub IS 3>selected</cfif>>Platinum</option>
-                </cfselect>
-            </td>
-        </tr>
-        <tr>
-            <td>Driver Skill</td>
-            <td>
-                {{ form.driver_skill }}
-                <cfselect name="driverskill">
-                    <option value="0" <cfif Customer.driverskill IS 0>selected</cfif>>1 - Good lord.</option>
-                    <option value="1" <cfif Customer.driverskill IS 1>selected</cfif>>2</option>
-                    <option value="2" <cfif Customer.driverskill IS 2>selected</cfif>>3</option>
-                    <option value="3" <cfif Customer.driverskill IS 3>selected</cfif>>4</option>
-                    <option value="4" <cfif Customer.driverskill IS 4 OR customerid IS 0>selected</cfif>>5</option>
-                    <option value="5" <cfif Customer.driverskill IS 5>selected</cfif>>6</option>
-                    <option value="6" <cfif Customer.driverskill IS 6>selected</cfif>>7</option>
-                    <option value="7" <cfif Customer.driverskill IS 7>selected</cfif>>8</option>
-                    <option value="8" <cfif Customer.driverskill IS 8>selected</cfif>>9</option>
-                    <option value="9" <cfif Customer.driverskill IS 9>selected</cfif>>10 - Schumi</option>
-                </cfselect>
-            </td>
-        </tr>
-        <tr>
-            <td>Customer Rating</td>
-            <td>
-                {{ form.rating }}
-                <cfselect name="rating">
-                    <option value="0" <cfif Customer.rating IS 0>selected</cfif>>1 - Horrible</option>
-                    <option value="1" <cfif Customer.rating IS 1>selected</cfif>>2</option>
-                    <option value="2" <cfif Customer.rating IS 2>selected</cfif>>3</option>
-                    <option value="3" <cfif Customer.rating IS 3>selected</cfif>>4</option>
-                    <option value="4" <cfif Customer.rating IS 4 OR customerid IS 0>selected</cfif>>5</option>
-                    <option value="5" <cfif Customer.rating IS 5>selected</cfif>>6</option>
-                    <option value="6" <cfif Customer.rating IS 6>selected</cfif>>7</option>
-                    <option value="7" <cfif Customer.rating IS 7>selected</cfif>>8</option>
-                    <option value="8" <cfif Customer.rating IS 8>selected</cfif>>9</option>
-                    <option value="9" <cfif Customer.rating IS 9>selected</cfif>>10 - Awesome</option>
-                </cfselect>
-            </td>
-        </tr>
-        <tr>
-            <td>Discount</td>
-            <td>
-                {{ form.discount_pct }}
-                <cfset discount = Customer.discount IS "" ? 0 : Customer.discount>
-                <cfinput name="discount" value="#discount#" maxlength="2" class="short" />
-                <small>(Percentage, deducted from all rentals for customer)</small>
-            </td>
-        </tr>
-
-        <tr class="divider">
-            <td colspan="2">
-                <h3>Billing Info</h3>
-                <p class="subtext">Can be left blank for creation.</p>
-            </td>
-        </tr>
-
-        <tr>
-            <td>Stripe customer ID</td>
-            <td>
-                <a href="https://dashboard.stripe.com/customers/{{ customer.stripe_customer }}" target="_blank">
-                    {{ customer.stripe_customer }}
-                </a>
-            </td>
-        </tr>
-        <tr>
-            <td>Credit Card (1) Stripe ID</td>
-            <td>
-                {{ customer.card_1.stripe_card }}
-            </td>
-        </tr>
-        <tr>
-            <td>Credit Card (1) Number</td>
-            <td>
-                {{ form.cc_number }}
-                <cfinput name="ccnum" value="#formatCCNumber(ccnum_dec)#" class="cc-field">
-                <small><a href="stripepay.cfm?customerid=#customerid#&card=1">Stripe charge</a></small>
-            </td>
-        </tr>
-        <tr>
-            <td>Credit Card (1) Expiration</td>
-            <td>
-                {{ form.cc_exp_mo }} / {{ form.cc_exp_yr }}
-                {% comment %}
-                <cfselect name="ccexpmo">
-                    <option value="01" <cfif Customer.ccexpmo IS "01">selected</cfif>>January (01)</option>
-                    <option value="02" <cfif Customer.ccexpmo IS "02">selected</cfif>>February (02)</option>
-                    <option value="03" <cfif Customer.ccexpmo IS "03">selected</cfif>>March (03)</option>
-                    <option value="04" <cfif Customer.ccexpmo IS "04">selected</cfif>>April (04)</option>
-                    <option value="05" <cfif Customer.ccexpmo IS "05">selected</cfif>>May (05)</option>
-                    <option value="06" <cfif Customer.ccexpmo IS "06">selected</cfif>>June (06)</option>
-                    <option value="07" <cfif Customer.ccexpmo IS "07">selected</cfif>>July (07)</option>
-                    <option value="08" <cfif Customer.ccexpmo IS "08">selected</cfif>>August (08)</option>
-                    <option value="09" <cfif Customer.ccexpmo IS "09">selected</cfif>>September (09)</option>
-                    <option value="10" <cfif Customer.ccexpmo IS "10">selected</cfif>>October (10)</option>
-                    <option value="11" <cfif Customer.ccexpmo IS "11">selected</cfif>>November (11)</option>
-                    <option value="12" <cfif Customer.ccexpmo IS "12">selected</cfif>>December (12)</option>
-                </cfselect> /
-
-                <cfset tyear = #Dateformat(Now(),"yyyy")#>
-                <cfset fyear = tyear+15>
-                <cfset ynow=#LSDateFormat(Now(),"yyyy")#>
-                <cfset ythen=(#ynow# + 11)>
-                <cfset mnow=#LSDateFormat(Now(),"mm")#>
-                <cfset dyear=ynow>
-                <cfselect name="ccexpyr">
-                    <cfoutput>
-                    <cfloop index="year" from="#ynow#" to="#ythen#">
-                        <option value="#dyear#" <cfif Customer.ccexpyr IS dyear>selected</cfif>>#dyear#</option>>
-                        <cfset dyear = dyear + 1>
-                    </cfloop>
-                    </cfoutput>
-                </cfselect>
-                {% endcomment %}
-            </td>
-        </tr>
-        <tr>
-            <td>Credit Card (1) CVV</td>
-            <td>
-                {{ form.cc_cvv }}
-                <cfinput name="cccvv" value="#Customer.cccvv#" maxlength="6" class="short" />
-            </td>
-        </tr>
-        <tr>
-            <td>Credit Card (1) Bank Telephone</td>
-            <td>
-                {{ form.cc_phone }}
-                <cfinput name="cctel" class="phone short" value="#Customer.cctel#" maxlength="20" />
-            </td>
-        </tr>
-
-        <tr class="divider">
-            <td colspan="2">
-                <h3>Second Credit Card</h3>
-                <p class="subtext">(Optional)</p>
-            </td>
-        </tr>
-
-        <tr>
-            <td>Credit Card (2) Stripe</td>
-            <td>
-                {{ customer.card_2.stripe_card }}
-            </td>
-        </tr>
-        <tr>
-            <td>Credit Card (2) Number</td>
-            <td>
-                {{ form.cc2_number }}
-                <cfinput name="cc2num" value="#formatCCNumber(cc2num_dec)#" class="cc-field">
-                <small><a href="stripepay.cfm?customerid=#customerid#&card=2">Stripe charge</a></small>
-            </td>
-        </tr>
-        <tr>
-            <td>Credit Card (2) Expiration</td>
-            <td>
-                {{ form.cc2_exp_mo }} / {{ form.cc2_exp_yr }}
-                {% comment %}
-                <cfselect name="cc2expmo">
-                    <option value="01" <cfif Customer.cc2expmo IS "01">selected</cfif>>January (01)</option>
-                    <option value="02" <cfif Customer.cc2expmo IS "02">selected</cfif>>February (02)</option>
-                    <option value="03" <cfif Customer.cc2expmo IS "03">selected</cfif>>March (03)</option>
-                    <option value="04" <cfif Customer.cc2expmo IS "04">selected</cfif>>April (04)</option>
-                    <option value="05" <cfif Customer.cc2expmo IS "05">selected</cfif>>May (05)</option>
-                    <option value="06" <cfif Customer.cc2expmo IS "06">selected</cfif>>June (06)</option>
-                    <option value="07" <cfif Customer.cc2expmo IS "07">selected</cfif>>July (07)</option>
-                    <option value="08" <cfif Customer.cc2expmo IS "08">selected</cfif>>August (08)</option>
-                    <option value="09" <cfif Customer.cc2expmo IS "09">selected</cfif>>September (09)</option>
-                    <option value="10" <cfif Customer.cc2expmo IS "10">selected</cfif>>October (10)</option>
-                    <option value="11" <cfif Customer.cc2expmo IS "11">selected</cfif>>November (11)</option>
-                    <option value="12" <cfif Customer.cc2expmo IS "12">selected</cfif>>December (12)</option>
-                </cfselect> /
-
-                <cfset tyear = #Dateformat(Now(),"yyyy")#>
-                <cfset fyear = tyear+15>
-                <cfset ynow=#LSDateFormat(Now(),"yyyy")#>
-                <cfset ythen=(#ynow# + 11)>
-                <cfset mnow=#LSDateFormat(Now(),"mm")#>
-                <cfset dyear = ynow>
-                <cfselect name="cc2expyr">
-                    <cfoutput>
-                    <cfloop index="year" from="#ynow#" to="#ythen#">
-                        <option value="#dyear#" <cfif Customer.cc2expyr IS dyear>selected</cfif>>#dyear#</option>>
-                        <cfset dyear = dyear + 1>
-                    </cfloop>
-                    </cfoutput>
-                </cfselect>
-                {% endcomment %}
-            </td>
-        </tr>
-        <tr>
-            <td>Credit Card (2) CVV</td>
-            <td>
-                {{ form.cc2_cvv }}
-                <cfinput name="cc2cvv" value="#Customer.cc2cvv#" maxlength="6" class="short" />
-            </td>
-        </tr>
-        <tr>
-            <td>Credit Card (2) Bank Telephone</td>
-            <td>
-                {{ form.cc2_phone }}
-                <cfinput name="cc2tel" class="phone short" value="#Customer.cc2tel#" maxlength="20" />
-            </td>
-        </tr>
-
-        <tr class="divider">
-            <td colspan="2">
-                <h3>Music Prefs</h3>
-                <p class="subtext">(Optional)</p>
-            </td>
-        </tr>
-
-        <tr>
-            <td>Favorite Genre</td>
-            <td>
-                {{ form.music_genre }}
-                {% comment %}
-                <cfselect name="musicgenre">
-                    <option value="0" <cfif Customer.musicgenre IS 0>selected</cfif>>None</option>
-                    <option value="1" <cfif Customer.musicgenre IS 1>selected</cfif>>50's</option>
-                    <option value="2" <cfif Customer.musicgenre IS 2>selected</cfif>>60's</option>
-                    <option value="3" <cfif Customer.musicgenre IS 3>selected</cfif>>70's</option>
-                    <option value="4" <cfif Customer.musicgenre IS 4>selected</cfif>>80's</option>
-                    <option value="5" <cfif Customer.musicgenre IS 5>selected</cfif>>90's</option>
-                    <option value="6" <cfif Customer.musicgenre IS 6>selected</cfif>>Alternative</option>
-                    <option value="7" <cfif Customer.musicgenre IS 7>selected</cfif>>Big Band / Swing</option>
-                    <option value="8" <cfif Customer.musicgenre IS 8>selected</cfif>>Classical</option>
-                    <option value="9" <cfif Customer.musicgenre IS 9>selected</cfif>>Country</option>
-                    <option value="10" <cfif Customer.musicgenre IS 10>selected</cfif>>Dance</option>
-                    <option value="11" <cfif Customer.musicgenre IS 11>selected</cfif>>Electronic</option>
-                    <option value="12" <cfif Customer.musicgenre IS 12>selected</cfif>>Everything!</option>
-                    <option value="13" <cfif Customer.musicgenre IS 13>selected</cfif>>Heavy Metal</option>
-                    <option value="14" <cfif Customer.musicgenre IS 14>selected</cfif>>Instrumental</option>
-                    <option value="15" <cfif Customer.musicgenre IS 15>selected</cfif>>Jazz</option>
-                    <option value="16" <cfif Customer.musicgenre IS 16>selected</cfif>>Mellow</option>
-                    <option value="17" <cfif Customer.musicgenre IS 17>selected</cfif>>Musicals/Broadway</option>
-                    <option value="18" <cfif Customer.musicgenre IS 18>selected</cfif>>Pop</option>
-                    <option value="19" <cfif Customer.musicgenre IS 19>selected</cfif>>Punk</option>
-                    <option value="20" <cfif Customer.musicgenre IS 20>selected</cfif>>Rap</option>
-                    <option value="21" <cfif Customer.musicgenre IS 21>selected</cfif>>R&B</option>
-                    <option value="22" <cfif Customer.musicgenre IS 22>selected</cfif>>Reggae</option>
-                    <option value="23" <cfif Customer.musicgenre IS 23>selected</cfif>>Rock</option>
-                    <option value="24" <cfif Customer.musicgenre IS 24>selected</cfif>>Soul</option>
-                    <option value="25" <cfif Customer.musicgenre IS 25>selected</cfif>>Soundtracks</option>
-                    <option value="26" <cfif Customer.musicgenre IS 26>selected</cfif>>Top 40</option>
-                    <option value="27" <cfif Customer.musicgenre IS 27>selected</cfif>>World</option>
-                </cfselect>
-                {% endcomment %}
-            </td>
-        </tr>
-        <tr>
-            <td>Favorite Artist / Composer</td>
-            <td>
-                {{ form.music_favorite }}
-                <cfinput name="musicfav" value="#Customer.musicfav#" maxlength="255">
-            </td>
-        </tr>
-
-        <tr class="divider">
-            <td colspan="2">
-                <h3>Front Site Login</h3>
-            </td>
-        </tr>
-
-        <tr>
-            <td>Ban</td>
-            <td>
-                {{ form.ban }}
-                <cfinput type="checkbox" name="ban" checked="#YesNoFormat(Customer.ban)#">
-            </td>
-        </tr>
-        <tr>
-            <td>Password</td>
-            {% if customer.user %}
-                <td>
-                    <a href="{% url "admin:auth_user_password_change" id=customer.user.id %}">Change password</a>
-                    <input type="hidden" id="id_password" name="password" value="{{ customer.user.password }}" />
-                </td>
-            {% else %}
-                <td>{{ form.password }}</td>
-            {% endif %}
-        </tr>
-
-        <tr>
-            <td></td>
-            <td>
-                <button class="btn" type="submit" name="edit">
-                    {% if customer %}
-                        Edit
-                    {% else %}
-                        Add
-                    {% endif %}
-                </button>
-                {% if customer %}
-                <cfif customerid>
-                    <button class="btn" type="button" name="clone" onclick="promptCloneCustomer();">Clone</button>
-                    <button
-                        class="btn delete"
-                        type="submit"
-                        name="delete"
-                        onclick="return confirmDelete(this.form, '{% url "backoffice:customer-delete" pk=customer.id %}', 'customer')"
-                    >
-                        Delete Customer
-                    </button>
-                </cfif>
-                {% endif %}
-            </td>
-        </tr>
-    </table>
-    <cfinput type="hidden" name="customerid" value="#customerid#" />
-    <cfinput type="hidden" name="fnc" value="edit" />
-    {% csrf_token %}
-    </form>
-
-    <div class="dialog" id="dialog_clone_driver" title="Clone Customer">
-        <p>
-        Creating a clone of <strong>{{ customer.full_name }}</strong>.
-        </p>
-
-        <form>
-        <table class="inputform">
+        <table class="inputform customers">
             <tr>
                 <td>First Name</td>
                 <td>
-                    {{ clone_form.clone_first_name }}<cfinput name="clone_fname" value="" />
-                    <p class="form-error" id="error_clone_first_name"></p>
+                    {{ form.first_name }}
                 </td>
             </tr>
             <tr>
                 <td>Last Name</td>
                 <td>
-                    {{ clone_form.clone_last_name }}<cfinput name="clone_lname" value="" />
-                    <p class="form-error" id="error_clone_last_name"></p>
+                    {{ form.last_name }}
                 </td>
             </tr>
             <tr>
                 <td>Email</td>
                 <td>
-                    {{ clone_form.clone_email }}<cfinput name="clone_email" value="#nextEmail#" />
-                    <p class="form-error" id="error_clone_email"></p>
+                    {{ form.email }}
                 </td>
             </tr>
             <tr>
+                <td>Receive Email</td>
+                <td>
+                    {{ form.receive_email }}
+                </td>
+            </tr>
+            <tr>
+                <td>Customer Since</td>
+                <td>{{ customer.created_at|date:"m/d/Y" }}</td>
+            </tr>
+            <tr>
+                <td>Number of Rentals</td>
+                <td><span class="past-rentals">{{ customer.rentals_count }}</span></td>
+            </tr>
+            {% if customer.registration_ip %}
+                <tr>
+                    <td>Reg IP</td>
+                    <td>{{ customer.registration_ip }} {% if customer.ip_country %}(Country: {{ customer.ip_country }}){% endif %}</td>
+                </tr>
+            {% endif %}
+            <tr>
+                <td>Address Line 1</td>
+                <td>
+                    {{ form.address_line_1 }}
+                </td>
+            </tr>
+            <tr>
+                <td>Address Line 2</td>
+                <td>
+                    {{ form.address_line_2 }}
+                </td>
+            </tr>
+            <tr>
+                <td>City</td>
+                <td>
+                    {{ form.city }}
+                </td>
+            </tr>
+            <tr>
+                <td>State</td>
+                <td>
+                    {{ form.state }}
+                </td>
+            </tr>
+            <tr>
+                <td>ZIP</td>
+                <td>
+                    {{ form.zip }}
+                </td>
+            </tr>
+            <tr>
+                <td>Home Phone</td>
+                <td>
+                    {{ form.home_phone }}
+                </td>
+            </tr>
+            <tr>
+                <td>Work Phone</td>
+                <td>
+                    {{ form.work_phone }}
+                </td>
+            </tr>
+            <tr>
+                <td>Mobile Phone</td>
+                <td>
+                    {{ form.mobile_phone }}
+                </td>
+            </tr>
+            <tr>
+                <td>Fax</td>
+                <td>
+                    {{ form.fax }}
+                </td>
+            </tr>
+            <tr>
+                <td>Date of Birth</td>
+                <td>
+                    {{ form.date_of_birth }}
+                </td>
+            </tr>
+            <tr>
+                <td>License Number</td>
+                <td>
+                    {{ form.license_number }}
+                </td>
+            </tr>
+            <tr>
+                <td>License State</td>
+                <td>
+                    {{ form.license_state }}
+                </td>
+            </tr>
+            <tr>
+                <td class="align-top">License History</td>
+                <td>
+                    {{ form.license_history }}
+                </td>
+            </tr>
+            <tr>
+                <td>Insurance Company</td>
+                <td>
+                    {{ form.insurance_company }}
+                </td>
+            </tr>
+            <tr>
+                <td>Insurance Policy Number</td>
+                <td>
+                    {{ form.insurance_policy_number }}
+                </td>
+            </tr>
+            <tr>
+                <td>Insurance Policy Telephone</td>
+                <td>
+                    {{ form.insurance_company_phone }}
+                </td>
+            </tr>
+            <tr>
+                <td>Insurance Coverage</td>
+                <td>
+                    {{ form.coverage_verified }}
+                </td>
+            </tr>
+            <tr>
+                <td class="align-top">Remarks</td>
+                <td>
+                    {{ form.remarks }}
+                </td>
+            </tr>
+            <tr>
+                <td>Drivers' Club</td>
+                <td>
+                    {{ form.drivers_club }}
+                </td>
+            </tr>
+            <tr>
+                <td>Driver Skill</td>
+                <td>
+                    {{ form.driver_skill }}
+                </td>
+            </tr>
+            <tr>
+                <td>Customer Rating</td>
+                <td>
+                    {{ form.rating }}
+                </td>
+            </tr>
+            <tr>
+                <td>Discount</td>
+                <td>
+                    {{ form.discount_pct }}
+                    <small>(Percentage, deducted from all rentals for customer)</small>
+                </td>
+            </tr>
+
+            <tr class="divider">
+                <td colspan="2">
+                    <h3>Billing Info</h3>
+                    <p class="subtext">Can be left blank for creation.</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Stripe customer ID</td>
+                <td>
+                    <a href="https://dashboard.stripe.com/customers/{{ customer.stripe_customer }}" target="_blank">
+                        {{ customer.stripe_customer }}
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td>Credit Card (1) Stripe ID</td>
+                <td>
+                    {{ customer.card_1.stripe_card }}
+                </td>
+            </tr>
+            <tr>
+                <td>Credit Card (1) Number</td>
+                <td>
+                    {{ form.cc_number }}
+                    <small><a href="stripepay.cfm?customerid=#customerid#&card=1">Stripe charge</a></small>
+                </td>
+            </tr>
+            <tr>
+                <td>Credit Card (1) Expiration</td>
+                <td>
+                    {{ form.cc_exp_mo }} / {{ form.cc_exp_yr }}
+                </td>
+            </tr>
+            <tr>
+                <td>Credit Card (1) CVV</td>
+                <td>
+                    {{ form.cc_cvv }}
+                </td>
+            </tr>
+            <tr>
+                <td>Credit Card (1) Bank Telephone</td>
+                <td>
+                    {{ form.cc_phone }}
+                </td>
+            </tr>
+
+            <tr class="divider">
+                <td colspan="2">
+                    <h3>Second Credit Card</h3>
+                    <p class="subtext">(Optional)</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Credit Card (2) Stripe</td>
+                <td>
+                    {{ customer.card_2.stripe_card }}
+                </td>
+            </tr>
+            <tr>
+                <td>Credit Card (2) Number</td>
+                <td>
+                    {{ form.cc2_number }}
+                    <small><a href="stripepay.cfm?customerid=#customerid#&card=2">Stripe charge</a></small>
+                </td>
+            </tr>
+            <tr>
+                <td>Credit Card (2) Expiration</td>
+                <td>
+                    {{ form.cc2_exp_mo }} / {{ form.cc2_exp_yr }}
+                </td>
+            </tr>
+            <tr>
+                <td>Credit Card (2) CVV</td>
+                <td>
+                    {{ form.cc2_cvv }}
+                </td>
+            </tr>
+            <tr>
+                <td>Credit Card (2) Bank Telephone</td>
+                <td>
+                    {{ form.cc2_phone }}
+                </td>
+            </tr>
+
+            <tr class="divider">
+                <td colspan="2">
+                    <h3>Music Prefs</h3>
+                    <p class="subtext">(Optional)</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Favorite Genre</td>
+                <td>
+                    {{ form.music_genre }}
+                </td>
+            </tr>
+            <tr>
+                <td>Favorite Artist / Composer</td>
+                <td>
+                    {{ form.music_favorite }}
+                </td>
+            </tr>
+
+            <tr class="divider">
+                <td colspan="2">
+                    <h3>Front Site Login</h3>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Ban</td>
+                <td>
+                    {{ form.ban }}
+                </td>
+            </tr>
+            <tr>
+                <td>Password</td>
+                {% if customer.user %}
+                    <td>
+                        <a href="{% url "admin:auth_user_password_change" id=customer.user.id %}">Change password</a>
+                        <input type="hidden" id="id_password" name="password" value="{{ customer.user.password }}" />
+                    </td>
+                {% else %}
+                    <td>{{ form.password }}</td>
+                {% endif %}
+            </tr>
+
+            <tr>
                 <td></td>
                 <td>
-                    {{ clone_form.clone_duplicate_license }}<cfinput type="checkbox" name="clone_license" /> <label for="id_clone_duplicate_license">Clone driver's license</label>
+                    <button class="btn" type="submit" name="edit">
+                        {% if customer %}
+                            Edit
+                        {% else %}
+                            Add
+                        {% endif %}
+                    </button>
+                    {% if customer %}
+                        <button class="btn" type="button" name="clone" onclick="promptCloneCustomer();">Clone</button>
+                        <button
+                            class="btn delete"
+                            type="submit"
+                            name="delete"
+                            onclick="return confirmDelete(this.form, '{% url "backoffice:customer-delete" pk=customer.id %}', 'customer')"
+                        >
+                            Delete Customer
+                        </button>
+                    {% endif %}
                 </td>
             </tr>
         </table>
-        <input type="hidden" id="clone_customer_id" value="{{ customer.id }}" />
-        <cfinput type="hidden" name="clone_customerid" value="#customerid#" />
+        {% csrf_token %}
+    </form>
+
+    <div class="dialog" id="dialog_clone_driver" title="Clone Customer">
+        <p>
+            Creating a clone of <strong>{{ customer.full_name }}</strong>.
+        </p>
+
+        <form>
+            <table class="inputform">
+                <tr>
+                    <td>First Name</td>
+                    <td>
+                        {{ clone_form.clone_first_name }}
+                        <p class="form-error" id="error_clone_first_name"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Last Name</td>
+                    <td>
+                        {{ clone_form.clone_last_name }}
+                        <p class="form-error" id="error_clone_last_name"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td>
+                        {{ clone_form.clone_email }}
+                        <p class="form-error" id="error_clone_email"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        {{ clone_form.clone_duplicate_license }} <label for="id_clone_duplicate_license">Clone driver's license</label>
+                    </td>
+                </tr>
+            </table>
+            <input type="hidden" id="clone_customer_id" value="{{ customer.id }}" />
         </form>
     </div>
 
     <div class="dialog" id="dialog_past_rentals" title="Past Rentals">
         <p>
-        These are all prior rentals for {{ customer.full_name }}.
+            These are all prior rentals for {{ customer.full_name }}.
         </p>
-
-        {% comment %}
-        <cfquery name="PastRentals" datasource="#DSN#">
-            SELECT rentalid,dateout,numdays,make,model FROM Rentals
-            INNER JOIN Vehicles ON Vehicles.vehicleid = Rentals.vehicleid
-            WHERE customerid = <CFQUERYPARAM value="#customerid#" CFSQLType="CF_SQL_NUMERIC">
-            AND Rentals.status = 3
-            ORDER BY dateout DESC
-        </cfquery>
-        {% endcomment %}
 
         <table class="data">
             <tr>
-                <th>ID</td>
-                <th>Date</td>
-                <th>Vehicle</td>
-                <th>Num. Days</td>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Vehicle</th>
+                <th>Num. Days</th>
             </tr>
             {% for rental in customer.past_rentals %}
-            <cfloop query="PastRentals">
-            <tr>
-                <td><a href="{% url "backoffice:rental-detail" pk=rental.id %}">{{ rental.id }}</a></td>
-                <td>{{ rental.out_date|date:"m/d/Y" }}</td>
-                <td>{{ rental.vehicle.vehicle_name }}</td>
-                <td>{{ rental.num_days }}</td>
-            </tr>
-            </cfloop>
+                <tr>
+                    <td><a href="{% url "backoffice:rental-detail" pk=rental.id %}">{{ rental.id }}</a></td>
+                    <td>{{ rental.out_date|date:"m/d/Y" }}</td>
+                    <td>{{ rental.vehicle.vehicle_name }}</td>
+                    <td>{{ rental.num_days }}</td>
+                </tr>
             {% endfor %}
         </table>
     </div>

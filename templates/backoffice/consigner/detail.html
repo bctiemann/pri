@@ -10,40 +10,7 @@
     {% endif %}
 
     {% if consigner %}
-    <cfif consignerid GT 0>
         <div class="consigner-history">
-            {% comment %}
-            <cfquery name="ConsignmentVehicles" datasource="#DSN#">
-                SELECT vehicleid FROM ConsignmentVehicles
-                WHERE consignerid = <CFQUERYPARAM value="#consignerid#" CFSQLType="CF_SQL_NUMERIC">
-            </cfquery>
-            <cfset VehiclePrices = StructNew()>
-            <cfloop query="ConsignmentVehicles">
-                <cfquery name="VehiclePrice" datasource="#FDSN#">
-                    SELECT vehicleid,price,disc2day,disc3day,disc7day FROM VehiclesFront
-                    WHERE vehicleid = <CFQUERYPARAM value="#vehicleid#" CFSQLType="CF_SQL_NUMERIC">
-                </cfquery>
-                <cfset VehiclePrices[vehicleid] = VehiclePrice>
-            </cfloop>
-
-            <cfquery name="Transactions" datasource="#DSN#">
-                SELECT paymentid,rentalid,numdays,vehicleid,make,model,stamp,amount,method FROM (
-                    (
-                        SELECT rentalid,0 AS paymentid,numdays,Rentals.vehicleid,make,model,dateout AS stamp,0 AS amount,'' AS method FROM Rentals
-                        INNER JOIN ConsignmentVehicles ON ConsignmentVehicles.vehicleid = Rentals.vehicleid
-                        INNER JOIN Vehicles ON Rentals.vehicleid = Vehicles.vehicleid
-                        WHERE Rentals.status =3
-                        AND consignerid = <CFQUERYPARAM value="#consignerid#" CFSQLType="CF_SQL_NUMERIC">
-                    ) UNION (
-                        SELECT 0 AS rentalid,paymentid,0 AS numdays,0 AS vehicleid,'' AS make,'' AS model,stamp,amount,method FROM ConsignmentPayments
-                        WHERE consignerid = <CFQUERYPARAM value="#consignerid#" CFSQLType="CF_SQL_NUMERIC">
-                    )
-                ) Transactions
-                ORDER BY stamp
-            </cfquery>
-            <cfset totalRevenue = 0>
-            <cfset totalPaid = 0>
-            {% endcomment %}
 
             <table class="data proceeds">
                 <tr>
@@ -53,64 +20,45 @@
                     <th>Gross to Date</th>
                 </tr>
                 {% for transaction in consigner.revenue_history.history %}
-                <cfoutput query="Transactions">
 
                     {% if transaction.is_rental %}
-                    <cfif paymentid GT 0>
 
-                       <cfif numdays GTE 7>
-                            <cfset gross = VehiclePrices[vehicleid].price * numdays * (1 - VehiclePrices[vehicleid].disc7day/100)>
-                        <cfelseif numdays GTE 3>
-                            <cfset gross = VehiclePrices[vehicleid].price * numdays * (1 - VehiclePrices[vehicleid].disc3day/100)>
-                        <cfelseif numdays GTE 2>
-                            <cfset gross = VehiclePrices[vehicleid].price * numdays * (1 - VehiclePrices[vehicleid].disc2day/100)>
-                        <cfelse>
-                            <cfset gross = VehiclePrices[vehicleid].price * numdays>
-                        </cfif>
                         <tr>
                             <td><a href="{% url "backoffice:rental-detail" pk=transaction.id %}">{{ transaction.vehicle.vehicle_name }}</a></td>
                             <td>{{ transaction.out_date|date:"m/d/Y" }}</td>
                             <td class="numeric">${{ transaction.final_price_data.post_multi_day_discount_subtotal|intcomma }}</td>
                             <td class="numeric">${{ transaction.running_total|intcomma }}</td>
                         </tr>
-                        <cfset totalRevenue = totalRevenue + gross>
 
                     {% else %}
-                    <cfelse>
 
                         <tr class="payment">
-                            <td><a href="ownerpay.cfm?edit=1&paymentid=#paymentid#">Payment {{ transaction.id }}</a></td>
+                            <td><a href="{% url "backoffice:consignmentpayment-detail" pk=transaction.id %}">Payment {{ transaction.id }}</a></td>
                             <td>{{ transaction.paid_at|date:"m/d/Y" }}</td>
                             <td class="numeric">(${{ transaction.amount|intcomma }})</td>
                             <td class="numeric"></td>
                         </tr>
-                        <cfset totalPaid = totalPaid + amount>
 
-                    </cfif>
                     {% endif %}
 
-                </cfoutput>
                 {% endfor %}
 
-                <cfoutput>
                 <tbody class="totals">
-                <tr>
-                    <td>Total revenue:</td>
-                    <td></td>
-                    <td></td>
-                    <td class="numeric">${{ consigner.revenue_history.total_revenue|intcomma }}</td>
-                </tr>
-                <tr class="payment">
-                    <td>Total paid:</td>
-                    <td></td>
-                    <td></td>
-                    <td class="numeric">(${{ consigner.revenue_history.total_paid|intcomma }})</td>
-                </tr>
+                    <tr>
+                        <td>Total revenue:</td>
+                        <td></td>
+                        <td></td>
+                        <td class="numeric">${{ consigner.revenue_history.total_revenue|intcomma }}</td>
+                    </tr>
+                    <tr class="payment">
+                        <td>Total paid:</td>
+                        <td></td>
+                        <td></td>
+                        <td class="numeric">(${{ consigner.revenue_history.total_paid|intcomma }})</td>
+                    </tr>
                 </tbody>
-                </cfoutput>
             </table>
         </div>
-    </cfif>
     {% endif %}
 
     {% include "backoffice/includes/form_error.html" %}
@@ -121,99 +69,83 @@
         <form method="POST" action="{% url "backoffice:consigner-create" %}">
     {% endif %}
 
-    <table class="inputform consigners" style="width: 700px;">
-        <tr>
-            <td>First Name</td>
-            <td>
-                {{ form.first_name }}
-                <cfinput name="fname" value="#Consigner.fname#" required="yes" maxlength="255" message="Enter a first name." />
-            </td>
-        </tr>
-        <tr>
-            <td>Last Name</td>
-            <td>
-                {{ form.last_name }}
-                <cfinput name="lname" value="#Consigner.lname#" required="yes" maxlength="255" message="Enter a last name." />
-            </td>
-        </tr>
-        <tr>
-            <td>Email</td>
-            {% if consigner %}
+        <table class="inputform consigners" style="width: 700px;">
+            <tr>
+                <td>First Name</td>
                 <td>
-                    {{ consigner.user.email }}
-                    <input type="hidden" id="id_email" name="email" value="{{ consigner.user.email }}" />
+                    {{ form.first_name }}
                 </td>
-            {% else %}
-                <td>{{ form.email }}</td>
-            {% endif %}
-            <cfinput type="email" name="email" value="#Consigner.email#" required="yes" validate="email" maxlength="255" message="Enter an email address." />
-        </tr>
-        <tr>
-            <td>Password</td>
-            {% if consigner %}
+            </tr>
+            <tr>
+                <td>Last Name</td>
                 <td>
-                    <a href="{% url "admin:auth_user_password_change" id=consigner.user.id %}">Change password</a>
-                    <input type="hidden" id="id_password" name="password" value="{{ consigner.user.password }}" />
+                    {{ form.last_name }}
                 </td>
-            {% else %}
-                <td>{{ form.password }}</td>
-            {% endif %}
-        </tr>
-        <cfif consignerid GT 0>
-        <tr>
-            <td class="align-top">Vehicles</td>
-            <td style="vertical-align: top;">
-                {% comment %}
-                <cfquery name="Vehicles" datasource="#DSN#">
-                    SELECT Vehicles.vehicleid,year,make,model FROM Vehicles
-                    INNER JOIN ConsignmentVehicles ON ConsignmentVehicles.vehicleid = Vehicles.vehicleid
-                    WHERE consignerid = <CFQUERYPARAM value="#Consigner.consignerid#" CFSQLType="CF_SQL_NUMERIC">
-                </cfquery>
-                {% endcomment %}
-                <ul class="consigner-vehicles">
-                    {% for vehicle in consigner.vehicle_set.all %}
-                    <cfloop query="Vehicles">
-                        <a href="{% url "backoffice:vehicle-detail" pk=vehicle.id %}"><li>{{ vehicle.vehicle_name }}</li></a>
-                    </cfloop>
-                    {% endfor %}
-                </ul>
-            </td>
-        </tr>
-        </cfif>
-        <tr>
-            <td class="align-top">Notes</td>
-            <td>
-                {{ form.notes }}
-{#                <cftextarea name="notes">#notes_dec#</cftextarea>#}
-            </td>
-        </tr>
-
-        <tr>
-            <td></td>
-            <td>
-                <button class="btn" type="submit" name="edit">
-                    {% if consigner %}
-                        Edit
-                    {% else %}
-                        Add
-                    {% endif %}
-                </button>
+            </tr>
+            <tr>
+                <td>Email</td>
                 {% if consigner %}
-                <cfif tolltagid>
-                    <button
-                        class="btn delete"
-                        type="submit"
-                        name="delete"
-                        onclick="return confirmDelete(this.form, '{% url "backoffice:consigner-delete" pk=consigner.id %}', 'owner')"
-                    >
-                        Delete Owner
-                    </button>
-                </cfif>
+                    <td>
+                        {{ consigner.user.email }}
+                    </td>
+                {% else %}
+                    <td>{{ form.email }}</td>
                 {% endif %}
-            </td>
-        </tr>
-    </table>
-    {% csrf_token %}
+            </tr>
+            <tr>
+                <td>Password</td>
+                {% if consigner %}
+                    <td>
+                        <a href="{% url "admin:auth_user_password_change" id=consigner.user.id %}">Change password</a>
+                        <input type="hidden" id="id_password" name="password" value="{{ consigner.user.password }}" />
+                    </td>
+                {% else %}
+                    <td>{{ form.password }}</td>
+                {% endif %}
+            </tr>
+            {% if consigner %}
+                <tr>
+                    <td class="align-top">Vehicles</td>
+                    <td style="vertical-align: top;">
+                        <ul class="consigner-vehicles">
+                            {% for vehicle in consigner.vehicle_set.all %}
+                                <a href="{% url "backoffice:vehicle-detail" pk=vehicle.id %}"><li>{{ vehicle.vehicle_name }}</li></a>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+            {% endif %}
+            <tr>
+                <td class="align-top">Notes</td>
+                <td>
+                    {{ form.notes }}
+                </td>
+            </tr>
+
+            <tr>
+                <td></td>
+                <td>
+                    <button class="btn" type="submit" name="edit">
+                        {% if consigner %}
+                            Edit
+                        {% else %}
+                            Add
+                        {% endif %}
+                    </button>
+                    {% if consigner %}
+                        <button
+                            class="btn delete"
+                            type="submit"
+                            name="delete"
+                            onclick="return confirmDelete(this.form, '{% url "backoffice:consigner-delete" pk=consigner.id %}', 'owner')"
+                        >
+                            Delete Owner
+                        </button>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+        {% csrf_token %}
     </form>
 
 {% endblock %}
