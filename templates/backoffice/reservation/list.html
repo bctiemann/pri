@@ -7,31 +7,28 @@
     {% include "backoffice/includes/search_form.html" %}
 
     <table class="data alternating" sortedby="{{ sortby }}">
-    <tr>
-        <cfoutput>
-        <th col="id" default-sort="desc">ID</th>
-        <th col="vehicle__make">Vehicle</th>
-        <th col="customer__last_name">Customer</th>
-        <th col="out_at">Date Out</th>
-        <th col="back_at">Date In</th>
-        <th col="num_days" default-sort="desc">Days</th>
-        <th>Conf Code</th>
-        <th>Method</th>
-        </cfoutput>
-    </tr>
-    {% for reservation in reservation_list %}
-    <cfoutput query="Reservations">
-    <tr class="clickable click-to-edit" destination="{% url "backoffice:reservation-detail" pk=reservation.id %}">
-        <td><a href="{% url "backoffice:reservation-detail" pk=reservation.id %}">{{ reservation.id }}</a></td>
-        <td><a href="{% url "backoffice:vehicle-detail" pk=reservation.vehicle.id %}">{{ reservation.vehicle.vehicle_name }}</a></td>
-        <td><a href="{% url "backoffice:customer-detail" pk=reservation.customer.id %}">{{ reservation.customer.full_name }}</a></td>
-        <td>{{ reservation.out_at|date:"m/d/Y @ H:i" }} <small>{{ reservation.out_at|date:"D" }}</small></td>
-        <td>{{ reservation.back_at|date:"m/d/Y @ H:i" }} <small>{{ reservation.back_at|date:"D" }}</td>
-        <td>{{ reservation.num_days }}</td>
-        <td>{{ reservation.confirmation_code }}</td>
-        <td>{{ reservation.get_app_channel_display }}</td>
-    </tr>
-    {% endfor %}
+        <tr>
+            <th col="id" default-sort="desc">ID</th>
+            <th col="vehicle__make">Vehicle</th>
+            <th col="customer__last_name">Customer</th>
+            <th col="out_at">Date Out</th>
+            <th col="back_at">Date In</th>
+            <th col="num_days" default-sort="desc">Days</th>
+            <th>Conf Code</th>
+            <th>Method</th>
+        </tr>
+        {% for reservation in reservation_list %}
+            <tr class="clickable click-to-edit" destination="{% url "backoffice:reservation-detail" pk=reservation.id %}">
+                <td><a href="{% url "backoffice:reservation-detail" pk=reservation.id %}">{{ reservation.id }}</a></td>
+                <td><a href="{% url "backoffice:vehicle-detail" pk=reservation.vehicle.id %}">{{ reservation.vehicle.vehicle_name }}</a></td>
+                <td><a href="{% url "backoffice:customer-detail" pk=reservation.customer.id %}">{{ reservation.customer.full_name }}</a></td>
+                <td>{{ reservation.out_at|date:"m/d/Y @ H:i" }} <small>{{ reservation.out_at|date:"D" }}</small></td>
+                <td>{{ reservation.back_at|date:"m/d/Y @ H:i" }} <small>{{ reservation.back_at|date:"D" }}</td>
+                <td>{{ reservation.num_days }}</td>
+                <td>{{ reservation.confirmation_code }}</td>
+                <td>{{ reservation.get_app_channel_display }}</td>
+            </tr>
+        {% endfor %}
     </table>
 
 {% endblock %}

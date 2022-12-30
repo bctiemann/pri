@@ -47,6 +47,9 @@ class ReservationCreateView(AdminViewMixin, ReservationViewMixin, ListViewMixin,
     template_name = 'backoffice/reservation/detail.html'
     form_class = ReservationForm
 
+    # TODO: if form.send_email, reservation.send_welcome_email()
+    #  If existing customer, use reservation_confirm_existing_customer.txt
+
     def get_success_url(self):
         return reverse('backoffice:reservation-detail', kwargs={'pk': self.object.id})
 

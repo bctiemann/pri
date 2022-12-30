@@ -258,7 +258,7 @@ class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, CustomerSearchMix
     send_email = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, required=False)
     is_military = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, required=False)
     customer_notes = forms.CharField(widget=forms.Textarea(attrs={'class': 'customer-notes'}), required=False)
-    tax_percent = forms.DecimalField(disabled=True)
+    tax_percent = forms.DecimalField(disabled=True, required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -277,6 +277,12 @@ class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, CustomerSearchMix
         if self.instance.id:
             self.fields['tax_percent'].initial = self.instance.get_price_data()['tax_rate'] * 100
         self.fields['override_subtotal'].widget.attrs['placeholder'] = 'Override'
+
+    def clean(self):
+        super().clean()
+        vehicle_marketing = self.cleaned_data['vehicle'].vehicle_marketing
+        self.cleaned_data['miles_included'] = vehicle_marketing.miles_included
+        self.cleaned_data['deposit_amount'] = vehicle_marketing.security_deposit
 
     class Meta:
         model = Reservation

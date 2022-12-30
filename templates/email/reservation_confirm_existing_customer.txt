@@ -1,0 +1,11 @@
+Dear {{ reservation.customer.full_name }},
+
+You've recently submitted a reservation request to Performance Rentals for our exciting {{ reservation.vehicle.make }} {{ reservation.vehicle.model }}!
+We will be contacting you shortly to confirm your reservation and arrange any additional services you may require.
+
+Your confirmation code is: {{ reservation.confirmation_code }}
+Reservation date(s): {{ reservation.out_at|date:"g:i A D m/d/Y" }} thru {{ reservation.back_at|date:"g:i A D m/d/Y" }}
+
+If you need to contact us regarding this reservation, please call {{ company_phone }}.
+
+PLEASE DO NOT E-MAIL SENSITIVE INFORMATION.

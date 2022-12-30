@@ -234,6 +234,11 @@ class ReservationRentalDetailsForm(forms.ModelForm):
         except (Customer.DoesNotExist, KeyError):
             pass
         self.vehicle = Vehicle.objects.filter(vehicle_marketing_id=self.cleaned_data['vehicle_marketing'].id).first()
+
+        vehicle_marketing = self.vehicle.vehicle_marketing
+        self.cleaned_data['miles_included'] = vehicle_marketing.miles_included
+        self.cleaned_data['deposit_amount'] = vehicle_marketing.security_deposit
+
         return super().clean()
 
     @property
