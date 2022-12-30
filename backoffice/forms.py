@@ -764,7 +764,10 @@ class RedFlagForm(forms.ModelForm):
         # exclude = ('confirmation_code',)
 
 
-class IPBanForm(forms.ModelForm):
+class IPBanForm(CSSClassMixin, forms.ModelForm):
+    short_fields = ('ip_address', 'prefix_bits',)
+
+    # TODO: Date field for expires_at
 
     def clean_prefix_bits(self):
         if self.cleaned_data['prefix_bits'] == 0:

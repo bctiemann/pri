@@ -16,60 +16,58 @@
         <form method="POST" action="{% url "backoffice:ipban-create" %}">
     {% endif %}
 
-    <table class="inputform ipbans">
-        {% if ipban %}
-        <tr>
-            <td>Resolved CIDR Address</td>
-            <td>
-                {{ ipban.cidr_address }}
-            </td>
-        </tr>
-        {% endif %}
-        <tr>
-            <td>IP Address/Network</td>
-            <td>
-                {{ form.ip_address }}
-            </td>
-        </tr>
-        <tr>
-            <td>CIDR Bits</td>
-            <td>
-                {{ form.prefix_bits }}
-            </td>
-        </tr>
-        <tr>
-            <td>Expires</td>
-            <td>
-                {{ form.expires_at }}
-            </td>
-        </tr>
+        <table class="inputform ipbans">
+            {% if ipban %}
+            <tr>
+                <td>Resolved CIDR Address</td>
+                <td>
+                    {{ ipban.cidr_address }}
+                </td>
+            </tr>
+            {% endif %}
+            <tr>
+                <td>IP Address/Network</td>
+                <td>
+                    {{ form.ip_address }}
+                </td>
+            </tr>
+            <tr>
+                <td>CIDR Bits</td>
+                <td>
+                    {{ form.prefix_bits }}
+                </td>
+            </tr>
+            <tr>
+                <td>Expires</td>
+                <td>
+                    {{ form.expires_at }}
+                </td>
+            </tr>
 
-        <tr>
-            <td></td>
-            <td>
-                <button class="btn" type="submit" name="edit">
-                    {% if ipban %}
-                        Edit
-                    {% else %}
-                        Add
-                    {% endif %}
-                </button>
-                {% if ipban %}
-                <cfif tolltagid>
-                    <button
-                        class="btn delete"
-                        type="submit"
-                        name="delete"
-                        onclick="return confirmDelete(this.form, '{% url "backoffice:ipban-delete" pk=ipban.id %}', 'IP ban')"
-                    >
-                        Delete IP ban
+            <tr>
+                <td></td>
+                <td>
+                    <button class="btn" type="submit" name="edit">
+                        {% if ipban %}
+                            Edit
+                        {% else %}
+                            Add
+                        {% endif %}
                     </button>
-                </cfif>
-                {% endif %}
-            </td>
-        </tr>
-    </table>
-    {% csrf_token %}
+                    {% if ipban %}
+                        <button
+                            class="btn delete"
+                            type="submit"
+                            name="delete"
+                            onclick="return confirmDelete(this.form, '{% url "backoffice:ipban-delete" pk=ipban.id %}', 'IP ban')"
+                        >
+                            Delete IP ban
+                        </button>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+        {% csrf_token %}
     </form>
 
 {% endblock %}
