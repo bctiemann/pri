@@ -8,38 +8,26 @@
 
     <form method="POST" action="{% url "backoffice:massemail-image-create" %}" enctype="multipart/form-data">
 
-    <table class="inputform emailpic">
-        <tr>
-            <td>Image</td>
-            <td>
-                {{ form.image }}
-                <cfinput type="file" name="image" value="#image#" required="yes" message="You may only upload jpg/gif/png images." validate="regex" pattern="\.(png|PNG|jpe?g|JPE?G|gif|GIF)$" />
-            </td>
-        </tr>
-        <tr>
-            <td>Resize</td>
-            <td>
-                <cfselect name="size">
-                    <option value="800" <cfif size IS 800>selected</cfif>>800</option>
-                    <option value="600" <cfif size IS 600>selected</cfif>>600</option>
-                    <option value="500" <cfif size IS 500>selected</cfif>>500</option>
-                    <option value="400" <cfif size IS 400>selected</cfif>>400</option>
-                    <option value="300" <cfif size IS 300>selected</cfif>>300</option>
-                    <option value="200" <cfif size IS 200>selected</cfif>>200</option>
-                    <option value="100" <cfif size IS 100>selected</cfif>>100</option>
-                </cfselect>
-                <small>Resize dimension will apply to any dimension of original which exceeds limit, width or height depending on orientation.</small>
-            </td>
-        </tr>
+        <table class="inputform emailpic">
+            <tr>
+                <td>Image</td>
+                <td>
+                    {{ form.image }}
+                </td>
+            </tr>
+            <tr>
+                <td>Resize</td>
+                <td>Resize images appropriately prior to uploading.</td>
+            </tr>
 
-        <tr>
-            <td></td>
-            <td>
-                <button class="btn" type="submit" name="edit">Add</button>
-            </td>
-        </tr>
-    </table>
-    {% csrf_token %}
+            <tr>
+                <td></td>
+                <td>
+                    <button class="btn" type="submit" name="edit">Add</button>
+                </td>
+            </tr>
+        </table>
+        {% csrf_token %}
     </form>
 
 {% endblock %}
