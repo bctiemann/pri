@@ -11,3 +11,5 @@ TODO: Backoffice pages to manage Promotions
 TODO: Stripe payment success page with link to Stripe dashboard
 
 TODO: Mass email "done" page (styling, navigation)
+
+TODO: Single template/include for coupon code VALID/INVALID display
