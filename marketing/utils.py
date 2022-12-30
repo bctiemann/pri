@@ -14,7 +14,7 @@ def get_all_emailable_customers():
     return Customer.objects.annotate(email_length=Length('user__email')).filter(receive_email=True, email_length__gt=6).values('user__email')
 
 
-def get_all_newsletter_subecribers():
+def get_all_newsletter_subscribers():
     return NewsletterSubscription.objects.filter(confirmed_at__isnull=False).values('email')
 
 
@@ -29,7 +29,7 @@ def get_recently_visiting_customers():
 
 
 def get_recently_visiting_newsletter_subscribers():
-    subscribers = get_all_newsletter_subecribers()
+    subscribers = get_all_newsletter_subscribers()
     return subscribers.filter(confirmed_at__gte=THREE_DAYS_AGO)
 
 
@@ -39,7 +39,7 @@ def get_all_admin_users():
 
 RECIPIENT_CLASS_METHOD_MAP = {
     'all_customers': get_all_emailable_customers,
-    'newsletter_subs': get_all_newsletter_subecribers,
+    'newsletter_subs': get_all_newsletter_subscribers,
     'best_customers': get_best_customers,
     'recent_customers': get_recently_visiting_customers,
     'recent_newsletter_subs': get_recently_visiting_newsletter_subscribers,
