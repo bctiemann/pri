@@ -45,6 +45,10 @@ class RentalDetailView(PermissionRequiredMixin, AdminViewMixin, RentalViewMixin,
     template_name = 'backoffice/rental/detail.html'
     form_class = RentalForm
 
+    # TODO: Update vehicle mileage and damage if changed in this rental
+
+    # TODO: If rental is in-progress and back_at is changed, recalculate extended_days
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['price_data'] = self.object.get_price_data()

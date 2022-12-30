@@ -7,31 +7,28 @@
     {% include "backoffice/includes/search_form.html" %}
 
     <table class="data alternating" sortedby="{{ sortby }}">
-    <tr>
-        <cfoutput>
-        <th col="id" default-sort="desc">ID</th>
-        <th col="vehicle__make">Vehicle</th>
-        <th col="customer__last_name">Customer</th>
-        <th col="out_at">Date Out</th>
-        <th col="back_at">Date In</th>
-        <th col="num_days" default-sort="desc">Days</th>
-        <th>Conf Code</th>
-        <th col="status">Status</th>
-        </cfoutput>
-    </tr>
-    {% for rental in rental_list %}
-    <cfoutput query="Reservations">
-    <tr class="clickable click-to-edit {% if rental.status == rental.Status.CANCELLED %}cancelled{% endif %}" destination="{% url "backoffice:rental-detail" pk=rental.id %}">
-        <td><a href="{% url "backoffice:rental-detail" pk=rental.id %}">{{ rental.id }}</a></td>
-        <td><a href="{% url "backoffice:vehicle-detail" pk=rental.vehicle.id %}">{{ rental.vehicle.vehicle_name }}</a></td>
-        <td><a href="{% url "backoffice:customer-detail" pk=rental.customer.id %}">{{ rental.customer.full_name }}</a></td>
-        <td>{{ rental.out_at|date:"m/d/Y @ H:i" }} <small>{{ rental.out_at|date:"D" }}</small></td>
-        <td>{{ rental.back_at|date:"m/d/Y @ H:i" }} <small>{{ rental.back_at|date:"D" }}</td>
-        <td>{{ rental.num_days }}</td>
-        <td>{{ rental.confirmation_code }}</td>
-        <td>{{ rental.get_status_display }}</td>
-    </tr>
-    {% endfor %}
+        <tr>
+            <th col="id" default-sort="desc">ID</th>
+            <th col="vehicle__make">Vehicle</th>
+            <th col="customer__last_name">Customer</th>
+            <th col="out_at">Date Out</th>
+            <th col="back_at">Date In</th>
+            <th col="num_days" default-sort="desc">Days</th>
+            <th>Conf Code</th>
+            <th col="status">Status</th>
+        </tr>
+        {% for rental in rental_list %}
+            <tr class="clickable click-to-edit {% if rental.status == rental.Status.CANCELLED %}cancelled{% endif %}" destination="{% url "backoffice:rental-detail" pk=rental.id %}">
+                <td><a href="{% url "backoffice:rental-detail" pk=rental.id %}">{{ rental.id }}</a></td>
+                <td><a href="{% url "backoffice:vehicle-detail" pk=rental.vehicle.id %}">{{ rental.vehicle.vehicle_name }}</a></td>
+                <td><a href="{% url "backoffice:customer-detail" pk=rental.customer.id %}">{{ rental.customer.full_name }}</a></td>
+                <td>{{ rental.out_at|date:"m/d/Y @ H:i" }} <small>{{ rental.out_at|date:"D" }}</small></td>
+                <td>{{ rental.back_at|date:"m/d/Y @ H:i" }} <small>{{ rental.back_at|date:"D" }}</td>
+                <td>{{ rental.num_days }}</td>
+                <td>{{ rental.confirmation_code }}</td>
+                <td>{{ rental.get_status_display }}</td>
+            </tr>
+        {% endfor %}
     </table>
 
 {% endblock %}

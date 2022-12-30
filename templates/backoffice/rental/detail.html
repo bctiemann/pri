@@ -27,685 +27,359 @@
         <form method="POST" action="{% url "backoffice:rental-create" %}">
     {% endif %}
 
-    <table class="inputform rentals">
-        <tr>
-            <td>Conf Code</td>
-            <td>
-                <cfinput type="hidden" name="confcode" value="#Rental.confcode#" />
-                {{ rental.confirmation_code }}
-                <a class="btn" href="{% url "backoffice:rental-generate-contract" pk=rental.id %}?inline" target="_blank" style="margin-left: 50px;">Generate Contract</a>
-            </td>
-        </tr>
-        <tr>
-            <td>Customer</td>
-            <td><a href="{% url "backoffice:customer-detail" pk=rental.customer.id %}">{{ rental.customer.full_name }}</a></td>
-        </tr>
-        <tr>
-            <td>Email</td>
-            <td><a href="mailto:{{ rental.customer.email }}">{{ rental.customer.email }}</a></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>
-                <button class="btn" type="button" name="send_insurance" onclick="sendInsuranceAuthForm({{ rental.customer.id }})">Send Insurance Auth</button>
-                <button class="btn" type="button" name="send_welcome" onclick="sendWelcomeEmail({{ rental.id }})">Send Welcome Email</button>
-            </td>
-        </tr>
-        <tr>
-            <td>Status</td>
-            <td>
-                {{ form.status }}
-            <cfselect name="status">
-                <option value="0" <CFIF Rental.status IS 0>selected</CFIF>>Incomplete</option>
-                <option value="1" <CFIF Rental.status IS 1>selected</CFIF>>Confirmed/Billed</option>
-                <option value="2" <CFIF Rental.status IS 2>selected</CFIF>>In Progress</option>
-                <option value="3" <CFIF Rental.status IS 3>selected</CFIF>>Complete</option>
-                <option value="4" <CFIF Rental.status IS 4>selected</CFIF>>Cancelled</option>
-            </cfselect>
-            </td>
-        </tr>
-        <tr>
-            <td>Vehicle</td>
-            <td>
-                {{ form.vehicle }}
-                {% comment %}
-                <cfquery name="Cars" datasource="#DSN#">
-                    SELECT vehicleid,make,model,year,status FROM Vehicles
-                    WHERE type = 1
-                    ORDER BY make
-                </cfquery>
-                <cfquery name="Motorcycles" datasource="#DSN#">
-                    SELECT vehicleid,make,model,year,status FROM Vehicles
-                    WHERE type = 2
-                    ORDER BY make
-                </cfquery>
-                <cfselect name="vehicleid" onchange="changeCar();" class="check-conflict">
-                    <optgroup label="Cars">
-                        <cfloop query="Cars">
-                            <option value="#vehicleid#" <cfif Cars.vehicleid IS Rental.vehicleid>selected</cfif>>#year# #make# #model#</option>
-                        </cfloop>
-                    </optgroup>
-                    <optgroup label="Motorcycles">
-                        <cfloop query="Motorcycles">
-                            <option value="#vehicleid#" <cfif Motorcycles.vehicleid IS Rental.vehicleid>selected</cfif>>#year# #make# #model#</option>
-                        </cfloop>
-                    </optgroup>
-                </cfselect>
-                {% endcomment %}
-            </td>
-        </tr>
-        <tr>
-            <td>Reservation Date</td>
-            <td>
-                <b>{{ rental.reserved_at|date:"m/d/Y" }} <small>{{ rental.reserved_at|date:"l" }}</small> @ {{ rental.reserved_at|date:"H:i" }} </b>
-            </td>
-        </tr>
-        <tr>
-            <td>Date Out</td>
-            <td>
-                {{ form.out_at_date }}
-                {% comment %}
-                <cftry>
-                    <cfset dateout = DateFormat(Rental.dateout,"MM/DD/YYYY")>
-                    <cfcatch type="Any">
-                        <cfset dateout = "">
-                    </cfcatch>
-                </cftry>
-                <cfif IsDefined("Form.dateouttime")>
-                    <cfset DateOutTime = Form.dateouttime>
-                <cfelse>
-                    <cftry>
-                        <cfset DateOutTime = TimeFormat(Rental.dateout,"HH:MM")>
-                        <cfcatch type="Any">
-                            <cfset DateOutTime = "07:00">
-                        </cfcatch>
-                    </cftry>
-                </cfif>
-                {% endcomment %}
-                <cfinput name="dateout" value="#dateout#" maxlength="20" class="check-conflict short" /> @
-                {{ form.out_at_time }}
-                {% comment %}
-                <cfselect name="dateouttime" class="check-conflict">
-                    <option value="07:00" <CFIF DateOutTime IS "07:00">selected</CFIF>>07:00</option>
-                    <option value="07:30" <CFIF DateOutTime IS "07:30">selected</CFIF>>07:30</option>
-                    <option value="08:00" <CFIF DateOutTime IS "08:00">selected</CFIF>>08:00</option>
-                    <option value="08:30" <CFIF DateOutTime IS "08:30">selected</CFIF>>08:30</option>
-                    <option value="09:00" <CFIF DateOutTime IS "09:00">selected</CFIF>>09:00</option>
-                    <option value="09:30" <CFIF DateOutTime IS "09:30">selected</CFIF>>09:30</option>
-                    <option value="10:00" <CFIF DateOutTime IS "10:00">selected</CFIF>>10:00</option>
-                    <option value="10:30" <CFIF DateOutTime IS "10:30">selected</CFIF>>10:30</option>
-                    <option value="11:00" <CFIF DateOutTime IS "11:00">selected</CFIF>>11:00</option>
-                    <option value="11:30" <CFIF DateOutTime IS "11:30">selected</CFIF>>11:30</option>
-                    <option value="12:00" <CFIF DateOutTime IS "12:00">selected</CFIF>>12:00</option>
-                    <option value="12:30" <CFIF DateOutTime IS "12:30">selected</CFIF>>12:30</option>
-                    <option value="13:00" <CFIF DateOutTime IS "13:00">selected</CFIF>>13:00</option>
-                    <option value="13:30" <CFIF DateOutTime IS "13:30">selected</CFIF>>13:30</option>
-                    <option value="14:00" <CFIF DateOutTime IS "14:00">selected</CFIF>>14:00</option>
-                    <option value="14:30" <CFIF DateOutTime IS "14:30">selected</CFIF>>14:30</option>
-                    <option value="15:00" <CFIF DateOutTime IS "15:00">selected</CFIF>>15:00</option>
-                    <option value="15:30" <CFIF DateOutTime IS "15:30">selected</CFIF>>15:30</option>
-                    <option value="16:00" <CFIF DateOutTime IS "16:00">selected</CFIF>>16:00</option>
-                    <option value="16:30" <CFIF DateOutTime IS "16:30">selected</CFIF>>16:30</option>
-                    <option value="17:00" <CFIF DateOutTime IS "17:00">selected</CFIF>>17:00</option>
-                    <option value="17:30" <CFIF DateOutTime IS "17:30">selected</CFIF>>17:30</option>
-                    <option value="18:00" <CFIF DateOutTime IS "18:00">selected</CFIF>>18:00</option>
-                    <option value="18:30" <CFIF DateOutTime IS "18:30">selected</CFIF>>18:30</option>
-                    <option value="19:00" <CFIF DateOutTime IS "19:00">selected</CFIF>>19:00</option>
-                    <option value="19:30" <CFIF DateOutTime IS "19:30">selected</CFIF>>19:30</option>
-                    <option value="20:00" <CFIF DateOutTime IS "20:00">selected</CFIF>>20:00</option>
-                    <option value="00:00" <CFIF DateOutTime IS "00:00">selected</CFIF>>Other (special)</option>
-                </cfselect>
-                {% endcomment %}
-                <cfinput type="hidden" name="dateout_orig" value="#dateout#" />
-                <cfinput type="hidden" name="dateouttime_orig" value="#DateOutTime#" />
-                <div class="schedule-conflict-warning ui-state-error hidden" onclick="showScheduleConflicts();">
-                    <p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>
-                    <strong>Schedule conflict.</strong> Click to view.</p>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td>Date Returned</td>
-            <td>
-                {{ form.back_at_date }}
-                {% comment %}
-                <cftry>
-                    <cfset dateback = DateFormat(Rental.dateback,"MM/DD/YYYY")>
-                    <cfcatch type="Any">
-                        <cfset dateback = "">
-                    </cfcatch>
-                </cftry>
-                <cfif IsDefined("Form.datebacktime")>
-                    <cfset DateBackTime = Form.datebacktime>
-                <cfelse>
-                    <cftry>
-                        <cfset DateBackTime = TimeFormat(Rental.dateback,"HH:MM")>
-                        <cfcatch type="Any">
-                            <cfset DateBackTime = "07:00">
-                        </cfcatch>
-                    </cftry>
-                </cfif>
-                {% endcomment %}
-                <cfinput name="dateback" value="#dateback#" maxlength="20" class="check-conflict short" /> @
-                {{ form.back_at_time }}
-                {% comment %}
-                <cfselect name="datebacktime" class="check-conflict">
-                    <option value="07:00" <CFIF DateBackTime IS "07:00">selected</CFIF>>07:00</option>
-                    <option value="07:30" <CFIF DateBackTime IS "07:30">selected</CFIF>>07:30</option>
-                    <option value="08:00" <CFIF DateBackTime IS "08:00">selected</CFIF>>08:00</option>
-                    <option value="08:30" <CFIF DateBackTime IS "08:30">selected</CFIF>>08:30</option>
-                    <option value="09:00" <CFIF DateBackTime IS "09:00">selected</CFIF>>09:00</option>
-                    <option value="09:30" <CFIF DateBackTime IS "09:30">selected</CFIF>>09:30</option>
-                    <option value="10:00" <CFIF DateBackTime IS "10:00">selected</CFIF>>10:00</option>
-                    <option value="10:30" <CFIF DateBackTime IS "10:30">selected</CFIF>>10:30</option>
-                    <option value="11:00" <CFIF DateBackTime IS "11:00">selected</CFIF>>11:00</option>
-                    <option value="11:30" <CFIF DateBackTime IS "11:30">selected</CFIF>>11:30</option>
-                    <option value="12:00" <CFIF DateBackTime IS "12:00">selected</CFIF>>12:00</option>
-                    <option value="12:30" <CFIF DateBackTime IS "12:30">selected</CFIF>>12:30</option>
-                    <option value="13:00" <CFIF DateBackTime IS "13:00">selected</CFIF>>13:00</option>
-                    <option value="13:30" <CFIF DateBackTime IS "13:30">selected</CFIF>>13:30</option>
-                    <option value="14:00" <CFIF DateBackTime IS "14:00">selected</CFIF>>14:00</option>
-                    <option value="14:30" <CFIF DateBackTime IS "14:30">selected</CFIF>>14:30</option>
-                    <option value="15:00" <CFIF DateBackTime IS "15:00">selected</CFIF>>15:00</option>
-                    <option value="15:30" <CFIF DateBackTime IS "15:30">selected</CFIF>>15:30</option>
-                    <option value="16:00" <CFIF DateBackTime IS "16:00">selected</CFIF>>16:00</option>
-                    <option value="16:30" <CFIF DateBackTime IS "16:30">selected</CFIF>>16:30</option>
-                    <option value="17:00" <CFIF DateBackTime IS "17:00">selected</CFIF>>17:00</option>
-                    <option value="17:30" <CFIF DateBackTime IS "17:30">selected</CFIF>>17:30</option>
-                    <option value="18:00" <CFIF DateBackTime IS "18:00">selected</CFIF>>18:00</option>
-                    <option value="18:30" <CFIF DateBackTime IS "18:30">selected</CFIF>>18:30</option>
-                    <option value="19:00" <CFIF DateBackTime IS "19:00">selected</CFIF>>19:00</option>
-                    <option value="19:30" <CFIF DateBackTime IS "19:30">selected</CFIF>>19:30</option>
-                    <option value="20:00" <CFIF DateBackTime IS "20:00">selected</CFIF>>20:00</option>
-                    <option value="00:00" <CFIF DateBackTime IS "00:00">selected</CFIF>>Other (special)</option>
-                </cfselect>
-                {% endcomment %}
-                <cfinput type="hidden" name="dateback_orig" value="#dateback#" />
-                <cfinput type="hidden" name="datebacktime_orig" value="#DateBackTime#" />
-                {% if rental.status == rental.Status.IN_PROGRESS %}
-                <cfif Rental.status IS 2>
-                    <small>&plusmn; &#x2264; {{ extend_threshold_hours }} hours free</small>
-                </cfif>
-                {% endif %}
-            </td>
-        </tr>
-        <tr>
-            <td>Number of Days</td>
-            <td>
-                <b>{{ rental.num_days }}</b>
-                {% if rental.extended_days %}
-                    (Extended {{ rental.extended_days }} day{{ rental.extended_days|pluralize }})
-                {% endif %}
-            </td>
-        </tr>
-        <tr>
-            <td>Delivery</td>
-            <td>
-                {{ form.delivery_required }}
-                <cfselect name="delivery">
-                    <option value="0" <CFIF Rental.delivery IS 0>selected</CFIF>>Pickup at PRI</option>
-                    <option value="1" <CFIF Rental.delivery IS 1>selected</CFIF>>Delivery</option>
-                </cfselect>
-            </td>
-        </tr>
-        <tr>
-            <td class="align-top">Drivers</td>
-            <td id="drivers"></td>
-        </tr>
-        <tr>
-            <td>Miles Included</td>
-            <td>
-                {{ form.miles_included }}
-                <cfinput name="milesinc" value="#Rental.milesinc#" maxlength="10" class="short" />
-            </td>
-        </tr>
-        <tr>
-            <td>Extra Miles</td>
-            <td>
-                {{ form.extra_miles }}
-                <cfselect name="xtramiles">
-                    <cfloop from="1" to="#arrayLen(extraMilesPrices)#" index="i">
-                        <cfset milesChoice = extraMilesPrices[i]>
-                        <option value="#milesChoice.value#" <cfif Rental.xtramiles IS milesChoice.value>selected</cfif>>#milesChoice.label#</option>
-                    </cfloop>
-                </cfselect>
-            </td>
-        </tr>
-        <tr>
-            <td>Mileage Out</td>
-            <td>
-                {{ form.mileage_out }}
-                <cfset milesout = Rental.milesout GT 0 ? Rental.milesout : Rental.mileage>
-                <cfinput name="milesout" id="milesout" value="#milesout#" class="short" />
-                <small><b>CONFIRM AT DELIVERY</b></small>
-            </td>
-        </tr>
-        <tr>
-            <td>Mileage Back</td>
-            <td>
-                {{ form.mileage_back }}
-                <cfset milesback = Rental.milesback GT 0 ? Rental.milesback : Rental.mileage>
-                <cfinput name="milesback" id="milesback" value="#milesback#" class="short" />
-            </td>
-        </tr>
-        <tr>
-            <td class="align-top">Abuse Incidents</td>
-            <td>
-                {{ form.abuse }}
-{#                <cftextarea name="abuse">#Rental.abuse#</cftextarea>#}
-            </td>
-        </tr>
-        <tr>
-            <td class="align-top">Damage Out</td>
-            <td>
-                {{ form.damage_out }}
-{#                <cftextarea name="damageout">#Rental.damageout#</cftextarea>#}
-            </td>
-        </tr>
-        <tr>
-            <td class="align-top">Damage In (return)</td>
-            <td>
-                {{ form.damage_in }}
-{#                <cftextarea name="damagein">#Rental.damagein#</cftextarea>#}
-            </td>
-        </tr>
-        <tr>
-            <td>Discount/Coupon Code</td>
-            <td>
-                {{ form.coupon_code }}
-                {% comment %}
-                <CFIF len(Rental.coupon) GT 0>
-                    <CFQUERY NAME="codecheck" DATASOURCE="#DSN#">
-                        SELECT * FROM discounts
-                        WHERE LOWER(code) = '#lcase(trim(Rental.coupon))#'
-                    </CFQUERY>
-                </CFIF>
-                <cfinput name="coupon" value="#Rental.coupon#" maxlength="30" />
-                <CFIF len(Rental.coupon) GT 0>
-                    (<CFIF codecheck.recordcount IS 1>
-                         <span style="color:green">VALID</span> #codecheck.amount# %
-                     <CFELSE>
-                         <span style="color:red">INVALID</span>
-                     </CFIF>)
-                </CFIF>
-                {% endcomment %}
-                {% if rental.coupon_code %}
-                <CFIF len(Reservation.coupon) GT 0>
-                    ({% if rental.coupon %}
-                    <CFIF codecheck.recordcount IS 1>
-                         <span style="color:green">VALID</span> {{ rental.coupon.value_str }}
-                    {% else %}
-                     <CFELSE>
-                         <span style="color:red">INVALID</span>
-                     </CFIF>
-                    {% endif %})
-                </CFIF>
-                {% endif %}
-            </td>
-        </tr>
-        <tr>
-            <td>Military ID</td>
-            <td>
-                {{ form.is_military }}
-            </td>
-        </tr>
-        <tr>
-            <td class="align-top">Notes<br /><small>Customer Requests<br />Visible to Customer</small></td>
-            <td>
-                {{ form.customer_notes }}
-{#                <cftextarea name="notes" class="customer-notes">#Rental.notes#</cftextarea>#}
-            </td>
-        </tr>
-        <tr>
-            <td class="align-top">Our Notes<br /><small>Not Public</small></td>
-            <td>
-                {{ form.internal_notes }}
-{#                <cftextarea name="ournotes" class="our-notes">#ournotes_dec#</cftextarea>#}
-            </td>
-        </tr>
-
-        <!--- Billing info --->
-        <tr>
-            <td></td>
-            <td>
-            {% comment %}
-            <CFQUERY NAME="eCustomer" DATASOURCE="#DSN#">
-                SELECT customerid,fname,lname,addr,city,state,zip,email,discount,ccnum,ccexpyr,ccexpmo,cccvv,cctel,cc2num,cc2expyr,cc2expmo,cc2cvv,cc2tel FROM Customers
-                WHERE customerid = #Rental.customerid#
-            </CFQUERY>
-
-            <cftry>
-                <cfset addr_dec = Decrypt(eCustomer.addr,globalkey,"AES","hex")>
-                <cfcatch type="Any">
-                    <cfset addr_dec = "">
-                </cfcatch>
-            </cftry>
-            {% endcomment %}
-
-            <div id="billinginfo">
-                <p>{{ rental.customer.full_name }}</p>
-                <p>{{ rental.customer.address_line_1 }}</p>
-                {% if rental.customer.address_line_2 %}
-                    <p>{{ rental.customer.address_line_2 }}</p>
-                {% endif %}
-                <p>{{ rental.customer.city }}, {{ rental.customer.state }} {{ rental.customer.zip }}</p>
-
-                <cftry>
-                    <cfset ccnum_dec = decrypt('#eCustomer.ccnum#','#globalkey#','AES','hex')>
-                    <cfcatch type="Any">
-                        <cfset ccnum_dec = "">
-                    </cfcatch>
-                </cftry>
-                <cftry>
-                    <cfset cc2num_dec = decrypt('#eCustomer.cc2num#','#globalkey#','AES','hex')>
-                    <cfcatch type="Any">
-                        <cfset cc2num_dec = "">
-                    </cfcatch>
-                </cftry>
-
-                <div class="card-mockup {% if not rental.customer.cc_number %}inactive{% endif %}">
-                    <div class="card-label">1</div>
-                    {% if rental.customer.cc_number %}
-{#                    <cfif Len(eCustomer.ccnum) GT 0>#}
-                        <div class="card-number">{{ rental.customer.cc_number }}</div>
-                        <div class="card-exp">{{ rental.customer.cc_exp_mo }} / {{ rental.customer.cc_exp_yr }}</div>
-                        <div class="card-cvv">{{ rental.customer.cc_cvv }}</div>
-                        <div class="card-phone">{{ rental.customer.cc_phone }}</div>
-{#                    </cfif>#}
+        <table class="inputform rentals">
+            <tr>
+                <td>Conf Code</td>
+                <td>
+                    {{ rental.confirmation_code }}
+                    <a class="btn" href="{% url "backoffice:rental-generate-contract" pk=rental.id %}?inline" target="_blank" style="margin-left: 50px;">Generate Contract</a>
+                </td>
+            </tr>
+            <tr>
+                <td>Customer</td>
+                <td><a href="{% url "backoffice:customer-detail" pk=rental.customer.id %}">{{ rental.customer.full_name }}</a></td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td><a href="mailto:{{ rental.customer.email }}">{{ rental.customer.email }}</a></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <button class="btn" type="button" name="send_insurance" onclick="sendInsuranceAuthForm({{ rental.customer.id }})">Send Insurance Auth</button>
+                    <button class="btn" type="button" name="send_welcome" onclick="sendWelcomeEmail({{ rental.id }})">Send Welcome Email</button>
+                </td>
+            </tr>
+            <tr>
+                <td>Status</td>
+                <td>
+                    {{ form.status }}
+                </td>
+            </tr>
+            <tr>
+                <td>Vehicle</td>
+                <td>
+                    {{ form.vehicle }}
+                </td>
+            </tr>
+            <tr>
+                <td>Reservation Date</td>
+                <td>
+                    <b>{{ rental.reserved_at|date:"m/d/Y" }} <small>{{ rental.reserved_at|date:"l" }}</small> @ {{ rental.reserved_at|date:"H:i" }} </b>
+                </td>
+            </tr>
+            <tr>
+                <td>Date Out</td>
+                <td>
+                    {{ form.out_at_date }} @ {{ form.out_at_time }}
+                    <div class="schedule-conflict-warning ui-state-error hidden" onclick="showScheduleConflicts();">
+                        <p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>
+                        <strong>Schedule conflict.</strong> Click to view.</p>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Date Returned</td>
+                <td>
+                    {{ form.back_at_date }} @ {{ form.back_at_time }}
+                    {% if rental.status == rental.Status.IN_PROGRESS %}
+                        <small>&plusmn; &#x2264; {{ extend_threshold_hours }} hours free</small>
                     {% endif %}
-                </div>
-                <div class="card-mockup {% if not rental.customer.cc2_number %}inactive{% endif %}">
-                    <div class="card-label">2</div>
-                    {% if rental.customer.cc2_number %}
-{#                    <cfif Len(eCustomer.cc2num) GT 0>#}
-                        <div class="card-number">{{ rental.customer.cc2_number }}</div>
-                        <div class="card-exp">{{ rental.customer.cc2_exp_mo }} / {{ rental.customer.cc2_exp_yr }}</div>
-                        <div class="card-cvv">{{ rental.customer.cc2_cvv }}</div>
-                        <div class="card-phone">{{ rental.customer.cc2_phone }}</div>
-{#                    </cfif>#}
+                </td>
+            </tr>
+            <tr>
+                <td>Number of Days</td>
+                <td>
+                    <b>{{ rental.num_days }}</b>
+                    {% if rental.extended_days %}
+                        (Extended {{ rental.extended_days }} day{{ rental.extended_days|pluralize }})
                     {% endif %}
-                </div>
-
-            </div>
-            </td>
-        </tr>
-
-        <tr>
-            <cfset depamount = Rental.depamount GT 0 ? Rental.depamount : 0.00>
-            <td>Deposit Amount</td>
-            <td class="currency"><span class="currency-prefix">$</span>{{ form.deposit_amount }}<cfinput name="depamount" value="#depamount#" maxlength="10" class="short" /></td>
-        </tr>
-        <tr>
-            <td>Deposit Charged On</td>
-            <td>
-                {{ form.deposit_charged_on }}
-                <cfinput name="depchargedon" value="#DateFormat(Rental.depchargedon,"mm/dd/yyyy")#" class="short" />
-            </td>
-        </tr>
-        <tr>
-            <cfset deprefundamount = Rental.deprefundamount GT 0 ? Rental.deprefundamount : 0.00>
-            <td>Deposit Refund Amount</td>
-            <td class="currency"><span class="currency-prefix">$</span>{{ form.deposit_refund_amount }}<cfinput name="deprefundamount" value="#deprefundamount#" maxlength="10" class="short" /></td>
-        </tr>
-        <tr>
-            <td>Deposit Refunded On</td>
-            <td>
-                {{ form.deposit_refunded_on }}
-                <cfinput name="deprefundon" value="#DateFormat(Rental.deprefundon,"mm/dd/yyyy")#" class="short" />
-            </td>
-        </tr>
-        <tr>
-            <td>Discount</td>
-            <td>
-                {{ form.rental_discount_pct }}
-                <cfinput name="discount" value="#Rental.discount#" class="short" /> % (This rental only)
-            </td>
-        </tr>
-        <tr>
-            <td>Delivery ZIP</td>
-            <td>
-                {{ form.delivery_zip }}
-                <cfinput name="deliveryzip" value="#Rental.deliveryzip#" class="short" />
-                <button class="btn" type="button" onclick="getTaxRate()">Get Tax Rate</button>
-            </td>
-        </tr>
-        <tr>
-            <td>Tax Rate</td>
-            <td>
-{#                <span id="id_tax_percent"></span>#}
-                {{ form.tax_percent }}
-                <cfset taxpct = IsNumeric(Rental.taxpct) ? Rental.taxpct : salesTaxDefault>
-                <cfinput name="taxpct" value="#taxpct#" class="short" /> %
-            </td>
-        </tr>
-
-        {% comment %}
-        <cfquery name="VFront" datasource="#FDSN#">
-            SELECT price,disc2day,disc3day,disc7day,deposit,milesinc
-            FROM VehiclesFront
-            WHERE vehicleid = <CFQUERYPARAM value="#Rental.vehicleid#" CFSQLType="CF_SQL_NUMERIC">
-        </cfquery>
-
-        <cfset tcostRaw = VFront.price * Rental.numdays>
-
-        <cfset dMultiDay = 0>
-        <cfif Rental.numdays GTE 7>
-            <cfset dMultiDay = VFront.disc7day>
-        <cfelseif Rental.numdays GTE 3>
-            <cfset dMultiDay = VFront.disc3day>
-        <cfelseif Rental.numdays IS 2>
-            <cfset dMultiDay = VFront.disc2day>
-        </cfif>
-        <cfset tcost = tcostRaw * (100 - dMultiDay) / 100>
-
-        <CFIF len(Rental.coupon) GT 0>
-            <CFIF codecheck.recordcount IS 1>
-                <CFSET d1 = codecheck.amount>
-            <CFELSE>
-                <CFSET d1 = 0>
-            </CFIF>
-        <CFELSE>
-            <CFSET d1 = 0>
-        </CFIF>
-        <CFSET d2 = Rental.customer_discount>
-        <cfset d3 = IsValid("integer",Rental.discount) ? Rental.discount : 0>
-
-        <CFSET s1 = #evaluate(tcost - (tcost * (d1/100)))#>
-        <CFSET s2 = #evaluate(s1 - (s1 * (d2/100)))#>
-
-        <cfloop from="1" to="#arrayLen(extraMilesPrices)#" index="i">
-            <cfset milesChoice = extraMilesPrices[i]>
-            <cfif Rental.xtramiles IS milesChoice.value>
-                <cfset xmi = milesChoice.cost>
-            </cfif>
-        </cfloop>
-        <cfif Rental.xtramiles GT 0>
-            <CFSET s3 = #evaluate(s2 - (s2 * (d3/100)))#>
-            <CFSET s3 = s3 + xmi>
-        <cfelse>
-            <CFSET s3 = #evaluate(s2 - (s2 * (d3/100)))#>
-        </cfif>
-
-        <CFSET ds1 = #evaluate(tcost * (d1/100))#>
-        <CFSET ds2 = #evaluate(s1 * (d2/100))#>
-        <CFSET ds3 = #evaluate(s2 * (d3/100))#>
-
-        <CFSET ratediff = 0>
-        <CFIF IsDefined("Rental.rate") AND Rental.rate IS not "0.00" AND Len(Rental.rate) GT 0>
-            <CFIF Rental.rate IS NOT #NumberFormat(s3,"______.__")#>
-                <CFSET ratediff = 1>
-                <CFSET rateval = Rental.rate>
-            </CFIF>
-        </CFIF>
-        {% endcomment %}
-
-        <tr class="divider">
-            <td colspan="2">
-                <h3>Price Breakdown</h3>
-            </td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>
-                <table class="price-breakdown">
-                    <tr>
-                        <td>Rental Total ({{ rental.num_days }} day{{ rental.num_days|pluralize }}):</td>
-                        <td><b>${{ price_data.base_price|intcomma }}</b></td>
-                        <td></td>
-                    </tr>
-                    {% if price_data.multi_day_discount %}
-                    <cfif dMultiDay>
-                    <tr>
-                        <td>Multi-Day Discount ({{ price_data.multi_day_discount_pct }}%):</td>
-                        <td>- ${{ price_data.multi_day_discount|intcomma }}</td>
-                        <td></td>
-                    </tr>
-                    </cfif>
+                </td>
+            </tr>
+            <tr>
+                <td>Delivery</td>
+                <td>
+                    {{ form.delivery_required }}
+                </td>
+            </tr>
+            <tr>
+                <td class="align-top">Drivers</td>
+                <td id="drivers"></td>
+            </tr>
+            <tr>
+                <td>Miles Included</td>
+                <td>
+                    {{ form.miles_included }}
+                </td>
+            </tr>
+            <tr>
+                <td>Extra Miles</td>
+                <td>
+                    {{ form.extra_miles }}
+                </td>
+            </tr>
+            <tr>
+                <td>Mileage Out</td>
+                <td>
+                    {{ form.mileage_out }}
+                    <small><b>CONFIRM AT DELIVERY</b></small>
+                </td>
+            </tr>
+            <tr>
+                <td>Mileage Back</td>
+                <td>
+                    {{ form.mileage_back }}
+                </td>
+            </tr>
+            <tr>
+                <td class="align-top">Abuse Incidents</td>
+                <td>
+                    {{ form.abuse }}
+                </td>
+            </tr>
+            <tr>
+                <td class="align-top">Damage Out</td>
+                <td>
+                    {{ form.damage_out }}
+                </td>
+            </tr>
+            <tr>
+                <td class="align-top">Damage In (return)</td>
+                <td>
+                    {{ form.damage_in }}
+                </td>
+            </tr>
+            <tr>
+                <td>Discount/Coupon Code</td>
+                <td>
+                    {{ form.coupon_code }}
+                    {% if rental.coupon_code %}
+                        ({% if rental.coupon %}
+                             <span style="color:green">VALID</span> {{ rental.coupon.value_str }}
+                        {% else %}
+                             <span style="color:red">INVALID</span>
+                        {% endif %})
                     {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>Military ID</td>
+                <td>
+                    {{ form.is_military }}
+                </td>
+            </tr>
+            <tr>
+                <td class="align-top">Notes<br /><small>Customer Requests<br />Visible to Customer</small></td>
+                <td>
+                    {{ form.customer_notes }}
+                </td>
+            </tr>
+            <tr>
+                <td class="align-top">Our Notes<br /><small>Not Public</small></td>
+                <td>
+                    {{ form.internal_notes }}
+                </td>
+            </tr>
 
-                    <tr>
-                        <td colspan="2">Effective Specific Discount (greatest of following):</td>
-                        <td></td>
-                    </tr>
+            <!--- Billing info --->
+            <tr>
+                <td></td>
+                <td>
+                    <div id="billinginfo">
+                        <p>{{ rental.customer.full_name }}</p>
+                        <p>{{ rental.customer.address_line_1 }}</p>
+                        {% if rental.customer.address_line_2 %}
+                            <p>{{ rental.customer.address_line_2 }}</p>
+                        {% endif %}
+                        <p>{{ rental.customer.city }}, {{ rental.customer.state }} {{ rental.customer.zip }}</p>
 
-                    <tr class="specific-discount">
-                        <td>Coupon Discount: </td>
-                        <td>- ${{ price_data.coupon_discount|intcomma }}</td>
-                        <td></td>
-                    </tr>
-                    <tr class="specific-discount">
-                        <td>Promotion Discount: </td>
-                        <td>- ${{ price_data.promotion_discount|intcomma }}</td>
-                        <td></td>
-                    </tr>
-                    <tr class="specific-discount">
-                        <td>Customer Discount: </td>
-                        <td>- ${{ price_data.customer_discount|intcomma }}</td>
-                        <td></td>
-                    </tr>
-                    <tr class="specific-discount">
-                        <td>Military Discount: </td>
-                        <td>- ${{ price_data.military_discount|intcomma }}</td>
-                        <td></td>
-                    </tr>
-                    <tr class="specific-discount">
-                        <td>One-Time Discount: </td>
-                        <td>- ${{ price_data.one_time_discount|intcomma }}</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>Effective Discount: </td>
-                        <td>- ${{ price_data.specific_discount|intcomma }}</td>
-                        <td>{{ price_data.specific_discount_label }}</td>
-                    </tr>
+                        <div class="card-mockup {% if not rental.customer.cc_number %}inactive{% endif %}">
+                            <div class="card-label">1</div>
+                            {% if rental.customer.cc_number %}
+                                <div class="card-number">{{ rental.customer.cc_number }}</div>
+                                <div class="card-exp">{{ rental.customer.cc_exp_mo }} / {{ rental.customer.cc_exp_yr }}</div>
+                                <div class="card-cvv">{{ rental.customer.cc_cvv }}</div>
+                                <div class="card-phone">{{ rental.customer.cc_phone }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="card-mockup {% if not rental.customer.cc2_number %}inactive{% endif %}">
+                            <div class="card-label">2</div>
+                            {% if rental.customer.cc2_number %}
+                                <div class="card-number">{{ rental.customer.cc2_number }}</div>
+                                <div class="card-exp">{{ rental.customer.cc2_exp_mo }} / {{ rental.customer.cc2_exp_yr }}</div>
+                                <div class="card-cvv">{{ rental.customer.cc2_cvv }}</div>
+                                <div class="card-phone">{{ rental.customer.cc2_phone }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </td>
+            </tr>
 
-                    {% if rental.extra_miles %}
-                    <CFIF Rental.xtramiles GT 0>
-                    <tr>
-                        <td>Extra Miles ({{ rental.extra_miles }}):</td>
-                        <td>${{ price_data.extra_miles_cost|intcomma }}</td>
-                    </tr>
-                    </CFIF>
+            <tr>
+                <td>Deposit Amount</td>
+                <td class="currency"><span class="currency-prefix">$</span>{{ form.deposit_amount }}</td>
+            </tr>
+            <tr>
+                <td>Deposit Charged On</td>
+                <td>
+                    {{ form.deposit_charged_on }}
+                </td>
+            </tr>
+            <tr>
+                <td>Deposit Refund Amount</td>
+                <td class="currency"><span class="currency-prefix">$</span>{{ form.deposit_refund_amount }}</td>
+            </tr>
+            <tr>
+                <td>Deposit Refunded On</td>
+                <td>
+                    {{ form.deposit_refunded_on }}
+                </td>
+            </tr>
+            <tr>
+                <td>Discount</td>
+                <td>
+                    {{ form.rental_discount_pct }} % (This rental only)
+                </td>
+            </tr>
+            <tr>
+                <td>Delivery ZIP</td>
+                <td>
+                    {{ form.delivery_zip }}
+                    <button class="btn" type="button" onclick="getTaxRate()">Get Tax Rate</button>
+                </td>
+            </tr>
+            <tr>
+                <td>Tax Rate</td>
+                <td>
+                    {{ form.tax_percent }} %
+                </td>
+            </tr>
+
+            <tr class="divider">
+                <td colspan="2">
+                    <h3>Price Breakdown</h3>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <table class="price-breakdown">
+                        <tr>
+                            <td>Rental Total ({{ rental.num_days }} day{{ rental.num_days|pluralize }}):</td>
+                            <td><b>${{ price_data.base_price|intcomma }}</b></td>
+                            <td></td>
+                        </tr>
+                        {% if price_data.multi_day_discount %}
+                            <tr>
+                                <td>Multi-Day Discount ({{ price_data.multi_day_discount_pct }}%):</td>
+                                <td>- ${{ price_data.multi_day_discount|intcomma }}</td>
+                                <td></td>
+                            </tr>
+                        {% endif %}
+
+                        <tr>
+                            <td colspan="2">Effective Specific Discount (greatest of following):</td>
+                            <td></td>
+                        </tr>
+
+                        <tr class="specific-discount">
+                            <td>Coupon Discount: </td>
+                            <td>- ${{ price_data.coupon_discount|intcomma }}</td>
+                            <td></td>
+                        </tr>
+                        <tr class="specific-discount">
+                            <td>Promotion Discount: </td>
+                            <td>- ${{ price_data.promotion_discount|intcomma }}</td>
+                            <td></td>
+                        </tr>
+                        <tr class="specific-discount">
+                            <td>Customer Discount: </td>
+                            <td>- ${{ price_data.customer_discount|intcomma }}</td>
+                            <td></td>
+                        </tr>
+                        <tr class="specific-discount">
+                            <td>Military Discount: </td>
+                            <td>- ${{ price_data.military_discount|intcomma }}</td>
+                            <td></td>
+                        </tr>
+                        <tr class="specific-discount">
+                            <td>One-Time Discount: </td>
+                            <td>- ${{ price_data.one_time_discount|intcomma }}</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Effective Discount: </td>
+                            <td>- ${{ price_data.specific_discount|intcomma }}</td>
+                            <td>{{ price_data.specific_discount_label }}</td>
+                        </tr>
+
+                        {% if rental.extra_miles %}
+                            <tr>
+                                <td>Extra Miles ({{ rental.extra_miles }}):</td>
+                                <td>${{ price_data.extra_miles_cost|intcomma }}</td>
+                            </tr>
+                        {% endif %}
+
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td>
+                                SubTotal: <strong>{{ price_data.computed_subtotal|intcomma }}</strong>
+                            </td>
+                            <td>
+                                {{ form.override_subtotal }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td>Tax: <small>({{ price_data.tax_rate_as_percent }}%)</small> ${{ price_data.tax_amount|intcomma }} </td>
+                            <td></td>
+                        </tr>
+
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td>Invoice Total: <strong>${{ price_data.total_with_tax|intcomma }}</strong></td>
+                            <td></td>
+                        </tr>
+
+                        <tr class="bill-total">
+                            <td>&nbsp;</td>
+                            <td>50% deposit: <strong>${{ price_data.reservation_deposit|intcomma }}</strong></td>
+                            <td></td>
+                        </tr>
+                    </table>
+
+                    {% if rental.extended_days %}
+                        <p><strong>Extended Days:</strong> {{ rental.extended_days }} @ ${{ price_data.vehicle_price_per_day|intcomma }}</p>
+                        <p><strong><u>Extension Total:</u></strong> <strong>${{ rental.extended_days_amount|intcomma }}</strong></p>
                     {% endif %}
+                </td>
+            </tr>
 
-                    <tr>
-                        <td>&nbsp;</td>
-                        <td>
-                            SubTotal: <strong>{{ price_data.computed_subtotal|intcomma }}</strong>
-                        </td>
-                        <td>
-                            {{ form.override_subtotal }}
-                        </td>
-                    </tr>
-
-                    {% comment %}
-                    <CFSET taxtot = s3 * (1 + (taxpct/100))>
-                    <CFSET taxmt = taxtot - s3>
-                    {% endcomment %}
-
-                    <tr>
-                        <td>&nbsp;</td>
-                        <td>Tax: <small>({{ price_data.tax_rate_as_percent }}%)</small> ${{ price_data.tax_amount|intcomma }} </td>
-                        <td></td>
-                    </tr>
-
-                    <tr>
-                        <td>&nbsp;</td>
-                        <td>Invoice Total: <strong>${{ price_data.total_with_tax|intcomma }}</strong></td>
-                        <td></td>
-                    </tr>
-
-                    <tr class="bill-total">
-                        <td>&nbsp;</td>
-                        <td>50% deposit: <strong>${{ price_data.reservation_deposit|intcomma }}</strong></td>
-                        <td></td>
-                    </tr>
-                </table>
-
-
-                {% comment %}
-                <input type="hidden" name="total" value="#s3#">
-                <CFIF ratediff IS 1>
-                    <b><big>Rate Override:</big></b> Rate set to: #NumberFormat(Rental.rate,"$___,___.__")#
-                </CFIF>
-                {% endcomment %}
-
-                {% if rental.extended_days %}
-                <CFIF Rental.extenddays GT 0>
-                    <CFSET extendamount =  VFront.price * Rental.extenddays>
-                    <p><strong>Extended Days:</strong> {{ rental.extended_days }} @ ${{ price_data.vehicle_price_per_day|intcomma }}</p>
-                    <p><strong><u>Extension Total:</u></strong> <strong>${{ rental.extended_days_amount|intcomma }}</strong></p>
-                </CFIF>
-                {% endif %}
-            </td>
-        </tr>
-
-        {% comment %}
-        <tr>
-            <td>Computed Cost<br><small>Not including tax</small></td>
-            <CFIF ratediff IS 0>
-                <cfset computedCost = NumberFormat(s3,".__")>
-            <CFELSEIF ratediff IS 1>
-                <cfset computedCost = NumberFormat(Rental.rate,".__")>
-            </CFIF>
-            <td class="currency">
-                <span class="currency-prefix">$</span>
-                <cfinput type="text" name="rate" size="15" value="#computedCost#" class="short" />
-                <CFIF ratediff IS 1>
-                    <b>Rate Override</b> <cfinput type="checkbox" name="delover" /><small>Clear</small>
-                </CFIF>
-            </td>
-        </tr>
-        {% endcomment %}
-
-        <tr>
-            <td></td>
-            <td>
-                <button class="btn" type="submit" name="edit">
-                    {% if rental %}
-                        Edit
-                    {% else %}
-                        Add
-                    {% endif %}
-                </button>
-                <button
-                    class="btn delete"
-                    type="submit"
-                    name="delete"
-                    onclick="return confirmDelete(this.form, '{% url "backoffice:rental-delete" pk=rental.id %}', 'rental')"
-                >
-                    Delete Rental
-                </button>
-            </td>
-        </tr>
-    </table>
-    <input type="hidden" id="rental_id" value="{{ rental.id }}" />
-    <cfinput type="hidden" name="addr" value="#addr_dec#" />
-    <cfinput type="hidden" name="zip" value="#Rental.zip#" />
-    <cfinput type="hidden" name="fnc" value="edit" />
-    {% csrf_token %}
+            <tr>
+                <td></td>
+                <td>
+                    <button class="btn" type="submit" name="edit">
+                        {% if rental %}
+                            Edit
+                        {% else %}
+                            Add
+                        {% endif %}
+                    </button>
+                    <button
+                        class="btn delete"
+                        type="submit"
+                        name="delete"
+                        onclick="return confirmDelete(this.form, '{% url "backoffice:rental-delete" pk=rental.id %}', 'rental')"
+                    >
+                        Delete Rental
+                    </button>
+                </td>
+            </tr>
+        </table>
+        <input type="hidden" id="rental_id" value="{{ rental.id }}" />
+        {% csrf_token %}
     </form>
-    </cfoutput>
 
     <div class="dialog" id="dialog_clone_driver" title="Clone Driver">
         <p>
@@ -717,48 +391,47 @@
             <tr>
                 <td>First Name</td>
                 <td>
-                    {{ clone_form.clone_first_name }}<cfinput name="clone_fname" value="" />
+                    {{ clone_form.clone_first_name }}
                     <p class="form-error" id="error_clone_first_name"></p>
                 </td>
             </tr>
             <tr>
                 <td>Last Name</td>
                 <td>
-                    {{ clone_form.clone_last_name }}<cfinput name="clone_lname" value="" />
+                    {{ clone_form.clone_last_name }}
                     <p class="form-error" id="error_clone_last_name"></p>
                 </td>
             </tr>
             <tr>
                 <td>Email</td>
                 <td>
-                    {{ clone_form.clone_email }}<cfinput name="clone_email" value="#nextEmail#" />
+                    {{ clone_form.clone_email }}
                     <p class="form-error" id="error_clone_email"></p>
                 </td>
             </tr>
             <tr>
                 <td></td>
-                <td>{{ clone_form.clone_duplicate_license }}<cfinput type="checkbox" name="clone_license" /> <label for="id_clone_duplicate_license">Clone driver's license</label></td>
+                <td>{{ clone_form.clone_duplicate_license }} <label for="id_clone_duplicate_license">Clone driver's license</label></td>
             </tr>
         </table>
         <input type="hidden" id="clone_customer_id" value="{{ rental.customer.id }}" />
-{#        <cfinput type="hidden" name="clone_customerid" value="#Rental.customerid#" />#}
         </form>
     </div>
 
     <div class="dialog" id="dialog_conflicts" title="Schedule Conflict">
         <p>
-        The <span id="conflict_vehicle"></span> is reserved for the following dates/times that conflict with your selection:
+            The <span id="conflict_vehicle"></span> is reserved for the following dates/times that conflict with your selection:
         </p>
 
         <table class="data" id="conflict_data">
             <thead>
-            <tr>
-                <th>Customer</td>
-                <th>Type</td>
-                <th>Date Out</td>
-                <th>Date Back</td>
-                <th>Num. Days</td>
-            </tr>
+                <tr>
+                    <th>Customer</th>
+                    <th>Type</th>
+                    <th>Date Out</th>
+                    <th>Date Back</th>
+                    <th>Num. Days</th>
+                </tr>
             </thead>
             <tbody>
             </tbody>

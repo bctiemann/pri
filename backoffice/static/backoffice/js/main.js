@@ -898,13 +898,13 @@ $(document).ready(function() {
     });
 
     // Disable out/in date pickers depending on status of rental
-    if ($.inArray($('#status').val(), ['2','3']) > -1) {
-        $('#dateout').addClass('dont-edit');
-        $('#dateouttime').addClass('dont-edit');
+    if ($.inArray($('#id_status').val(), ['2','3']) > -1) {
+        $('#id_out_at_date').addClass('dont-edit');
+        $('#id_out_at_time').addClass('dont-edit');
     }
-    if ($.inArray($('#status').val(), ['3']) > -1) {
-        $('#dateback').addClass('dont-edit');
-        $('#datebacktime').addClass('dont-edit');
+    if ($.inArray($('#id_status').val(), ['3']) > -1) {
+        $('#id_back_at_date').addClass('dont-edit');
+        $('#id_back_at_time').addClass('dont-edit');
     }
 
     // Set default driver and passenger numbers when switching JoyPerf type
