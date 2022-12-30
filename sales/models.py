@@ -579,7 +579,7 @@ class TaxRate(models.Model):
 
 class RedFlag(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    full_name = models.CharField(max_length=255, blank=True)
+    full_name = models.CharField(max_length=255)
     home_phone = PhoneNumberField(blank=True)
     mobile_phone = PhoneNumberField(blank=True)
     address = fields.EncryptedCharField(max_length=255, null=True, blank=True)

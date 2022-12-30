@@ -34,6 +34,7 @@ class CSSClassMixin:
     cc_fields = ()
     phone_fields = ()
     short_fields = ()
+    ssn_fields = ()
 
     def add_widget_css_class(self, field, css_class_name):
         if not self.fields.get(field):
@@ -52,6 +53,8 @@ class CSSClassMixin:
             self.add_widget_css_class(field, 'phone')
         for field in self.short_fields:
             self.add_widget_css_class(field, 'short')
+        for field in self.ssn_fields:
+            self.add_widget_css_class(field, 'ssn')
 
 
 # Provides styling and initial value formatting for the customer search fields in Reservation etc. forms.
@@ -756,7 +759,10 @@ class CardForm(forms.ModelForm):
         # exclude = ('uuid',)
 
 
-class RedFlagForm(forms.ModelForm):
+class RedFlagForm(CSSClassMixin, forms.ModelForm):
+    phone_fields = ('home_phone', 'mobile_phone',)
+    short_fields = ('home_phone', 'mobile_phone', 'zip', 'ssn',)
+    ssn_fields = ('ssn',)
 
     class Meta:
         model = RedFlag
