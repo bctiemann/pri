@@ -34,8 +34,8 @@ class NewsItem(models.Model):
     author_id = models.IntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     slug = models.SlugField(max_length=255, blank=True, db_index=True)
-    subject = models.CharField(max_length=255, blank=True)
-    body = models.TextField(blank=True)
+    subject = models.CharField(max_length=255)
+    body = models.TextField()
 
     def __str__(self):
         return f'{self.id} {self.created_at.date()} {self.slug}'
