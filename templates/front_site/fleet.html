@@ -5,22 +5,7 @@
 
 {% block content %}
 
-    {% comment %}
-    <CFQUERY NAME="Vehicles" DATASOURCE="#DSN#">
-    SELECT vehicleid,make,model,type FROM Vehicles
-    WHERE status = 1
-    <cfif fleet IS "cars">
-        AND type = 1
-    <cfelseif fleet IS "bikes">
-        AND type = 2
-    </cfif>
-    ORDER BY type,weighting DESC
-    </CFQUERY>
-    {% endcomment %}
-
     {% if vehicle_type %}
-        <cfif fleet IS NOT "all">
-        <cfoutput>
         <div
             class="fleet-banner"
             {% if vehicle_type == 'cars' %}
@@ -31,39 +16,18 @@
         >
             <div class="fleet-banner-title">
             {% if vehicle_type == 'cars' %}
-            <cfif fleet IS "cars">
                 <p class="overlay-text">The PRI Sports Cars</p>
             {% elif vehicle_type == 'bikes' %}
-            <cfelseif fleet IS "bikes">
                 <p class="overlay-text">The PRI Bike Fleet</p>
-            </cfif>
             {% endif %}
             </div>
         </div>
-        </cfoutput>
-        </cfif>
     {% endif %}
 
     <div class="fleet-list">
 
-    {% for vehicle in vehicles %}
-        {% if vehicle.slug %}
-            {% comment %}
-            <cfoutput query="Vehicles">
-                <cfquery name="VehicleFront" datasource="#FDSN#">
-                    SELECT blurb,price,specs FROM VehiclesFront
-                    WHERE vehicleid = <CFQUERYPARAM value="#vehicleid#" CFSQLType="CF_SQL_INTEGER">
-                </cfquery>
-
-                <cftry>
-                    <cfset specsStruct = DeserializeJSON(VehicleFront.specs)>
-                    <cfset headline = specsStruct.headline>
-                    <cfcatch type="Any">
-                        <cfset headline = "">
-                    </cfcatch>
-                </cftry>
-                {% endcomment %}
-
+        {% for vehicle in vehicles %}
+            {% if vehicle.slug %}
                 <div class="fleet-vehicle">
                     <a href="{% url "vehicle" slug=vehicle.slug %}">
                         {% if vehicle.thumbnail_image %}
@@ -72,7 +36,7 @@
                     </a>
                     <div class="car-info-fleet">
 
-                            <div class="price-fleet">
+                        <div class="price-fleet">
                             <div class="ih-item circle effect4 left_to_right price-bubble">
                                 <a href="{% url "reserve" slug=vehicle.slug %}">
                                 <div class="img">
@@ -87,22 +51,21 @@
                                 </div>
                                 </a>
                             </div>
-                            </div>
+                        </div>
 
                         <a href="{% url "vehicle" slug=vehicle.slug %}">
-                        <h3>
-                            {{ vehicle.make }} {{ vehicle.model }}
-                            <span class="trimlevel">{{ vehicle.headline }}</span>
-                        </h3>
+                            <h3>
+                                {{ vehicle.make }} {{ vehicle.model }}
+                                <span class="trimlevel">{{ vehicle.headline }}</span>
+                            </h3>
                         </a>
                         <div class="blurb-fleet">
                             {{ vehicle.blurb|bbcode|safe }}
                         </div>
                     </div>
                 </div>
-            </cfoutput>
-        {% endif %}
-    {% endfor %}
+            {% endif %}
+        {% endfor %}
 
     </div>
 

@@ -1,96 +1,7 @@
 {% extends "front_site/base.html" %}
 {% load static bbcode_tags humanize vehicle_tags %}
 
-{% comment %}
-<cfset vid = IsDefined("URL.vid") ? URL.vid : IsDefined("URL.carid") ? URL.carid : "">
-
-<CFIF NOT IsNumeric(vid)>
-    <CFLOCATION URL="fleet.cfm">
-    <CFABORT>
-</CFIF>
-
-<CFQUERY NAME="tCar" DATASOURCE="#DSN#">
-    SELECT vehicleid,make,model,status,type,redirect FROM Vehicles
-    WHERE vehicleid = <CFQUERYPARAM value="#vid#" CFSQLType="CF_SQL_INTEGER">
-</CFQUERY>
-<CFIF tCar.redirect GT 0>
-    <CFLOCATION URL="vehicle.cfm?vid=#tCar.redirect#">
-    <CFABORT>
-</CFIF>
-
-<CFQUERY NAME="tfCar" DATASOURCE="#FDSN#">
-    SELECT blurb,hp,tq,topspeed,trans,specs,
-    gears,milesinc,price,disc2day,disc3day,disc7day,
-    tightfit,origin,type
-    FROM VehiclesFront
-    WHERE vehicleid = <CFQUERYPARAM value="#vid#" CFSQLType="CF_SQL_INTEGER">
-</CFQUERY>
-
-<CFIF tfCar.recordCount IS 0>
-    <CFLOCATION URL="fleet.cfm">
-    <CFABORT>
-</CFIF>
-
-
-<cftry>
-    <cfset specsStruct = DeserializeJSON(tfCar.specs)>
-    <cfset headline = specsStruct.headline>
-    <cfcatch type="Any">
-        <cfset headline = "">
-    </cfcatch>
-</cftry>
-
-
-<CFINCLUDE TEMPLATE="inc_lib.cfm">
-<CFINCLUDE TEMPLATE="inc_header.cfm">
-    <title>
-    <CFOUTPUT QUERY="tCar">
-    <CFIF type IS 1>
-	Rent a #make# #model#! Available for rent in the New York tri-state area (NY / NYC, NJ, CT and PA)</title>
-	<meta name="DC.title" content="Rent a #make# #model#! Available for rent in the New York tri-state area (NY / NYC, NJ, CT and PA)">
-	<meta name="keywords" content="Performance Rentals, Performance Car Rentals, Exotic Car Rental, #make# rental, rent a #make# #model#, #make# rental NY, #make# rental NJ, #make# rental CT, #make# rental PA, exotic rental NY, exotic rental NJ, #model# rental NY, #model# rental NJ">
-	<meta name="description" content="Information about Performance Rentals' #make# #model#, available for rental in the New York tri-state area, including Manhattan (NYC), Long Island, Connecticut (CT), New Jersey (NJ), and Pennsylvania / Philadelphia (PA).">
-    <CFELSEIF type IS 2>
-	Rent a #make# #model#! Available for rent in the New York tri-state area (NY / NYC, NJ, CT and PA)</title>
-	<meta name="DC.title" content="Rent a #make# #model#! Available for rent in the New York tri-state area (NY / NYC, NJ, CT and PA)">
-	<meta name="keywords" content="Performance Rentals, Motorcycle Rental, Motorcycle Rentals, Bike Rentals, #make# rental, rent a #make# #model#,#make# rental NY, #make# rental NJ, #make# rental CT, #make# rental PA,#model# rental NY, #model# rental NJ">
-	<meta name="description" content="Information about Performance Rentals' #make# #model#, available for rental in the New York tri-state area, including Mahnattan (NYC), Long Island, Connecticut (CT), New Jersey (NJ), and Pennsylvania / Philadelphia (PA).">
-    <CFELSEIF type IS 3>
-	Rent a #make# #model#! Available for street or track rental in the New York tri-state area (NY / NYC, NJ, CT and PA)</title>
-	<meta name="DC.title" content="Rent a #make# #model#! Available for street or track rental in the New York tri-state area (NY / NYC, NJ, CT and PA)">
-	<meta name="keywords" content="Performance Rentals, Performance Car Rentals, Exotic Car Rental, #make# rental, rent a #make# #model#,#make# rental NY, #make# rental NJ, #make# rental CT, #make# rental PA, exotic rental NY, exotic rental NJ,#model# rental NY, #model# rental NJ">
-	<meta name="description" content="Information about Performance Rentals' #make# #model#, available for rental in the New York tri-state area, including Manhattan (NYC), Long Island, Connecticut (CT), New Jersey (NJ), and Pennsylvania / Philadelphia (PA).">
-    </CFIF>
-    </CFOUTPUT>
-<CFINCLUDE TEMPLATE="inc_meta.cfm">
-<CFINCLUDE TEMPLATE="inc_styles.cfm">
-<CFINCLUDE TEMPLATE="inc_js.cfm">
-
-</head>
-<body>
-
-<div class="wrapper">
-
-<CFINCLUDE TEMPLATE="inc_nav.cfm">
-
-<section class="l-content">
-{% endcomment %}
-
 {% block content %}
-{#<div class="l-container well">#}
-
-    {% comment %}
-    <CFQUERY NAME="tPics" DATASOURCE="#FDSN#">
-        SELECT vpicsid,vehicleid,fext,isfirst FROM VPics
-        WHERE vehicleid = <CFQUERYPARAM value="#tCar.vehicleid#" CFSQLType="CF_SQL_INTEGER">
-        ORDER BY isfirst DESC, vpicsid ASC
-    </CFQUERY>
-    <CFQUERY NAME="tVids" DATASOURCE="#FDSN#">
-        SELECT * from VVids
-        WHERE vehicleid = <CFQUERYPARAM value="#tCar.vehicleid#" CFSQLType="CF_SQL_INTEGER">
-        ORDER BY isfirst DESC, vvidsid ASC
-    </CFQUERY>
-    {% endcomment %}
 
     <div class="flexslider">
         <h1 class="car-make-model overlay-text">
@@ -101,24 +12,20 @@
         <div class="carousel left" id="bxslider_left"></div>
         <div class="carousel right" id="bxslider_right"></div>
         <ul class="bxslider" slider_id="car">
-        {% for pic in vehicle.pics.all %}
-            <li><img src="{{ pic.image.url }}" /></li>
-        {% endfor %}
+            {% for pic in vehicle.pics.all %}
+                <li><img src="{{ pic.image.url }}" /></li>
+            {% endfor %}
         </ul>
     </div>
-
-
-
-{#    <CFOUTPUT QUERY="tfCar">#}
 
     <div class="float-right">
 
         <div class="the-numbers"></div>
 
         <p class="newsletterblurb">
-        Interested in more information about this {{ vehicle.vehicle_type_casual }}? Sign up for our <a
-        class="pic" href="{% url "newsletter" %}">newsletter</a> and receive updates about
-        this and other vehicles, as well as special discounts from PRI!
+            Interested in more information about this {{ vehicle.vehicle_type_casual }}? Sign up for our <a
+            class="pic" href="{% url "newsletter" %}">newsletter</a> and receive updates about
+            this and other vehicles, as well as special discounts from PRI!
         </p>
 
     </div>
@@ -156,165 +63,135 @@
             <td colspan="4" class="fineprint">
                 Overage is ${{ vehicle.extra_miles_overage_per_mile }}/mile.
                 Purchase miles in advance for discounted rates.
-            </th>
+            </td>
         </tr>
 
     </table>
 
     <div class="price-fleet">
-    <div class="ih-item circle effect4 left_to_right price-bubble">
-        <a href="{% url "reserve" slug=vehicle.slug %}">
-        <div class="img">
-            <img class="click-to-reserve" src="{% static "images/ClickToReserve.png" %}" />
-            <img src="{% static "images/price-bg.jpg" %}" alt="img">
-            <span class="price-centered">
-                <p class="price">${{ vehicle.price_per_day|floatformat:"0"|intcomma}}</p>
-                /day
-            </span>
+        <div class="ih-item circle effect4 left_to_right price-bubble">
+            <a href="{% url "reserve" slug=vehicle.slug %}">
+                <div class="img">
+                    <img class="click-to-reserve" src="{% static "images/ClickToReserve.png" %}" />
+                    <img src="{% static "images/price-bg.jpg" %}" alt="img">
+                    <span class="price-centered">
+                        <p class="price">${{ vehicle.price_per_day|floatformat:"0"|intcomma}}</p>
+                        /day
+                    </span>
+                </div>
+                <div class="info">
+                    <h3>Reserve Now</h3>
+                </div>
+            </a>
         </div>
-        <div class="info">
-            <h3>Reserve Now</h3>
-        </div>
-        </a>
-    </div>
     </div>
 
     <div class="carblurb">
         {{ vehicle.blurb|bbcode|safe }}
     </div>
 
-{#    </CFOUTPUT>#}
-
-
     {% if vehicle.vids.exists %}
-    <CFIF tVids.recordcount GT 0>
 
-        <cfsetting showDebugOutput="No">
-
-        <cfoutput>
-            <video
-                id="vehicle_video"
-                class="video-js"
-                controls
-                preload="auto"
-                width="530"
-                height="298"
-                {% if vehicle.vids.first.poster %}
-                    poster="{{ vehicle.vids.first.poster.url }}"
-                {% endif %}
-                data-setup="{}"
-            >
-                {% if vehicle.vids.first.video_mp4 %}
-                    <source src="{{ vehicle.vids.first.video_mp4.url }}" type='video/mp4'>
-                {% endif %}
-                {% if vehicle.vids.first.video_webm %}
-                    <source src="{{ vehicle.vids.first.video_webm.url }}" type='video/webm'>
-                {% endif %}
+        <video
+            id="vehicle_video"
+            class="video-js"
+            controls
+            preload="auto"
+            width="530"
+            height="298"
+            {% if vehicle.vids.first.poster %}
+                poster="{{ vehicle.vids.first.poster.url }}"
+            {% endif %}
+            data-setup="{}"
+        >
+            {% if vehicle.vids.first.video_mp4 %}
+                <source src="{{ vehicle.vids.first.video_mp4.url }}" type='video/mp4'>
+            {% endif %}
+            {% if vehicle.vids.first.video_webm %}
+                <source src="{{ vehicle.vids.first.video_webm.url }}" type='video/webm'>
+            {% endif %}
             <p class="vjs-no-js">
-            To view this video please enable JavaScript, and consider upgrading to a web browser that
-            <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+                To view this video please enable JavaScript, and consider upgrading to a web browser that
+                <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
             </p>
-            </video>
-        </cfoutput>
+        </video>
 
         <script src="http://vjs.zencdn.net/5.8.7/video.js"></script>
 
         <div class="vvid-blurb-caption">{{ vehicle.vids.first.blurb|bbcode|safe }}</div>
 
         <div class="vvid-thumbs">
-        {% for video in vehicle.vids.all %}
-        <cfoutput query="tVids">
-            <div class="vvid-thumbnail" vvidsid="{{ video.id }}">
-                <img src="{{ video.thumbnail.url }}" title="{{ video.title }} - {{ video.length_formatted }}" />
-                <p>{{ video.title }}</p>
-                <p>Run time: {{ video.length_formatted }}</p>
-                <p class="vvid-blurb hidden">{{ video.blurb|bbcode|safe }}</p>
-            </div>
-        </cfoutput>
-        {% endfor %}
+            {% for video in vehicle.vids.all %}
+                <div class="vvid-thumbnail" vvidsid="{{ video.id }}">
+                    <img src="{{ video.thumbnail.url }}" title="{{ video.title }} - {{ video.length_formatted }}" />
+                    <p>{{ video.title }}</p>
+                    <p>Run time: {{ video.length_formatted }}</p>
+                    <p class="vvid-blurb hidden">{{ video.blurb|bbcode|safe }}</p>
+                </div>
+            {% endfor %}
         </div>
 
-    </CFIF>
     {% endif %}
 
-<script type="text/javascript">
-//var words = new Array();
+    <script type="text/javascript">
+    words = [
+    {
+        text: '{{ vehicle.gears }}-speed',
+        subtext: '{{ vehicle.get_transmission_type_display|lower }}',
+        weight: 6,
+    },
+    {
+        text: '{{ vehicle.horsepower }}',
+        subtext: 'bhp',
+        weight: 9,
+    },
+    {
+        text: '{{ vehicle.torque }}',
+        subtext: 'ft-lbs',
+        weight: 10,
+    },
+    {
+        text: '{{ vehicle.top_speed }}',
+        subtext: 'mph',
+        weight: 9,
+    },
+    ];
 
-//<CFOUTPUT QUERY="tfCar">
-words = [
-{
-    text: '{{ vehicle.gears }}-speed',
-    subtext: '{{ vehicle.get_transmission_type_display|lower }}',
-    weight: 6,
-},
-{
-    text: '{{ vehicle.horsepower }}',
-    subtext: 'bhp',
-    weight: 9,
-},
-{
-    text: '{{ vehicle.torque }}',
-    subtext: 'ft-lbs',
-    weight: 10,
-},
-{
-    text: '{{ vehicle.top_speed }}',
-    subtext: 'mph',
-    weight: 9,
-},
-];
+    var specs = {{ vehicle.specs_json|safe }};
 
-var specs = {{ vehicle.specs_json|safe }};
+    for (var k in specs.speclist) {
+        var spec = specs.speclist[k];
+        words.push({
+            text: spec.value,
+            subtext: spec.unit,
+            weight: (Math.random() * 6) + 3,
+        });
+    }
 
-for (var k in specs.speclist) {
-    var spec = specs.speclist[k];
-    words.push({
-        text: spec.value,
-        subtext: spec.unit,
-        weight: (Math.random() * 6) + 3,
+    $('.the-numbers').jQCloud(words, {
+        width: 450,
+        height: 500,
+        steps: 10,
+        fontSize: ['90px', '80px', '60px', '50px', '40px']
     });
-}
 
-//</CFOUTPUT>
+    let videos = {};
+    {% for video in vehicle.vids.all %}
+        let video = {src: []};
 
-$('.the-numbers').jQCloud(words, {
-    width: 450,
-    height: 500,
-    steps: 10,
-    fontSize: ['90px', '80px', '60px', '50px', '40px']
-});
+        {% if video.video_mp4 %}
+            video.src.push({type: 'video/mp4', src: '{{ video.video_mp4.url }}'});
+        {% endif %}
+        {% if video.video_webm %}
+            video.src.push({type: 'video/webm', src: '{{ video.video_webm.url }}'});
+        {% endif %}
+        {% if video.poster %}
+            video.poster = '{{ video.poster.url }}';
+        {% endif %}
 
-let videos = {};
-{% for video in vehicle.vids.all %}
-    let video = {src: []};
+        videos[{{ video.id }}] = video;
+    {% endfor %}
 
-    {% if video.video_mp4 %}
-        video.src.push({type: 'video/mp4', src: '{{ video.video_mp4.url }}'});
-    {% endif %}
-    {% if video.video_webm %}
-        video.src.push({type: 'video/webm', src: '{{ video.video_webm.url }}'});
-    {% endif %}
-    {% if video.poster %}
-        video.poster = '{{ video.poster.url }}';
-    {% endif %}
+    </script>
 
-    videos[{{ video.id }}] = video;
-{% endfor %}
-
-</script>
-
-
-{#    </div>#}
 {% endblock %}
-
-{% comment %}
-    </section>
-
-    <div class="push"></div>
-</div>
-
-<CFINCLUDE TEMPLATE="inc_footer.cfm">
-</div>
-</div>
-
-{% endcomment %}

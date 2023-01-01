@@ -31,110 +31,42 @@
             <td>Vehicle Choice ##1</td>
             <td>
                 {{ form.vehicle_choice_1 }}
-                <cfselect name="choice1">
-                    <option value="0">(Choose Vehicle)</option>
-                    <optgroup label="Cars">
-                        <cfloop query="Vehicles">
-                            <cfif type IS 1>
-                                <option value="#vehicleid#" <cfif JoyPerf.choice1 IS vehicleid>selected</cfif>>#make# #model#</option>
-                            </cfif>
-                        </cfloop>
-                    </optgroup>
-                    <optgroup label="Motorcycles">
-                        <cfloop query="Vehicles">
-                            <cfif type IS 2>
-                                <option value="#vehicleid#" <cfif JoyPerf.choice1 IS vehicleid>selected</cfif>>#make# #model#</option>
-                            </cfif>
-                        </cfloop>
-                    </optgroup>
-                </cfselect>
             </td>
         </tr>
         <tr class="vehicle-choice">
             <td>Vehicle Choice ##2</td>
             <td>
                 {{ form.vehicle_choice_2 }}
-                <cfselect name="choice2">
-                    <option value="0">(Choose Vehicle)</option>
-                    <optgroup label="Cars">
-                        <cfloop query="Vehicles">
-                            <cfif type IS 1>
-                                <option value="#vehicleid#" <cfif JoyPerf.choice2 IS vehicleid>selected</cfif>>#make# #model#</option>
-                            </cfif>
-                        </cfloop>
-                    </optgroup>
-                    <optgroup label="Motorcycles">
-                        <cfloop query="Vehicles">
-                            <cfif type IS 2>
-                                <option value="#vehicleid#" <cfif JoyPerf.choice2 IS vehicleid>selected</cfif>>#make# #model#</option>
-                            </cfif>
-                        </cfloop>
-                    </optgroup>
-                </cfselect>
             </td>
         </tr>
         <tr class="vehicle-choice">
             <td>Vehicle Choice ##3</td>
             <td>
                 {{ form.vehicle_choice_3 }}
-                <cfselect name="choice3">
-                    <option value="0">(Choose Vehicle)</option>
-                    <optgroup label="Cars">
-                        <cfloop query="Vehicles">
-                            <cfif type IS 1>
-                                <option value="#vehicleid#" <cfif JoyPerf.choice3 IS vehicleid>selected</cfif>>#make# #model#</option>
-                            </cfif>
-                        </cfloop>
-                    </optgroup>
-                    <optgroup label="Motorcycles">
-                        <cfloop query="Vehicles">
-                            <cfif type IS 2>
-                                <option value="#vehicleid#" <cfif JoyPerf.choice3 IS vehicleid>selected</cfif>>#make# #model#</option>
-                            </cfif>
-                        </cfloop>
-                    </optgroup>
-                </cfselect>
             </td>
         </tr>
         <tr>
             <td>Number of Drivers</td>
             <td>
                 {{ form.num_drivers }}
-                <cfselect name="nodrv" class="#StructKeyExists(fieldErrors,"nodrv") ? 'field-error' : ''#">
-                    <option value="1" <cfif JoyPerf.nodrv IS 1>selected</cfif>>1</option>
-                    <option value="2" <cfif JoyPerf.nodrv IS 2>selected</cfif>>2</option>
-                    <option value="3" <cfif JoyPerf.nodrv IS 3>selected</cfif>>3</option>
-                    <option value="4" <cfif JoyPerf.nodrv IS 4>selected</cfif>>4</option>
-                    <option value="5" <cfif JoyPerf.nodrv IS 5>selected</cfif>>More than 4 (will call)</option>
-                </cfselect>
             </td>
         </tr>
         <tr>
             <td>Number of Passengers</td>
             <td>
                 {{ form.num_passengers }}
-                <cfselect name="nopax" class="#StructKeyExists(fieldErrors,"nopax") ? 'field-error' : ''#">
-                    <option value="0" <cfif JoyPerf.nopax IS 1>selected</cfif>>0</option>
-                    <option value="1" <cfif JoyPerf.nopax IS 1>selected</cfif>>1</option>
-                    <option value="2" <cfif JoyPerf.nopax IS 2>selected</cfif>>2</option>
-                    <option value="3" <cfif JoyPerf.nopax IS 3>selected</cfif>>3</option>
-                    <option value="4" <cfif JoyPerf.nopax IS 4>selected</cfif>>4</option>
-                    <option value="5" <cfif JoyPerf.nopax IS 5>selected</cfif>>More than 4 (will call)</option>
-                </cfselect>
             </td>
         </tr>
         <tr>
             <td>Requested Date</td>
             <td>
                 {{ form.requested_date }}
-                <cfinput name="reqdate" value="#JoyPerf.reqdate#" style="width: 120px;" placeholder="MM/DD/YYYY" class="#StructKeyExists(fieldErrors,"reqdate") ? 'field-error' : ''#" />
             </td>
         </tr>
         <tr>
             <td>Alternate Date</td>
             <td>
                 {{ form.backup_date }}
-                <cfinput name="bupdate" value="#JoyPerf.bupdate#" style="width: 120px;" placeholder="MM/DD/YYYY" class="#StructKeyExists(fieldErrors,"bupdate") ? 'field-error' : ''#" />
                 <small class="tooltip" title="We'll do our best to accommodate your first choice of date, but please pick an alternate just in case."><span class="ui-icon ui-icon-info"></span></small>
             </td>
         </tr>
@@ -142,42 +74,28 @@
             <td>Email</td>
             <td>
                 {{ form.email }}
-                <cfinput name="email" value="#JoyPerf.email#" maxlength="255" class="#StructKeyExists(fieldErrors,"email") ? 'field-error' : ''#" />
             </td>
         </tr>
-        {% comment %}
-        <tr class="inline-password">
-            <td>Password</td>
-            <td><cfinput name="inline_pass" type="password" value="#JoyPerf.inline_pass#" placeholder="(If returning customer)" class="#StructKeyExists(fieldErrors,"login_pass") ? 'field-error' : ''#" /></td>
-        </tr>
-        {% endcomment %}
         <tr>
             <td>Big and Tall</td>
             <td>
                 {{ form.big_and_tall }}
-                <cfselect name="bigtall">
-                    <option value="0" <cfif JoyPerf.bigtall IS 0>selected</cfif>>No</option>
-                    <option value="1" <cfif JoyPerf.bigtall IS 1>selected</cfif>>Yes</option>
-                </cfselect>
-                <small class="tooltip" title="If anyone in your party is especially big or tall, please let us know so we can make sure everyone is comfortable."><span class="ui-icon ui-icon-info"></span></small>
+                <small class="tooltip" title="{{ form.big_and_tall.help_text }}"><span class="ui-icon ui-icon-info"></span></small>
             </td>
         </tr>
         <tr>
             <td>Discount/Coupon Code</td>
             <td>
                 {{ form.coupon_code }}
-                <cfinput name="coupon" value="#JoyPerf.coupon#" maxlength="20" placeholder="(Optional)" class="#StructKeyExists(fieldErrors,"coupon") ? 'field-error' : ''#" />
             </td>
         </tr>
         <tr>
             <td class="align-top">Notes/Requests</td>
             <td>
                 {{ form.customer_notes }}
-{#                            <cftextarea name="notes" class="#StructKeyExists(fieldErrors,"notes") ? 'field-error' : ''#">#JoyPerf.notes#</cftextarea>#}
             </td>
         </tr>
 
-        <cfif NOT IsDefined("IdentityResult") OR NOT IdentityResult.success OR (IsDefined("LoginResult") AND NOT LoginResult.success)>
         <tr class="buttons">
             <td></td>
             <td>
@@ -185,7 +103,6 @@
                 <div class="spinner next-form-spinner identity-spinner"></div>
             </td>
         </tr>
-        </cfif>
     </table>
 
 </div>

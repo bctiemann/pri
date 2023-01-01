@@ -1,121 +1,78 @@
 {% load static tz %}
 
-<footer class='l-footer'>
+<footer class="l-footer">
     <nav>
-    <div class="l-container" style="position: relative;">
-    <a href='/' class='' style="z-index: 10; position: relative;"><img src="{% static "images/PRI_logo.png" %}" alt='Performance Rentals' width='255px'></a>
-    <ul>
-        <cfoutput>
-        <li><a href="{% url "fleet" %}">Fleet &amp; Rates</a></li>
-        <li><a href="{% url "services" %}">Services</a></li>
-        <li><a href="{% url "specials" %}">Specials</a></li>
-        <li><a href="{% url "about" %}">About Us</a></li>
-        <li><a href="{% url "policies" %}">Policies</a></li>
-        <li><a href="{% url "news" %}">News</a></li>
-        <li><a href="{% url "contact" %}">Contact</a></li>
-        </cfoutput>
-    </ul>
-    </div>
+        <div class="l-container" style="position: relative;">
+            <a href="{% url "home" %}" class="" style="z-index: 10; position: relative;"><img src="{% static "images/PRI_logo.png" %}" alt="Performance Rentals" width="255px"></a>
+            <ul>
+                <li><a href="{% url "fleet" %}">Fleet &amp; Rates</a></li>
+                <li><a href="{% url "services" %}">Services</a></li>
+                <li><a href="{% url "specials" %}">Specials</a></li>
+                <li><a href="{% url "about" %}">About Us</a></li>
+                <li><a href="{% url "policies" %}">Policies</a></li>
+                <li><a href="{% url "news" %}">News</a></li>
+                <li><a href="{% url "contact" %}">Contact</a></li>
+            </ul>
+        </div>
     </nav>
 
-    {% comment %}
-    <CFQUERY NAME="news" DATASOURCE="#FDSN#">
-    SELECT newsid,subject,thenews FROM News
-    ORDER BY stamp DESC
-    LIMIT 3
-    </CFQUERY>
-    {% endcomment %}
-
     <section class="quick-links">
-    <div class='l-container' style="position: relative; z-index: 10;">
-    <div class="l-row">
-    <section class='footer-container l-col-4'>
-    <span>News</span>
-    <ul class='object-list'>
-    <CFIF news.recordcount GT 0>
-    {% timezone "UTC" %}
-        {% if footer_news_items %}
-            {% for news_item in footer_news_items %}
-            <CFOUTPUT QUERY="news">
-                <li>
-                    <a href="{% url "news-item" year=news_item.created_at.year month=news_item.created_at.month day=news_item.created_at.day slug=news_item.slug %}">
-                        {{ news_item.subject}}
-                    </a>
-                </li>
-                <small>{{ news_item.body|truncatechars:100 }}</small>
-            </CFOUTPUT>
-            {% endfor %}
-        {% else %}
-             <CFELSE>
-             <li>None.</li>
-             </CFIF>
-        {% endif %}
-    {% endtimezone %}
-     </ul>
-    <div class="ant-footer">
-        {% include "front_site/includes/footer_seo.html" %}
-        <CFINCLUDE TEMPLATE="inc_footer_seo.cfm">
-    </div>
-    </section>
+        <div class='l-container' style="position: relative; z-index: 10;">
+            <div class="l-row">
+                <section class="footer-container l-col-4">
+                    <span>News</span>
+                    <ul class='object-list'>
+                        {% timezone "UTC" %}
+                            {% if footer_news_items %}
+                                {% for news_item in footer_news_items %}
+                                    <li>
+                                        <a href="{% url "news-item" year=news_item.created_at.year month=news_item.created_at.month day=news_item.created_at.day slug=news_item.slug %}">
+                                            {{ news_item.subject}}
+                                        </a>
+                                    </li>
+                                    <small>{{ news_item.body|truncatechars:100 }}</small>
+                                {% endfor %}
+                            {% else %}
+                                 <li>None.</li>
+                            {% endif %}
+                        {% endtimezone %}
+                     </ul>
+                    <div class="ant-footer">
+                        {% include "front_site/includes/footer_seo.html" %}
+                    </div>
+                </section>
 
-    {% comment %}
-    <CFQUERY NAME="tweets" DATASOURCE="#FDSN#">
-    SELECT text,stamp FROM tweets
-    ORDER BY stamp DESC
-    LIMIT 2
-    </CFQUERY>
-    {% endcomment %}
+                <section class="footer-container l-col-4">
+                    {# Official Twitter timeline embed #}
+                    <a class="twitter-timeline" data-width="320" data-height="200" data-theme="dark" href="https://twitter.com/PerfRentals?ref_src=twsrc%5Etfw">Tweets by PerfRentals</a>
+                    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                </section>
 
-    <section class='footer-container l-col-4'>
-
-        {# Official Twitter timeline embed #}
-        <a class="twitter-timeline" data-width="320" data-height="200" data-theme="dark" href="https://twitter.com/PerfRentals?ref_src=twsrc%5Etfw">Tweets by PerfRentals</a>
-        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-        {# Locally cached tweets feed #}
-        {% comment %}
-        <span>Twitter</span> <small><i><a target="_blank" href="http://twitter.com/PerfRentals">@PerfRentals</a></i></small>
-        <br /><br />
-        <CFIF tweets.recordcount GT 0>
-        <CFOUTPUT QUERY="tweets">
-        <p class="tweet">#text#<br /><small class="er">#DateFormat(stamp,"mm/dd/yy")# @ #TimeFormat(stamp,"HH:mm")#</small></p><br />
-        </CFOUTPUT>
-        <CFELSE>
-        No tweets.
-        </CFIF>
-        {% endcomment %}
-
-    </section>
-    <section class='footer-container l-col-4 l-lastcol'>
-    <span>Follow Performance Rentals</span>
-    <br />
-    <ul class='sock-list'>
-        <cfoutput>
-        <li><a href="https://twitter.com/perfrentals" class="twatter-follow-button" data-show-count="false" data-show-screen-name="true">Follow @perfrentals</a></li>
-        <li><a href="https://www.youtube.com/channel/UCunX3VH-J1xSc9KZF-lAqyA">Watch us on YouTube</a></li>
-        <li><a href="https://profiles.google.com/105350119426435106180/about" rel="publisher">Find us on Google+</a></li>
-        <li><a href="{% url "newsletter" %}" rel="publisher">Subscribe to our Newsletter</a></li>
-        </cfoutput>
-    </ul>
-    <a target="_blank" href="https://itunes.apple.com/us/app/pri-cars/id456142248?mt=8"><img class="app-store" src="{% static "images/appstore.png" %}" /></a>
-    </section>
-    </div>
-    </div>
-
+                <section class="footer-container l-col-4 l-lastcol">
+                    <span>Follow Performance Rentals</span>
+                    <br />
+                    <ul class="sock-list">
+                        <li><a href="https://twitter.com/perfrentals" class="twatter-follow-button" data-show-count="false" data-show-screen-name="true">Follow @perfrentals</a></li>
+                        <li><a href="https://www.youtube.com/channel/UCunX3VH-J1xSc9KZF-lAqyA">Watch us on YouTube</a></li>
+                        <li><a href="https://profiles.google.com/105350119426435106180/about" rel="publisher">Find us on Google+</a></li>
+                        <li><a href="{% url "newsletter" %}" rel="publisher">Subscribe to our Newsletter</a></li>
+                    </ul>
+                    <a target="_blank" href="https://itunes.apple.com/us/app/pri-cars/id456142248?mt=8"><img class="app-store" src="{% static "images/appstore.png" %}" /></a>
+                </section>
+            </div>
+        </div>
 
     </section>
 
-    <section class='info'>
-    <div class='l-container'>
-    <ul>
-        <cfoutput>
-        <li><a href="{% url "terms-and-conditions" %}">Terms & Conditions</a></li>
-        <li><a href="{% url "privacy-policy" %}">Privacy Policy</a></li>
-        <li><a href="{% url "media-inquiries" %}">Media Inquiries</a></li>
-        <li><a href="{% url "terms-and-conditions" %}">Copyright &copy; 2007-{% now "Y" %}{# <CFOUTPUT>#DateFormat(Now(),"yyyy")#</CFOUTPUT> #} Performance Rentals, Inc. All Rights Reserved.	</a></li>
-        </cfoutput>
-    </ul>
-    </div>
+    <section class="info">
+        <div class="l-container">
+            <ul>
+                <li><a href="{% url "terms-and-conditions" %}">Terms & Conditions</a></li>
+                <li><a href="{% url "privacy-policy" %}">Privacy Policy</a></li>
+                <li><a href="{% url "media-inquiries" %}">Media Inquiries</a></li>
+                <li><a href="{% url "terms-and-conditions" %}">Copyright &copy; 2007-{% now "Y" %} Performance Rentals, Inc. All Rights Reserved.</a></li>
+            </ul>
+        </div>
     </section>
 
 </footer>

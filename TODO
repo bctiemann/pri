@@ -13,3 +13,5 @@ TODO: Stripe payment success page with link to Stripe dashboard
 TODO: Mass email "done" page (styling, navigation)
 
 TODO: Wagtail for site content pages
+
+TODO: tracking functionality if necessary (see inc_trk.cfm); probably via middleware

@@ -1,70 +1,50 @@
 {% load static %}
 
-<header class='l-header'>
+<header class="l-header">
 
-<section class="upper">
-    <div class="l-container">
-        <a class="banner" href="{% url "home" %}">
-            <p class="highlight" style="font-size: 22px;">{{ title_bar_line_1 }}</p>
-            <p>{{ title_bar_line_2 }}</p>
-        </a>
-    </div>
-</section>
+    <section class="upper">
+        <div class="l-container">
+            <a class="banner" href="{% url "home" %}">
+                <p class="highlight" style="font-size: 22px;">{{ title_bar_line_1 }}</p>
+                <p>{{ title_bar_line_2 }}</p>
+            </a>
+        </div>
+    </section>
 
-<section class='lower'>
-<div class="l-container">
+    <section class="lower">
+        <div class="l-container">
 
+            <a class="header-logo" href="{% url "home" %}"><img src="{% static "images/PRI_logo.png" %}" alt="Performance Rentals" width="255px"></a>
 
-<cfoutput>
-<a class="header-logo" href="{% url "home" %}"><img src="{% static "images/PRI_logo.png" %}" alt="Performance Rentals" width="255px"></a>
-</cfoutput>
-
-{% comment %}
-<CFQUERY NAME="theCars" DATASOURCE="#DSN#">
-SELECT vehicleid,make,model FROM Vehicles
-WHERE type = 1
-AND status = 1
-ORDER BY weighting DESC
-</CFQUERY>
-
-<CFQUERY NAME="theBikes" DATASOURCE="#DSN#">
-SELECT vehicleid,make,model FROM Vehicles
-WHERE type = 2
-AND status = 1
-ORDER BY weighting DESC
-</CFQUERY>
-{% endcomment %}
-
-<ul class='header-sitenav header-nav-obj'>
-    <li class='fleet dropdown'><a href='{% url "fleet" vehicle_type='cars' %}'>Cars</a>
-        <ul class="dropdown-menu">
-        {% for car in cars %}
-            {% if car.slug %}
-                <li><a href="{% url "vehicle" slug=car.slug %}">{{ car.make }} {{ car.model }}</a></li>
-            {% endif %}
-        {% endfor %}
-        </ul>
-    </li>
-    {% if bikes_enabled %}
-        <li class='fleet dropdown'><a href='{% url "fleet" vehicle_type='bikes' %}'>Bikes</a>
-            <ul class="dropdown-menu">
-            {% for bike in bikes %}
-                {% if bike.slug %}
-                    <li><a href="{% url "vehicle" slug=bike.slug %}">{{ bike.make }} {{ bike.model }}</a></li>
+            <ul class="header-sitenav header-nav-obj">
+                <li class="fleet dropdown"><a href="{% url "fleet" vehicle_type="cars" %}">Cars</a>
+                    <ul class="dropdown-menu">
+                    {% for car in cars %}
+                        {% if car.slug %}
+                            <li><a href="{% url "vehicle" slug=car.slug %}">{{ car.make }} {{ car.model }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    </ul>
+                </li>
+                {% if bikes_enabled %}
+                    <li class='fleet dropdown'><a href='{% url "fleet" vehicle_type='bikes' %}'>Bikes</a>
+                        <ul class="dropdown-menu">
+                        {% for bike in bikes %}
+                            {% if bike.slug %}
+                                <li><a href="{% url "vehicle" slug=bike.slug %}">{{ bike.make }} {{ bike.model }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        </ul>
+                    </li>
                 {% endif %}
-            {% endfor %}
+                <li class="services"><a href="{% url "services" %}">Our Services</a></li>
+                <li class="services"><a href="{% url "specials" %}">Specials</a></li>
+                <li class="services"><a href="{% url "about" %}">About Us</a></li>
+                <li class="services"><a href="{% url "policies" %}">Policies</a></li>
+                <li class="services"><a href="{% url "news" %}">News</a></li>
+                <li class="services"><a href="{% url "contact" %}">Contact</a></li>
             </ul>
-        </li>
-    {% endif %}
-    <li class='services'><a href='{% url "services" %}'>Our Services</a></li>
-    <li class='services'><a href='{% url "specials" %}'>Specials</a></li>
-    <li class='services'><a href='{% url "about" %}'>About Us</a></li>
-    <li class='services'><a href='{% url "policies" %}'>Policies</a></li>
-    <li class='services'><a href='{% url "news" %}'>News</a></li>
-    <li class='services'><a href='{% url "contact" %}'>Contact</a></li>
-</ul>
 
-
-</div>
-</section>
+        </div>
+    </section>
 </header>

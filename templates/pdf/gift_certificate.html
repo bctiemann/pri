@@ -117,19 +117,16 @@ body {
             <img id="img_header" src="{% static "images/gift_cert_header.png" %}">
 
             <div id="bodytextbox">
-            <div id="bodytext">
-                <cfoutput>
-                This certificate entitles <b>{{ gift_certificate.beneficiary_name }}</b> to
+                <div id="bodytext">
+                    This certificate entitles <b>{{ gift_certificate.beneficiary_name }}</b> to
 
-                {% if gift_certificate.value_message %}
-                    {{ gift_certificate.value_message }}
-                {% else %}
-                    <b>${{ gift_certificate.amount|floatformat:0|intcomma }}</b> toward any vehicle rental from PRI's
-                    sports car or bike fleet, or any service including the PRI Performance Experience or Joy Ride.
-                </cfif>
-                {% endif %}
-                </cfoutput>
-            </div>
+                    {% if gift_certificate.value_message %}
+                        {{ gift_certificate.value_message }}
+                    {% else %}
+                        <b>${{ gift_certificate.amount|floatformat:0|intcomma }}</b> toward any vehicle rental from PRI's
+                        sports car or bike fleet, or any service including the PRI Performance Experience or Joy Ride.
+                    {% endif %}
+                </div>
             </div>
 
             <table id="infoboxes">
@@ -139,33 +136,32 @@ body {
                         <h4>To Redeem:</h4>
                         <div>
                         Visit www.PerformanceRentals.us<br />
-                        Or call <CFOUTPUT>{{ company_phone }}</CFOUTPUT>
+                        Or call {{ company_phone }}
                         </div>
                     </td>
 
                     <td>
-                        <div><CFOUTPUT>
-                        <b>From:</b> {{ gift_certificate.cc_name }}<br />
-                        <b>Date:</b> {{ gift_certificate.issued_at|date:"m-d-Y" }}<br />
-                        <b>Expires:</b> {{ gift_certificate.expires_at|date:"m-d-Y" }}<br />
-                        <b>Code:</b> {{ gift_certificate.tag }}<br />
-                        </CFOUTPUT>
+                        <div>
+                            <b>From:</b> {{ gift_certificate.cc_name }}<br />
+                            <b>Date:</b> {{ gift_certificate.issued_at|date:"m-d-Y" }}<br />
+                            <b>Expires:</b> {{ gift_certificate.expires_at|date:"m-d-Y" }}<br />
+                            <b>Code:</b> {{ gift_certificate.tag }}<br />
                         </div>
                     </td>
 
                     <td>
                         <h4>Message:</h4>
                         <div>
-                        <CFOUTPUT>{{ gift_certificate.message }}</CFOUTPUT>
+                            {{ gift_certificate.message }}
                         </div>
                     </td>
                 </tr>
             </table>
 
             <div id="fineprintbox">
-            <div id="fineprint">
-            Not redeemable for cash. Cannot be combined with any other offer or discount.
-            </div>
+                <div id="fineprint">
+                    Not redeemable for cash. Cannot be combined with any other offer or discount.
+                </div>
             </div>
 
         </div>

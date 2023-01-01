@@ -1,112 +1,61 @@
 {% load static bbcode_tags humanize %}
 
-{% comment %}
-<cfquery name="Showcase" datasource="#DSN#">
-    SELECT vehicleid,make,model,type FROM Vehicles
-    WHERE status = 1
-    <cfif IsDefined("URL.t") AND IsNumeric(URL.t)>
-        AND type = <CFQUERYPARAM value="#URL.t#" CFSQLType="CF_SQL_INTEGER">
-    </cfif>
-    ORDER BY RAND()
-    LIMIT 1
-</cfquery>
-{% endcomment %}
+<div
+    class="showcase"
+    {% if showcase_vehicle.showcase_image %}
+        style="background-image: url('{{ showcase_vehicle.showcase_image.url }}');"
+    {% endif %}
+>
+    <div class="showcase-overlay">
+        <h1 class="cartitle">{{ showcase_vehicle.make }} {{ showcase_vehicle.model }}</h1>
 
-<cfoutput query="Showcase">
+        <h1 class="cartitle headline">{{ showcase_vehicle.headline }}</h1>
 
-    {% comment %}
-    <cfquery name="ShowcaseFront" datasource="#FDSN#">
-        SELECT price,blurb,hp,tq,gears,trans,topspeed,specs FROM VehiclesFront
-        WHERE vehicleid = <CFQUERYPARAM value="#vehicleid#" CFSQLType="CF_SQL_INTEGER">
-    </cfquery>
-    {% endcomment %}
+        <div class="showcasecontent">
+            {{ showcase_vehicle.blurb|bbcode|safe }}
+        </div>
+        <p class="readmore">
+            <a href="{% url "vehicle" slug=showcase_vehicle.slug %}">Read more</a>
+        </p>
 
-    <cftry>
-        <cfset specsStruct = DeserializeJSON(ShowcaseFront.specs)>
-        <cfcatch type="Any">
-        </cfcatch>
-    </cftry>
-
-    <div
-        class="showcase"
-        {% if showcase_vehicle.showcase_image %}
-            style="background-image: url('{{ showcase_vehicle.showcase_image.url }}');"
-        {% endif %}
-    >
-        <div class="showcase-overlay">
-            <h1 class="cartitle">{{ showcase_vehicle.make }} {{ showcase_vehicle.model }}</h1>
-
-            <cftry>
-                <cfset headline = specsStruct.headline>
-                <h1 class="cartitle headline">{{ showcase_vehicle.headline }}</h1>
-                <cfcatch type="Any">
-                </cfcatch>
-            </cftry>
-
-            <div class="showcasecontent">
-                {{ showcase_vehicle.blurb|bbcode|safe }}
-            </div>
-            <p class="readmore">
-                <a href="{% url "vehicle" slug=showcase_vehicle.slug %}">Read more</a>
-            </p>
-
-            <div class="carstats">
-                <h3 class="statsheader">Quick Stats</h3>
-                <table class="labeled">
+        <div class="carstats">
+            <h3 class="statsheader">Quick Stats</h3>
+            <table class="labeled">
+                <tr>
+                    <td>Power:</td> <td>{{ showcase_vehicle.horsepower }} bhp</td>
+                </tr>
+                <tr>
+                    <td>Torque:</td> <td>{{ showcase_vehicle.torque }} ft-lbs</td>
+                </tr>
+                <tr>
+                    <td>Transmission:</td>
+                    <td>
+                        {{ showcase_vehicle.gears }}-speed {{ showcase_vehicle.get_transmission_type_display|lower }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Top speed:</td> <td>{{ showcase_vehicle.top_speed }} mph</td>
+                </tr>
+                {% for spec in showcase_vehicle.specs.speclist %}
+                    {% if not spec.hide_front %}
                     <tr>
-                        <td>Power:</td> <td>{{ showcase_vehicle.horsepower }} bhp</td>
-                    </tr>
-                    <tr>
-                        <td>Torque:</td> <td>{{ showcase_vehicle.torque }} ft-lbs</td>
-                    </tr>
-                    <tr>
-                        {% comment %}
-                        <cfif ShowcaseFront.trans IS 1>
-                            <cfset transtype = "manual">
-                        <cfelseif ShowcaseFront.trans IS 2>
-                            <cfset transtype = "paddle-shift">
-                        <cfelseif ShowcaseFront.trans IS 3>
-                            <cfset transtype = "auto">
-                        </cfif>
-                        {% endcomment %}
-                        <td>Transmission:</td>
+                        <td>{{ spec.spec }}:</td>
                         <td>
-                            {{ showcase_vehicle.gears }}-speed {{ showcase_vehicle.get_transmission_type_display|lower }}
+                            {{ spec.value }} {% if not spec.hide_unit %}{{ spec.unit }}{% endif %}
                         </td>
                     </tr>
-                    <tr>
-                        <td>Top speed:</td> <td>{{ showcase_vehicle.top_speed }} mph</td>
-                    </tr>
-                    <cftry>
-                        <cfloop array="#specsStruct.speclist#" index="spec">
-                        {% for spec in showcase_vehicle.specs.speclist %}
-                            {% if not spec.hide_front %}
-                            <cfif NOT IsDefined("spec.hide_front") OR NOT spec.hide_front>
-                            <tr>
-                                <td>{{ spec.spec }}:</td>
-                                <td>
-                                    {{ spec.value }} {% if not spec.hide_unit %}{{ spec.unit }}{% endif %}
-{#                                    <cfif NOT IsDefined("spec.hide_unit") OR NOT spec.hide_unit>#spec.unit#</cfif>#}
-                                </td>
-                            </tr>
-                            </cfif>
-                            {% endif %}
-                        {% endfor %}
-                        </cfloop>
-                        <cfcatch type="Any">
-                        </cfcatch>
-                    </cftry>
-                </table>
-            </div>
+                    {% endif %}
+                {% endfor %}
+            </table>
+        </div>
 
+        <div class="resnow">
+            <div class="row">
+                <div class="col-sm-6">
 
-            <div class="resnow">
-                <div class="row">
-                    <div class="col-sm-6">
-
-                        <!-- normal -->
-                        <div class="ih-item circle effect3 right_to_left price-bubble">
-                            <a href="{% url "reserve" slug=showcase_vehicle.slug %}">
+                    <!-- normal -->
+                    <div class="ih-item circle effect3 right_to_left price-bubble">
+                        <a href="{% url "reserve" slug=showcase_vehicle.slug %}">
                             <div class="img">
                                 <img class="click-to-reserve" src="{% static "images/ClickToReserve.png" %}" />
                                 <img src="{% static "images/price-bg.jpg" %}" alt="img" />
@@ -116,12 +65,6 @@
                             </div>
                             <div class="info">
                                 <h3>Reserve Now</h3>
-                                <cftry>
-                                    <cfset adjective = specsStruct.adjective>
-                                    <cfcatch type="Any">
-                                        <cfset adjective = "amazing">
-                                    </cfcatch>
-                                </cftry>
                                 <p>
                                     {% if showcase_vehicle.vehicle_type == vehicle_type.CAR.value %}
                                         Drive
@@ -130,17 +73,15 @@
                                     {% endif %}
                                     our {{ showcase_vehicle.specs.adjective }}<br />
                                     {{ showcase_vehicle.make }} {{ showcase_vehicle.model }}!
-{#                                    <cfif type IS 1>Drive<cfelseif type IS 2>Ride</cfif> our #adjective#<br />#make# #model#!#}
                                 </p>
                             </div>
-                            </a>
-                        </div>
-                        <!-- end normal -->
-
+                        </a>
                     </div>
+                    <!-- end normal -->
+
                 </div>
             </div>
-
         </div>
+
     </div>
-</cfoutput>
+</div>

@@ -10,28 +10,25 @@
 
     <div class="wrapper">
 
-        <CFINCLUDE TEMPLATE="inc_nav.cfm">
         {% include "front_site/includes/nav.html" %}
 
         {% block full_page_content %}
-        <section class="l-content">
-            <div class="l-container">
-                <div class="well">
+            <section class="l-content">
+                <div class="l-container">
+                    <div class="well">
 
-                    <div class='section-header'>{% block page_title %}{% endblock %}</div>
-                    {% block content %}{% endblock %}
+                        <div class='section-header'>{% block page_title %}{% endblock %}</div>
+                        {% block content %}{% endblock %}
 
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
         {% endblock %}
 
         <div class="push"></div>
     </div>
 
     {% include "front_site/includes/footer.html" %}
-
-    <CFINCLUDE TEMPLATE="inc_trk.cfm">
 
 </body>
 </html>

@@ -1,58 +1,6 @@
 {% extends "front_site/base.html" %}
 {% load static %}
 
-{% comment %}
-<!--- If a form was submitted, the user had JS turned off, so we have to process the sequential logic. --->
-<cfset fieldErrors = StructNew()>
-<cfset formError = "">
-<cfif IsDefined("Form.reservation_type")>
-
-    <!--- Validate the first page (identity and rental date/specs) --->
-    <cfset ret = StructAppend(Form, Variables)>
-    <cfinvoke
-        component="cfc/porknbeans"
-        method="subscribeNewsletter"
-        returnVariable="NewsletterResult"
-        argumentCollection="#Form#">
-    </cfinvoke>
-    <cfset fieldErrors = NewsletterResult.fieldErrors>
-
-    <!--- Push to confirmation page if successful --->
-    <cfif NewsletterResult.success>
-        <cfset redirectUrl = "newsletter.cfm?done=1">
-        <cflocation url=#redirectUrl#>
-    </cfif>
-
-    <!--- We're still here, so bind the form variables for redisplay --->
-    <cfset Newsletter = Form>
-    <cfset formError = NOT NewsletterResult.success ? NewsletterResult.error : "">
-
-<!--- If the user has JS on, pull a blank Newsletter object to populate the form --->
-<cfelse>
-
-    <cfset Newsletter = {
-        "name" = "",
-        "email" = ""
-    }>
-
-</cfif>
-
-<CFINCLUDE TEMPLATE="inc_states.cfm">
-<CFINCLUDE TEMPLATE="inc_header.cfm">
-<title>Performance Rentals</title>
-<CFINCLUDE TEMPLATE="inc_meta.cfm">
-<CFINCLUDE TEMPLATE="inc_styles.cfm">
-<CFINCLUDE TEMPLATE="inc_js.cfm">
-</head>
-<body>
-
-<div class="wrapper">
-
-<CFINCLUDE TEMPLATE="inc_nav.cfm">
-
-<section class="l-content">
-{% endcomment %}
-
 {% block page_title %}Newsletter{% endblock %}
 
 {% block content %}
@@ -63,58 +11,56 @@
 
     <div class="reservation-form-sidebar">
 
-    {% block newsletter_content %}
-        <form method="POST" name="reservation_form" id="reservation_form" action="{% url "newsletter" %}" onsubmit="return false;" autocomplete="on">
-        <cfoutput>
+        {% block newsletter_content %}
+            <form method="POST" name="reservation_form" id="reservation_form" action="{% url "newsletter" %}" onsubmit="return false;" autocomplete="on">
 
-        {% if form.errors %}
-            {% with form_id="reservation_form_error" %}
-                {% include "global_includes/form_errors.html" %}
-            {% endwith %}
-        {% endif %}
-
-        <div id="subscribe_payment">
-
-            <h3>Sign up for our newsletter!</h3>
-            <p class="reservation-info">
-            We often have all sorts of discounts, incentives and special events here at Performance Rentals. Sign up with your name and
-            email address below, and we'll let you know what's happening! Of course, you may also <a href="unsubscribe.cfm">unsubscribe</a> at any time.
-            </p>
-
-            <table class="inputform payment">
-                <tr>
-                    <td>Your Name</td>
-                    <td>{{ form.full_name }}</td>
-                </tr>
-                <tr>
-                    <td>Your Email</td>
-                    <td>{{ form.email }}</td>
-                </tr>
-
-                {% if recaptcha_enabled %}
-                    {% include "front_site/includes/recaptcha.html" %}
+                {% if form.errors %}
+                    {% with form_id="reservation_form_error" %}
+                        {% include "global_includes/form_errors.html" %}
+                    {% endwith %}
                 {% endif %}
 
-                <tr class="buttons">
-                    <td></td>
-                    <td>
-                        <button type="submit" name="subscribe_btn" class="btn subscribe-complete-btn">Subscribe</button>
-                        <div class="spinner next-form-spinner payment-spinner"></div>
-                    </td>
-                </tr>
-            </table>
+                <div id="subscribe_payment">
 
-        </div>
+                    <h3>Sign up for our newsletter!</h3>
+                    <p class="reservation-info">
+                        We often have all sorts of discounts, incentives and special events here at Performance Rentals.
+                        Sign up with your name and email address below, and we'll let you know what's happening! Of course,
+                        you may also <a href="{% url "newsletter-unsubscribe" %}">unsubscribe</a> at any time.
+                    </p>
 
-        {% with hidden="hidden" form_id="reservation_subscribe_error" %}
-            {% include "global_includes/form_errors.html" %}
-        {% endwith %}
+                    <table class="inputform payment">
+                        <tr>
+                            <td>Your Name</td>
+                            <td>{{ form.full_name }}</td>
+                        </tr>
+                        <tr>
+                            <td>Your Email</td>
+                            <td>{{ form.email }}</td>
+                        </tr>
 
-        </cfoutput>
-        <cfinput type="hidden" name="reservation_type" value="subscribe" />
-        {% csrf_token %}
-        </form>
-    {% endblock %}
+                        {% if recaptcha_enabled %}
+                            {% include "front_site/includes/recaptcha.html" %}
+                        {% endif %}
+
+                        <tr class="buttons">
+                            <td></td>
+                            <td>
+                                <button type="submit" name="subscribe_btn" class="btn subscribe-complete-btn">Subscribe</button>
+                                <div class="spinner next-form-spinner payment-spinner"></div>
+                            </td>
+                        </tr>
+                    </table>
+
+                </div>
+
+                {% with hidden="hidden" form_id="reservation_subscribe_error" %}
+                    {% include "global_includes/form_errors.html" %}
+                {% endwith %}
+
+                {% csrf_token %}
+            </form>
+        {% endblock %}
 
     </div>
 

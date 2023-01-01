@@ -280,8 +280,8 @@ span.ul {
         <br />
         <p>
             X__________________________________________________________<span style="margin-left: 20px; font-weight: bold;">
-            <cfoutput>{{ rental.customer.full_name }}</cfoutput></span>
-            <span style="margin-left:50px;">Date: <CFOUTPUT>{{ rental.out_date|date:"m/d/Y" }}</CFOUTPUT></span><br />
+            {{ rental.customer.full_name }}</span>
+            <span style="margin-left:50px;">Date: {{ rental.out_date|date:"m/d/Y" }}</span><br />
         </p>
 
         <br />
@@ -337,9 +337,8 @@ span.ul {
         </p>
 
         {% if rental.vehicle.vehicle_type == vehicle_type.CAR %}
-        <cfif tVehicle.type IS 1>
             <p>
-            5. Prohibited Use. <b>The following uses of the Vehicle are prohibited and are considered breaches of this
+                5. Prohibited Use. <b>The following uses of the Vehicle are prohibited and are considered breaches of this
                 Agreement. You may not: a) allow any person who is not an Authorized Driver to operate the Vehicle;
                 b) operate the Vehicle while intoxicated or under the influence of any drug whether prescribed or over
                 the counter that could impair your driving ability; c) attend any car or truck racing event, or drive
@@ -365,7 +364,6 @@ span.ul {
             <span>X________</span>
             </p>
         {% elif rental.vehicle.vehicle_type == vehicle_type.BIKE %}
-        <cfelseif tVehicle.type IS 2>
             <p>
                 5. Prohibited Use. <b>The following uses of the Vehicle are prohibited and are considered breaches of
                 this Agreement. You may not: a) allow any person who is not an Authorized Driver to operate the
@@ -396,7 +394,6 @@ span.ul {
                 recording device to the Vehicle without our prior authorization.</b>
                 <span>X________</span>
             </p>
-        </cfif>
         {% endif %}
 
         <p>

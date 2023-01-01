@@ -3,7 +3,6 @@
 {% block newsletter_content %}
 
     <form method="POST" name="reservation_form" id="reservation_form" action="{% url "newsletter-unsubscribe" %}" onsubmit="return false;" autocomplete="on">
-        <cfoutput>
 
         {% if form.errors %}
              {% with form_id="reservation_form_error" %}
@@ -14,7 +13,7 @@
             <div id="subscribe_payment">
 
                 <p class="reservation-info">
-                If you'd like to unsubscribe from our newsletter, simply enter your address below.
+                    If you'd like to unsubscribe from our newsletter, simply enter your address below.
                 </p>
 
                 <table class="inputform payment">
@@ -22,7 +21,6 @@
                         <td>Your Email</td>
                         <td>
                             {{ form.email }}
-                            <cfinput name="email" value="#Newsletter.email#" class="#StructKeyExists(fieldErrors,"email") ? 'field-error' : ''#" />
                         </td>
                     </tr>
 
@@ -37,12 +35,10 @@
 
             </div>
 
-        {% with hidden="hidden" form_id="reservation_payment_error" %}
-            {% include "global_includes/form_errors.html" %}
-        {% endwith %}
+            {% with hidden="hidden" form_id="reservation_payment_error" %}
+                {% include "global_includes/form_errors.html" %}
+            {% endwith %}
 
-        </cfoutput>
-        <cfinput type="hidden" name="reservation_type" value="unsubscribe" />
         {% csrf_token %}
     </form>
 
