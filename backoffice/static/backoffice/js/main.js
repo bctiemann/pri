@@ -940,7 +940,7 @@ $(document).ready(function() {
         return false;
     });
 
-    // Survey details diaog
+    // Survey details dialog
     $('tr.survey').click(function() {
         showSurveyDetails($(this).attr('itemid'));
     });
