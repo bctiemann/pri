@@ -19,6 +19,7 @@ from sales.utils import EncryptedUSSocialSecurityNumberField, format_cc_number
 from sales.stripe import Stripe
 from pri.cipher import AESCipher
 from sales.tasks import send_email
+from sales.constants import BANK_PHONE_HELP_TEXT
 
 stripe = Stripe()
 
@@ -339,13 +340,13 @@ class Customer(models.Model):
     cc_exp_yr = models.CharField(max_length=4, blank=True, verbose_name='CC1 exp year')
     cc_exp_mo = models.CharField(max_length=2, blank=True, verbose_name='CC1 exp month')
     cc_cvv = models.CharField(max_length=6, blank=True, verbose_name='CC1 CVV')
-    cc_phone = PhoneNumberField(blank=True, verbose_name='CC1 contact phone')
+    cc_phone = PhoneNumberField(blank=True, verbose_name='CC1 contact phone', help_text=BANK_PHONE_HELP_TEXT)
 
     cc2_number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC2 number')
     cc2_exp_yr = models.CharField(max_length=4, blank=True, verbose_name='CC2 exp year')
     cc2_exp_mo = models.CharField(max_length=2, blank=True, verbose_name='CC2 exp month')
     cc2_cvv = models.CharField(max_length=6, blank=True, verbose_name='CC2 CVV')
-    cc2_phone = PhoneNumberField(blank=True, verbose_name='CC2 contact phone')
+    cc2_phone = PhoneNumberField(blank=True, verbose_name='CC2 contact phone', help_text=BANK_PHONE_HELP_TEXT)
 
     rentals_count = models.IntegerField(null=True, blank=True)
     remarks = fields.EncryptedTextField(blank=True)

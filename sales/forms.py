@@ -18,6 +18,7 @@ from sales.models import Reservation, Coupon, PerformanceExperience, JoyRide, Gi
 from users.models import Customer
 from sales.calculators import RentalPriceCalculator, PerformanceExperiencePriceCalculator, JoyRidePriceCalculator
 from sales.enums import get_service_hours, TRUE_FALSE_CHOICES, get_exp_year_choices, get_exp_month_choices, get_numeric_choices
+from sales.constants import BANK_PHONE_HELP_TEXT
 from backoffice.forms import CSSClassMixin
 
 current_year = timezone.now().year
@@ -29,7 +30,7 @@ class CardFormMixin(forms.Form):
     cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices())
     cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices())
     cc_cvv = forms.CharField()
-    cc_phone = PhoneNumberField()
+    cc_phone = PhoneNumberField(help_text=BANK_PHONE_HELP_TEXT)
 
 
 # This mixin can be added to any form to enforce checking a g-recaptcha-response field included in the form.data.

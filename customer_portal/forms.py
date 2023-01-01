@@ -9,7 +9,6 @@ from sales.forms import ReservationRentalDetailsForm, JoyRideDetailsForm, Perfor
 from users.models import Customer
 from backoffice.forms import CSSClassMixin
 from sales.enums import get_service_hours, TRUE_FALSE_CHOICES, get_exp_year_choices, get_exp_month_choices
-from sales.constants import BANK_PHONE_HELP_TEXT
 
 
 class PasswordForm(forms.Form):
@@ -43,7 +42,6 @@ class CustomerCardPrimaryForm(CSSClassMixin, forms.ModelForm):
     cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices(since_founding=False, allow_null=False))
     cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(allow_null=False))
     cc_cvv = forms.CharField()
-    cc_phone = PhoneNumberField(region='US')
 
     # def __init__(self, *args, **kwargs):
     #     super().__init__(*args, **kwargs)
@@ -69,7 +67,6 @@ class CustomerCardSecondaryForm(CSSClassMixin, forms.ModelForm):
     cc2_exp_yr = forms.ChoiceField(choices=get_exp_year_choices(since_founding=False, allow_null=False))
     cc2_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(allow_null=False))
     cc2_cvv = forms.CharField()
-    cc2_phone = PhoneNumberField(region='US')
 
     # def __init__(self, *args, **kwargs):
     #     super().__init__(*args, **kwargs)
@@ -103,13 +100,11 @@ class ReservationCustomerInfoForm(CSSClassMixin, forms.ModelForm):
     cc_exp_yr = forms.ChoiceField(required=False, choices=get_exp_year_choices(since_founding=True, allow_null=False))
     cc_exp_mo = forms.ChoiceField(required=False, choices=get_exp_month_choices(allow_null=False))
     cc_cvv = forms.CharField(required=False)
-    cc_phone = PhoneNumberField(region='US', required=False, help_text=BANK_PHONE_HELP_TEXT)
 
     cc2_number = forms.CharField(required=False)
     cc2_exp_yr = forms.ChoiceField(required=False, choices=get_exp_year_choices(since_founding=True, allow_null=True))
     cc2_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(allow_null=True), required=False)
     cc2_cvv = forms.CharField(required=False)
-    cc2_phone = PhoneNumberField(region='US', required=False, help_text=BANK_PHONE_HELP_TEXT)
     cc2_instructions = forms.CharField(widget=forms.Textarea(), required=False)
 
     def __init__(self, *args, confirmation_code=None, **kwargs):

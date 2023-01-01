@@ -24,6 +24,7 @@ from django.shortcuts import reverse
 from sales.enums import SERVICE_TYPE_CODE_MAP, ServiceType
 from sales.utils import EncryptedUSSocialSecurityNumberField, format_cc_number
 from sales.tasks import send_email
+from sales.constants import BANK_PHONE_HELP_TEXT
 from pri.cipher import AESCipher
 
 logger = logging.getLogger(__name__)
@@ -698,7 +699,7 @@ class Card(models.Model):
     city = models.CharField(max_length=255, blank=True)
     state = USStateField(null=True, blank=True)
     zip = USZipCodeField(null=True, blank=True)
-    phone = PhoneNumberField(blank=True, verbose_name='CC contact phone')
+    phone = PhoneNumberField(blank=True, verbose_name='CC contact phone', help_text=BANK_PHONE_HELP_TEXT)
 
     def __str__(self):
         return '{0} ({1} {2})'.format(self.id, self.brand, self.last_4)
