@@ -16,213 +16,152 @@
         <form method="POST" action="{% url "backoffice:charge-create" %}">
     {% endif %}
 
-    <table class="inputform charges">
-        {% if charge %}
-        <cfif chargeid GT 0>
-        <tr>
-            <td>Charge ID</td>
-            <td>
-                <cfif Charge.processorchargeid IS NOT "">
-                    <a href="https://dashboard.stripe.com/payments/{{ charge.processor_charge_id }}" target="_blank">{{ charge.processor_charge_id }}</a>
-                </cfif>
-            </td>
-        </tr>
-        <tr>
-            <td>Charge Status</td>
-            <td>
-                {{ charge.status }}
-            </td>
-        </tr>
-        <tr>
-            <td>Charge Date</td>
-            <td>
-                {{ charge.charged_at|date:"m/d/Y" }}
-{#                <cfif Charge.chargedon IS NOT "">#DateFormat(Charge.chargedon,"MM/DD/YYYY")#</cfif>#}
-            </td>
-        </tr>
-        </cfif>
-        {% endif %}
+        <table class="inputform charges">
+            {% if charge %}
+                <tr>
+                    <td>Charge ID</td>
+                    <td>
+                        {% if charge.processor_charge_id %}
+                            <a href="https://dashboard.stripe.com/payments/{{ charge.processor_charge_id }}" target="_blank">{{ charge.processor_charge_id }}</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Charge Status</td>
+                    <td>
+                        {{ charge.status }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Charge Date</td>
+                    <td>
+                        {{ charge.charged_at|date:"m/d/Y" }}
+                    </td>
+                </tr>
+            {% endif %}
 
-        <tr>
-            <td>Payer Name</td>
-            <td>
-                {{ form.full_name }}
-                <cfinput name="fullname" value="#Charge.fullname#" required="yes" message="Enter payer name." maxlength="40" />
-            </td>
-        </tr>
-        <tr>
-            <td>Payer E-mail</td>
-            <td>
-                {{ form.email }}
-                <cfinput name="email" value="#Charge.email#" required="yes" validate="email" message="You must enter a valid email address." />
-            </td>
-        </tr>
-        <tr>
-            <td>Contact Phone Number</td>
-            <td>
-                {{ form.phone }}
-                <cfinput name="tel" class="phone short" value="#Charge.tel#" maxlength="20" />
-            </td>
-        </tr>
-        <tr>
-            <td>Charge Amount<br /><small>Decimal format. 100.00</small></td>
-            <cfset amount = 100.00>
-            <cfif Charge.amount GT 0>
-                <cfset amount = Charge.amount>
-            </cfif>
-            <td class="currency">
-                <span class="currency-prefix">$</span>{{ form.amount }}
-                <cfinput name="amount" value="#amount#" class="short" />
-            </td>
-        </tr>
-        <tr>
-            <td>Charge Type</td>
-            <td>
-                {{ form.charge_type }}
-                <cfselect name="capture">
-                    <option value="1" <cfif Charge.capture IS 1>selected</cfif>>Charge</option>
-                    <option value="0" <cfif Charge.capture IS 0>selected</cfif>>Auth Only</option>
-                </cfselect>
-            </td>
-        </tr>
+            <tr>
+                <td>Payer Name</td>
+                <td>
+                    {{ form.full_name }}
+                </td>
+            </tr>
+            <tr>
+                <td>Payer E-mail</td>
+                <td>
+                    {{ form.email }}
+                </td>
+            </tr>
+            <tr>
+                <td>Contact Phone Number</td>
+                <td>
+                    {{ form.phone }}
+                </td>
+            </tr>
+            <tr>
+                <td>Charge Amount<br /><small>Decimal format. 100.00</small></td>
+                <td class="currency">
+                    <span class="currency-prefix">$</span>{{ form.amount }}
+                </td>
+            </tr>
+            <tr>
+                <td>Charge Type</td>
+                <td>
+                    {{ form.charge_type }}
+                </td>
+            </tr>
 
-        <tr>
-            <td class="align-top">Notes</td>
-            <td>
-                {{ form.notes }}
-{#                <cftextarea name="notes">#Charge.notes#</cftextarea>#}
-            </td>
-        </tr>
-        <tr>
-            <td>Billing Address</td>
-            <td>
-                {{ form.cc_address }}
-                <cfinput name="addr" value="#addr_dec#" maxlength="255" />
-            </td>
-        </tr>
-        <tr>
-            <td>Billing City</td>
-            <td>
-                {{ form.cc_city }}
-                <cfinput name="city" value="#Charge.city#" maxlength="150" />
-            </td>
-        </tr>
-        <tr>
-            <td>Billing State</td>
-            <td>
-                {{ form.cc_state }}
-                <cfselect name="state">
-                    <cfloop array="#states#" index="state">
-                        <option value="#state.abbr#" <CFIF Charge.state IS state.abbr>selected</CFIF>>#state.name#</option>
-                    </cfloop>
-                </cfselect>
-            </td>
-        </tr>
-        <tr>
-            <td>Other State</td>
-            <td>
-                {{ form.foreign_region }}
-                <cfinput name="ostate" value="#Charge.ostate#" maxlength="150" /> <small>(Non-US state/prov)</small>
-            </td>
-        </tr>
-        <tr>
-            <td>Billing Country</td>
-            <td>
-                {{ form.country }}
-                <cfinput name="country" value="#Charge.country#" maxlength="2" />
-            </td>
-        </tr>
-        <tr>
-            <td>Billing Zip</td>
-            <td>
-                {{ form.cc_zip }}
-                <cfinput name="zip" value="#Charge.zip#" maxlength="10" />
-            </td>
-        </tr>
-        <tr>
-            <td>Card</td>
-            <td>
-                {{ charge.card.stripe_card }}
-            </td>
-        </tr>
-        <tr>
-            <td>Credit Card Number</td>
-            <td>
-                {{ form.cc_number }}
-                <cfinput name="ccnum" class="cc-field" value="#formatCCNumber(ccnum_dec)#" maxlength="30" />
-            </td>
-        </tr>
-        <tr>
-            <td>Credit Card Expiration</td>
-            <td>
-                {{ form.cc_exp_mo }} / {{ form.cc_exp_yr }}
-                {% comment %}
-                <cfselect name="ccexpmo">
-                    <option value="01" <cfif Charge.ccexpmo IS "01">selected</cfif>>January (01)</option>
-                    <option value="02" <cfif Charge.ccexpmo IS "02">selected</cfif>>February (02)</option>
-                    <option value="03" <cfif Charge.ccexpmo IS "03">selected</cfif>>March (03)</option>
-                    <option value="04" <cfif Charge.ccexpmo IS "04">selected</cfif>>April (04)</option>
-                    <option value="05" <cfif Charge.ccexpmo IS "05">selected</cfif>>May (05)</option>
-                    <option value="06" <cfif Charge.ccexpmo IS "06">selected</cfif>>June (06)</option>
-                    <option value="07" <cfif Charge.ccexpmo IS "07">selected</cfif>>July (07)</option>
-                    <option value="08" <cfif Charge.ccexpmo IS "08">selected</cfif>>August (08)</option>
-                    <option value="09" <cfif Charge.ccexpmo IS "09">selected</cfif>>September (09)</option>
-                    <option value="10" <cfif Charge.ccexpmo IS "10">selected</cfif>>October (10)</option>
-                    <option value="11" <cfif Charge.ccexpmo IS "11">selected</cfif>>November (11)</option>
-                    <option value="12" <cfif Charge.ccexpmo IS "12">selected</cfif>>December (12)</option>
-                </cfselect> /
+            <tr>
+                <td class="align-top">Notes</td>
+                <td>
+                    {{ form.notes }}
+                </td>
+            </tr>
+            <tr>
+                <td class="align-top">Billing Address</td>
+                <td>
+                    {{ form.cc_address }}
+                </td>
+            </tr>
+            <tr>
+                <td>Billing City</td>
+                <td>
+                    {{ form.cc_city }}
+                </td>
+            </tr>
+            <tr>
+                <td>Billing State</td>
+                <td>
+                    {{ form.cc_state }}
+                </td>
+            </tr>
+            <tr>
+                <td>Other State</td>
+                <td>
+                    {{ form.foreign_region }}
+                </td>
+            </tr>
+            <tr>
+                <td>Billing Country</td>
+                <td>
+                    {{ form.country }}
+                </td>
+            </tr>
+            <tr>
+                <td>Billing Zip</td>
+                <td>
+                    {{ form.cc_zip }}
+                </td>
+            </tr>
+            <tr>
+                <td>Card</td>
+                <td>
+                    {{ charge.card.stripe_card }}
+                </td>
+            </tr>
+            <tr>
+                <td>Credit Card Number</td>
+                <td>
+                    {{ form.cc_number }}
+                </td>
+            </tr>
+            <tr>
+                <td>Credit Card Expiration</td>
+                <td>
+                    {{ form.cc_exp_mo }} / {{ form.cc_exp_yr }}
+                </td>
+            </tr>
+            <tr>
+                <td>Credit Card<br> Security Code (CVV)</td>
+                <td>
+                    {{ form.cc_cvv }}
+                </td>
+            </tr>
 
-                <cfset tyear = #Dateformat(Now(),"yyyy")#>
-                <cfset fyear = tyear+15>
-                <cfset ynow=#LSDateFormat(Now(),"yyyy")#>
-                <cfset ythen=(#ynow# + 11)>
-                <cfset mnow=#LSDateFormat(Now(),"mm")#>
-                <cfset dyear=ynow>
-                <cfselect name="ccexpyr">
-                    <cfoutput>
-                    <cfloop index="year" from="#ynow#" to="#ythen#">
-                        <option value="#dyear#" <cfif Charge.ccexpyr IS dyear>selected</cfif>>#dyear#</option>>
-                        <cfset dyear = dyear + 1>
-                    </cfloop>
-                    </cfoutput>
-                </cfselect>
-                {% endcomment %}
-            </td>
-        </tr>
-        <tr>
-            <td>Credit Card<br> Security Code (CVV)</td>
-            <td>
-                {{ form.cc_cvv }}
-                <cfinput name="cccvv" value="#Charge.cccvv#" maxlength="5" message="Enter a valid CVV number for the credit card." />
-            </td>
-        </tr>
-
-        <tr>
-            <td></td>
-            <td>
-                <button class="btn" type="submit" name="edit">
-                    {% if charge %}
-                        Edit
-                    {% else %}
-                        Add
-                    {% endif %}
-                </button>
-                {% if charge %}
-                <cfif tolltagid>
-                    <button
-                        class="btn delete"
-                        type="submit"
-                        name="delete"
-                        onclick="return confirmDelete(this.form, '{% url "backoffice:charge-delete" pk=charge.id %}', 'charge')"
-                    >
-                        Delete Charge
+            <tr>
+                <td></td>
+                <td>
+                    <button class="btn" type="submit" name="edit">
+                        {% if charge %}
+                            Edit
+                        {% else %}
+                            Add
+                        {% endif %}
                     </button>
-                </cfif>
-                {% endif %}
-            </td>
-        </tr>
-    </table>
-    {% csrf_token %}
+                    {% if charge %}
+                        <button
+                            class="btn delete"
+                            type="submit"
+                            name="delete"
+                            onclick="return confirmDelete(this.form, '{% url "backoffice:charge-delete" pk=charge.id %}', 'charge')"
+                        >
+                            Delete Charge
+                        </button>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+        {% csrf_token %}
     </form>
 
 {% endblock %}
