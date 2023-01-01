@@ -5,19 +5,15 @@
 {% block subpage_pane %}
 
     {% for reservation in upcoming_reservations %}
-    <cfoutput query="RentalsUpcoming">
         <a href="{% url "customer_portal:confirm-reservation" confirmation_code=reservation.confirmation_code %}">
             <div class="reservation {% if not user.customer.info_is_complete %}incomplete-info{% endif %}">
                 {% include "customer_portal/reservations/reservation.html" %}
             </div>
         </a>
-    </cfoutput>
     {% endfor %}
 
     {% if not upcoming_reservations.exists %}
-    <cfif RentalsUpcoming.recordCount IS 0>
         <div class="no-records">No upcoming rentals</div>
-    </cfif>
     {% endif %}
 
 {% endblock %}

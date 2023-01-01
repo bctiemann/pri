@@ -49,6 +49,9 @@ class CustomerAdmin(admin.ModelAdmin):
         ('License', {
             'fields': ('date_of_birth', 'license_number', 'license_state', 'license_history',)
         }),
+        ('Insurance', {
+            'fields': ('insurance_company', 'insurance_policy_number', 'insurance_company_phone', 'coverage_verified',)
+        }),
         ('Credit Card 1', {
             'fields': ('cc_number', 'cc_exp_yr', 'cc_exp_mo', 'cc_cvv', 'cc_phone',)
         }),

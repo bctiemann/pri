@@ -1,154 +1,56 @@
 {% load static %}
 
-<cfoutput>
 <a class="header-logo" href="{% url "customer_portal:home" %}"><img src='{% static "customer/images/PRI_logo.png" %}' alt='Performance Rentals' width="255px"></a>
-</cfoutput>
 
 {% if user.is_authenticated %}
-<cfif IsValidUser>
 
-    {% comment %}
-<cfquery name="RentalsUpcoming" datasource="#DSN#">
-    SELECT Upcoming.vehicleid,reservationid,rentalid,confcode,dateout,dateback,make,model,Upcoming.status,Upcoming.notes,delivery,numdays FROM (
-        (
-            SELECT reservationid,0 AS rentalid,vehicleid,confcode,dateout,dateback,status,notes,delivery,numdays
-            FROM Reservations
-            WHERE dateback > NOW()
-            AND customerid = <CFQUERYPARAM value="#YourID.customerid#" CFSQLType="CF_SQL_NUMERIC">
-        ) UNION (
-            SELECT 0 AS reservationid,rentalid,vehicleid,confcode,dateout,dateback,status,notes,delivery,numdays
-            FROM Rentals
-            WHERE dateback > NOW()
-            AND status != 4
-           AND customerid = <CFQUERYPARAM value="#YourID.customerid#" CFSQLType="CF_SQL_NUMERIC">
-        )
-    ) Upcoming
-    INNER JOIN Vehicles ON Vehicles.vehicleid = Upcoming.vehicleid
-    ORDER BY dateout ASC
-</cfquery>
+    <ul class="sidebar-nav">
+        <li class="{% if selected_page == "reservations" %}selected-page{% endif %}">
+            <a href="{% url "customer_portal:upcoming-reservations" %}">
+                {% if upcoming_reservations.exists %}
+                    <div class="badge">{{ upcoming_reservations.count }}</div>
+                {% endif %}
+                Reservations
+            </a>
+        </li>
+        <li class="{% if selected_page == "joy_ride" %}selected-page{% endif %}">
+            <a href="{% url "customer_portal:joyride-upcoming" %}">
+                {% if upcoming_joy_rides.exists %}
+                    <div class="badge">{{ upcoming_joy_rides.count }}</div>
+                {% endif %}
+                Joy Ride
+            </a>
+        </li>
+        <li class="{% if selected_page == "performance_experience" %}selected-page{% endif %}">
+            <a href="{% url "customer_portal:perfexp-upcoming" %}">
+                {% if upcoming_performance_experiences.exists %}
+                    <div class="badge">{{ upcoming_performance_experiences.count }}</div>
+                {% endif %}
+                Performance Experience
+            </a>
+        </li>
+        <li class="{% if selected_page == "rates" %}selected-page{% endif %}">
+            <a href="{% url "customer_portal:select-vehicle" %}">Rental Rates</a>
+        </li>
+        <li class="{% if selected_page == "find_us" %}selected-page{% endif %}">
+            <a href="{% url "customer_portal:find-us" %}">Find Us</a>
+        </li>
+    </ul>
+    <ul class="sidebar-nav">
+        <li class="account-info {% if selected_page == "account_info" %}selected-page{% endif %}">
+            <a href="{% url "customer_portal:account-info" %}">Account Info</a>
+        </li>
+        <li class="account-info {% if selected_page == "payment_info" %}selected-page{% endif %}">
+            <a href="{% url "customer_portal:payment-info" %}">Payment Info</a>
+        </li>
+        <li class="account-info {% if selected_page == "password" %}selected-page{% endif %}">
+            <a href="{% url "customer_portal:password" %}">Change Password</a>
+        </li>
+    </ul>
+    <ul class="sidebar-nav">
+        <li class="account-info">
+            <a href="{% url "customer_portal:logout" %}">Log Out</a>
+        </li>
+    </ul>
 
-<cfquery name="RentalsPast" datasource="#DSN#">
-    SELECT Rentals.vehicleid,rentalid,confcode,dateout,dateback,make,model,Rentals.status,Rentals.notes,delivery,numdays FROM Rentals
-    INNER JOIN Vehicles ON Vehicles.vehicleid = Rentals.vehicleid
-    WHERE dateback < NOW()
-    AND customerid = <CFQUERYPARAM value="#YourID.customerid#" CFSQLType="CF_SQL_NUMERIC">
-    AND Rentals.status = 3
-    ORDER BY dateout DESC
-</cfquery>
-
-<cfquery name="PerfExpUpcoming" datasource="#DSN#">
-    SELECT joyperfid,confcode,reqdate,bupdate,JoyPerf.notes,choice1,choice2,choice3,
-    V1.make AS v1_make,V1.model AS v1_model,V1.year AS v1_year,
-    V2.make AS v2_make,V2.model AS v2_model,V2.year AS v2_year,
-    V3.make AS v3_make,V3.model AS v3_model,V3.year AS v3_year
-    FROM JoyPerf
-    LEFT JOIN Vehicles V1 ON V1.vehicleid=JoyPerf.choice1
-    LEFT JOIN Vehicles V2 ON V2.vehicleid=JoyPerf.choice2
-    LEFT JOIN Vehicles V3 ON V3.vehicleid=JoyPerf.choice3
-    WHERE JoyPerf.type = 2
-    AND reqdate > NOW()
-    AND customerid = <CFQUERYPARAM value="#YourID.customerid#" CFSQLType="CF_SQL_NUMERIC">
-</cfquery>
-
-<cfquery name="PerfExpPast" datasource="#DSN#">
-    SELECT joyperfid,confcode,reqdate,bupdate,JoyPerf.notes,choice1,choice2,choice3,
-    V1.make AS v1_make,V1.model AS v1_model,V1.year AS v1_year,
-    V2.make AS v2_make,V2.model AS v2_model,V2.year AS v2_year,
-    V3.make AS v3_make,V3.model AS v3_model,V3.year AS v3_year
-    FROM JoyPerf
-    LEFT JOIN Vehicles V1 ON V1.vehicleid=JoyPerf.choice1
-    LEFT JOIN Vehicles V2 ON V2.vehicleid=JoyPerf.choice2
-    LEFT JOIN Vehicles V3 ON V3.vehicleid=JoyPerf.choice3
-    WHERE JoyPerf.type = 2
-    AND reqdate < NOW()
-    AND customerid = <CFQUERYPARAM value="#YourID.customerid#" CFSQLType="CF_SQL_NUMERIC">
-</cfquery>
-
-<cfquery name="JoyRideUpcoming" datasource="#DSN#">
-    SELECT joyperfid,confcode,reqdate,bupdate,JoyPerf.notes,choice1,choice2,choice3,
-    V1.make AS v1_make,V1.model AS v1_model,V1.year AS v1_year,
-    V2.make AS v2_make,V2.model AS v2_model,V2.year AS v2_year,
-    V3.make AS v3_make,V3.model AS v3_model,V3.year AS v3_year
-    FROM JoyPerf
-    LEFT JOIN Vehicles V1 ON V1.vehicleid=JoyPerf.choice1
-    LEFT JOIN Vehicles V2 ON V2.vehicleid=JoyPerf.choice2
-    LEFT JOIN Vehicles V3 ON V3.vehicleid=JoyPerf.choice3
-    WHERE JoyPerf.type = 1
-    AND reqdate > NOW()
-    AND customerid = <CFQUERYPARAM value="#YourID.customerid#" CFSQLType="CF_SQL_NUMERIC">
-</cfquery>
-
-<cfquery name="JoyRidePast" datasource="#DSN#">
-    SELECT joyperfid,confcode,reqdate,bupdate,JoyPerf.notes,choice1,choice2,choice3,
-    V1.make AS v1_make,V1.model AS v1_model,V1.year AS v1_year,
-    V2.make AS v2_make,V2.model AS v2_model,V2.year AS v2_year,
-    V3.make AS v3_make,V3.model AS v3_model,V3.year AS v3_year
-    FROM JoyPerf
-    LEFT JOIN Vehicles V1 ON V1.vehicleid=JoyPerf.choice1
-    LEFT JOIN Vehicles V2 ON V2.vehicleid=JoyPerf.choice2
-    LEFT JOIN Vehicles V3 ON V3.vehicleid=JoyPerf.choice3
-    WHERE JoyPerf.type = 1
-    AND reqdate < NOW()
-    AND customerid = <CFQUERYPARAM value="#YourID.customerid#" CFSQLType="CF_SQL_NUMERIC">
-</cfquery>
-{% endcomment %}
-
-<ul class="sidebar-nav">
-    <cfoutput>
-    <li class="{% if selected_page == "reservations" %}selected-page{% endif %}">
-        <a href="{% url "customer_portal:upcoming-reservations" %}">
-            {% if upcoming_reservations.exists %}
-            <cfif RentalsUpcoming.recordCount GT 0>
-                <div class="badge">{{ upcoming_reservations.count }}</div>
-            </cfif>
-            {% endif %}
-            Reservations
-        </a>
-    </li>
-    <li class="{% if selected_page == "joy_ride" %}selected-page{% endif %}">
-        <a href="{% url "customer_portal:joyride-upcoming" %}">
-            {% if upcoming_joy_rides.exists %}
-            <cfif JoyRideUpcoming.recordCount GT 0>
-                <div class="badge">{{ upcoming_joy_rides.count }}</div>
-            </cfif>
-            {% endif %}
-            Joy Ride
-        </a>
-    </li>
-    <li class="{% if selected_page == "performance_experience" %}selected-page{% endif %}">
-        <a href="{% url "customer_portal:perfexp-upcoming" %}">
-            {% if upcoming_performance_experiences.exists %}
-            <cfif PerfExpUpcoming.recordCount GT 0>
-                <div class="badge">{{ upcoming_performance_experiences.count }}</div>
-            </cfif>
-            {% endif %}
-            Performance Experience
-        </a>
-    </li>
-    <li class="{% if selected_page == "rates" %}selected-page{% endif %}">
-        <a href="{% url "customer_portal:select-vehicle" %}">Rental Rates</a>
-    </li>
-    <li class="{% if selected_page == "find_us" %}selected-page{% endif %}">
-        <a href="{% url "customer_portal:find-us" %}">Find Us</a>
-    </li>
-    </cfoutput>
-</ul>
-<ul class="sidebar-nav">
-    <li class="account-info {% if selected_page == "account_info" %}selected-page{% endif %}">
-        <a href="{% url "customer_portal:account-info" %}">Account Info</a>
-    </li>
-    <li class="account-info {% if selected_page == "payment_info" %}selected-page{% endif %}">
-        <a href="{% url "customer_portal:payment-info" %}">Payment Info</a>
-    </li>
-    <li class="account-info {% if selected_page == "password" %}selected-page{% endif %}">
-        <a href="{% url "customer_portal:password" %}">Change Password</a>
-    </li>
-</ul>
-<ul class="sidebar-nav">
-    <li class="account-info">
-        <a href="{% url "customer_portal:logout" %}">Log Out</a>
-    </li>
-</ul>
-
-</cfif>
 {% endif %}

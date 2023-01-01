@@ -1,746 +1,417 @@
 {% extends "customer_portal/base.html" %}
 
-{% comment %}
-<!--- If a form was submitted, the user had JS turned off, so we have to process the sequential logic. --->
-<cfset fieldErrors = StructNew()>
-<cfset formError = "">
-<cfif IsDefined("Form.confcode")>
+{% block page_title %}Reservation Information{% endblock %}
 
-    <!--- Validate the first page (identity and rental date/specs) --->
-    <cfset ret = StructAppend(Form, Variables)>
-    <cfinvoke
-        component="cfc/cassidy"
-        method="#Form.method#"
-        returnVariable="ReservationResult"
-        argumentCollection="#Form#">
-    </cfinvoke>
-    <cfset fieldErrors = ReservationResult.fieldErrors>
+{% block content %}
 
-    <!--- Push to customer portal if successful --->
-    <cfif ReservationResult.success>
-        <cfset redirectUrl = #OnCustSite# & "reserve_confirm.cfm?confcode=" & Form.confcode>
-        <cflocation url=#redirectUrl#>
-    </cfif>
-
-    <cfset Customer = Form>
-    <cftry>
-        <cfset ccnum_dec = REReplace(Form.ccnum,"[^0-9]","","All")>
-        <cfcatch type="Any">
-        </cfcatch>
-    </cftry>
-    <cftry>
-        <cfset cc2num_dec = REReplace(Form.cc2num,"[^0-9]","","All")>
-        <cfset addr_dec = Form.addr>
-        <cfcatch type="Any">
-        </cfcatch>
-    </cftry>
-    <cfset formError = NOT ReservationResult.success ? ReservationResult.error : "">
-
-<!--- If the user has JS on, pull a blank Customer object to populate the form --->
-<cfelse>
-
-    <cfset Customer = YourID>
-
-    <!--- Decrypt encrypted fields --->
-    <cftry>
-        <cfset password_dec = Decrypt(CustFront.password,globalkey,'AES','hex')>
-        <cfcatch type="Any">
-            <cfset password_dec = "">
-        </cfcatch>
-    </cftry>
-    <cftry>
-        <cfset addr_dec = Decrypt(Customer.addr,globalkey,'AES','hex')>
-        <cfcatch type="Any">
-            <cfset addr_dec = "">
-        </cfcatch>
-    </cftry>
-    <cftry>
-        <cfset ccnum_dec = Decrypt(Customer.ccnum,globalkey,'AES','hex')>
-        <cfcatch type="Any">
-            <cfset ccnum_dec = "">
-        </cfcatch>
-    </cftry>
-    <cftry>
-        <cfset cc2num_dec = Decrypt(Customer.cc2num,globalkey,'AES','hex')>
-        <cfcatch type="Any">
-            <cfset cc2num_dec = "">
-        </cfcatch>
-    </cftry>
-
-</cfif>
-
-<cfset confcode = IsDefined("Form.confcode") ? Form.confcode : IsDefined("URL.confcode") ? URL.confcode : "">
-
-<CFINCLUDE TEMPLATE="inc_lib.cfm">
-<CFINCLUDE TEMPLATE="inc_header.cfm">
-<title>Performance Rentals Customer Portal</title>
-<CFINCLUDE TEMPLATE="inc_meta.cfm">
-<CFINCLUDE TEMPLATE="inc_styles.cfm">
-<CFINCLUDE TEMPLATE="inc_js.cfm">
-</head>
-<body>
-
-<CFINCLUDE TEMPLATE="inc_states.cfm">
-<cfset selectedPage="reservations">
-
-<table class="layout">
-<tr>
-<td class="sidebar">
-    <cfinclude template="inc_sidebar.cfm">
-</td>
-<td class="main">
-
-    <div class="wrapper">
-
-    <CFINCLUDE TEMPLATE="inc_contentheader.cfm">
-
-    <div class="well">
-        <div class='section-header'>Reservation Information</div>
-    {% endcomment %}
-
-        {% block page_title %}Reservation Information{% endblock %}
-
-        {% block content %}
-        <cftry>
-
-            {% comment %}
-            <cfif confcode IS "">
-                <cfthrow message="Invalid confirmation code.">
-            </cfif>
-
-            <cfquery name="Reservation" datasource="#DSN#">
-                SELECT reservationid,0 AS rentalid,confcode,Reservations.status,make,model,dateout,dateback,numdays,delivery,Reservations.notes,'' AS cc2notes FROM Reservations
-                INNER JOIN Vehicles ON Reservations.vehicleid=Vehicles.vehicleid
-                WHERE confcode = <CFQUERYPARAM value="#confcode#" CFSQLType="CF_SQL_VARCHAR">
-                AND customerid = <CFQUERYPARAM value="#YourID.customerid#" CFSQLType="CF_SQL_INTEGER">
-            </cfquery>
-            <cfif Reservation.recordCount IS 0>
-                <cfquery name="Reservation" datasource="#DSN#">
-                    SELECT rentalid,0 AS reservationid,confcode,Rentals.status,make,model,dateout,dateback,numdays,delivery,Rentals.notes,'' AS cc2notes FROM Rentals
-                    INNER JOIN Vehicles ON Rentals.vehicleid=Vehicles.vehicleid
-                    WHERE confcode = <CFQUERYPARAM value="#confcode#" CFSQLType="CF_SQL_VARCHAR">
-                    AND customerid = <CFQUERYPARAM value="#YourID.customerid#" CFSQLType="CF_SQL_INTEGER">
-                </cfquery>
-                <cfif Reservation.recordCount IS 0>
-                    <cfthrow message="Confirmation code not found.">
-                </cfif>
-            </cfif>
-            {% endcomment %}
-
-            <p class="reservation-info">
-            Thank you for your reservation!
-            {% if user.customer.info_is_complete %}
-            <cfif InfoComplete>
-                {% if reservation.is_reservation and reservation.reservation.status == reservation.reservation.Status.UNCONFIRMED %}
-                <cfif Reservation.reservationid GT 0 AND Reservation.status IS 0>
-                    We may need to contact you for more details before your vehicle is confirmed. We will not charge your card until the reservation is confirmed.
-                {% elif reservation.is_reservation and reservation.reservation.status == reservation.reservation.Status.CONFIRMED %}
-                <cfelseif (Reservation.reservationid GT 0 AND Reservation.status IS 1) OR (Reservation.rentalid GT 0 AND Reservation.status IS 1)>
-                    Your vehicle is now secured for the dates you've selected. Your card has not yet been billed.
-                {% elif reservation.is_rental and reservation.rental.status == reservation.rental.Status.CONFIRMED %}
-                    Your vehicle is now secured for the dates you've selected. Your card has been billed.
-                {% elif reservation.is_rental and reservation.rental.status == reservation.rental.Status.IN_PROGRESS %}
-                <cfelseif Reservation.status IS 2>
-                    This rental is in progress.
-                {% elif reservation.is_rental and reservation.rental.status == reservation.rental.Status.COMPLETE %}
-                <cfelseif Reservation.status IS 3>
-                    This rental is complete.
-                </cfif>
-                {% endif %}
-            {% else %}
-            <cfelse>
-                We're not quite done, however...
-            </cfif>
+    <p class="reservation-info">
+        Thank you for your reservation!
+        {% if user.customer.info_is_complete %}
+            {% if reservation.is_reservation and reservation.reservation.status == reservation.reservation.Status.UNCONFIRMED %}
+                We may need to contact you for more details before your vehicle is confirmed. We will not charge
+                your card until the reservation is confirmed.
+            {% elif reservation.is_reservation and reservation.reservation.status == reservation.reservation.Status.CONFIRMED %}
+                Your vehicle is now secured for the dates you've selected. Your card has not yet been billed.
+            {% elif reservation.is_rental and reservation.rental.status == reservation.rental.Status.CONFIRMED %}
+                Your vehicle is now secured for the dates you've selected. Your card has been billed.
+            {% elif reservation.is_rental and reservation.rental.status == reservation.rental.Status.IN_PROGRESS %}
+                This rental is in progress.
+            {% elif reservation.is_rental and reservation.rental.status == reservation.rental.Status.COMPLETE %}
+                This rental is complete.
             {% endif %}
+        {% else %}
+            We're not quite done, however...
+        {% endif %}
+    </p>
 
-            </p>
+    <div class="confcode-container">
+        <p>Confirmation code:</p>
+        <div class="confcode">{{ basereservation.confirmation_code }}</div>
+    </div>
 
-            <cfoutput query="Reservation">
+    <table class="reservation-details small-item-data">
+        <tr>
+            <td>Vehicle</td>
+            <td>{{ basereservation.vehicle.make }} {{ basereservation.vehicle.model }}</td>
+        </tr>
+        <tr>
+            <td>
+                {% if basereservation.delivery_required %}
+                    PRI Delivers Vehicle:
+                {% else %}
+                    Pick Up at PRI:
+                {% endif %}
+            </td>
+            <td>{{ basereservation.out_at|date:"g:i A D m/d/Y" }}</td>
+        </tr>
+        <tr>
+            <td>
+                {% if basereservation.delivery_required %}
+                    PRI Collects Vehicle:
+                {% else %}
+                    Due Back at PRI:
+                {% endif %}
+            </td>
+            <td>{{ basereservation.back_at|date:"g:i A D m/d/Y" }}</td>
+        </tr>
+        <tr>
+            <td>Number of Days</td>
+            <td>{{ basereservation.num_days }}</td>
+        </tr>
+    </table>
 
-            <div class="confcode-container">
-                <p>Confirmation code:</p>
-                <div class="confcode">{{ basereservation.confirmation_code }}</div>
+    {% if not user.customer.info_is_complete %}
+
+        <form method="POST" name="reservation_form" id="reservation_form" action="{% url "customer_portal:confirm-reservation" confirmation_code=basereservation.confirmation_code %}" autocomplete="on" onsubmit="return false;">
+
+            <div class="reservation-info">
+                <p>
+                    Before you take the keys, we'll need some additional information from you. Specifically, we need
+                    to verify your insurance, and also take a look at your driving record. You can fill out the
+                    required information now, or if you need time to gather it, you can bookmark this site and come
+                    back later.
+                </p>
+
+                <p>
+                    We take the utmost care to preserve your privacy and security. All information you submit is held
+                    in our encrypted data store and is not shared with anyone except the relevant agencies for
+                    verification purposes.
+                </p>
             </div>
 
-            <table class="reservation-details small-item-data">
-                <tr>
-                    <td>Vehicle</td>
-                    <td>{{ basereservation.vehicle.make }} {{ basereservation.vehicle.model }}</td>
-                </tr>
-                <tr>
-                    <td>
-                        {% if basereservation.delivery_required %}
-                        <cfif delivery IS 1>
-                            PRI Delivers Vehicle:
-                        {% else %}
-                        <cfelse>
-                            Pick Up at PRI:
-                        </cfif>
-                        {% endif %}
-                    </td>
-                    <td>{{ basereservation.out_at|date:"g:i A D m/d/Y" }}{# #TimeFormat(dateout, "h:MM tt")# #DateFormat(dateout,"ddd MM/DD/YYYY")# #}</td>
-                </tr>
-                <tr>
-                    <td>
-                        {% if basereservation.delivery_required %}
-                        <cfif delivery IS 1>
-                            PRI Collects Vehicle:
-                        {% else %}
-                        <cfelse>
-                            Due Back at PRI:
-                        </cfif>
-                        {% endif %}
-                    </td>
-                    <td>{{ basereservation.back_at|date:"g:i A D m/d/Y" }}{# #TimeFormat(dateback, "h:MM tt")# #DateFormat(dateback,"ddd MM/DD/YYYY")# #}</td>
-                </tr>
-                <tr>
-                    <td>Number of Days</td>
-                    <td>{{ basereservation.num_days }}</td>
-                </tr>
-            </table>
-            </cfoutput>
+            {% if form.errors %}
+               {% with form_id="customer_form_error" %}
+                    {% include "global_includes/form_errors.html" %}
+                {% endwith %}
+            {% endif %}
 
-            {% comment %}
-            <cfif YourID.firsttime IS 1>
-                <cftry>
-                    <cfset pass_dec = Decrypt(CustFront.password,globalkey,"AES","hex")>
-                    <cfcatch type="Any">
-                        <cfset pass_dec = "">
-                    </cfcatch>
-                </cftry>
-                <cfoutput>
-                <div class="exception alert password-banner">
-                    <p>Your temporary password is: <span class="password">#pass_dec#</span></p>
-                    <p>When you're done here, please change your password using the <b>Change Password</b> option at left.</p>
-                </div>
-                </cfoutput>
-            </cfif>
-            {% endcomment %}
-
-            {% if not user.customer.info_is_complete %}
-            <cfif NOT InfoComplete OR Len(formError) GT 0>
-
-                <form method="POST" name="reservation_form" id="reservation_form" action="{% url "customer_portal:confirm-reservation" confirmation_code=basereservation.confirmation_code %}" autocomplete="on" onsubmit="return false;">
-
-                <div class="reservation-info">
-                    <p>
-                        Before you take the keys, we'll need some additional information from you. Specifically, we need to verify your
-                        insurance, and also take a look at your driving record. You can fill out the required information now, or if you
-                        need time to gather it, you can bookmark this site and come back later.
-                    </p>
-
-                    <p>
-                        We take the utmost care to preserve your privacy and security. All information you submit is held in our encrypted
-                        data store and is not shared with anyone except the relevant agencies for verification purposes.
-                    </p>
-                </div>
-
-                {% if form.errors %}
-                   {% with form_id="customer_form_error" %}
-                        {% include "global_includes/form_errors.html" %}
-                    {% endwith %}
-                {% endif %}
-
-                <cfoutput>
-                <table class="inputform rentalinfo">
+            <table class="inputform rentalinfo">
 
                 <thead>
-                <tr>
-                    <th colspan="2">
-                        <div class="form-section-header">
-                        <h3>Driver Information</h3>
-                        <p>
-                        We'll need the license information of the primary driver in order to run a public-records driving history background check. Please make sure the address info is
-                        correct according to the driver's license. If the primary driver is not you, please update all information accordingly.
-                        </p>
-                        </div>
-                    </h3>
-                </tr>
+                    <tr>
+                        <th colspan="2">
+                            <div class="form-section-header">
+                                <h3>Driver Information</h3>
+                                <p>
+                                    We'll need the license information of the primary driver in order to run a
+                                    public-records driving history background check. Please make sure the address info
+                                    is correct according to the driver's license. If the primary driver is not you,
+                                    please update all information accordingly.
+                                </p>
+                            </div>
+                        </h3>
+                    </tr>
                 </thead>
 
                 <tbody>
+                    <tr>
+                        <td>First Name</td>
+                        <td>
+                            {{ form.first_name }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Last Name</td>
+                        <td>
+                            {{ form.last_name }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Address</td>
+                        <td>
+                            {{ form.address_line_1 }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Address Line 2</td>
+                        <td>
+                            {{ form.address_line_2 }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>City</td>
+                        <td>
+                            {{ form.city }}
+                        </td>
+                    </tr>
+                    <tr>
+                       <td>State</td>
+                       <td>
+                           {{ form.state }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>ZIP</td>
+                        <td>
+                            {{ form.zip }}
+                        </td>
+                    </tr>
 
-                <tr>
-                    <td>First Name</td>
-                    <td>
-                        {{ form.first_name }}
-                        <cfinput name="fname" value="#Customer.fname#" maxlength="255" class="#StructKeyExists(fieldErrors,"fname") ? 'field-error' : ''#" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>Last Name</td>
-                    <td>
-                        {{ form.last_name }}
-                        <cfinput name="lname" value="#Customer.lname#" maxlength="255" class="#StructKeyExists(fieldErrors,"lname") ? 'field-error' : ''#" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>Address</td>
-                    <td>
-                        {{ form.address_line_1 }}
-{#                        <cftextarea name="addr" id="addr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#addr_dec#</cftextarea>#}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Address Line 2</td>
-                    <td>
-                        {{ form.address_line_2 }}
-{#                        <cftextarea name="addr" id="addr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#addr_dec#</cftextarea>#}
-                    </td>
-                </tr>
-                <tr>
-                    <td>City</td>
-                    <td>
-                        {{ form.city }}
-                        <cfinput name="city" value="#Customer.city#" maxlength="255" class="#StructKeyExists(fieldErrors,"city") ? 'field-error' : ''#" />
-                    </td>
-                </tr>
-                <tr>
-                   <td>State</td>
-                   <td>
-                       {{ form.state }}
-                        <cfselect name="state" class="#StructKeyExists(fieldErrors,"state") ? 'field-error' : ''#">
-                            <option value="">(Select state)</option>
-                            <cfloop array="#states#" index="state">
-                                <option value="#state.abbr#" <CFIF Customer.state IS state.abbr>selected</CFIF>>#state.name#</option>
-                            </cfloop>
-                        </cfselect>
-                    </td>
-                </tr>
-                <tr>
-                    <td>ZIP</td>
-                    <td>
-                        {{ form.zip }}
-                        <cfinput name="zip" value="#Customer.zip#" maxlength="10" class="#StructKeyExists(fieldErrors,"zip") ? 'field-error' : ''#" />
-                    </td>
-                </tr>
+                    <tr>
+                        <td>Mobile Phone</td>
+                        <td>
+                            {{ form.mobile_phone }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Home Phone</td>
+                        <td>
+                            {{ form.home_phone }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Work Phone</td>
+                        <td>
+                            {{ form.work_phone }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Fax</td>
+                        <td>
+                            {{ form.fax }}
+                        </td>
+                    </tr>
 
-                <tr>
-                    <td>Mobile Phone</td>
-                    <td>
-                        {{ form.mobile_phone }}
-                        <cfinput name="mphone" value="#Customer.mphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"mphone") ? 'field-error' : ''#" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>Home Phone</td>
-                    <td>
-                        {{ form.home_phone }}
-                        <cfinput name="hphone" value="#Customer.hphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"hphone") ? 'field-error' : ''#" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>Work Phone</td>
-                    <td>
-                        {{ form.work_phone }}
-                        <cfinput name="wphone" value="#Customer.wphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"wphone") ? 'field-error' : ''#" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>Fax</td>
-                    <td>
-                        {{ form.fax }}
-                        <cfinput name="fax" value="#Customer.fax#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"fax") ? 'field-error' : ''#" />
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Date Of Birth</td>
-                    <cftry>
-                        <cfset dob = DateFormat(Customer.dob,"MM/DD/YYYY")>
-                        <cfcatch type="Any">
-                            <cfset dob = "">
-                        </cfcatch>
-                    </cftry>
-                    <td>
-                        {{ form.date_of_birth_date }}
-                        <cfinput name="dob" value="#dob#" class="#StructKeyExists(fieldErrors,"dob") ? 'field-error' : ''#" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>License Number</td>
-                    <td>
-                        {{ form.license_number }}
-                        <cfinput name="licenseno" maxlength="30" value="#Customer.licenseno#" class="#StructKeyExists(fieldErrors,"licenseno") ? 'field-error' : ''#" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>License State</td>
-                    <td>
-                        {{ form.license_state }}
-                        <cfselect name="licensestate" class="#StructKeyExists(fieldErrors,"licensestate") ? 'field-error' : ''#">
-                            <option value="">(Select state)</option>
-                            <cfloop array="#states#" index="state">
-                                <option value="#state.abbr#" <CFIF Customer.licensestate IS state.abbr>selected</CFIF>>#state.name#</option>
-                            </cfloop>
-                        </cfselect>
-                    </td>
-                </tr>
+                    <tr>
+                        <td>Date Of Birth</td>
+                        <td>
+                            {{ form.date_of_birth_date }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>License Number</td>
+                        <td>
+                            {{ form.license_number }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>License State</td>
+                        <td>
+                            {{ form.license_state }}
+                        </td>
+                    </tr>
                 </tbody>
 
                 <thead>
-                <tr>
-                    <th colspan="2">
-                        <div class="form-section-header">
-                        <h3>Insurance</h3>
-                        <p>
-                        We'll need to verify your insurance coverage. As a reminder, we require you to carry at least $100K/300K bodily injury and $100K property damage coverage which will apply to rental vehicles.
-                        </p>
-                        </div>
-                    </th>
-                </tr>
+                    <tr>
+                        <th colspan="2">
+                            <div class="form-section-header">
+                                <h3>Insurance</h3>
+                                <p>
+                                    We'll need to verify your insurance coverage. As a reminder, we require you to carry
+                                    at least $100K/300K bodily injury and $100K property damage coverage which will apply
+                                    to rental vehicles.
+                                </p>
+                            </div>
+                        </th>
+                    </tr>
                 </thead>
 
                 <tbody>
-                <tr>
-                    <td>Insurance Company</td>
-                    <td>
-                        {{ form.insurance_company }}
-                        <cfinput name="insco" size="40" maxlength="250" value="#Customer.insco#" class="#StructKeyExists(fieldErrors,"insco") ? 'field-error' : ''#" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>Insurance Policy Number</td>
-                    <td>
-                        {{ form.insurance_policy_number }}
-                        <cfinput name="inspolnum" maxlength="250" value="#Customer.inspolnum#" class="#StructKeyExists(fieldErrors,"inspolnum") ? 'field-error' : ''#" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>Insurance Co. Telephone</td>
-                    <td>
-                        {{ form.insurance_company_phone }}
-                        <cfinput name="inscotel" type="tel" maxlength="20" value="#Customer.inscotel#" class="phone #StructKeyExists(fieldErrors,"inscotel") ? 'field-error' : ''#" />
-                    </td>
-                </tr>
+                    <tr>
+                        <td>Insurance Company</td>
+                        <td>
+                            {{ form.insurance_company }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Insurance Policy Number</td>
+                        <td>
+                            {{ form.insurance_policy_number }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Insurance Co. Telephone</td>
+                        <td>
+                            {{ form.insurance_company_phone }}
+                        </td>
+                    </tr>
                 </tbody>
 
                 {% if not user.customer.has_primary_card %}
-                <cfif IsDefined("Customer.ccnum") AND (Customer.ccnum IS "" OR Customer.cccvv IS "" OR Customer.cctel IS "")>
 
-                <thead>
-                <tr>
-                    <th colspan="2">
-                        <div class="form-section-header">
-                        <h3>Credit Card</h3>
-                        <p>
-                        We'll need a credit card to secure your reservation. We charge 50% of the rental amount as a deposit, and the remainder is due at the time you receive the vehicle.
-                        </p>
-                        </div>
-                    </th>
-                </tr>
-                </thead>
+                    <thead>
+                        <tr>
+                            <th colspan="2">
+                                <div class="form-section-header">
+                                    <h3>Credit Card</h3>
+                                    <p>
+                                        We'll need a credit card to secure your reservation. We charge 50% of the rental
+                                        amount as a deposit, and the remainder is due at the time you receive the vehicle.
+                                    </p>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
 
-                <tbody>
-                <tr>
-                    <td>Primary Credit Card Number</td>
-                    <td>
-                        {{ form.cc_number }}
-                        <cfinput name="ccnum" maxlength="30" value="#ccnum_dec#" class="cc-field #StructKeyExists(fieldErrors,"ccnum") ? 'field-error' : ''#" autocomplete="cc-number" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>Expiration</td>
-                    <td>
-                        {{ form.cc_exp_mo }} / {{ form.cc_exp_yr }}
-                        {% comment %}
-                        <cfselect name="ccexpmo" class="#StructKeyExists(fieldErrors,"ccexpmo") ? 'field-error' : ''#">
-                            <option value="01" <cfif Customer.ccexpmo IS "01">selected</cfif>>January (01)</option>
-                            <option value="02" <cfif Customer.ccexpmo IS "02">selected</cfif>>February (02)</option>
-                            <option value="03" <cfif Customer.ccexpmo IS "03">selected</cfif>>March (03)</option>
-                            <option value="04" <cfif Customer.ccexpmo IS "04">selected</cfif>>April (04)</option>
-                            <option value="05" <cfif Customer.ccexpmo IS "05">selected</cfif>>May (05)</option>
-                            <option value="06" <cfif Customer.ccexpmo IS "06">selected</cfif>>June (06)</option>
-                            <option value="07" <cfif Customer.ccexpmo IS "07">selected</cfif>>July (07)</option>
-                            <option value="08" <cfif Customer.ccexpmo IS "08">selected</cfif>>August (08)</option>
-                            <option value="09" <cfif Customer.ccexpmo IS "09">selected</cfif>>September (09)</option>
-                            <option value="10" <cfif Customer.ccexpmo IS "10">selected</cfif>>October (10)</option>
-                            <option value="11" <cfif Customer.ccexpmo IS "11">selected</cfif>>November (11)</option>
-                            <option value="12" <cfif Customer.ccexpmo IS "12">selected</cfif>>December (12)</option>
-                        </cfselect> /
+                    <tbody>
+                        <tr>
+                            <td>Primary Credit Card Number</td>
+                            <td>
+                                {{ form.cc_number }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Expiration</td>
+                            <td>
+                                {{ form.cc_exp_mo }} / {{ form.cc_exp_yr }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Security Code (CVV)</td>
+                            <td>
+                                {{ form.cc_cvv }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Bank Telephone</td>
+                            <td>
+                                {{ form.cc_phone }}
+                                <span class="inline-text ui-icon ui-icon-info tooltip" title="{{ form.cc_phone.help_text }}"></span>
+                            </td>
+                        </tr>
+                    </tbody>
 
-                        <cfset tyear = #Dateformat(Now(),"yyyy")#>
-                        <cfset fyear = tyear+15>
-                        <cfset ynow=#LSDateFormat(Now(),"yyyy")#>
-                        <cfset ythen=(#ynow# + 11)>
-                        <cfset mnow=#LSDateFormat(Now(),"mm")#>
-                        <cfset dyear=ynow>
-                        <cfselect name="ccexpyr" class="#StructKeyExists(fieldErrors,"ccexpyr") ? 'field-error' : ''#">
-                            <cfoutput>
-                            <cfloop index="year" from="#ynow#" to="#ythen#">
-                                <option value="#dyear#" <cfif Customer.ccexpyr IS dyear>selected</cfif>>#dyear#</option>
-                                <cfset dyear = dyear + 1>
-                            </cfloop>
-                            </cfoutput>
-                        </cfselect>
-                        {% endcomment %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Security Code (CVV)</td>
-                    <td>
-                        {{ form.cc_cvv }}
-                        <cfinput name="cccvv" maxlength="5" value="#Customer.cccvv#" class="#StructKeyExists(fieldErrors,"cccvv") ? 'field-error' : ''#" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>Bank Telephone</td>
-                    <td>
-                        {{ form.cc_phone }}
-                        <cfinput name="cctel" maxlength="20" value="#Customer.cctel#" class="phone #StructKeyExists(fieldErrors,"cctel") ? 'field-error' : ''#" />
-                        <span class="inline-text ui-icon ui-icon-info tooltip" title="We need the customer service contact phone number shown on the back of your card so that we can verify the card if necessary, and to refund the security deposit after the rental is over."></span>
-                    </td>
-                </tr>
-                </tbody>
-
-                </cfif>
                 {% endif %}
 
                 <thead>
-                <tr>
-                    <th colspan="2">
-                        <div class="form-section-header">
-                        <h3>Secondary Credit Card (optional)</h3>
-                        <p>
-                        We require a refundable security deposit for our vehicles. You might wish to put it on a different credit card from the one you used to make the reservation. If so,
-                        enter the info and tell us how you'd like us to use it. Otherwise we'll use the primary card for the security deposit as well.
-                        </p>
-                        </div>
-                    </th>
-                </tr>
+                    <tr>
+                        <th colspan="2">
+                            <div class="form-section-header">
+                                <h3>Secondary Credit Card (optional)</h3>
+                                <p>
+                                    We require a refundable security deposit for our vehicles. You might wish to put
+                                    it on a different credit card from the one you used to make the reservation. If so,
+                                    enter the info and tell us how you'd like us to use it. Otherwise we'll use the
+                                    primary card for the security deposit as well.
+                                </p>
+                            </div>
+                        </th>
+                    </tr>
                 </thead>
 
                 <tbody>
-                <tr>
-                    <td>Secondary Credit Card Number</td>
-                    <td>
-                        {{ form.cc2_number }}
-                        <cfinput name="cc2num" maxlength="30" value="#formatCCNumber(cc2num_dec)#" class="cc-field #StructKeyExists(fieldErrors,"cc2num") ? 'field-error' : ''#" autocomplete="cc-number" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>Expiration</td>
-                    <td>
-                        {{ form.cc2_exp_mo }} / {{ form.cc2_exp_yr }}
-                        {% comment %}
-                        <cfselect name="cc2expmo" class="#StructKeyExists(fieldErrors,"cc2expmo") ? 'field-error' : ''#">
-                            <option value="01" <cfif Customer.cc2expmo IS "01">selected</cfif>>January (01)</option>
-                            <option value="02" <cfif Customer.cc2expmo IS "02">selected</cfif>>February (02)</option>
-                            <option value="03" <cfif Customer.cc2expmo IS "03">selected</cfif>>March (03)</option>
-                            <option value="04" <cfif Customer.cc2expmo IS "04">selected</cfif>>April (04)</option>
-                            <option value="05" <cfif Customer.cc2expmo IS "05">selected</cfif>>May (05)</option>
-                            <option value="06" <cfif Customer.cc2expmo IS "06">selected</cfif>>June (06)</option>
-                            <option value="07" <cfif Customer.cc2expmo IS "07">selected</cfif>>July (07)</option>
-                            <option value="08" <cfif Customer.cc2expmo IS "08">selected</cfif>>August (08)</option>
-                            <option value="09" <cfif Customer.cc2expmo IS "09">selected</cfif>>September (09)</option>
-                            <option value="10" <cfif Customer.cc2expmo IS "10">selected</cfif>>October (10)</option>
-                            <option value="11" <cfif Customer.cc2expmo IS "11">selected</cfif>>November (11)</option>
-                            <option value="12" <cfif Customer.cc2expmo IS "12">selected</cfif>>December (12)</option>
-                        </cfselect> /
-
-                        <cfset tyear = #Dateformat(Now(),"yyyy")#>
-                        <cfset fyear = tyear+15>
-                        <cfset ynow=#LSDateFormat(Now(),"yyyy")#>
-                        <cfset ythen=(#ynow# + 11)>
-                        <cfset mnow=#LSDateFormat(Now(),"mm")#>
-                        <cfset dyear=ynow>
-                        <cfselect name="cc2expyr" class="#StructKeyExists(fieldErrors,"cc2expyr") ? 'field-error' : ''#">
-                            <cfoutput>
-                            <cfloop index="year" from="#ynow#" to="#ythen#">
-                                <option value="#dyear#" <cfif Customer.cc2expyr IS dyear>selected</cfif>>#dyear#</option>
-                                <cfset dyear = dyear + 1>
-                            </cfloop>
-                            </cfoutput>
-                        </cfselect>
-                        {% endcomment %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Security Code (CVV)</td>
-                    <td>
-                        {{ form.cc2_cvv }}
-                        <cfinput name="cc2cvv" maxlength="5" value="#Customer.cc2cvv#" class="#StructKeyExists(fieldErrors,"cc2cvv") ? 'field-error' : ''#" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>Bank Telephone</td>
-                    <td>
-                        {{ form.cc2_phone }}
-                        <cfinput name="cc2tel" maxlength="20" value="#Customer.cc2tel#" class="phone #StructKeyExists(fieldErrors,"cc2tel") ? 'field-error' : ''#" />
-                        <span class="inline-text ui-icon ui-icon-info tooltip" title="We need the customer service contact phone number shown on the back of your card so that we can verify the card if necessary, and to refund the security deposit after the rental is over."></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="align-top">
-                        Secondary Card Instructions<br />
-                        <p class="small">Want to use the secondary card for the security deposit? Split the rental amount across the two cards? Let us know!</p>
-                    </td>
-                    <td>
-                        {{ form.cc2_instructions }}
-                        <cftextarea name="cc2notes" class="#StructKeyExists(fieldErrors,"cc2notes") ? 'field-error' : ''#"></cftextarea>
-                    </td>
-                </tr>
+                    <tr>
+                        <td>Secondary Credit Card Number</td>
+                        <td>
+                            {{ form.cc2_number }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Expiration</td>
+                        <td>
+                            {{ form.cc2_exp_mo }} / {{ form.cc2_exp_yr }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Security Code (CVV)</td>
+                        <td>
+                            {{ form.cc2_cvv }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Bank Telephone</td>
+                        <td>
+                            {{ form.cc2_phone }}
+                            <span class="inline-text ui-icon ui-icon-info tooltip" title="{{ form.cc2_phone.help_text }}"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="align-top">
+                            Secondary Card Instructions<br />
+                            <p class="small">Want to use the secondary card for the security deposit? Split the rental amount across the two cards? Let us know!</p>
+                        </td>
+                        <td>
+                            {{ form.cc2_instructions }}
+                        </td>
+                    </tr>
                 </tbody>
 
                 <thead>
-                <tr>
-                    <th colspan="2">
-                        <div class="form-section-header">
-                        <h3>Music Preference (optional)</h3>
-                        <p>
-                        If you like, we can pre-load a car with your favorite music!
-                        </p>
-                        </div>
-                    </th>
-                </tr>
+                    <tr>
+                        <th colspan="2">
+                            <div class="form-section-header">
+                            <h3>Music Preference (optional)</h3>
+                                <p>
+                                    If you like, we can pre-load a car with your favorite music!
+                                </p>
+                            </div>
+                        </th>
+                    </tr>
                 </thead>
 
                 <tbody>
-                <tr>
-                    <td>Favorite Genre</td>
-                    <td>
-                        {{ form.music_genre }}
-                        <cfselect name="musicgenre" class="#StructKeyExists(fieldErrors,"musicgenre") ? 'field-error' : ''#">
-                            <option value="0" <cfif Customer.musicgenre IS 0>selected</cfif>>None</option>
-                            <option value="1" <cfif Customer.musicgenre IS 1>selected</cfif>>50's</option>
-                            <option value="2" <cfif Customer.musicgenre IS 2>selected</cfif>>60's</option>
-                            <option value="3" <cfif Customer.musicgenre IS 3>selected</cfif>>70's</option>
-                            <option value="4" <cfif Customer.musicgenre IS 4>selected</cfif>>80's</option>
-                            <option value="5" <cfif Customer.musicgenre IS 5>selected</cfif>>90's</option>
-                            <option value="6" <cfif Customer.musicgenre IS 6>selected</cfif>>Alternative</option>
-                            <option value="7" <cfif Customer.musicgenre IS 7>selected</cfif>>Big Band / Swing</option>
-                            <option value="8" <cfif Customer.musicgenre IS 8>selected</cfif>>Classical</option>
-                            <option value="9" <cfif Customer.musicgenre IS 9>selected</cfif>>Country</option>
-                            <option value="10" <cfif Customer.musicgenre IS 10>selected</cfif>>Dance</option>
-                            <option value="11" <cfif Customer.musicgenre IS 11>selected</cfif>>Electronic</option>
-                            <option value="12" <cfif Customer.musicgenre IS 12>selected</cfif>>Everything!</option>
-                            <option value="13" <cfif Customer.musicgenre IS 13>selected</cfif>>Heavy Metal</option>
-                            <option value="14" <cfif Customer.musicgenre IS 14>selected</cfif>>Instrumental</option>
-                            <option value="15" <cfif Customer.musicgenre IS 15>selected</cfif>>Jazz</option>
-                            <option value="16" <cfif Customer.musicgenre IS 16>selected</cfif>>Mellow</option>
-                            <option value="17" <cfif Customer.musicgenre IS 17>selected</cfif>>Musicals/Broadway</option>
-                            <option value="18" <cfif Customer.musicgenre IS 18>selected</cfif>>Pop</option>
-                            <option value="19" <cfif Customer.musicgenre IS 19>selected</cfif>>Punk</option>
-                            <option value="20" <cfif Customer.musicgenre IS 20>selected</cfif>>Rap</option>
-                            <option value="21" <cfif Customer.musicgenre IS 21>selected</cfif>>R&B</option>
-                            <option value="22" <cfif Customer.musicgenre IS 22>selected</cfif>>Reggae</option>
-                            <option value="23" <cfif Customer.musicgenre IS 23>selected</cfif>>Rock</option>
-                            <option value="24" <cfif Customer.musicgenre IS 24>selected</cfif>>Soul</option>
-                            <option value="25" <cfif Customer.musicgenre IS 25>selected</cfif>>Soundtracks</option>
-                            <option value="26" <cfif Customer.musicgenre IS 26>selected</cfif>>Top 40</option>
-                            <option value="27" <cfif Customer.musicgenre IS 27>selected</cfif>>World</option>
-                        </cfselect>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Favorite Artist / Composer</td>
-                    <td>
-                        {{ form.music_favorite }}
-                        <cfinput name="musicfav" maxlength="250" value="#Customer.musicfav#" class="#StructKeyExists(fieldErrors,"musicfav") ? 'field-error' : ''#" />
-                    </td>
-                </tr>
+                    <tr>
+                        <td>Favorite Genre</td>
+                        <td>
+                            {{ form.music_genre }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Favorite Artist / Composer</td>
+                        <td>
+                            {{ form.music_favorite }}
+                        </td>
+                    </tr>
 
-                <tr class="buttons">
-                    <td></td>
-                    <td>
-                        <button type="submit" class="btn reserve-submit-info-btn">Submit</button>
-                        <div class="spinner next-form-spinner rentalinfo-spinner"></div>
-                    </td>
-                </tr>
+                    <tr class="buttons">
+                        <td></td>
+                        <td>
+                            <button type="submit" class="btn reserve-submit-info-btn">Submit</button>
+                            <div class="spinner next-form-spinner rentalinfo-spinner"></div>
+                        </td>
+                    </tr>
                 </tbody>
 
-                </table>
-                </cfoutput>
+            </table>
 
-                {{ form.confirmation_code }}
-                {% csrf_token %}
+            {{ form.confirmation_code }}
+            {% csrf_token %}
+        </form>
 
-                <cfinput name="method" type="hidden" value="updateReservationCustomerInfo" />
-                <cfinput name="confcode" type="hidden" value="#confcode#" />
-                <cfinput name="reservation_type" type="hidden" value="rental" />
-                <cfinput name="reservationid" type="hidden" value="#Reservation.reservationid#" />
-                <cfinput name="rentalid" type="hidden" value="#Reservation.rentalid#" />
-                </form>
+    {% else %}
 
-            {% else %}
-            <cfelse>
+        <form method="POST" name="reservation_form" id="reservation_form" action="{% url "customer_portal:confirm-reservation" confirmation_code=basereservation.confirmation_code %}" autocomplete="on">
 
-                <form method="POST" name="reservation_form" id="reservation_form" action="{% url "customer_portal:confirm-reservation" confirmation_code=basereservation.confirmation_code %}" autocomplete="on">
-
-                <cfoutput query="Reservation">
-                <table class="inputform rentalinfo">
+            <table class="inputform rentalinfo">
 
                 <thead>
-                <tr>
-                    <th colspan="2">
-                        <div class="form-section-header">
-                        <h3>Reservation Notes</h3>
-                        <p>
-                        Please let us know if you've got any special requests or notes. Delivery locations/times, payment instructions, planning for
-                        special events&mdash;tell us what you need!
-                        </p>
-                        </div>
-                    </h3>
-                </tr>
+                    <tr>
+                        <th colspan="2">
+                            <div class="form-section-header">
+                                <h3>Reservation Notes</h3>
+                                <p>
+                                    Please let us know if you've got any special requests or notes. Delivery
+                                    locations/times, payment instructions, planning for special events&mdash;tell us what
+                                    you need!
+                                </p>
+                            </div>
+                        </h3>
+                    </tr>
                 </thead>
 
                 <tbody>
-                <tr>
-                    <td class="align-top">Notes/Requests</td>
-                    <td>
-                        {{ form.customer_notes }}
-                        <cftextarea name="notes" id="notes" class="#StructKeyExists(fieldErrors,"notes") ? 'field-error' : ''#">#notes#</cftextarea>
-                    </td>
-                </tr>
+                    <tr>
+                        <td class="align-top">Notes/Requests</td>
+                        <td>
+                            {{ form.customer_notes }}
+                        </td>
+                    </tr>
 
-                <tr class="buttons">
-                    <td></td>
-                    <td>
-                        <button type="submit" class="btn">Update</button>
-                        <div class="spinner next-form-spinner rentalinfo-spinner"></div>
-                    </td>
-                </tr>
+                    <tr class="buttons">
+                        <td></td>
+                        <td>
+                            <button type="submit" class="btn">Update</button>
+                            <div class="spinner next-form-spinner rentalinfo-spinner"></div>
+                        </td>
+                    </tr>
                 </tbody>
 
-                </table>
-                </cfoutput>
+            </table>
 
-                {% csrf_token %}
-                <cfinput name="method" type="hidden" value="updateReservationNotes" />
-                <cfinput name="confcode" type="hidden" value="#confcode#" />
-                <cfinput name="reservation_type" type="hidden" value="rental" />
-                <cfinput name="reservationid" type="hidden" value="#Reservation.reservationid#" />
-                <cfinput name="rentalid" type="hidden" value="#Reservation.rentalid#" />
-                </form>
+            {% csrf_token %}
+        </form>
 
-            </cfif>
-            {% endif %}
+    {% endif %}
 
-            {% comment %}
-            <cfcatch type="Any">
-                <cfoutput>
-                <div class="exception">
-                    <h3>An error occurred</h3>
-                    <p class="alert-message">#cfcatch.message & " " & cfcatch.detail#</p>
-                </div>
-                </cfoutput>
-            </cfcatch>
-            {% endcomment %}
-        </cftry>
-        {% endblock %}
-    </div>
-
-    <div class="push"></div>
-    </div>
-
-    <CFINCLUDE TEMPLATE="inc_footer.cfm">
-
-</td>
-</tr>
-</table>
-
-
-</body>
-</html>
-
-
+{% endblock %}

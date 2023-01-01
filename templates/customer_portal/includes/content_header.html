@@ -1,24 +1,19 @@
-<header class='l-header'>
+<header class="l-header">
 
-<section class="upper">
-    <div class="l-container">
-        <div class="banner right">
-            <p class="highlight" style="font-size: 22px;">Sports car rentals for the automotive enthusiast</p>
-            <p>Serving the NYC area and beyond</p>
+    <section class="upper">
+        <div class="l-container">
+            <div class="banner right">
+                <p class="highlight" style="font-size: 22px;">Sports car rentals for the automotive enthusiast</p>
+                <p>Serving the NYC area and beyond</p>
+            </div>
+            <div class="banner left">
+                {% if user.is_authenticated %}
+                    <p>PRI Customer Portal - <span class="your-name">{{ user.customer.full_name }}</span></p>
+                {% else %}
+                    <p>PRI Customer Portal</p>
+                {% endif %}
+            </div>
         </div>
-        <div class="banner left">
-            <cfoutput>
-            {% if user.is_authenticated %}
-            <cfif IsValidUser>
-                <p>PRI Customer Portal - <span class="your-name">{{ user.customer.full_name }}</span></p>
-            {% else %}
-            <cfelse>
-                <p>PRI Customer Portal</p>
-            </cfif>
-            {% endif %}
-            </cfoutput>
-        </div>
-    </div>
-</section>
+    </section>
 
 </header>

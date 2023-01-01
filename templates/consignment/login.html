@@ -1,54 +1,55 @@
 {% extends "consignment/base.html" %}
 
-    {% block page_title %}Customer Login{% endblock %}
+{% block page_title %}Customer Login{% endblock %}
 
-    {% block content %}
-        <div id="content" class="loginwrap">
-            <div class="logincontent">
+{% block content %}
 
-            {% if form.errors %}
-                <div class="loginerror">
-                    <h3>ACCESS DENIED</h3>
-                    {% for field, error in form.errors.items %}
-                        <p>{{ error }}</p>
-                    {% endfor %}
-                </div>
-            {% endif %}
+    <div id="content" class="loginwrap">
+        <div class="logincontent">
 
-            <form method="post" action="{% url "consignment:login" %}">
-                <table class="inputform">
-                    <tr>
-                        <td>Email</td>
-                        <td>
-                            {{ form.username }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Password</td>
-                        <td>
-                            {{ form.password }}
-                            <small class="forgot-password dialog-trigger">Forgot?</small>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td><button type="submit" class="btn">Log In</button></td>
-                    </tr>
-                </table>
-                {% csrf_token %}
-                <input type="hidden" name="next" value="{{ next }}" />
-            </form>
-
+        {% if form.errors %}
+            <div class="loginerror">
+                <h3>ACCESS DENIED</h3>
+                {% for field, error in form.errors.items %}
+                    <p>{{ error }}</p>
+                {% endfor %}
             </div>
-        </div>
+        {% endif %}
 
-        <div class="dialog" id="dialog_reset_password" title="Reset Password">
-            <p>Please enter your email address and we will send you a link to click on to receive your new password.</p>
-            <input type="email" id="password_reset_email" placeholder="email" />
-        </div>
+        <form method="post" action="{% url "consignment:login" %}">
+            <table class="inputform">
+                <tr>
+                    <td>Email</td>
+                    <td>
+                        {{ form.username }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Password</td>
+                    <td>
+                        {{ form.password }}
+                        <small class="forgot-password dialog-trigger">Forgot?</small>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><button type="submit" class="btn">Log In</button></td>
+                </tr>
+            </table>
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}" />
+        </form>
 
-        <div class="dialog" id="dialog_reset_password_done" title="Reset Password">
-            <p>An email has been sent to you containing a link to follow to receive your new password.</p>
         </div>
+    </div>
+
+    <div class="dialog" id="dialog_reset_password" title="Reset Password">
+        <p>Please enter your email address and we will send you a link to click on to receive your new password.</p>
+        <input type="email" id="password_reset_email" placeholder="email" />
+    </div>
+
+    <div class="dialog" id="dialog_reset_password_done" title="Reset Password">
+        <p>An email has been sent to you containing a link to follow to receive your new password.</p>
+    </div>
 
 {% endblock %}

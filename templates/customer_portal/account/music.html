@@ -5,68 +5,32 @@
 {% block subpage_pane %}
     <div class="form-page" page="music">
 
-    <form method="POST" name="account_form" action="{% url "customer_portal:account-music" %}" autocomplete="on">
+        <form method="POST" name="account_form" action="{% url "customer_portal:account-music" %}" autocomplete="on">
 
-        <cfoutput>
-        <table class="inputform rentalinfo">
+            <table class="inputform rentalinfo">
 
-        <tr>
-            <td>Favorite Genre</td>
-            <td>
-                {{ form.music_genre }}
-                <cfselect name="musicgenre" class="#StructKeyExists(fieldErrors,"musicgenre") ? 'field-error' : ''#">
-                    <option value="0" <cfif Customer.musicgenre IS 0>selected</cfif>>None</option>
-                    <option value="1" <cfif Customer.musicgenre IS 1>selected</cfif>>50's</option>
-                    <option value="2" <cfif Customer.musicgenre IS 2>selected</cfif>>60's</option>
-                    <option value="3" <cfif Customer.musicgenre IS 3>selected</cfif>>70's</option>
-                    <option value="4" <cfif Customer.musicgenre IS 4>selected</cfif>>80's</option>
-                    <option value="5" <cfif Customer.musicgenre IS 5>selected</cfif>>90's</option>
-                    <option value="6" <cfif Customer.musicgenre IS 6>selected</cfif>>Alternative</option>
-                    <option value="7" <cfif Customer.musicgenre IS 7>selected</cfif>>Big Band / Swing</option>
-                    <option value="8" <cfif Customer.musicgenre IS 8>selected</cfif>>Classical</option>
-                    <option value="9" <cfif Customer.musicgenre IS 9>selected</cfif>>Country</option>
-                    <option value="10" <cfif Customer.musicgenre IS 10>selected</cfif>>Dance</option>
-                    <option value="11" <cfif Customer.musicgenre IS 11>selected</cfif>>Electronic</option>
-                    <option value="12" <cfif Customer.musicgenre IS 12>selected</cfif>>Everything!</option>
-                    <option value="13" <cfif Customer.musicgenre IS 13>selected</cfif>>Heavy Metal</option>
-                    <option value="14" <cfif Customer.musicgenre IS 14>selected</cfif>>Instrumental</option>
-                    <option value="15" <cfif Customer.musicgenre IS 15>selected</cfif>>Jazz</option>
-                    <option value="16" <cfif Customer.musicgenre IS 16>selected</cfif>>Mellow</option>
-                    <option value="17" <cfif Customer.musicgenre IS 17>selected</cfif>>Musicals/Broadway</option>
-                    <option value="18" <cfif Customer.musicgenre IS 18>selected</cfif>>Pop</option>
-                    <option value="19" <cfif Customer.musicgenre IS 19>selected</cfif>>Punk</option>
-                    <option value="20" <cfif Customer.musicgenre IS 20>selected</cfif>>Rap</option>
-                    <option value="21" <cfif Customer.musicgenre IS 21>selected</cfif>>R&B</option>
-                    <option value="22" <cfif Customer.musicgenre IS 22>selected</cfif>>Reggae</option>
-                    <option value="23" <cfif Customer.musicgenre IS 23>selected</cfif>>Rock</option>
-                    <option value="24" <cfif Customer.musicgenre IS 24>selected</cfif>>Soul</option>
-                    <option value="25" <cfif Customer.musicgenre IS 25>selected</cfif>>Soundtracks</option>
-                    <option value="26" <cfif Customer.musicgenre IS 26>selected</cfif>>Top 40</option>
-                    <option value="27" <cfif Customer.musicgenre IS 27>selected</cfif>>World</option>
-                </cfselect>
-            </td>
-        </tr>
-        <tr>
-            <td>Favorite Artist / Composer</td>
-            <td>
-                {{ form.music_favorite }}
-                <cfinput name="musicfav" maxlength="250" value="#Customer.musicfav#" class="#StructKeyExists(fieldErrors,"musicfav") ? 'field-error' : ''#" />
-            </td>
-        </tr>
+                <tr>
+                    <td>Favorite Genre</td>
+                    <td>
+                        {{ form.music_genre }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Favorite Artist / Composer</td>
+                    <td>
+                        {{ form.music_favorite }}
+                    </td>
+                </tr>
 
-        <tr class="buttons">
-            <td></td>
-            <td><button type="submit" class="btn">Submit</button></td>
-        </tr>
-        </tbody>
+                <tr class="buttons">
+                    <td></td>
+                    <td><button type="submit" class="btn">Submit</button></td>
+                </tr>
 
-        </table>
-        </cfoutput>
+            </table>
 
-    {% csrf_token %}
-    <cfinput name="page" type="hidden" value="#page#" />
-    <cfinput name="method" type="hidden" value="updateMusicPrefs" />
-    </form>
+            {% csrf_token %}
+        </form>
 
-</div>
+    </div>
 {% endblock %}

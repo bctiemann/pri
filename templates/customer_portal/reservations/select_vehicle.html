@@ -5,32 +5,24 @@
 
 {% block subpage_pane %}
 
-    {% comment %}
-    <cfquery name="Cars" datasource="#DSN#">
-        SELECT vehicleid,make,model FROM Vehicles
-        WHERE status = 1
-        AND type = 1
-        ORDER BY weighting DESC
-    </cfquery>
-
-    <cfquery name="Bikes" datasource="#DSN#">
-        SELECT vehicleid,make,model FROM Vehicles
-        WHERE status = 1
-        AND type = 2
-        ORDER BY weighting DESC
-    </cfquery>
-    {% endcomment %}
-
     {% if bikes_enabled %}
         <div class="vehicle-picker-column right">
-        {% for vehicle in bikes %}
-        <cfoutput query="Bikes">
-            {% comment %}
-            <cfquery name="BikesFront" datasource="#FDSN#">
-                SELECT price FROM VehiclesFront
-                WHERE vehicleid = <CFQUERYPARAM value="#vehicleid#" CFSQLType="CF_SQL_INTEGER">
-            </cfquery>
-            {% endcomment %}
+            {% for vehicle in bikes %}
+                <a href="{% url "customer_portal:make-reservation" slug=vehicle.slug %}">
+                    <div class="vehicle-picker-pick reservation-picker" vehicleid="#vehicleid#">
+                        <div class="section-header">${{ vehicle.price_per_day|floatformat:0|intcomma }} / day</div>
+                        {% if vehicle.thumbnail_image %}
+                            <img src="{{ vehicle.thumbnail_image.url }}" />
+                        {% endif %}
+                        <span class="caption">{{ vehicle.make }} {{ vehicle.model }}</span>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="vehicle-picker-column">
+        {% for vehicle in cars %}
             <a href="{% url "customer_portal:make-reservation" slug=vehicle.slug %}">
                 <div class="vehicle-picker-pick reservation-picker" vehicleid="#vehicleid#">
                     <div class="section-header">${{ vehicle.price_per_day|floatformat:0|intcomma }} / day</div>
@@ -40,31 +32,7 @@
                     <span class="caption">{{ vehicle.make }} {{ vehicle.model }}</span>
                 </div>
             </a>
-        </cfoutput>
         {% endfor %}
-        </div>
-    {% endif %}
-
-    <div class="vehicle-picker-column">
-    {% for vehicle in cars %}
-    <cfoutput query="Cars">
-        {% comment %}
-        <cfquery name="CarsFront" datasource="#FDSN#">
-            SELECT price FROM VehiclesFront
-            WHERE vehicleid = <CFQUERYPARAM value="#vehicleid#" CFSQLType="CF_SQL_INTEGER">
-        </cfquery>
-        {% endcomment %}
-        <a href="{% url "customer_portal:make-reservation" slug=vehicle.slug %}">
-            <div class="vehicle-picker-pick reservation-picker" vehicleid="#vehicleid#">
-                <div class="section-header">${{ vehicle.price_per_day|floatformat:0|intcomma }} / day</div>
-                {% if vehicle.thumbnail_image %}
-                    <img src="{{ vehicle.thumbnail_image.url }}" />
-                {% endif %}
-                <span class="caption">{{ vehicle.make }} {{ vehicle.model }}</span>
-            </div>
-        </a>
-    </cfoutput>
-    {% endfor %}
     </div>
 
 {% endblock %}

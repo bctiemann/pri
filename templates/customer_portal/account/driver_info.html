@@ -7,164 +7,120 @@
 
         <form method="POST" name="account_form" action="{% url "customer_portal:account-driver-info" %}" autocomplete="on">
 
-            <cfoutput>
             <table class="inputform rentalinfo">
 
-            <tr>
-            <td>Name</td>
-                <td>
-                    {{ user.customer.full_name }}
-                    <cfinput name="fname" type="hidden" value="#Customer.fname#" />
-                    <cfinput name="lname" type="hidden" value="#Customer.lname#" />
-                </td>
-            </tr>
-            <tr>
-                <td>Email</td>
-                <td>
-                    {{ user.email }}
-                    <cfinput name="email" type="hidden" value="#Customer.email#" />
-                </td>
-            </tr>
-
-            <tr>
-                <td>Date Of Birth</td>
-                <cftry>
-                    <cfset dob = DateFormat(Customer.dob,"MM/DD/YYYY")>
-                    <cfcatch type="Any">
-                        <cfset dob = "">
-                    </cfcatch>
-                </cftry>
-                {% if user.customer.date_of_birth %}
-                <cfif dob IS "">
+                <tr>
+                    <td>Name</td>
                     <td>
-                        {{ user.customer.date_of_birth|date:"m/d/Y" }}
-                        <cfinput name="dob" type="hidden" value="#Customer.dob#" />
+                        {{ user.customer.full_name }}
                     </td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td>
+                        {{ user.email }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Date Of Birth</td>
+                    {% if user.customer.date_of_birth %}
+                        <td>
+                            {{ user.customer.date_of_birth|date:"m/d/Y" }}
+                        </td>
+                    {% else %}
+                        <td>
+                            {{ form.date_of_birth }}
+                        </td>
+                    {% endif %}
+                </tr>
+
+                {% if user.customer.license_number and user.customer.license_state %}
+                    <tr>
+                        <td>License Number</td>
+                        <td>
+                            {{ user.customer.license_number }} ({{ user.customer.license_state }})
+                        </td>
+                    </tr>
                 {% else %}
-                <cfelse>
-                    <td>
-                        {{ form.date_of_birth }}
-                        <cfinput name="dob" value="#dob#" class="#StructKeyExists(fieldErrors,"dob") ? 'field-error' : ''#" placeholder="MM/DD/YYYY" />
-                    </td>
-                </cfif>
+                    <tr>
+                        <td>License Number</td>
+                        <td>
+                            {{ form.license_number }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>License State</td>
+                        <td>
+                            {{ form.license_state }}
+                        </td>
+                    </tr>
                 {% endif %}
-            </tr>
 
-            {% if user.customer.license_number and user.customer.license_state %}
-            <cfif Customer.licenseno IS "">
-            <tr>
-                <td>License Number</td>
-                <td>
-                    {{ user.customer.license_number }} ({{ user.customer.license_state }})
-                    <cfinput name="licenseno" type="hidden" value="#Customer.licenseno#" />
-                    <cfinput name="licensestate" type="hidden" value="#Customer.licensestate#" />
-                </td>
-            </tr>
-            {% else %}
-            <cfelse>
-            <tr>
-                <td>License Number</td>
-                <td>
-                    {{ form.license_number }}
-                    <cfinput name="licenseno" maxlength="30" value="#Customer.licenseno#" class="#StructKeyExists(fieldErrors,"licenseno") ? 'field-error' : ''#" />
-                </td>
-            </tr>
-            <tr>
-                <td>License State</td>
-                <td>
-                    {{ form.license_state }}
-                    <cfselect name="licensestate" class="#StructKeyExists(fieldErrors,"licensestate") ? 'field-error' : ''#">
-                        <option value="">(Select state)</option>
-                        <cfloop array="#states#" index="state">
-                            <option value="#state.abbr#" <CFIF Customer.licensestate IS state.abbr>selected</CFIF>>#state.name#</option>
-                        </cfloop>
-                    </cfselect>
-                </td>
-            </tr>
-            </cfif>
-            {% endif %}
+                <tr>
+                    <td>Address</td>
+                    <td>
+                        {{ form.address_line_1 }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Address Line 2</td>
+                    <td>
+                        {{ form.address_line_2 }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>City</td>
+                    <td>
+                        {{ form.city }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>State</td>
+                    <td>
+                        {{ form.state }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>ZIP</td>
+                    <td class="{% if form.zip.errors %}field-error{% endif %}">
+                        {{ form.zip }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Mobile Phone</td>
+                    <td class="{% if form.mobile_phone.errors %}field-error{% endif %}">
+                        {{ form.mobile_phone }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Home Phone</td>
+                    <td class="{% if form.home_phone.errors %}field-error{% endif %}">
+                        {{ form.home_phone }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Work Phone</td>
+                    <td class="{% if form.work_phone.errors %}field-error{% endif %}">
+                        {{ form.work_phone }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Fax</td>
+                    <td>
+                        {{ form.fax }}
+                    </td>
+                </tr>
 
-            <tr>
-                <td>Address</td>
-                <td>
-                    {{ form.address_line_1 }}
-{#                    <cftextarea name="addr" id="addr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#addr_dec#</cftextarea>#}
-                </td>
-            </tr>
-            <tr>
-                <td>Address Line 2</td>
-                <td>
-                    {{ form.address_line_2 }}
-{#                    <cftextarea name="addr" id="addr" style="height: 50px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#addr_dec#</cftextarea>#}
-                </td>
-            </tr>
-            <tr>
-                <td>City</td>
-                <td>
-                    {{ form.city }}
-                    <cfinput name="city" value="#Customer.city#" maxlength="255" class="#StructKeyExists(fieldErrors,"city") ? 'field-error' : ''#" />
-                </td>
-            </tr>
-            <tr>
-                <td>State</td>
-                <td>
-                    {{ form.state }}
-                    <cfselect name="state" class="#StructKeyExists(fieldErrors,"state") ? 'field-error' : ''#">
-                        <option value="">(Select state)</option>
-                        <cfloop array="#states#" index="state">
-                            <option value="#state.abbr#" <CFIF Customer.state IS state.abbr>selected</CFIF>>#state.name#</option>
-                        </cfloop>
-                    </cfselect>
-                </td>
-            </tr>
-            <tr>
-                <td>ZIP</td>
-                <td class="{% if form.zip.errors %}field-error{% endif %}">
-                    {{ form.zip }}
-                    <cfinput name="zip" value="#Customer.zip#" maxlength="10" class="#StructKeyExists(fieldErrors,"zip") ? 'field-error' : ''#" />
-                </td>
-            </tr>
-            <tr>
-                <td>Mobile Phone</td>
-                <td class="{% if form.mobile_phone.errors %}field-error{% endif %}">
-                    {{ form.mobile_phone }}
-                    <cfinput name="mphone" value="#Customer.mphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"mphone") ? 'field-error' : ''#" />
-                </td>
-            </tr>
-            <tr>
-                <td>Home Phone</td>
-                <td class="{% if form.home_phone.errors %}field-error{% endif %}">
-                    {{ form.home_phone }}
-                    <cfinput name="hphone" value="#Customer.hphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"hphone") ? 'field-error' : ''#" />
-                </td>
-            </tr>
-            <tr>
-                <td>Work Phone</td>
-                <td class="{% if form.work_phone.errors %}field-error{% endif %}">
-                    {{ form.work_phone }}
-                    <cfinput name="wphone" value="#Customer.wphone#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"wphone") ? 'field-error' : ''#" />
-                </td>
-            </tr>
-            <tr>
-                <td>Fax</td>
-                <td>
-                    {{ form.fax }}
-                    <cfinput name="fax" value="#Customer.fax#" maxlength="20" class="phone #StructKeyExists(fieldErrors,"fax") ? 'field-error' : ''#" />
-                </td>
-            </tr>
-
-            <tr class="buttons">
-                <td></td>
-                <td><button type="submit" class="btn">Submit</button></td>
-            </tr>
+                <tr class="buttons">
+                    <td></td>
+                    <td><button type="submit" class="btn">Submit</button></td>
+                </tr>
 
             </table>
-            </cfoutput>
 
-        {% csrf_token %}
-        <cfinput name="page" type="hidden" value="#page#" />
-        <cfinput name="method" type="hidden" value="updateDriverInfo" />
+            {% csrf_token %}
         </form>
 
-        </div>
+    </div>
 {% endblock %}

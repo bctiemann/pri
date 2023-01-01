@@ -4,16 +4,12 @@
 
 {% block subpage_pane %}
     {% for event in past_joy_rides %}
-    <cfoutput query="JoyRidePast">
         <div class="reservation">
             {% include "customer_portal/joy_ride/event.html" %}
         </div>
-    </cfoutput>
     {% endfor %}
 
     {% if not past_joy_rides.exists %}
-    <cfif JoyRidePast.recordCount IS 0>
         <div class="no-records">No past Joy Ride events</div>
-    </cfif>
     {% endif %}
 {% endblock %}

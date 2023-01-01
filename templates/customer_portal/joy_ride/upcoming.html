@@ -4,18 +4,14 @@
 
 {% block subpage_pane %}
     {% for event in upcoming_joy_rides %}
-    <cfoutput query="JoyRideUpcoming">
         <a href="{% url "customer_portal:joyride-confirm" confirmation_code=event.confirmation_code %}">
-        <div class="reservation">
-            {% include "customer_portal/joy_ride/event.html" %}
-        </div>
+            <div class="reservation">
+                {% include "customer_portal/joy_ride/event.html" %}
+            </div>
         </a>
-    </cfoutput>
     {% endfor %}
 
     {% if not upcoming_joy_rides.exists %}
-    <cfif JoyRideUpcoming.recordCount IS 0>
         <div class="no-records">No upcoming Joy Ride events</div>
-    </cfif>
     {% endif %}
 {% endblock %}

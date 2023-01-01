@@ -9,6 +9,7 @@ from sales.forms import ReservationRentalDetailsForm, JoyRideDetailsForm, Perfor
 from users.models import Customer
 from backoffice.forms import CSSClassMixin
 from sales.enums import get_service_hours, TRUE_FALSE_CHOICES, get_exp_year_choices, get_exp_month_choices
+from sales.constants import BANK_PHONE_HELP_TEXT
 
 
 class PasswordForm(forms.Form):
@@ -102,13 +103,13 @@ class ReservationCustomerInfoForm(CSSClassMixin, forms.ModelForm):
     cc_exp_yr = forms.ChoiceField(required=False, choices=get_exp_year_choices(since_founding=True, allow_null=False))
     cc_exp_mo = forms.ChoiceField(required=False, choices=get_exp_month_choices(allow_null=False))
     cc_cvv = forms.CharField(required=False)
-    cc_phone = PhoneNumberField(region='US', required=False)
+    cc_phone = PhoneNumberField(region='US', required=False, help_text=BANK_PHONE_HELP_TEXT)
 
     cc2_number = forms.CharField(required=False)
     cc2_exp_yr = forms.ChoiceField(required=False, choices=get_exp_year_choices(since_founding=True, allow_null=True))
     cc2_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(allow_null=True), required=False)
     cc2_cvv = forms.CharField(required=False)
-    cc2_phone = PhoneNumberField(region='US', required=False)
+    cc2_phone = PhoneNumberField(region='US', required=False, help_text=BANK_PHONE_HELP_TEXT)
     cc2_instructions = forms.CharField(widget=forms.Textarea(), required=False)
 
     def __init__(self, *args, confirmation_code=None, **kwargs):
@@ -188,7 +189,8 @@ class PerformanceExperienceNotesForm(forms.ModelForm):
         fields = ('customer_notes',)
 
 
-class AccountDriverInfoForm(forms.ModelForm):
+class AccountDriverInfoForm(CSSClassMixin, forms.ModelForm):
+    phone_fields = ('mobile_phone', 'work_phone', 'home_phone', 'fax',)
 
     def clean_license_number(self):
         return self.instance.license_number or self.cleaned_data['license_number']
