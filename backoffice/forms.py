@@ -8,6 +8,7 @@ import logging
 from django.conf import settings
 from django import forms
 from phonenumber_field.formfields import PhoneNumberField
+from localflavor.us.forms import USZipCodeField
 
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, TollTag
 from consignment.models import Consigner, ConsignmentPayment
@@ -534,6 +535,7 @@ class TollTagForm(forms.ModelForm):
 class TaxRateForm(CSSClassMixin, forms.ModelForm):
     short_fields = ('postal_code', 'total_rate_as_percent',)
 
+    postal_code = USZipCodeField(required=True)
     total_rate_as_percent = forms.DecimalField()
 
     def __init__(self, *args, **kwargs):

@@ -534,7 +534,7 @@ console.log(data);
         if (data.success) {
             $('#id_tax_percent, #id_total_rate_as_percent').val(data.tax_rate.toFixed(3));
             // $('#totalrate').val(data.tax_rate.toFixed(3));
-            // $('#detail').val(JSON.stringify(data.detail));
+            $('#id_detail').val(JSON.stringify(data.detail));
             refreshSalesTaxDetail();
         } else {
             alert(data.error);

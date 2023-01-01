@@ -16,63 +16,57 @@
         <form method="POST" action="{% url "backoffice:taxrate-create" %}">
     {% endif %}
 
-    <table class="inputform taxrates">
-        <tr>
-            <td>Zipcode</td>
-            <td>
-                {{ form.postal_code }}
-                <cfinput name="zipcode" value="#SalesTax.zipcode#" maxlength="10" validate="zipcode" required="yes" message="Enter a zip." class="short" />
-                <button class="btn" type="button" onclick="getTaxRate(forceRefresh=true)">Fetch from API</button>
-            </td>
-        </tr>
-        <tr>
-            <td>Total Rate</td>
-            <td>{{ form.total_rate_as_percent }}
-                <cfinput name="totalrate" value="#SalesTax.totalrate#" maxlength="10" class="short" /> %
-            </td>
-        </tr>
-        <tr>
-            <td class="align-top">Details</td>
-            <td>
-                {{ form.detail }}
-{#                <cftextarea name="detail" class="pre">#SalesTax.detail#</cftextarea>#}
-                <pre id="taxrate-output"></pre>
-            </td>
-        </tr>
-        <tr>
-            <td>Cached Date</td>
-            <td>
-                {{ taxrate.date_updated }}
-                <cfinput name="stamp" value="#DateFormat(SalesTax.stamp,"MM/DD/YYYY")#" maxlength="20" class="short" />
-            </td>
-        </tr>
+        <table class="inputform taxrates">
+            <tr>
+                <td>Zipcode</td>
+                <td>
+                    {{ form.postal_code }}
+                    <button class="btn" type="button" onclick="getTaxRate(forceRefresh=true)">Fetch from API</button>
+                </td>
+            </tr>
+            <tr>
+                <td>Total Rate</td>
+                <td>{{ form.total_rate_as_percent }}
+                </td>
+            </tr>
+            <tr>
+                <td class="align-top">Details</td>
+                <td>
+                    {{ form.detail }}
+                    <pre id="taxrate-output"></pre>
+                </td>
+            </tr>
+            <tr>
+                <td>Cached Date</td>
+                <td>
+                    {{ taxrate.date_updated }}
+                </td>
+            </tr>
 
-        <tr>
-            <td></td>
-            <td>
-                <button class="btn" type="submit" name="edit">
-                    {% if taxrate %}
-                        Edit
-                    {% else %}
-                        Add
-                    {% endif %}
-                </button>
-                {% if taxrate %}
-                <cfif tolltagid>
-                    <button
-                        class="btn delete"
-                        type="submit"
-                        name="delete"
-                        onclick="return confirmDelete(this.form, '{% url "backoffice:taxrate-delete" pk=taxrate.id %}', 'sales tax')"
-                    >
-                        Delete Sales Tax
+            <tr>
+                <td></td>
+                <td>
+                    <button class="btn" type="submit" name="edit">
+                        {% if taxrate %}
+                            Edit
+                        {% else %}
+                            Add
+                        {% endif %}
                     </button>
-                </cfif>
-                {% endif %}
-            </td>
-        </tr>
-    </table>
-    {% csrf_token %}
+                    {% if taxrate %}
+                        <button
+                            class="btn delete"
+                            type="submit"
+                            name="delete"
+                            onclick="return confirmDelete(this.form, '{% url "backoffice:taxrate-delete" pk=taxrate.id %}', 'sales tax')"
+                        >
+                            Delete Sales Tax
+                        </button>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+        {% csrf_token %}
     </form>
 
 {% endblock %}
