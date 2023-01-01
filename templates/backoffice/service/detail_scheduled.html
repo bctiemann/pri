@@ -16,127 +16,80 @@
         <form method="POST" action="{% url "backoffice:service-create-scheduled" %}">
     {% endif %}
 
-    <table class="inputform service">
-        <tr>
-            <td>Vehicle</td>
-            <td>
-                {{ form.vehicle }}
-                {% comment %}
-                <cfquery name="Vehicles" datasource="#DSN#">
-                    SELECT vehicleid,make,model,year,type FROM Vehicles
-                    ORDER BY make,model,year
-                </cfquery>
-                <cfselect name="vehicleid">
-                    <cfloop query="Vehicles">
-                        <option value="#vehicleid#" <cfif vehicleid IS Service.vehicleid>selected</cfif>>#make# #model#</option>
-                    </cfloop>
-                </cfselect>
-                {% endcomment %}
-            </td>
-        </tr>
-        <tr>
-            <td>Service Item</td>
-            <td>
-                {{ form.service_item }}
-                {% comment %}
-                <cfquery name="ServiceItems" datasource="#DSN#">
-                    SELECT serviceitemid,name FROM ServiceItems
-                    ORDER BY serviceitemid
-                </cfquery>
-                <cfselect name="serviceitemid">
-                    <cfloop query="ServiceItems">
-                        <option value="#serviceitemid#" <cfif serviceitemid IS Service.serviceitemid>selected</cfif>>#name#</option>
-                    </cfloop>
-                </cfselect>
-                {% endcomment %}
-            </td>
-        </tr>
-        <tr>
-            <td>Done On</td>
-            <td>
-                {{ form.done_on }}
-                <cftry>
-                    <cfset donestamp = DateFormat(Service.donestamp,"MM/DD/YYYY")>
-                    <cfcatch type="Any">
-                        <cfset donestamp = "">
-                    </cfcatch>
-                </cftry>
-                <cfinput name="donestamp" value="#donestamp#" maxlength="20" class="short" />
-            </td>
-        </tr>
-        <tr>
-            <td>Done Miles</td>
-            <td>
-                {{ form.done_mileage }}
-                <cfinput name="donemiles" value="#Service.donemiles#" maxlength="20" class="short" />
-            </td>
-        </tr>
-        <tr>
-            <td>Next On</td>
-            <td>
-                {{ form.next_on }}
-                <cftry>
-                    <cfset nextstamp = DateFormat(Service.nextstamp,"MM/DD/YYYY")>
-                    <cfcatch type="Any">
-                        <cfset nextstamp = "">
-                    </cfcatch>
-                </cftry>
-                <cfinput name="nextstamp" value="#nextstamp#" maxlength="20" class="short" />
-            </td>
-        </tr>
-        <tr>
-            <td>Next Miles</td>
-            <td>
-                {{ form.next_mileage }}
-                <cfinput name="nextmiles" value="#Service.nextmiles#" maxlength="20" class="short" />
-            </td>
-        </tr>
-        <tr>
-            <td>Due</td>
-            <td>
-                {{ form.is_due }}
-                {% comment %}
-                <cfselect name="due">
-                    <option value="0" <cfif Service.due IS 0>selected</cfif>>No</option>
-                    <option value="1" <cfif Service.due IS 1>selected</cfif>>Yes</option>
-                </cfselect>
-                {% endcomment %}
-            </td>
-        </tr>
-        <tr>
-            <td class="align-top">Notes</td>
-            <td>
-                {{ form.notes }}
-{#                <cftextarea name="notes">#Service.notes#</cftextarea>#}
-            </td>
-        </tr>
+        <table class="inputform service">
+            <tr>
+                <td>Vehicle</td>
+                <td>
+                    {{ form.vehicle }}
+                </td>
+            </tr>
+            <tr>
+                <td>Service Item</td>
+                <td>
+                    {{ form.service_item }}
+                </td>
+            </tr>
+            <tr>
+                <td>Done On</td>
+                <td>
+                    {{ form.done_on }}
+                </td>
+            </tr>
+            <tr>
+                <td>Done Miles</td>
+                <td>
+                    {{ form.done_mileage }}
+                </td>
+            </tr>
+            <tr>
+                <td>Next On</td>
+                <td>
+                    {{ form.next_on }}
+                </td>
+            </tr>
+            <tr>
+                <td>Next Miles</td>
+                <td>
+                    {{ form.next_mileage }}
+                </td>
+            </tr>
+            <tr>
+                <td>Due</td>
+                <td>
+                    {{ form.is_due }}
+                </td>
+            </tr>
+            <tr>
+                <td class="align-top">Notes</td>
+                <td>
+                    {{ form.notes }}
+                </td>
+            </tr>
 
-        <tr>
-            <td></td>
-            <td>
-                <button class="btn" type="submit" name="edit">
-                    {% if scheduledservice %}
-                        Edit
-                    {% else %}
-                        Add
-                    {% endif %}
-                </button>
-                {% if scheduledservice %}
-                <cfif tolltagid>
-                    <button
-                        class="btn delete"
-                        type="submit"
-                        name="delete"
-                        onclick="return confirmDelete(this.form, '{% url "backoffice:service-delete-scheduled" pk=scheduledservice.id %}', 'service')"
-                    >
-                        Delete Service
+            <tr>
+                <td></td>
+                <td>
+                    <button class="btn" type="submit" name="edit">
+                        {% if scheduledservice %}
+                            Edit
+                        {% else %}
+                            Add
+                        {% endif %}
                     </button>
-                </cfif>
-                {% endif %}
-            </td>
-        </tr>
-    </table>
-    {% csrf_token %}
+                    {% if scheduledservice %}
+                        <button
+                            class="btn delete"
+                            type="submit"
+                            name="delete"
+                            onclick="return confirmDelete(this.form, '{% url "backoffice:service-delete-scheduled" pk=scheduledservice.id %}', 'service')"
+                        >
+                            Delete Service
+                        </button>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+        {% csrf_token %}
     </form>
 
 {% endblock %}

@@ -2,124 +2,11 @@
 
 {% block content %}
 
-    {% comment %}
-    <cfif IsDefined("URL.deleted")>
-        <p>Vehicle deleted successfully.</p>
-    </cfif>
-
-    <cfset sortCols = "vehicleid,make,model,year,status">
-
-    <cfif NOT IsDefined("URL.sortby") OR NOT ListContains(sortCols, URL.sortby)>
-        <cfset URL.sortby = "vehicleid">
-    </cfif>
-    <cfif NOT IsDefined("URL.sortdir") OR NOT ListContains("ASC,DESC", URL.sortdir)>
-        <cfset URL.sortdir = "ASC">
-    </cfif>
-    <cfif NOT IsDefined("URL.page") OR NOT IsNumeric(URL.page) OR URL.page LT 1>
-        <cfset URL.page = 1>
-    </cfif>
-
-    <CFQUERY NAME="allRecords" DATASOURCE="#DSN#">
-        SELECT vehicleid FROM Vehicles
-        WHERE 1
-        <cfif IsDefined("Form.query")>
-            AND (
-                make LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR"> OR
-                model LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR"> OR
-                year LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR">
-            )
-        </cfif>
-        <cfif IsDefined("URL.type") AND IsValid("integer",URL.type)>
-            AND type = <CFQUERYPARAM value="#URL.type#" CFSQLType="CF_SQL_INTEGER">
-        </cfif>
-        <cfif NOT (IsDefined("URL.showall") AND URL.showall IS 1)>
-            AND status != 3
-        </cfif>
-    </CFQUERY>
-
-    <cfset pageViewLink = getPageViewLink(allRecords.recordCount)>
-    <CFSET Pages = pagesLink(#allRecords.recordCount#,#rowsperpage#,int(#URL.page#),#CGI.SCRIPT_NAME#,#URL#)>
-
-    <CFQUERY NAME="Vehicles" DATASOURCE="#DSN#" result="result">
-        SELECT Vehicles.vehicleid,make,model,year,type,plate,vin,mileage,damage,Vehicles.notes,policyno,policyco,policytel,
-        status,weighting,tagnumber FROM Vehicles
-        LEFT JOIN TollTags ON TollTags.vehicleid=Vehicles.vehicleid
-        WHERE 1
-        <cfif IsDefined("Form.query")>
-            AND (
-                make LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR"> OR
-                model LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR"> OR
-                year LIKE <CFQUERYPARAM value="%#Form.query#%" CFSQLType="CF_SQL_VARCHAR">
-            )
-        </cfif>
-        <cfif IsDefined("URL.type") AND IsValid("integer",URL.type)>
-            AND type = <CFQUERYPARAM value="#URL.type#" CFSQLType="CF_SQL_INTEGER">
-        </cfif>
-        <cfif NOT (IsDefined("URL.showall") AND URL.showall IS 1)>
-            AND status != 3
-        </cfif>
-        ORDER BY #URL.sortby# #URL.sortdir#
-        LIMIT #Pages.offset#,#Pages.thispage#
-    </CFQUERY>
-
-    <CFOUTPUT>
-    <div class="pager">
-    #pageViewLink#
-    #Pages.pages#
-    </div>
-    </CFOUTPUT>
-    {% endcomment %}
-
     {% if due_only %}
-    <cfif list IS "due">
         <h2>Due Services</h2>
     {% elif upcoming_only %}
-    <cfelseif list IS "upcoming">
         <h2>Upcoming Services</h2>
-    </cfif>
     {% endif %}
-
-    {% comment %}
-    <select id="vehicle_select" onchange="selectVehicle()">
-        <option value="0">(Select Vehicle)</option>
-        <optgroup label="Cars">
-            <cfoutput query="Cars">
-                <option value="#vehicleid#" <cfif vehicleid IS vehicleid_selected>selected</cfif>>#year# #make# #model#</option>
-            </cfoutput>
-        </optgroup>
-        <optgroup label="Motorcycles">
-            <cfoutput query="Motorcycles">
-                <option value="#vehicleid#" <cfif vehicleid IS vehicleid_selected>selected</cfif>>#year# #make# #model#</option>
-            </cfoutput>
-        </optgroup>
-    </select>
-    {% endcomment %}
-
-    {% comment %}
-    {% include "backoffice/includes/paginator.html" %}
-
-    <table class="data alternating" sortedby="{{ sortby }}">
-    <tr>
-        <cfoutput>
-        <th col="id" default-sort="desc">ID</th>
-        <th col="vehicle__make">Vehicle</th>
-        <th>Description</th>
-        <th>Damaged On</th>
-        <th>Repaired</th>
-        </cfoutput>
-    </tr>
-    {% for damage in damage_list %}
-        <tr class="clickable click-to-edit" destination="{% url "backoffice:damage-detail" pk=damage.id %}">
-            <td><a href="{% url "backoffice:damage-detail" pk=damage.id %}">{{ damage.id }}</a></td>
-            <td>{{ damage.vehicle.vehicle_name }}</td>
-            <td>{{ damage.title }}</td>
-            <td>{{ damage.damaged_at|date:"m/d/Y" }}</td>
-            <td>{% if damage.is_repaired %}&#10003;{% endif %}</td>
-        </tr>
-
-    {% endfor %}
-    </table>
-    {% endcomment %}
 
     {% for vehicle in vehicle_list %}
 
@@ -130,20 +17,7 @@
 
                 {% for service in vehicle.upcoming_services %}
                     {% include "backoffice/service/service_detail.html" %}
-                    {% comment %}
-                    <cfoutput query="Service">
-                        <a href="#CGI.SCRIPT_NAME#?edit=1&serviceid=#serviceid#">
-                        <div class="service-item">
-                            <p>#name#</p>
-                            <p>#nextstamp GT 0 ? DateFormat(nextstamp,"MM/DD/YYYY") : "(Date not set)"#</p>
-                            <p>#nextmiles GT 0 ? NumberFormat(nextmiles,",") & " mi." : "(Mileage not set)"#</p>
-                            <div class="notes">#parseNewlines(notes)#</div>
-                        </div>
-                        </a>
-                    </cfoutput>
-                    {% endcomment %}
                 {% endfor %}
-
             </div>
 
         {% endif %}

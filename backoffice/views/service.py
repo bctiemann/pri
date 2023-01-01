@@ -25,6 +25,8 @@ class ServiceViewMixin:
     history_only = False
     filter_vehicle = None
 
+    # TODO: Differentiate nav pill between "Add Scheduled" and "Add Incidental"
+
     @property
     def is_unfiltered_list_view(self):
         return not self.due_only and not self.upcoming_only and self.history_only and super().is_unfiltered_list_view
@@ -79,6 +81,8 @@ class ServiceHistoryListView(PermissionRequiredMixin, AdminViewMixin, ServiceVie
     permission_required = ('users.view_service',)
     template_name = 'backoffice/service/list_history.html'
     search_fields = ('title', 'notes',)
+
+    # TODO: Preserve selected vehicle when sorting
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)

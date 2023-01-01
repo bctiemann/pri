@@ -16,83 +16,62 @@
         <form method="POST" action="{% url "backoffice:service-create-incidental" %}">
     {% endif %}
 
-    <table class="inputform service">
-        <tr>
-            <td>Vehicle</td>
-            <td>
-                {{ form.vehicle }}
-                <cfquery name="Vehicles" datasource="#DSN#">
-                    SELECT vehicleid,make,model,year,type FROM Vehicles
-                    ORDER BY make,model,year
-                </cfquery>
-                <cfselect name="vehicleid">
-                    <cfloop query="Vehicles">
-                        <option value="#vehicleid#" <cfif vehicleid IS ServiceHist.vehicleid>selected</cfif>>#make# #model#</option>
-                    </cfloop>
-                </cfselect>
-            </td>
-        </tr>
-        <tr>
-            <td>Service</td>
-            <td>
-                {{ form.title }}
-                <cfinput name="title" value="#ServiceHist.title#" maxlength="255" />
-            </td>
-        </tr>
-        <tr>
-            <td>Done On</td>
-            <td>
-                {{ form.done_on }}
-                <cftry>
-                    <cfset stamp = DateFormat(ServiceHist.stamp,"MM/DD/YYYY")>
-                    <cfcatch type="Any">
-                        <cfset stamp = "">
-                    </cfcatch>
-                </cftry>
-                <cfinput name="stamp" value="#stamp#" maxlength="20" class="short" />
-            </td>
-        </tr>
-        <tr>
-            <td>Mileage</td>
-            <td>
-                {{ form.mileage }}
-                <cfinput name="mileage" value="#ServiceHist.mileage#" maxlength="20" class="short" />
-            </td>
-        </tr>
-        <tr>
-            <td class="align-top">Notes</td>
-            <td>
-                {{ form.notes }}
-                <cftextarea name="notes">#ServiceHist.notes#</cftextarea>
-            </td>
-        </tr>
+        <table class="inputform service">
+            <tr>
+                <td>Vehicle</td>
+                <td>
+                    {{ form.vehicle }}
+                </td>
+            </tr>
+            <tr>
+                <td>Service</td>
+                <td>
+                    {{ form.title }}
+                </td>
+            </tr>
+            <tr>
+                <td>Done On</td>
+                <td>
+                    {{ form.done_on }}
+                </td>
+            </tr>
+            <tr>
+                <td>Mileage</td>
+                <td>
+                    {{ form.mileage }}
+                </td>
+            </tr>
+            <tr>
+                <td class="align-top">Notes</td>
+                <td>
+                    {{ form.notes }}
+                </td>
+            </tr>
 
-        <tr>
-            <td></td>
-            <td>
-                <button class="btn" type="submit" name="edit">
-                    {% if incidentalservice %}
-                        Edit
-                    {% else %}
-                        Add
-                    {% endif %}
-                </button>
-                {% if incidentalservice %}
-                <cfif tolltagid>
-                    <button
-                        class="btn delete"
-                        type="submit"
-                        name="delete"
-                        onclick="return confirmDelete(this.form, '{% url "backoffice:service-delete-incidental" pk=incidentalservice.id %}', 'service log item')"
-                    >
-                        Delete Service Log Item
+            <tr>
+                <td></td>
+                <td>
+                    <button class="btn" type="submit" name="edit">
+                        {% if incidentalservice %}
+                            Edit
+                        {% else %}
+                            Add
+                        {% endif %}
                     </button>
-                </cfif>
-                {% endif %}
-            </td>
-        </tr>
-    </table>
-    {% csrf_token %}
+                    {% if incidentalservice %}
+                        <button
+                            class="btn delete"
+                            type="submit"
+                            name="delete"
+                            onclick="return confirmDelete(this.form, '{% url "backoffice:service-delete-incidental" pk=incidentalservice.id %}', 'service log item')"
+                        >
+                            Delete Service Log Item
+                        </button>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+        {% csrf_token %}
     </form>
 
 {% endblock %}
