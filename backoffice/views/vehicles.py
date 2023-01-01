@@ -98,13 +98,14 @@ class VehicleCreateView(AdminViewMixin, VehicleViewMixin, ListViewMixin, CreateV
         vehicle.slug = vehicle.get_slug()
         vehicle.save()
         vehicle_marketing = VehicleMarketing.objects.create(
-            vehicle_id=vehicle.id,
             make=vehicle.make,
             model=vehicle.model,
             year=vehicle.year,
             slug=vehicle.slug,
             weighting=vehicle.weighting,
         )
+        vehicle.vehicle_marketing_id = vehicle_marketing.id
+        vehicle.save()
         self.object = vehicle
         return HttpResponseRedirect(self.get_success_url())
 

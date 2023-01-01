@@ -93,6 +93,9 @@ class VehicleForm(CSSClassMixin, forms.ModelForm):
     phone_fields = ('policy_phone',)
     short_fields = ('year', 'plate', 'mileage',)
 
+    make = forms.CharField(required=True)
+    model = forms.CharField(required=True)
+    year = forms.IntegerField(required=True)
     external_owner = forms.ModelChoiceField(queryset=Consigner.objects.all(), empty_label='PRI', required=False)
     toll_tag = forms.ModelChoiceField(queryset=TollTag.objects.all(), required=False)
 

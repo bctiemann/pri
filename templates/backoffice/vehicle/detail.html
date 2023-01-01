@@ -8,55 +8,15 @@
         <h2>Add Vehicle</h2>
     {% endif %}
 
-    {% comment %}
-    <cfif not IsDefined("vehicleid") OR vehicleid IS 0>
-        <h2>Add Vehicle</h2>
-        <cfset vehicleid = 0>
-    <cfelse>
-        <h2>Edit Vehicle</h2>
-    </cfif>
-    <!--- Pull vehicle (empty object with all fields blank if id=0) --->
-    <cfquery name="Vehicle" datasource="#DSN#">
-        SELECT vehicleid,make,model,year,type,plate,vin,mileage,damage,policyno,policyco,policytel,status,weighting FROM Vehicles
-        WHERE vehicleid = <CFQUERYPARAM value="#vehicleid#" CFSQLType="CF_SQL_NUMERIC">
-    </cfquery>
-    <cfquery name="VehicleFront" datasource="#FDSN#">
-        SELECT type,hp,tq,topspeed,trans,gears,status,location,tightfit,blurb,specs,origin,price,disc2day,disc3day,disc7day,deposit,milesinc FROM VehiclesFront
-        WHERE vehicleid = <CFQUERYPARAM value="#vehicleid#" CFSQLType="CF_SQL_NUMERIC">
-    </cfquery>
-
-    <!--- Decrypt encrypted fields --->
-    <cftry>
-        <cfset policyno_dec = Decrypt(Vehicle.policyno, globalkey, 'AES', 'hex')>
-        <cfcatch type="Any">
-            <cfset policyno_dec = "">
-        </cfcatch>
-    </cftry>
-
-    <cfif IsDefined("Form.fnc")>
-        <cfset Vehicle = Form>
-        <cfset VehicleFront = Form>
-        <cfset policyno_dec = Form.policyno>
-    </cfif>
-
-    <cfif IsDefined("URL.created")>
-        <p>Vehicle created successfully.</p>
-    <cfelseif IsDefined("URL.edited")>
-        <p>Vehicle updated successfully.</p>
-    </cfif>
-    {% endcomment %}
-
     {% if vehicle %}
-    <cfif vehicleid>
-    <div id="media_container">
-        <div class="media-section" id="vpics"></div>
-        <div class="media-section" id="vvids"></div>
-        <div class="media-section" id="showcase"></div>
-        <div class="media-section" id="thumbnail"></div>
-        <div class="media-section" id="inspection"></div>
-        <div class="media-section" id="mobilethumb"></div>
-    </div>
-    </cfif>
+        <div id="media_container">
+            <div class="media-section" id="vpics"></div>
+            <div class="media-section" id="vvids"></div>
+            <div class="media-section" id="showcase"></div>
+            <div class="media-section" id="thumbnail"></div>
+            <div class="media-section" id="inspection"></div>
+            <div class="media-section" id="mobilethumb"></div>
+        </div>
     {% endif %}
 
     {% include "backoffice/includes/form_error.html" %}
@@ -66,205 +26,191 @@
     {% else %}
         <form method="POST" action="{% url "backoffice:vehicle-create" %}">
     {% endif %}
-    <table class="inputform vehicles">
-        <tr>
-            <td><label for="id_vehicle_type">Type</label></td>
-            <td>
-                {{ form.vehicle_type }}
-            </td>
-        </tr>
-        <tr>
-            <td>Ownership</td>
-            <td>
-                {{ form.external_owner }}
-            </td>
-        </tr>
-        <tr>
-            <td>Make</td>
-            <td>{{ form.make }}</td>
-        </tr>
-        <tr>
-            <td>Model</td>
-            <td>{{ form.model }}</td>
-        </tr>
-        <tr>
-            <td>Year</td>
-            <td>{{ form.year }}</td>
-        </tr>
-        <tr>
-            <td>Plate</td>
-            <td>{{ form.plate }}</td>
-        </tr>
-        <tr>
-            <td>VIN</td>
-            <td>{{ form.vin }}</td>
-        </tr>
-        <tr>
-            <td>Mileage</td>
-            <td>{{ form.mileage }}</td>
-        </tr>
-        <tr>
-            <td class="align-top">Damage</td>
-            <td>{{ form.damage }}</td>
-        </tr>
-        <tr>
-            <td class="align-top">Notes</td>
-            <td>{{ form.notes }}</td>
-        </tr>
-        <tr>
-            <td>Insurance Policy No.</td>
-            <td>{{ form.policy_number }}</td>
-        </tr>
-        <tr>
-            <td>Insurance Policy Company</td>
-            <td>{{ form.policy_company }}</td>
-        </tr>
-        <tr>
-            <td>Insurance Policy Telephone</td>
-            <td>{{ form.policy_phone }}</td>
-        </tr>
-        <tr>
-            <td>Status</td>
-            <td>{{ form.status }}</td>
-        </tr>
-        <tr>
-            <td>Toll tag</td>
-            <td>
-                {{ form.toll_tag }}
-                {% comment %}
-                <cfquery name="TollTags" datasource="#DSN#">
-                    SELECT * FROM TollTags
-                    LEFT JOIN Vehicles ON Vehicles.vehicleid=TollTags.vehicleid
-                    ORDER BY tagnumber
-                </cfquery>
-                <cfselect name="tolltagid">
-                    <option value="">(None)</option>
-                    <cfloop query="#TollTags#">
-                        <option value="#tolltagid#" <cfif tolltagid IS TollTag.tolltagid>selected</cfif>>#tagnumber#<cfif TollTags.vehicleid GT 0> (#year# #make# #model#)<cfelseif altusage IS NOT ""> (#altusage#)</cfif></option>
-                    </cfloop>
-                </cfselect>
-                {% endcomment %}
-            </td>
-        </tr>
-        <tr>
-            <td>Redirect to</td>
-            <td>
-                {{ form.redirect_to }}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Weighting
-                <p class="subtext">Set Fleet Display Priority</p>
-            </td>
-            <td>
-                {{ marketing_form.weighting }}
-            </td>
-        </tr>
 
-        {% if vehicle %}
-        <tr class="divider">
-            <td colspan="2">
-                <h3>Front Site Data</h3>
-                <p class="subtext">All fields mandatory if published.</p>
-            </td>
-        </tr>
+        <table class="inputform vehicles">
+            <tr>
+                <td><label for="id_vehicle_type">Type</label></td>
+                <td>
+                    {{ form.vehicle_type }}
+                </td>
+            </tr>
+            <tr>
+                <td>Ownership</td>
+                <td>
+                    {{ form.external_owner }}
+                </td>
+            </tr>
+            <tr>
+                <td>Make</td>
+                <td>{{ form.make }}</td>
+            </tr>
+            <tr>
+                <td>Model</td>
+                <td>{{ form.model }}</td>
+            </tr>
+            <tr>
+                <td>Year</td>
+                <td>{{ form.year }}</td>
+            </tr>
+            <tr>
+                <td>Plate</td>
+                <td>{{ form.plate }}</td>
+            </tr>
+            <tr>
+                <td>VIN</td>
+                <td>{{ form.vin }}</td>
+            </tr>
+            <tr>
+                <td>Mileage</td>
+                <td>{{ form.mileage }}</td>
+            </tr>
+            <tr>
+                <td class="align-top">Damage</td>
+                <td>{{ form.damage }}</td>
+            </tr>
+            <tr>
+                <td class="align-top">Notes</td>
+                <td>{{ form.notes }}</td>
+            </tr>
+            <tr>
+                <td>Insurance Policy No.</td>
+                <td>{{ form.policy_number }}</td>
+            </tr>
+            <tr>
+                <td>Insurance Policy Company</td>
+                <td>{{ form.policy_company }}</td>
+            </tr>
+            <tr>
+                <td>Insurance Policy Telephone</td>
+                <td>{{ form.policy_phone }}</td>
+            </tr>
+            <tr>
+                <td>Status</td>
+                <td>{{ form.status }}</td>
+            </tr>
+            <tr>
+                <td>Toll tag</td>
+                <td>
+                    {{ form.toll_tag }}
+                </td>
+            </tr>
+            <tr>
+                <td>Redirect to</td>
+                <td>
+                    {{ form.redirect_to }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Weighting
+                    <p class="subtext">Set Fleet Display Priority</p>
+                </td>
+                <td>
+                    {{ marketing_form.weighting }}
+                </td>
+            </tr>
 
-        <tr>
-            <td>Horsepower (hp)</td>
-            <td>{{ marketing_form.horsepower }}</td>
-        </tr>
-        <tr>
-            <td>Torque (ft-lbs)</td>
-            <td>{{ marketing_form.torque }}</td>
-        </tr>
-        <tr>
-            <td>Top Speed (mph)</td>
-            <td>{{ marketing_form.top_speed }}</td>
-        </tr>
-        <tr>
-            <td>Transmission Type</td>
-            <td>
-                {{ marketing_form.transmission_type }}
-            </td>
-        </tr>
-        <tr>
-            <td>Number of Gears</td>
-            <td>{{ marketing_form.gears }}</td>
-        </tr>
-        <tr>
-            <td>Location</td>
-            <td>
-                {{ marketing_form.location }}
-            </td>
-        </tr>
-        <tr>
-            <td>Tight Fit (think Elise)</td>
-            <td>
-                {{ marketing_form.tight_fit }}
-            </td>
-        </tr>
-        <tr>
-            <td class="align-top">Blurb<br /><small>BBcode allowed. Line breaks are parsed into HTML.</small></td>
-            <td>{{ marketing_form.blurb }}</td>
-        </tr>
-        <tr>
-            <td class="align-top">Specs (JSON)<br /><small class="specs-model" title="model">Model</small></td>
-            <td>
-                {{ marketing_form.specs }}
-                <pre id="specs-output"></pre>
-            </td>
-        </tr>
-        <tr>
-            <td>Country of Origin</td>
-            <td>{{ marketing_form.origin_country }}</td>
-        </tr>
-        <tr>
-            <td>Price Per Day</td>
-            <td class="currency"><span class="currency-prefix">$</span>{{ marketing_form.price_per_day }}</td>
-        </tr>
-        <tr>
-            <td>2-Day Discount (%)</td>
-            <td>{{ marketing_form.discount_2_day }}</td>
-        </tr>
-        <tr>
-            <td>3-Day Discount (%)</td>
-            <td>{{ marketing_form.discount_3_day }}</td>
-        </tr>
-        <tr>
-            <td>7-Day Discount (%)</td>
-            <td>{{ marketing_form.discount_7_day }}</td>
-        </tr>
-        <tr>
-            <td>Deposit Amount</td>
-            <td class="currency"><span class="currency-prefix">$</span>{{ marketing_form.security_deposit }}</td>
-        </tr>
-        <tr>
-            <td>Miles Included</td>
-            <td>{{ marketing_form.miles_included }}</td>
-        </tr>
-        {% endif %}
+            {% if vehicle %}
+                <tr class="divider">
+                    <td colspan="2">
+                        <h3>Front Site Data</h3>
+                        <p class="subtext">All fields mandatory if published.</p>
+                    </td>
+                </tr>
 
-        <tr>
-            <td></td>
-            <td>
-                <button class="btn" type="submit" name="edit">
+                <tr>
+                    <td>Horsepower (hp)</td>
+                    <td>{{ marketing_form.horsepower }}</td>
+                </tr>
+                <tr>
+                    <td>Torque (ft-lbs)</td>
+                    <td>{{ marketing_form.torque }}</td>
+                </tr>
+                <tr>
+                    <td>Top Speed (mph)</td>
+                    <td>{{ marketing_form.top_speed }}</td>
+                </tr>
+                <tr>
+                    <td>Transmission Type</td>
+                    <td>
+                        {{ marketing_form.transmission_type }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Number of Gears</td>
+                    <td>{{ marketing_form.gears }}</td>
+                </tr>
+                <tr>
+                    <td>Location</td>
+                    <td>
+                        {{ marketing_form.location }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Tight Fit (think Elise)</td>
+                    <td>
+                        {{ marketing_form.tight_fit }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="align-top">Blurb<br /><small>BBcode allowed. Line breaks are parsed into HTML.</small></td>
+                    <td>{{ marketing_form.blurb }}</td>
+                </tr>
+                <tr>
+                    <td class="align-top">Specs (JSON)<br /><small class="specs-model" title="model">Model</small></td>
+                    <td>
+                        {{ marketing_form.specs }}
+                        <pre id="specs-output"></pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Country of Origin</td>
+                    <td>{{ marketing_form.origin_country }}</td>
+                </tr>
+                <tr>
+                    <td>Price Per Day</td>
+                    <td class="currency"><span class="currency-prefix">$</span>{{ marketing_form.price_per_day }}</td>
+                </tr>
+                <tr>
+                    <td>2-Day Discount (%)</td>
+                    <td>{{ marketing_form.discount_2_day }}</td>
+                </tr>
+                <tr>
+                    <td>3-Day Discount (%)</td>
+                    <td>{{ marketing_form.discount_3_day }}</td>
+                </tr>
+                <tr>
+                    <td>7-Day Discount (%)</td>
+                    <td>{{ marketing_form.discount_7_day }}</td>
+                </tr>
+                <tr>
+                    <td>Deposit Amount</td>
+                    <td class="currency"><span class="currency-prefix">$</span>{{ marketing_form.security_deposit }}</td>
+                </tr>
+                <tr>
+                    <td>Miles Included</td>
+                    <td>{{ marketing_form.miles_included }}</td>
+                </tr>
+            {% endif %}
+
+            <tr>
+                <td></td>
+                <td>
+                    <button class="btn" type="submit" name="edit">
+                        {% if vehicle %}
+                            Edit
+                        {% else %}
+                            Add
+                        {% endif %}
+                    </button>
                     {% if vehicle %}
-                        Edit
-                    {% else %}
-                        Add
+                        <button class="btn delete" type="submit" name="delete" onclick="return confirmDelete(this.form, 'vehicle')">Delete Vehicle</button>
                     {% endif %}
-                </button>
-                {% if vehicle %}
-                <cfif vehicleid>
-                    <button class="btn delete" type="submit" name="delete" onclick="return confirmDelete(this.form, 'vehicle')">Delete Vehicle</button>
-                </cfif>
-                {% endif %}
-            </td>
-        </tr>
-    </table>
-    <input type="hidden" id="vehicle_marketing_id" value="{{ vehicle.vehicle_marketing.id }}" />
-    {% csrf_token %}
+                </td>
+            </tr>
+        </table>
+        <input type="hidden" id="vehicle_marketing_id" value="{{ vehicle.vehicle_marketing.id }}" />
+        {% csrf_token %}
     </form>
 
     <div id="specs_model">
