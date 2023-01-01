@@ -522,6 +522,8 @@ class AdHocPaymentForm(CSSClassMixin, forms.ModelForm):
 
 class TollTagForm(forms.ModelForm):
 
+    tag_number = forms.CharField(required=True)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
