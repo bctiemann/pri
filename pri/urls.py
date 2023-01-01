@@ -90,7 +90,7 @@ urlpatterns = [
 
     path('newsletter/', marketing_views.NewsletterView.as_view(), name='newsletter'),
     path('newsletter/done/', marketing_views.NewsletterDoneView.as_view(), name='newsletter-done'),
-    path('newsletter/confirm/', marketing_views.NewsletterSubscribeConfirmView.as_view(), name='newsletter-subscribe-confirm'),
+    path('newsletter/confirm/<uuid:hash>/', marketing_views.NewsletterSubscribeConfirmView.as_view(), name='newsletter-subscribe-confirm'),
     path('newsletter/unsubscribe/', marketing_views.NewsletterUnsubscribeView.as_view(), name='newsletter-unsubscribe'),
     path('newsletter/unsubscribe/done/', marketing_views.NewsletterUnsubscribeDoneView.as_view(), name='newsletter-unsubscribe-done'),
 

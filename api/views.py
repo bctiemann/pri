@@ -29,6 +29,7 @@ from sales.forms import (
     GiftCertificateForm, AdHocPaymentForm
 )
 from marketing.forms import NewsletterSubscribeForm, NewsletterUnsubscribeForm
+from marketing.models import NewsletterSubscription
 from customer_portal.forms import ReservationCustomerInfoForm
 from sales.models import BaseReservation, Reservation, Rental, TaxRate, AdHocPayment, GiftCertificate, generate_code
 from sales.tasks import send_email
@@ -289,6 +290,7 @@ class ValidateNewsletterSubscriptionView(APIView):
         email_subject = 'Performance Rentals Newsletter Confirmation'
         email_context = {
             'subscription': newsletter_subscription,
+            'site_url': settings.SERVER_BASE_URL,
         }
         # TODO: Format confirm emails and point to correct URL
         send_email(
@@ -324,6 +326,9 @@ class ValidateNewsletterUnsubscriptionView(APIView):
                 'success': False,
                 'errors': form.errors,
             })
+
+        subscriptions = NewsletterSubscription.objects.filter(email=form.cleaned_data['email'])
+        subscriptions.delete()
 
         response = {
             'success': form.is_valid(),

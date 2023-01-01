@@ -1,12 +1,15 @@
 from django.conf import settings
-from django.views.generic import TemplateView, FormView, CreateView, DeleteView, UpdateView
+from django.views.generic import TemplateView, FormView, CreateView, DeleteView, UpdateView, DetailView
 from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 from users.models import Customer
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
 from marketing.models import NewsItem, SiteContent, NewsletterSubscription, SurveyResponse
 from marketing.forms import NewsletterSubscribeForm, NewsletterUnsubscribeForm, SurveyResponseForm
+from sales.tasks import send_email
 
 
 # This mixin allows us to include the common query for cars and bikes into every view, for the nav menu
@@ -191,23 +194,41 @@ class NewsletterDoneView(NavMenuMixin, TemplateView):
     #     return context
 
 
-# TODO: Newsletter confirm page and functionality
-class NewsletterSubscribeConfirmView(NavMenuMixin, TemplateView):
+class NewsletterSubscribeConfirmView(NavMenuMixin, DetailView):
     template_name = 'front_site/newsletter/subscribe_confirm.html'
+    model = NewsletterSubscription
 
-    # def get_context_data(self, slug=None, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context['recaptcha_site_key'] = settings.RECAPTCHA_SITE_KEY
-    #     return context
+    def get_object(self):
+        return get_object_or_404(self.get_queryset(), hash=self.kwargs['hash'])
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        if not self.object.is_confirmed:
+            self.object.confirmed_at = timezone.now()
+            self.object.save()
+
+            email_subject = 'Performance Rentals Newsletter Confirmed'
+            email_context = {
+                'subscription': self.object,
+                'site_url': settings.SERVER_BASE_URL,
+            }
+            send_email(
+                [self.object.email], email_subject, email_context,
+                text_template='front_site/email/newsletter_subscribe_confirmed.txt',
+                html_template='front_site/email/newsletter_subscribe_confirmed.html'
+            )
+        return response
 
 
+# For non-JS flow. JS flow is in api.views.ValidateNewsletterUnsubscriptionView
 class NewsletterUnsubscribeView(NavMenuMixin, FormView):
     template_name = 'front_site/newsletter/unsubscribe.html'
     form_class = NewsletterUnsubscribeForm
-    model = NewsletterSubscription
 
     def form_valid(self, form):
         result = super().form_valid(form)
+        subscriptions = NewsletterSubscription.objects.filter(email=form.cleaned_data['email'])
+        subscriptions.delete()
         return result
 
     def get_success_url(self):

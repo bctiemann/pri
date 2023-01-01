@@ -1,0 +1,8 @@
+Hello!
+
+Your subscription to our newsletter has been confirmed.
+
+If you would like to unsubscribe at any time, visit: {{ site_url }}{% url "newsletter-unsubscribe" %}
+
+Performance Rentals
+Cars without compromise.

@@ -25,9 +25,16 @@ class NewsletterSubscription(models.Model):
     email = LowercaseEmailField(null=True, unique=True)
     full_name = models.CharField(max_length=255)
     confirmed_at = models.DateTimeField(null=True, blank=True)
-    hash = models.UUIDField(null=True, blank=True)
+    hash = models.UUIDField(null=True, blank=True, default=uuid.uuid4)
     ip = models.GenericIPAddressField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def is_confirmed(self):
+        return self.confirmed_at is not None
+
+    def save(self, **kwargs):
+        super().save()
 
 
 class NewsItem(models.Model):
