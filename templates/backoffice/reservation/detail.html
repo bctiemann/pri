@@ -168,11 +168,9 @@
                 <td>
                     {{ form.coupon_code }}
                     {% if reservation.coupon_code %}
-                        ({% if reservation.coupon %}
-                             <span style="color:green">VALID</span> {{ reservation.coupon.value_str }}
-                        {% else %}
-                             <span style="color:red">INVALID</span>
-                        {% endif %})
+                        {% with coupon=reservation.coupon %}
+                            {% include "backoffice/includes/coupon_validation.html" %}
+                        {% endwith %}
                     {% endif %}
                 </td>
             </tr>

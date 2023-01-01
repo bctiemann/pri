@@ -193,11 +193,9 @@
                 <td>
                     {{ form.coupon_code }}
                     {% if event.coupon_code %}
-                        ({% if event.coupon %}
-                             <span style="color:green">VALID</span> {{ event.coupon.value_str }}
-                        {% else %}
-                             <span style="color:red">INVALID</span>
-                        {% endif %})
+                        {% with coupon=event.coupon %}
+                            {% include "backoffice/includes/coupon_validation.html" %}
+                        {% endwith %}
                     {% endif %}
                 </td>
             </tr>
