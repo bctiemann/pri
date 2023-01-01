@@ -53,6 +53,8 @@ class ConsignmentReservationForm(forms.ModelForm):
         out_at = self.cleaned_data.get('out_at')
         num_days = self.cleaned_data.get('num_days', 0)
         self.cleaned_data['back_at'] = out_at + datetime.timedelta(days=num_days)
+        if num_days < 1:
+            raise forms.ValidationError('An invalid number of days was entered.')
 
     class Meta:
         model = ConsignmentReservation

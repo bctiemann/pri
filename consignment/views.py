@@ -173,6 +173,8 @@ class PaymentInfoView(SidebarMixin, UpdateView):
     model = Consigner
     form_class = ConsignerPaymentInfoForm
 
+    # TODO: Mask routing/account numbers in form and allow them to be cleared/re-entered but not edited directly
+
     def get_object(self, queryset=None):
         return self.request.user.consigner
 

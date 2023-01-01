@@ -21,33 +21,31 @@
 </head>
 <body>
 
-<cfset selectedPage="vehicles">
+    <table class="layout">
+        <tr>
+            <td class="sidebar">
+                {% include "consignment/includes/sidebar.html" %}
+            </td>
+            <td class="main">
 
-<table class="layout">
-    <tr>
-        <td class="sidebar">
-            {% include "consignment/includes/sidebar.html" %}
-        </td>
-        <td class="main">
+                <div class="wrapper">
 
-            <div class="wrapper">
+                {% include "consignment/includes/content_header.html" %}
 
-            {% include "consignment/includes/content_header.html" %}
+                <div class="well">
+                    <div class='section-header'>{% block page_title %}{% endblock %}</div>
 
-            <div class="well">
-                <div class='section-header'>{% block page_title %}{% endblock %}</div>
+                    {% block content %}{% endblock %}
+                </div>
 
-                {% block content %}{% endblock %}
-            </div>
+                <div class="push"></div>
+                </div>
 
-            <div class="push"></div>
-            </div>
+                {% include "consignment/includes/footer.html" %}
 
-            {% include "consignment/includes/footer.html" %}
-
-        </td>
-    </tr>
-</table>
+            </td>
+        </tr>
+    </table>
 
 </body>
 </html>

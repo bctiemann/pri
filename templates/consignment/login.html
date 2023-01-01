@@ -1,148 +1,54 @@
 {% extends "consignment/base.html" %}
 
-<CFINCLUDE TEMPLATE="inc_lib.cfm">
-<CFINCLUDE TEMPLATE="inc_header.cfm">
-<title>Performance Rentals Customer Portal</title>
-<CFINCLUDE TEMPLATE="inc_meta.cfm">
-<CFINCLUDE TEMPLATE="inc_styles.cfm">
-<CFINCLUDE TEMPLATE="inc_js.cfm">
-</head>
-<body>
+    {% block page_title %}Customer Login{% endblock %}
 
-<table class="layout">
-<tr>
-<td class="sidebar">
-    <cfinclude template="inc_sidebar.cfm">
-</td>
-<td class="main">
+    {% block content %}
+        <div id="content" class="loginwrap">
+            <div class="logincontent">
 
-    <div class="wrapper">
+            {% if form.errors %}
+                <div class="loginerror">
+                    <h3>ACCESS DENIED</h3>
+                    {% for field, error in form.errors.items %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
 
-    <CFINCLUDE TEMPLATE="inc_contentheader.cfm">
+            <form method="post" action="{% url "consignment:login" %}">
+                <table class="inputform">
+                    <tr>
+                        <td>Email</td>
+                        <td>
+                            {{ form.username }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Password</td>
+                        <td>
+                            {{ form.password }}
+                            <small class="forgot-password dialog-trigger">Forgot?</small>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><button type="submit" class="btn">Log In</button></td>
+                    </tr>
+                </table>
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}" />
+            </form>
 
-    <div class="well">
-        <div class='section-header'>Customer Login</div>
+            </div>
+        </div>
 
-        {% block page_title %}Customer Login{% endblock %}
+        <div class="dialog" id="dialog_reset_password" title="Reset Password">
+            <p>Please enter your email address and we will send you a link to click on to receive your new password.</p>
+            <input type="email" id="password_reset_email" placeholder="email" />
+        </div>
 
-        {% block content %}
-<div id="content" class="loginwrap">
-<div class="logincontent">
-
-{% comment %}
-<CFIF IsDefined("AccessDenied")>
-    <div class="loginerror">
-        <h3>ACCESS DENIED</h3>
-        <p>You have entered an incorrect password for the specified account.</p>
-    </div>
-</CFIF>
-
-<CFIF IsDefined("NoMail")>
-    <div class="loginerror">
-        <h3>ACCESS DENIED</h3>
-        <p>The administrator account you have entered does not exist.</p>
-    </div>
-</CFIF>
-
-<CFIF IsDefined("BadKey")>
-    <div class="loginerror">
-        <h3>ACCESS DENIED</h3>
-        <p>Your 2-factor authenticator is invalid or has expired.</p>
-    </div>
-</CFIF>
-
-<CFIF IsDefined("Disabled")>
-    <div class="loginerror">
-        <h3>ACCESS DENIED</h3>
-        <p>Your account has been disabled.</p>
-    </div>
-</CFIF>
-
-<CFIF IsDefined("NoKey")>
-    <div class="loginerror">
-        <h3>ACCESS DENIED</h3>
-        <p>You do not have a 2-factor key.</p>
-    </div>
-</CFIF>
-
-<CFIF IsDefined("KeyExpired")>
-    <div class="loginerror">
-        <h3>ACCESS DENIED</h3>
-        <p>Your 2-factor key has expired.</p>
-    </div>
-</CFIF>
-{% endcomment %}
-
-{% if form.errors %}
-    <div class="loginerror">
-        <h3>ACCESS DENIED</h3>
-        {% for field, error in form.errors.items %}
-            <p>{{ error }}</p>
-        {% endfor %}
-    </div>
-{% endif %}
-
-<form method="post" action="{% url "consignment:login" %}">
-<table class="inputform">
-    <tr>
-        <td>Email</td>
-        <td>
-            {{ form.username }}
-            <cfinput type="text" size="20" name="email" required="yes" message="Please enter an email address." />
-        </td>
-    </tr>
-    <tr>
-        <td>Password</td>
-        <td>
-            {{ form.password }}
-            <cfinput type="password" size="20" name="pass" required="yes" message="You must enter a password." />
-            <small class="forgot-password dialog-trigger">Forgot?</small>
-        </td>
-    </tr>
-    <tr>
-        <td></td>
-        <td><button type="submit" class="btn">Log In</button></td>
-    </tr>
-</table>
-    {% csrf_token %}
-    <input type="hidden" name="next" value="{{ next }}" />
-</form>
-
-</div>
-</div>
-
-<div class="dialog" id="dialog_reset_password" title="Reset Password">
-<p>Please enter your email address and we will send you a link to click on to receive your new password.</p>
-<input type="email" id="password_reset_email" placeholder="email" />
-</div>
-
-<div class="dialog" id="dialog_reset_password_done" title="Reset Password">
-<p>An email has been sent to you containing a link to follow to receive your new password.</p>
-</div>
+        <div class="dialog" id="dialog_reset_password_done" title="Reset Password">
+            <p>An email has been sent to you containing a link to follow to receive your new password.</p>
+        </div>
 
 {% endblock %}
-
-    </div>
-
-    <div class="push"></div>
-    </div>
-
-    <CFINCLUDE TEMPLATE="inc_footer.cfm">
-
-</td>
-</tr>
-</table>
-
-<div class="dialog" id="dialog_reset_password" title="Reset Password">
-<p>Please enter your email address and we will send you a link to click on to receive your new password.</p>
-<input type="email" id="password_reset_email" placeholder="email" />
-</div>
-
-<div class="dialog" id="dialog_reset_password_done" title="Reset Password">
-<p>An email has been sent to you containing a link to follow to receive your new password.</p>
-</div>
-
-</body>
-</html>
-
-<cfabort>

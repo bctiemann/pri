@@ -4,26 +4,11 @@
 {% block nav_proceeds_class %}selected{% endblock %}
 
 {% block subpage_pane %}
-    <p class="table-info">
-    These are estimated gross amounts of rental revenues collected from the selected vehicle(s). These amounts do not reflect taxes, fees,
-    or deductions by PRI prior to the calculation of net revenues.
-    </p>
 
-    {% comment %}
-    <cfquery name="PastRentals" datasource="#DSN#">
-        SELECT rentalid,Rentals.vehicleid,dateout,dateback,numdays,rate,milesout,milesback,year,make,model FROM Rentals
-        INNER JOIN ConsignmentVehicles ON ConsignmentVehicles.vehicleid = Rentals.vehicleid
-        INNER JOIN Vehicles ON Rentals.vehicleid = Vehicles.vehicleid
-        WHERE Rentals.status = 3
-        AND Vehicles.status = 1
-        <cfif vid GT 0>
-            AND Rentals.vehicleid = <CFQUERYPARAM value="#vid#" CFSQLType="CF_SQL_NUMERIC">
-        </cfif>
-        AND consignerid = <CFQUERYPARAM value="#YourID.consignerid#" CFSQLType="CF_SQL_NUMERIC">
-        ORDER BY dateout
-    </cfquery>
-    <cfset rateTotal = 0>
-    {% endcomment %}
+    <p class="table-info">
+        These are estimated gross amounts of rental revenues collected from the selected vehicle(s). These amounts do not reflect taxes, fees,
+        or deductions by PRI prior to the calculation of net revenues.
+    </p>
 
     <table class="data proceeds">
         <tr>
@@ -34,38 +19,21 @@
             <th>Gross</th>
         </tr>
         {% for rental in past_rentals %}
-        <cfoutput query="PastRentals">
-
-        {% comment %}
-        <cfif numdays GTE 7>
-            <cfset gross = VehiclePrices[vehicleid].price * numdays * (1 - VehiclePrices[vehicleid].disc7day/100)>
-        <cfelseif numdays GTE 3>
-            <cfset gross = VehiclePrices[vehicleid].price * numdays * (1 - VehiclePrices[vehicleid].disc3day/100)>
-        <cfelseif numdays GTE 2>
-            <cfset gross = VehiclePrices[vehicleid].price * numdays * (1 - VehiclePrices[vehicleid].disc2day/100)>
-        <cfelse>
-            <cfset gross = VehiclePrices[vehicleid].price * numdays>
-        </cfif>
-        {% endcomment %}
-
-        <tr>
-            <td>{{ rental.vehicle.make }} {{ rental.vehicle.model }}</td>
-            <td>{{ rental.out_at|date:"m/d/Y" }}{# #DateFormat(dateout,"MM/DD/YYYY")# #}</td>
-            <td>{{ rental.back_at|date:"m/d/Y" }}{# #DateFormat(dateback,"MM/DD/YYYY")# #}</td>
-            <td class="numeric">{{ rental.mileage_back|intcomma }}{# #NumberFormat(milesback,",")# #}</td>
-            <td class="numeric">${{ rental.gross_revenue|intcomma }}{# #NumberFormat(gross,",.__")# #}</td>
-        </tr>
-        <cfset rateTotal = rateTotal + gross>
-        </cfoutput>
+            <tr>
+                <td>{{ rental.vehicle.make }} {{ rental.vehicle.model }}</td>
+                <td>{{ rental.out_at|date:"m/d/Y" }}</td>
+                <td>{{ rental.back_at|date:"m/d/Y" }}</td>
+                <td class="numeric">{{ rental.mileage_back|intcomma }}</td>
+                <td class="numeric">${{ rental.gross_revenue|intcomma }}</td>
+            </tr>
         {% endfor %}
-        <cfoutput>
         <tr>
             <td></td>
             <td></td>
             <td></td>
             <td></td>
-            <td class="numeric">${{ total_gross|intcomma }}{# #NumberFormat(rateTotal,",.__")# #}</td>
+            <td class="numeric">${{ total_gross|intcomma }}</td>
         </tr>
-        </cfoutput>
     </table>
+
 {% endblock %}

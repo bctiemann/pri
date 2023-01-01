@@ -99,31 +99,36 @@ var loadCalendar = function(mo) {
 };
 
 var reserveVehicle = function() {
+    let numDays = $('#reserve_number_days').val();
     var params = {
         component: 'cassidy',
         method: 'reserveVehicle',
         // vehicleid: vid,
         out_at: dateout,
-        num_days: $('#reserve_number_days').val(),
+        num_days: numDays,
     }
 console.log(params);
-    $('#dialog_reserve_vehicle').dialog('close');
-    $.post(`/special/reserve/${vehicleSlug}/`,params,function(data) {
-        console.log(data);
-        if (data.success) {
-            $('#dialog_reserve_vehicle_done').dialog({
-                modal: true,
-                buttons: {
-                    'Close': function() {
-                        $(this).dialog('close');
-                    },
+    if (parseInt(numDays) > 0) {
+        $('#dialog_reserve_vehicle').dialog('close');
+        $.post(`/special/reserve/${vehicleSlug}/`, params, function (data) {
+            console.log(data);
+            if (data.success) {
+                $('#dialog_reserve_vehicle_done').dialog({
+                    modal: true,
+                    buttons: {
+                        'Close': function () {
+                            $(this).dialog('close');
+                        },
+                    }
+                });
+                loadCalendar(0);
+            } else {
+                for (var field in data.errors) {
+                    alert(data.errors[field]);
                 }
-            });
-            loadCalendar(0);
-        } else { 
-            alert(data.errors);
-        }
-    });
+            }
+        });
+    }
 };
 
 var clearReservation = function() {

@@ -3,68 +3,47 @@
 {% block nav_payment_info_class %}selected{% endblock %}
 
 {% block subpage_pane %}
-                <div class="form-page" page="paymentinfo">
+    <div class="form-page" page="paymentinfo">
 
-                <p>
-                For wire / direct deposit transfers, specify your preferred Routing (ABA) and Account numbers below.
-                Please ensure accuracy as we are not responsible for failed transfers due to inaccurate information.
-                </p>
+        <p>
+            For wire / direct deposit transfers, specify your preferred Routing (ABA) and Account numbers below.
+            Please ensure accuracy as we are not responsible for failed transfers due to inaccurate information.
+        </p>
 
-                <form method="POST" name="payment_form" action="{% url "consignment:payment-info" %}" autocomplete="on" onsubmit="return true; return false;">
+        <form method="POST" name="payment_form" action="{% url "consignment:payment-info" %}" autocomplete="on">
 
-                    <cfoutput>
-                    <table class="inputform rentalinfo">
+            <table class="inputform rentalinfo">
 
-                    <tr>
-                        <td>Bank Routing Number</td>
-                        <td>
-                            {{ form.routing_number }}
-                            <cfset ar_masked = maskAcctNumber(ar_dec)>
-                            <cftry>
-                                <cfset ar = Form.ar>
-                                <cfcatch>
-                                    <cfset ar = "">
-                                </cfcatch>
-                            </cftry>
-                            <cfinput name="ar" maxlength="30" placeholder="#ar_masked#" value="#ar#" class="acctnum #StructKeyExists(fieldErrors,"ar") ? 'field-error' : ''#" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Bank Account Number</td>
-                        <td>
-                            {{ form.account_number }}
-                            <cfset aa_masked = maskAcctNumber(aa_dec)>
-                            <cftry>
-                                <cfset aa = Form.aa>
-                                <cfcatch>
-                                    <cfset aa = "">
-                                </cfcatch>
-                            </cftry>
-                            <cfinput name="aa" maxlength="30" placeholder="#aa_masked#" value="#aa#" class="acctnum #StructKeyExists(fieldErrors,"aa") ? 'field-error' : ''#" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="align-top">Address</td>
-                        <td>
-                            {{ form.address }}
-{#                            <cftextarea name="addr" id="addr" style="height: 80px;" class="#StructKeyExists(fieldErrors,"addr") ? 'field-error' : ''#">#addr_dec#</cftextarea>#}
-                        </td>
-                    </tr>
+            <tr>
+                <td>Bank Routing Number</td>
+                <td>
+                    {{ form.routing_number }}
+                </td>
+            </tr>
+            <tr>
+                <td>Bank Account Number</td>
+                <td>
+                    {{ form.account_number }}
+                </td>
+            </tr>
+            <tr>
+                <td class="align-top">Address</td>
+                <td>
+                    {{ form.address }}
+                </td>
+            </tr>
 
-                    <tr class="buttons">
-                        <td></td>
-                        <td>
-                            <cfinput name="fnc" type="hidden" value="update" />
-                            <button name="submit" type="submit" class="btn update-payment-info-btn">Submit</button>
-                        </td>
-                    </tr>
+            <tr class="buttons">
+                <td></td>
+                <td>
+                    <button name="submit" type="submit" class="btn update-payment-info-btn">Submit</button>
+                </td>
+            </tr>
 
-                    </table>
-                    </cfoutput>
+            </table>
 
-                    {% csrf_token %}
-                <cfinput name="page" type="hidden" value="#page#" />
-                </form>
+            {% csrf_token %}
+        </form>
 
-                </div>
+    </div>
 {% endblock %}

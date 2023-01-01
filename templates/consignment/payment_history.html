@@ -4,24 +4,6 @@
 {% block nav_payment_history_class %}selected{% endblock %}
 
 {% block subpage_pane %}
-    {% comment %}
-    <cfquery name="Transactions" datasource="#DSN#">
-        SELECT paymentid,rentalid,numdays,vehicleid,stamp,amount,method FROM (
-            (
-                SELECT rentalid,0 AS paymentid,numdays,Rentals.vehicleid,dateout AS stamp,0 AS amount,'' AS method FROM Rentals
-                INNER JOIN ConsignmentVehicles ON ConsignmentVehicles.vehicleid = Rentals.vehicleid
-                INNER JOIN Vehicles ON Rentals.vehicleid = Vehicles.vehicleid
-                WHERE Rentals.status =3
-                AND consignerid = <CFQUERYPARAM value="#YourID.consignerid#" CFSQLType="CF_SQL_NUMERIC">
-            ) UNION (
-                SELECT 0 AS rentalid,paymentid,0 AS numdays,0 AS vehicleid,stamp,amount,method FROM ConsignmentPayments
-                WHERE consignerid = <CFQUERYPARAM value="#YourID.consignerid#" CFSQLType="CF_SQL_NUMERIC">
-            )
-        ) Transactions
-        ORDER BY stamp
-    </cfquery>
-    <cfset totalBalance = 0>
-    {% endcomment %}
 
     <table class="data proceeds">
         <tr>
@@ -31,46 +13,26 @@
             <th>Gross to Date</th>
         </tr>
         {% for transaction in user.consigner.revenue_history.history %}
-        <cfoutput query="Transactions">
 
-            {% if transaction.is_rental %}
-            <cfif paymentid GT 0>
-
-                <cfif numdays GTE 7>
-                    <cfset gross = VehiclePrices[vehicleid].price * numdays * (1 - VehiclePrices[vehicleid].disc7day/100)>
-                <cfelseif numdays GTE 3>
-                    <cfset gross = VehiclePrices[vehicleid].price * numdays * (1 - VehiclePrices[vehicleid].disc3day/100)>
-                <cfelseif numdays GTE 2>
-                    <cfset gross = VehiclePrices[vehicleid].price * numdays * (1 - VehiclePrices[vehicleid].disc2day/100)>
-                <cfelse>
-                    <cfset gross = VehiclePrices[vehicleid].price * numdays>
-                </cfif>
-                <cfset totalBalance = totalBalance + gross>
-
-            {% else %}
-            <cfelse>
+            {% if not transaction.is_rental %}
 
                 <tr>
-                    <td>{{ transaction.paid_at|date:"m/d/Y" }}{# #DateFormat(stamp,"MM/DD/YYYY")# #}</td>
-                    <td class="numeric">${{ transaction.amount|intcomma }}{# $#NumberFormat(amount,",.__")# #}</td>
+                    <td>{{ transaction.paid_at|date:"m/d/Y" }}</td>
+                    <td class="numeric">${{ transaction.amount|intcomma }}</td>
                     <td>{{ transaction.method }}</td>
-                    <td class="numeric">${{ transaction.running_total|intcomma }}{# $#NumberFormat(totalBalance - amount,",.__")# #}</td>
+                    <td class="numeric">${{ transaction.running_total|intcomma }}</td>
                 </tr>
-<!---                            <cfset totalBalance = totalBalance - amount>--->
 
-            </cfif>
             {% endif %}
 
-        </cfoutput>
         {% endfor %}
 
-        <cfoutput>
         <tr>
             <td></td>
+            <td class="numeric">${{ user.consigner.revenue_history.total_paid|intcomma }}</td>
             <td></td>
-            <td></td>
-            <td class="numeric">${{ user.consigner.revenue_history.total_revenue|intcomma }}{# #NumberFormat(totalBalance,",.__")# #}</td>
+            <td class="numeric">${{ user.consigner.revenue_history.total_revenue|intcomma }}</td>
         </tr>
-        </cfoutput>
     </table>
+
 {% endblock %}

@@ -1,69 +1,36 @@
 {% load static %}
 
-<cfoutput>
-<a class="header-logo" href="{% url "consignment:home" %}"><img src='{% static "consignment/images/PRI_logo.png" %}' alt='Performance Rentals' width="255px"></a>
-</cfoutput>
+<a class="header-logo" href="{% url "consignment:home" %}"><img src="{% static "consignment/images/PRI_logo.png" %}" alt='Performance Rentals' width="255px"></a>
 
 {% if user.is_authenticated %}
-<cfif IsValidUser>
 
-    {% comment %}
-<cfquery name="Vehicles" datasource="#DSN#">
-    SELECT Vehicles.vehicleid,year,make,model FROM Vehicles
-    INNER JOIN ConsignmentVehicles ON ConsignmentVehicles.vehicleid = Vehicles.vehicleid
-    WHERE consignerid = <CFQUERYPARAM value="#YourID.consignerid#" CFSQLType="CF_SQL_NUMERIC">
-    AND status = 1
-</cfquery>
-{% endcomment %}
+    <ul class="sidebar-nav">
+        <li class="account-info {% if selected_page == 'vehicles' and not vehicle %}selected-page{% endif %}">
+            <a href="{% url "consignment:calendar" %}">All Vehicles</a>
+        </li>
+        {% for menu_vehicle in user.consigner.vehicle_set.all %}
+            <li class="{% if selected_page == 'vehicles' and menu_vehicle == vehicle %}selected-page{% endif %}">
+                <a href="{% url "consignment:calendar" slug=menu_vehicle.slug %}">
+                    {% if menu_vehicle.upcoming_rentals.exists %}
+                        <div class="badge">{{ menu_vehicle.upcoming_rentals.count }}</div>
+                    {% endif %}
+                    {{ menu_vehicle.make }} {{ menu_vehicle.model }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+    <ul class="sidebar-nav">
+        <li class="account-info {% if selected_page == "payments" %}selected-page{% endif %}">
+            <a href="{% url "consignment:payment-history" %}">Payments</a>
+        </li>
+        <li class="account-info {% if selected_page == "password" %}selected-page{% endif %}">
+            <a href="{% url "consignment:password" %}">Change Password</a>
+        </li>
+    </ul>
+    <ul class="sidebar-nav">
+        <li class="account-info">
+            <a href="{% url "consignment:logout" %}">Log Out</a>
+        </li>
+    </ul>
 
-
-<ul class="sidebar-nav">
-    <li class="account-info {% if selected_page == 'vehicles' and not vehicle %}selected-page{% endif %}">
-        <a href="{% url "consignment:calendar" %}">All Vehicles</a>
-    </li>
-    {% for menu_vehicle in user.consigner.vehicle_set.all %}
-    <cfoutput query="Vehicles">
-    <li class="{% if selected_page == 'vehicles' and menu_vehicle == vehicle %}selected-page{% endif %}">
-
-        {% comment %}
-        <cfquery name="RentalsUpcoming" datasource="#DSN#">
-            SELECT Upcoming.vehicleid,reservationid,rentalid,confcode,dateout,dateback,make,model,Upcoming.status,Upcoming.notes,delivery,numdays FROM (
-                SELECT 0 AS reservationid,rentalid,vehicleid,confcode,dateout,dateback,status,notes,delivery,numdays
-                FROM Rentals
-                WHERE dateback > NOW()
-                AND status != 4
-                AND vehicleid = <CFQUERYPARAM value="#vehicleid#" CFSQLType="CF_SQL_NUMERIC">
-            ) Upcoming
-            INNER JOIN Vehicles ON Vehicles.vehicleid = Upcoming.vehicleid
-            ORDER BY dateout ASC
-        </cfquery>
-        {% endcomment %}
-
-        <a href="{% url "consignment:calendar" slug=menu_vehicle.slug %}">
-            {% if menu_vehicle.upcoming_rentals.exists %}
-            <cfif RentalsUpcoming.recordCount GT 0>
-                <div class="badge">{{ menu_vehicle.upcoming_rentals.count }}</div>
-            </cfif>
-            {% endif %}
-            {{ menu_vehicle.make }} {{ menu_vehicle.model }}
-        </a>
-    </li>
-    </cfoutput>
-    {% endfor %}
-</ul>
-<ul class="sidebar-nav">
-    <li class="account-info {% if selected_page == "payments" %}selected-page{% endif %}">
-        <a href="{% url "consignment:payment-history" %}">Payments</a>
-    </li>
-    <li class="account-info {% if selected_page == "password" %}selected-page{% endif %}">
-        <a href="{% url "consignment:password" %}">Change Password</a>
-    </li>
-</ul>
-<ul class="sidebar-nav">
-    <li class="account-info">
-        <a href="{% url "consignment:logout" %}">Log Out</a>
-    </li>
-</ul>
-
-</cfif>
 {% endif %}
