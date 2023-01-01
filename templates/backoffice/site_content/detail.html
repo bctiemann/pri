@@ -3,38 +3,37 @@
 {% block content %}
 
     <h2>Edit Content Page</h2>
-    <h3><cfoutput>{{ sitecontent.name }}</cfoutput></h3>
+    <h3>{{ sitecontent.name }}</h3>
 
     {% include "backoffice/includes/form_error.html" %}
 
     <form method="POST" action="{% url "backoffice:sitecontent-detail" page=sitecontent.page %}">
 
-    <table class="inputform sitecontent">
-        <tr>
-            <td></td>
-            <td>
-                <p class="info">
-                This is raw HTML markup. No formatting is done automatically. All content is in a div container,
-                hard formatting/tables/weirdness will break stuff.
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td class="align-top">Content</td>
-            <td>
-                {{ form.content }}
-{#                <cftextarea name="content" style="width: 600px; height: 400px;">#pagecontent#</cftextarea>#}
-            </td>
-        </tr>
+        <table class="inputform sitecontent">
+            <tr>
+                <td></td>
+                <td>
+                    <p class="info">
+                    This is raw HTML markup. No formatting is done automatically. All content is in a div container,
+                    hard formatting/tables/weirdness will break stuff.
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td class="align-top">Content</td>
+                <td>
+                    {{ form.content }}
+                </td>
+            </tr>
 
-        <tr>
-            <td></td>
-            <td>
-                <button class="btn" type="submit" name="edit">Edit</button>
-            </td>
-        </tr>
-    </table>
-    {% csrf_token %}
+            <tr>
+                <td></td>
+                <td>
+                    <button class="btn" type="submit" name="edit">Edit</button>
+                </td>
+            </tr>
+        </table>
+        {% csrf_token %}
     </form>
 
 {% endblock %}
