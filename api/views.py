@@ -411,6 +411,7 @@ class ValidateAdHocPaymentView(APIView):
         return Response(response)
 
 
+# TODO: wtf is this
 class ValidateSurveyResponseView(APIView):
 
     form_type = None
