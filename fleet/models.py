@@ -270,6 +270,10 @@ class VehiclePicture(models.Model):
     thumb_height = models.IntegerField(null=True, blank=True)
     is_first = models.BooleanField(default=False)
 
+    @property
+    def extension(self):
+        return self.image.name.split('.')[-1].lower()
+
     # Override save method to post-process the uploaded image/thumbnail
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

@@ -111,6 +111,7 @@ urlpatterns = [
 
     path('api/vehicles/', api_views.GetVehiclesView.as_view(), name='get-vehicles'),
     path('api/vehicles/<int:vehicle_id>/', api_views.GetVehicleView.as_view(), name='get-vehicle'),
+    path('api/vehicles/<int:vehicle_id>/pics/', api_views.GetVehiclePicsView.as_view(), name='get-vehicle-pics'),
 
     path('api/validate/rental/details/', api_views.ValidateRentalDetailsView.as_view(), name='validate-rental-details'),
     path('api/validate/rental/payment/', api_views.ValidateRentalPaymentView.as_view(), name='validate-rental-payment'),

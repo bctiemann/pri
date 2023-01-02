@@ -39,8 +39,8 @@ from sales.models import Card
 from users.models import User, Customer, Employee, generate_password
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture
 from api.serializers import (
-    VehicleSerializer, VehicleDetailSerializer, CustomerSearchSerializer, ScheduleConflictSerializer,
-    TaxRateFetchSerializer, CardSerializer
+    VehicleSerializer, VehicleDetailSerializer, VehiclePicsSerializer, CustomerSearchSerializer,
+    ScheduleConflictSerializer, TaxRateFetchSerializer, CardSerializer
 )
 from sales.views import ReservationMixin
 
@@ -73,6 +73,17 @@ class GetVehicleView(APIView):
             raise Http404
         serializer = VehicleDetailSerializer(vehicle)
         return Response({'vehicle': serializer.data})
+
+
+class GetVehiclePicsView(APIView):
+
+    def get(self, request, vehicle_id):
+        try:
+            vehicle = VehicleMarketing.objects.get(pk=vehicle_id)
+        except VehicleMarketing.DoesNotExist:
+            raise Http404
+        serializer = VehiclePicsSerializer(vehicle.pics, many=True)
+        return Response(serializer.data)
 
 
 # 1st phase form; gathers basic rental details (vehicle date in/out, extra miles, etc)
@@ -448,7 +459,11 @@ class LegacyPostView(APIView):
             vehicle_id = request.POST.get('vehicleid')
             return view.get(request, vehicle_id=vehicle_id)
 
-        # TODO: 'getVehiclePics'
+        if method == 'getVehiclePics':
+            view = GetVehiclePicsView()
+            vehicle_id = request.POST.get('vehicleid')
+            return view.get(request, vehicle_id=vehicle_id)
+
         # TODO: 'validateRentalIdentity'
         # TODO: 'validateRentalPayment'
         # TODO: 'getNews'

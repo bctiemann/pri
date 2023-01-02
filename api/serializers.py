@@ -3,7 +3,7 @@ from django.urls import reverse
 from phonenumber_field.phonenumber import PhoneNumber
 from phonenumber_field.serializerfields import PhoneNumberField
 
-from fleet.models import Vehicle, VehicleMarketing
+from fleet.models import Vehicle, VehicleMarketing, VehiclePicture
 from users.models import Customer
 from sales.models import BaseReservation, Card
 
@@ -65,6 +65,22 @@ class VehicleDetailSerializer(serializers.ModelSerializer):
             # TODO: deprecate and remove below fields once mobile app is migrated to native field names
             'vehicleid', 'type', 'price', 'disc2day', 'disc3day', 'disc7day', 'milesinc', 'hp', 'tq', 'deposit',
             'origin', 'topspeed', 'type',
+        )
+
+
+class VehiclePicsSerializer(serializers.ModelSerializer):
+    # TODO for migration: deprecate below listed specified fields
+    vpicsid = serializers.IntegerField(source='id')
+    isfirst = serializers.IntegerField(source='is_first')
+    fext = serializers.CharField(source='extension')
+
+    class Meta:
+        model = VehiclePicture
+        fields = (
+            'id', 'image', 'width', 'height', 'thumbnail', 'thumb_width', 'thumb_height',
+            'is_first', 'vehicle_marketing',
+            # TODO: deprecate and remove below fields once mobile app is migrated to native field names
+            'vpicsid', 'isfirst', 'fext',
         )
 
 
