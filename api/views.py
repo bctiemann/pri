@@ -443,7 +443,11 @@ class LegacyPostView(APIView):
             view = GetVehiclesView()
             return view.get(request)
 
-        # TODO: 'getVehicle'
+        if method == 'getVehicle':
+            view = GetVehicleView()
+            vehicle_id = request.POST.get('vehicleid')
+            return view.get(request, vehicle_id=vehicle_id)
+
         # TODO: 'getVehiclePics'
         # TODO: 'validateRentalIdentity'
         # TODO: 'validateRentalPayment'

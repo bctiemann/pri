@@ -20,7 +20,7 @@ class VehicleSerializer(serializers.ModelSerializer):
     # TODO for migration: deprecate below listed specified fields
     vehicleid = serializers.IntegerField(source='id')
     type = serializers.IntegerField(source='vehicle_type')
-    price = serializers.FloatField(source='price_per_day')  # TODO: Should be a DecimalField
+    price = serializers.DecimalField(source='price_per_day', max_digits=9, decimal_places=2)
     disc2day = serializers.IntegerField(source='discount_2_day')
     disc3day = serializers.IntegerField(source='discount_3_day')
     disc7day = serializers.IntegerField(source='discount_7_day')
@@ -40,6 +40,20 @@ class VehicleSerializer(serializers.ModelSerializer):
 class VehicleDetailSerializer(serializers.ModelSerializer):
     extramiles = serializers.JSONField(source='extra_miles_choices')  # TODO: Should be extra_miles
     blurb = serializers.CharField(source='blurb_parsed')
+    # TODO for migration: deprecate below listed specified fields
+    vehicleid = serializers.IntegerField(source='id')
+    type = serializers.IntegerField(source='vehicle_type')
+    price = serializers.DecimalField(source='price_per_day', max_digits=9, decimal_places=2)
+    disc2day = serializers.IntegerField(source='discount_2_day')
+    disc3day = serializers.IntegerField(source='discount_3_day')
+    disc7day = serializers.IntegerField(source='discount_7_day')
+    milesinc = serializers.IntegerField(source='miles_included')
+    specs = serializers.CharField(source='specs_json')  # TODO: Should be a JSONField
+    hp = serializers.IntegerField(source='horsepower')
+    tq = serializers.IntegerField(source='torque')
+    deposit = serializers.DecimalField(source='security_deposit', max_digits=9, decimal_places=2)
+    origin = serializers.CharField(source='origin_country')
+    topspeed = serializers.IntegerField(source='top_speed')
 
     class Meta:
         model = VehicleMarketing
@@ -48,6 +62,9 @@ class VehicleDetailSerializer(serializers.ModelSerializer):
             'discount_2_day', 'discount_3_day', 'discount_7_day', 'miles_included', 'security_deposit', 'blurb', 'specs',
             'horsepower', 'torque', 'top_speed', 'transmission_type', 'gears', 'location', 'tight_fit', 'origin_country',
             'extramiles',
+            # TODO: deprecate and remove below fields once mobile app is migrated to native field names
+            'vehicleid', 'type', 'price', 'disc2day', 'disc3day', 'disc7day', 'milesinc', 'hp', 'tq', 'deposit',
+            'origin', 'topspeed', 'type',
         )
 
 
