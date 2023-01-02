@@ -9,6 +9,11 @@ from sales.enums import ServiceType
 from users.models import Customer
 
 
+def quantize_currency(value):
+    cents = decimal.Decimal('0.01')
+    return decimal.Decimal(value).quantize(cents, decimal.ROUND_HALF_UP)
+
+
 class PriceCalculator(ABC):
     """
     Abstract base class implementing utility methods for calculating price structure.
@@ -47,7 +52,6 @@ class PriceCalculator(ABC):
 
     subtotal = 0.0
     override_subtotal = None
-    cents = decimal.Decimal('0.01')
 
     def __init__(self, coupon_code, email, tax_zip, effective_date, is_military=False, override_subtotal=None, one_time_discount_pct=None):
         self.effective_date = effective_date
@@ -87,10 +91,6 @@ class PriceCalculator(ABC):
             raise ValueError('No tax ZIP provided.')
         tax_rate, tax_rate_created = TaxRate.objects.get_or_create(postal_code=tax_zip)
         return tax_rate
-
-    def quantize_currency(self, value):
-        # return f'{decimal.Decimal(value).quantize(self.cents, decimal.ROUND_HALF_UP)}'
-        return decimal.Decimal(value).quantize(self.cents, decimal.ROUND_HALF_UP)
 
     def get_promotion_discount(self, value=None):
         if not self.promotion:
@@ -280,30 +280,30 @@ class RentalPriceCalculator(PriceCalculator):
 
     def get_price_data(self):
         return dict(
-            vehicle_price_per_day=self.quantize_currency(self.vehicle_marketing.price_per_day),
+            vehicle_price_per_day=quantize_currency(self.vehicle_marketing.price_per_day),
             num_days=self.num_days,
             tax_zip=self.tax_zip,
             tax_rate=self.tax_rate.total_rate,
             tax_rate_as_percent=self.tax_rate.total_rate * 100,
             customer_id=self.customer.id if self.customer else None,
-            base_price=self.quantize_currency(self.base_price),
-            multi_day_discount=self.quantize_currency(self.multi_day_discount),
+            base_price=quantize_currency(self.base_price),
+            multi_day_discount=quantize_currency(self.multi_day_discount),
             multi_day_discount_pct=self.multi_day_discount_pct,
-            post_multi_day_discount_subtotal=self.quantize_currency(self.post_multi_day_discount_subtotal),
-            promotion_discount=self.quantize_currency(self.promotion_discount),
-            coupon_discount=self.quantize_currency(self.coupon_discount),
-            customer_discount=self.quantize_currency(self.customer_discount),
-            military_discount=self.quantize_currency(self.military_discount),
-            one_time_discount=self.quantize_currency(self.one_time_discount),
-            specific_discount=self.quantize_currency(self.specific_discount),
+            post_multi_day_discount_subtotal=quantize_currency(self.post_multi_day_discount_subtotal),
+            promotion_discount=quantize_currency(self.promotion_discount),
+            coupon_discount=quantize_currency(self.coupon_discount),
+            customer_discount=quantize_currency(self.customer_discount),
+            military_discount=quantize_currency(self.military_discount),
+            one_time_discount=quantize_currency(self.one_time_discount),
+            specific_discount=quantize_currency(self.specific_discount),
             specific_discount_label=self.specific_discount_label,
             extra_miles=self.extra_miles,
-            extra_miles_cost=self.quantize_currency(self.extra_miles_surcharge),
-            subtotal=self.quantize_currency(self.pre_tax_subtotal),
-            computed_subtotal=self.quantize_currency(self.computed_subtotal),
-            total_with_tax=self.quantize_currency(self.total_with_tax),
-            reservation_deposit=self.quantize_currency(self.reservation_deposit),
-            tax_amount=self.quantize_currency(self.get_tax_amount()),
+            extra_miles_cost=quantize_currency(self.extra_miles_surcharge),
+            subtotal=quantize_currency(self.pre_tax_subtotal),
+            computed_subtotal=quantize_currency(self.computed_subtotal),
+            total_with_tax=quantize_currency(self.total_with_tax),
+            reservation_deposit=quantize_currency(self.reservation_deposit),
+            tax_amount=quantize_currency(self.get_tax_amount()),
         )
 
 
@@ -363,20 +363,20 @@ class PerformanceExperiencePriceCalculator(PriceCalculator):
             tax_rate=self.tax_rate.total_rate,
             tax_rate_as_percent=self.tax_rate.total_rate * 100,
             customer_id=self.customer.id if self.customer else None,
-            base_price=self.quantize_currency(self.base_price),
+            base_price=quantize_currency(self.base_price),
 
-            promotion_discount=self.quantize_currency(self.promotion_discount),
-            coupon_discount=self.quantize_currency(self.coupon_discount),
-            customer_discount=self.quantize_currency(self.customer_discount),
-            military_discount=self.quantize_currency(self.military_discount),
-            one_time_discount=self.quantize_currency(self.one_time_discount),
-            specific_discount=self.quantize_currency(self.specific_discount),
+            promotion_discount=quantize_currency(self.promotion_discount),
+            coupon_discount=quantize_currency(self.coupon_discount),
+            customer_discount=quantize_currency(self.customer_discount),
+            military_discount=quantize_currency(self.military_discount),
+            one_time_discount=quantize_currency(self.one_time_discount),
+            specific_discount=quantize_currency(self.specific_discount),
             specific_discount_label=self.specific_discount_label,
 
-            subtotal=self.quantize_currency(self.pre_tax_subtotal),
-            computed_subtotal=self.quantize_currency(self.computed_subtotal),
-            total_with_tax=self.quantize_currency(self.total_with_tax),
-            tax_amount=self.quantize_currency(self.get_tax_amount()),
+            subtotal=quantize_currency(self.pre_tax_subtotal),
+            computed_subtotal=quantize_currency(self.computed_subtotal),
+            total_with_tax=quantize_currency(self.total_with_tax),
+            tax_amount=quantize_currency(self.get_tax_amount()),
         )
 
 
@@ -430,18 +430,18 @@ class JoyRidePriceCalculator(PriceCalculator):
             tax_rate=self.tax_rate.total_rate,
             tax_rate_as_percent=self.tax_rate.total_rate * 100,
             customer_id=self.customer.id if self.customer else None,
-            base_price=self.quantize_currency(self.base_price),
+            base_price=quantize_currency(self.base_price),
 
-            promotion_discount=self.quantize_currency(self.promotion_discount),
-            coupon_discount=self.quantize_currency(self.coupon_discount),
-            customer_discount=self.quantize_currency(self.customer_discount),
-            military_discount=self.quantize_currency(self.military_discount),
-            one_time_discount=self.quantize_currency(self.one_time_discount),
-            specific_discount=self.quantize_currency(self.specific_discount),
+            promotion_discount=quantize_currency(self.promotion_discount),
+            coupon_discount=quantize_currency(self.coupon_discount),
+            customer_discount=quantize_currency(self.customer_discount),
+            military_discount=quantize_currency(self.military_discount),
+            one_time_discount=quantize_currency(self.one_time_discount),
+            specific_discount=quantize_currency(self.specific_discount),
             specific_discount_label=self.specific_discount_label,
 
-            subtotal=self.quantize_currency(self.pre_tax_subtotal),
-            computed_subtotal=self.quantize_currency(self.computed_subtotal),
-            total_with_tax=self.quantize_currency(self.total_with_tax),
-            tax_amount=self.quantize_currency(self.get_tax_amount()),
+            subtotal=quantize_currency(self.pre_tax_subtotal),
+            computed_subtotal=quantize_currency(self.computed_subtotal),
+            total_with_tax=quantize_currency(self.total_with_tax),
+            tax_amount=quantize_currency(self.get_tax_amount()),
         )

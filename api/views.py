@@ -108,6 +108,41 @@ class ValidateRentalDetailsView(APIView):
         }
         return Response(response)
 
+    def post_legacy(self, request, payload):
+        form = ReservationRentalDetailsForm(payload)
+        print(form.data)
+        print(form.is_valid())
+        print(form.errors.as_json())
+        vehicle_marketing = form.cleaned_data.get('vehicle_marketing')
+        response = {
+            'success': form.is_valid(),
+            'error': None if form.is_valid() else form.non_field_errors()[0],
+            'price_data': form.price_data,
+            "tax_amt": form.price_data.get('tax_amount'),
+            "total_w_tax": form.price_data.get('total_with_tax'),
+            "reservation_deposit": form.price_data.get('reservation_deposit'),
+            "multi_day_discount_pct": form.price_data.get('multi_day_discount_pct'),
+            "extra_miles": form.price_data.get('extra_miles'),
+            "fieldErrors": form.errors,
+            "deposit": vehicle_marketing.security_deposit if vehicle_marketing else None,
+            "rental_duration": form.rental_duration_hours,
+            "tcostRaw": form.price_data.get('base_price'),
+            "numdrivers": int(form.cleaned_data['drivers']),
+            "customer_discount": form.price_data.get('specific_discount'),
+            "customer_discount_pct": 0,
+            "tcost": form.price_data.get('post_multi_day_discount_subtotal'),
+            "delivery": int(form.cleaned_data['delivery_required']),
+            "customerid": form.customer.id if form.customer else None,
+            "numdays": form.num_days,
+            "subtotal": form.price_data.get('subtotal'),
+            "dateout_check": form.cleaned_data['out_at'],  # "June, 01 2023 09:30:00",
+            "extra_miles_cost": form.price_data.get('extra_miles_cost'),
+            "tax_rate": form.price_data.get('tax_rate', 0) * 100,
+            "car_discount": form.price_data.get('coupon_discount'),
+            "multi_day_discount": form.price_data.get('multi_day_discount'),
+        }
+        return Response(response)
+
 
 # 2nd phase form; handles either new customers (with CC details) or returning (with login creds)
 
@@ -464,7 +499,23 @@ class LegacyPostView(APIView):
             vehicle_id = request.POST.get('vehicleid')
             return view.get(request, vehicle_id=vehicle_id)
 
-        # TODO: 'validateRentalIdentity'
+        if method == 'validateRentalIdentity':
+            view = ValidateRentalDetailsView()
+            payload = dict(
+                email=request.POST.get('email'),
+                vehicle_marketing=request.POST.get('vehicleid'),
+                out_date=request.POST.get('dateout'),
+                out_time=request.POST.get('dateouttime'),
+                back_date=request.POST.get('dateback'),
+                back_time=request.POST.get('datebacktime'),
+                delivery_required=request.POST.get('delivery'),
+                delivery_zip=request.POST.get('deliveryzip'),
+                extra_miles=request.POST.get('extramiles'),
+                coupon=request.POST.get('coupon'),
+                drivers=request.POST.get('drivers'),
+            )
+            return view.post_legacy(request, payload)
+
         # TODO: 'validateRentalPayment'
         # TODO: 'getNews'
 

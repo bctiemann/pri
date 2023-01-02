@@ -234,6 +234,10 @@ class ReservationRentalDetailsForm(forms.ModelForm):
             self.customer = Customer.objects.get(user__email=self.cleaned_data['email'])
         except (Customer.DoesNotExist, KeyError):
             pass
+
+        if not 'vehicle_marketing' in self.cleaned_data:
+            raise forms.ValidationError('Invalid vehicle specified.')
+
         self.vehicle = Vehicle.objects.filter(vehicle_marketing_id=self.cleaned_data['vehicle_marketing'].id).first()
 
         vehicle_marketing = self.vehicle.vehicle_marketing
@@ -250,8 +254,14 @@ class ReservationRentalDetailsForm(forms.ModelForm):
             return datetime.timedelta(seconds=0)
 
     @property
+    def rental_duration_hours(self):
+        return self.rental_duration.days * 24
+
+    @property
     def num_days(self):
-        return math.ceil(self.rental_duration.total_seconds() / 86400)
+        # Allow 1 hour past delivery time
+        grace_period = 3600
+        return math.ceil((self.rental_duration.total_seconds() - grace_period) / 86400)
 
     @property
     def tax_zip(self):
@@ -261,6 +271,8 @@ class ReservationRentalDetailsForm(forms.ModelForm):
     def price_data(self):
         if not self.is_bound:
             return None
+        if not self.vehicle:
+            return {}
         price_calculator = RentalPriceCalculator(
             vehicle_marketing=self.cleaned_data['vehicle_marketing'],
             num_days=self.num_days,
