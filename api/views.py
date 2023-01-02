@@ -116,7 +116,7 @@ class ValidateRentalDetailsView(APIView):
         vehicle_marketing = form.cleaned_data.get('vehicle_marketing')
         response = {
             'success': form.is_valid(),
-            'error': None if form.is_valid() else form.non_field_errors()[0],
+            'error': form.get_error(),
             'price_data': form.price_data,
             "tax_amt": form.price_data.get('tax_amount'),
             "total_w_tax": form.price_data.get('total_with_tax'),
@@ -153,6 +153,21 @@ class ValidateRentalPaymentView(ReservationMixin, APIView):
     def post(self, request):
         reservation_result = self.create_reservation(request)
         return Response(reservation_result)
+
+    def post_legacy(self, request, payload):
+        form = self.form_class(payload)
+        reservation_result = self.create_reservation(request, form=form)
+        response = {
+            'success': reservation_result.get('success'),
+            'error': reservation_result.get('error'),
+            'reservationid': reservation_result.get('reservation_id'),
+            'customerid': reservation_result.get('customer_id'),
+            'create_pass': None,
+            'confcode': reservation_result.get('confirmation_code'),
+            'custsite': reservation_result.get('customer_site_url'),
+            'reservation_type': reservation_result.get('reservation_type'),
+        }
+        return Response(response)
 
     def get_customer_site_url(self, confirmation_code):
         return reverse('customer_portal:confirm-reservation', kwargs={'confirmation_code': confirmation_code})
@@ -516,7 +531,54 @@ class LegacyPostView(APIView):
             )
             return view.post_legacy(request, payload)
 
-        # TODO: 'validateRentalPayment'
+        if method == 'validateRentalPayment':
+            # If the first-phase form collected a known email, the app prompts for login_pass. If this is not
+            # present, we use the payment view/form which creates a new customer and payment data, and we assign
+            # a randomly generated password (the customer must reset it using the Forgot mechanism at present).
+            if request.POST.get('login_pass'):
+                view = ValidateRentalLoginView()
+            else:
+                view = ValidateRentalPaymentView()
+
+            if request.POST.get('vk') != settings.MOBILE_KEY:
+                return Response({'success': False})
+            new_password = generate_password()
+            payload = dict(
+                reservation_type=request.POST.get('reservation_type'),
+                vehicle_marketing=request.POST.get('vehicleid'),
+                customer=request.POST.get('customerid'),
+                email=request.POST.get('email'),
+                password=request.POST.get('login_pass'),
+                out_date=request.POST.get('dateout'),
+                out_time=request.POST.get('dateouttime'),
+                back_date=request.POST.get('dateback'),
+                back_time=request.POST.get('datebacktime'),
+                delivery_required=request.POST.get('delivery'),
+                delivery_zip=request.POST.get('deliveryzip'),
+                extra_miles=request.POST.get('extramiles'),
+                coupon=request.POST.get('coupon'),
+                drivers=request.POST.get('drivers'),
+                customer_notes=request.POST.get('notes'),
+                first_name=request.POST.get('fname'),
+                last_name=request.POST.get('lname'),
+                mobile_phone=request.POST.get('mphone'),
+                home_phone=request.POST.get('hphone'),
+                work_phone=request.POST.get('wphone'),
+                fax=request.POST.get('fax'),
+                cc_number=request.POST.get('ccnum'),
+                cc_exp_mo=request.POST.get('ccexpmo'),
+                cc_exp_yr=request.POST.get('ccexpyr'),
+                cc_cvv=request.POST.get('cccvv'),
+                cc_phone=request.POST.get('cctel'),
+                address_line_1=request.POST.get('addr'),
+                city=request.POST.get('city'),
+                state=request.POST.get('state'),
+                zip=request.POST.get('zip'),
+                password_new=new_password,
+                password_repeat=new_password,
+            )
+            return view.post_legacy(request, payload)
+
         # TODO: 'getNews'
 
         return Response({})

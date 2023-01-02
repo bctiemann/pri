@@ -106,11 +106,21 @@ class PaymentFormMixin(CSSClassMixin, forms.Form):
         return password2
 
 
+# This dumbed-down error handler finds the "main" error out of a form, and returns a single string.
+class FormErrorMixin:
+    def get_error(self):
+        if self.is_valid():
+            return None
+        if self.non_field_errors():
+            return self.non_field_errors()[0]
+        return f'{list(self.errors.keys())[0]}: {list(self.errors.values())[0][0]}'
+
+
 # Rental forms
 
 # 1st phase: Rental Details
 
-class ReservationRentalDetailsForm(forms.ModelForm):
+class ReservationRentalDetailsForm(FormErrorMixin, forms.ModelForm):
     error_css_class = 'field-error'
     DRIVERS_CHOICES = (
         (1, '1'),

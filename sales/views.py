@@ -68,7 +68,7 @@ class ReservationMixin:
             # TODO: If authenticated user is not the same as the user in the request, logout and re-auth using POST data
             if request.user.is_authenticated:
                 return form.customer
-            if authenticate(request, username=form.customer.email, password=form.cleaned_data['password']):
+            if authenticate(request, username=form.customer.email, password=form.cleaned_data.get('password')):
                 login(request, form.customer.user)
                 return form.customer
             # Only way to return None is if password is incorrect for an existing user's email
@@ -123,6 +123,7 @@ class ReservationMixin:
         if not customer:
             return {
                 'success': False,
+                'error': 'Incorrect password',
                 'errors': {
                     'password': ['Incorrect password'],
                 },
@@ -149,9 +150,13 @@ class ReservationMixin:
 
         return {
             'success': form.is_valid(),
+            'error': form.get_error(),
             'errors': form.errors,
             'errors_html': form.errors.as_ul(),
+            'customer_id': reservation.customer.id,
+            'reservation_id': reservation.id,
             'reservation_type': self.reservation_type,
+            'confirmation_code': reservation.confirmation_code,
             'customer_site_url': self.get_customer_site_url(confirmation_code=reservation.confirmation_code),
         }
 
@@ -160,6 +165,13 @@ class ReservationMixin:
 
     def get_honeypot_url(self, **kwargs):
         raise NotImplementedError
+
+    def get_error(self, form):
+        if form.is_valid():
+            return None
+        if form.non_field_errors():
+            return form.non_field_errors()[0]
+        return f'{list(form.errors.keys())[0]}: {list(form.errors.values())[0][0]}'
 
 
 class NoJSFlowMixin:
