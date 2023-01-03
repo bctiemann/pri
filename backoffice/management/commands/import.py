@@ -23,7 +23,7 @@ from fleet.models import (
 from users.models import Customer, Employee, User, MusicGenre
 from sales.models import (
     Coupon, GuidedDrive, Reservation, Rental, Driver, JoyRide, PerformanceExperience, GiftCertificate,
-    AdHocPayment, Charge, RedFlag, generate_code
+    AdHocPayment, Charge, RedFlag, ServiceType, generate_code
 )
 from consignment.models import Consigner, ConsignmentPayment
 from service.models import Damage, ServiceItem, ScheduledService, IncidentalService
@@ -459,7 +459,7 @@ class Command(BaseCommand):
                     coupon_code=old['coupon'],
                     status=old['status'],
                     deposit_amount=old['depamount'],
-                    confirmation_code=old['confcode'] or generate_code(ReservationType.RENTAL.value),
+                    confirmation_code=old['confcode'] or generate_code(ServiceType.RENTAL),
                     delivery_required=bool(old['delivery']),
                     app_channel=Reservation.AppChannel.MOBILE if old['iphone'] else Reservation.AppChannel.WEB,
                     # tax_percent=old['taxpct'],
@@ -629,7 +629,6 @@ class Command(BaseCommand):
         if 'do_sitecontent' in self.enabled:
             if clear_existing:
                 SiteContent.objects.all().delete()
-                db_key, page_key, page_name = page
             for page in (
                     ('about', 'about', 'About the Company',),
                     ('policies', 'policies', 'Policies',),
@@ -637,6 +636,7 @@ class Command(BaseCommand):
                     ('servicescont', 'services', 'Our Services',),
                     ('reservations', 'specials', 'Specials',),
             ):
+                db_key, page_key, page_name = page
                 back_cursor.execute(f"""SELECT {db_key} FROM vars""")
                 old_content = back_cursor.fetchone()
                 print(old_content)

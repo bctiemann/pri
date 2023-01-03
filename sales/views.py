@@ -115,6 +115,7 @@ class ReservationMixin:
             return {
                 'success': True,
                 'reservation_type': self.reservation_type,
+                'confirmation_code': generate_code(self.reservation_type),
                 'customer_site_url': self.get_honeypot_url(form=form),
             }
 
@@ -237,14 +238,16 @@ class VehicleMixin:
         return context
 
 
+# Reservation/Rental
+
 # This template is rendered with three forms: details (phase 1), payment (phase 2 for new user), and login (phase 2 for
-# returning user. All three forms have different validation needs and field sets
+# returning user). All three forms have different validation needs and field sets.
 class ReserveView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, NoJSFlowMixin, VehicleMixin, FormView):
     template_name = 'front_site/reserve/reserve.html'
     form_class = ReservationRentalDetailsForm
     payment_form_class = ReservationRentalPaymentForm
     login_form_class = ReservationRentalLoginForm
-    form_type = 'details1'
+    form_type = 'details'
     reservation_type = ServiceType.RENTAL
 
     # def get(self, request, *args, **kwargs):
