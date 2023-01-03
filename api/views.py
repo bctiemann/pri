@@ -516,11 +516,15 @@ class LegacyPostView(APIView):
         if method == 'getVehicle':
             view = GetVehicleView()
             vehicle_id = request.POST.get('vehicleid')
+            if not vehicle_id.isdigit():
+                return HttpResponseBadRequest()
             return view.get(request, vehicle_id=vehicle_id)
 
         if method == 'getVehiclePics':
             view = GetVehiclePicsView()
             vehicle_id = request.POST.get('vehicleid')
+            if not vehicle_id.isdigit():
+                return HttpResponseBadRequest()
             return view.get(request, vehicle_id=vehicle_id)
 
         if method == 'validateRentalIdentity':
