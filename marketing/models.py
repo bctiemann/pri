@@ -1,4 +1,5 @@
 import uuid
+from precise_bbcode.bbcode import get_parser
 
 from django.db import models
 from django.utils.text import slugify
@@ -46,6 +47,11 @@ class NewsItem(models.Model):
 
     def __str__(self):
         return f'{self.id} {self.created_at.date()} {self.slug}'
+
+    @property
+    def body_parsed(self):
+        parser = get_parser()
+        return parser.render(self.body)
 
     def save(self, *args, **kwargs):
         if not self.slug:

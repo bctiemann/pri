@@ -18,7 +18,7 @@ from django.urls import reverse_lazy, reverse
 from django.db import IntegrityError
 from django.db.models import Q
 from django.contrib.auth import authenticate, login
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponseBadRequest
 from django.forms.models import model_to_dict
 from django.utils import timezone
 
@@ -29,7 +29,7 @@ from sales.forms import (
     GiftCertificateForm, AdHocPaymentForm
 )
 from marketing.forms import NewsletterSubscribeForm, NewsletterUnsubscribeForm
-from marketing.models import NewsletterSubscription
+from marketing.models import NewsletterSubscription, NewsItem
 from customer_portal.forms import ReservationCustomerInfoForm
 from sales.models import BaseReservation, Reservation, Rental, TaxRate, AdHocPayment, GiftCertificate, generate_code
 from sales.tasks import send_email
@@ -40,7 +40,7 @@ from users.models import User, Customer, Employee, generate_password
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture
 from api.serializers import (
     VehicleSerializer, VehicleDetailSerializer, VehiclePicsSerializer, CustomerSearchSerializer,
-    ScheduleConflictSerializer, TaxRateFetchSerializer, CardSerializer
+    ScheduleConflictSerializer, TaxRateFetchSerializer, CardSerializer, NewsItemSerializer
 )
 from sales.views import ReservationMixin
 
@@ -83,6 +83,14 @@ class GetVehiclePicsView(APIView):
         except VehicleMarketing.DoesNotExist:
             raise Http404
         serializer = VehiclePicsSerializer(vehicle.pics, many=True)
+        return Response(serializer.data)
+
+
+class GetNewsView(APIView):
+
+    def get(self, request):
+        news_items = NewsItem.objects.all()
+        serializer = NewsItemSerializer(news_items, many=True)
         return Response(serializer.data)
 
 
@@ -495,6 +503,7 @@ class ConsignmentReserveView(APIView):
 
 
 # Single entrypoint to handle all API calls from mobile app
+# TODO: Rebuild mobile app to use bespoke API endpoints directly and remove the ajax_post.cfm url
 class LegacyPostView(APIView):
 
     def post(self, request):
@@ -533,15 +542,18 @@ class LegacyPostView(APIView):
 
         if method == 'validateRentalPayment':
             # If the first-phase form collected a known email, the app prompts for login_pass. If this is not
-            # present, we use the payment view/form which creates a new customer and payment data, and we assign
-            # a randomly generated password (the customer must reset it using the Forgot mechanism at present).
+            # present in this second-phase form data, we use the payment view/form which creates a new customer
+            # and payment data, and we assign a randomly generated password (the customer must reset it using
+            # the Forgot mechanism at present). Otherwise, we use the login form which uses the entered login_pass.
             if request.POST.get('login_pass'):
                 view = ValidateRentalLoginView()
             else:
                 view = ValidateRentalPaymentView()
 
+            # Hard-coded app key which must be present in the payload for this final form submit
             if request.POST.get('vk') != settings.MOBILE_KEY:
                 return Response({'success': False})
+
             new_password = generate_password()
             payload = dict(
                 reservation_type=request.POST.get('reservation_type'),
@@ -579,9 +591,11 @@ class LegacyPostView(APIView):
             )
             return view.post_legacy(request, payload)
 
-        # TODO: 'getNews'
+        if method == 'getNews':
+            view = GetNewsView()
+            return view.get(request)
 
-        return Response({})
+        return HttpResponseBadRequest()
 
 
 class LegacyVehicleMobileThumbnailView(APIView):

@@ -6,6 +6,7 @@ from phonenumber_field.serializerfields import PhoneNumberField
 from fleet.models import Vehicle, VehicleMarketing, VehiclePicture
 from users.models import Customer
 from sales.models import BaseReservation, Card
+from marketing.models import NewsItem
 
 
 class NationalizedPhoneNumberField(PhoneNumberField):
@@ -152,4 +153,22 @@ class CardSerializer(serializers.ModelSerializer):
             'exp_month',
             'exp_year',
             'fingerprint',
+        )
+
+
+class NewsItemSerializer(serializers.ModelSerializer):
+    # TODO for migration: deprecate below listed specified fields
+    newsid = serializers.IntegerField(source='id')
+    thenews = serializers.CharField(source='body_parsed')
+    stamp = serializers.SerializerMethodField()
+
+    def get_stamp(self, obj):
+        return obj.created_at.strftime('%m/%d/%Y %H:%M')
+
+    class Meta:
+        model = NewsItem
+        fields = (
+            'id', 'author_id', 'created_at', 'slug', 'subject', 'body',
+            # TODO: deprecate and remove below fields once mobile app is migrated to native field names
+            'newsid', 'thenews', 'stamp',
         )

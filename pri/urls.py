@@ -129,6 +129,8 @@ urlpatterns = [
     path('api/validate/newsletter/subscribe/', api_views.ValidateNewsletterSubscriptionView.as_view(), name='validate-newsletter-subscription'),
     path('api/validate/newsletter/unsubscribe/', api_views.ValidateNewsletterUnsubscriptionView.as_view(), name='validate-newsletter-unsubscribe'),
 
+    path('api/news/', api_views.GetNewsView.as_view(), name='get-news'),
+
     path('api/validate/gift/payment/', api_views.ValidateGiftCertificateView.as_view(), name='validate-gift-certificate'),
 
     path('api/validate/adhoc/payment/', api_views.ValidateAdHocPaymentView.as_view(), name='validate-adhoc-payment'),
