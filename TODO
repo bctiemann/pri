@@ -13,3 +13,6 @@ TODO: Mass email "done" page (styling, navigation)
 TODO: Wagtail for site content pages
 
 TODO: tracking functionality if necessary (see inc_trk.cfm); probably via middleware
+
+TODO: Check templates/accounts, especially change_password.html; are these necessary? Password reset functionality
+should be covered via customer_portal
