@@ -372,7 +372,6 @@ var formatPhone = function(str) {
     return str;
 };
 
-
 var refreshUI = function() {
     // Date pickers
     $('#id_out_date').datepicker({});
@@ -391,6 +390,19 @@ var refreshUI = function() {
     // Enforce formatting for phone numbers
     $('.phone').off().on('keyup change', function() {
         $(this).val(formatPhone($(this).val()));
+    });
+
+    // Reset Password dialog
+    $('.forgot-password').click(function() {
+        $('#dialog_reset_password').dialog({
+            modal: true,
+            buttons: {
+                'Reset Password': sendResetPassword,
+                'Cancel': function() {
+                    $(this).dialog('close');
+                },
+            }
+        });
     });
 
     // Credit card input processing

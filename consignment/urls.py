@@ -33,15 +33,16 @@ urlpatterns = [
 
     # AJAX route for requesting password reset token email
     path('recovery/password_reset/',
-         views.PasswordResetView.as_view(
-             template_name='accounts/password_reset_form.html',
-             from_email=settings.SUPPORT_EMAIL,
-             extra_email_context={
-                 'site_name': settings.COMPANY_NAME
-             },
-         ),
-         name='password_reset',
-     ),
+        views.PasswordResetView.as_view(
+            template_name='accounts/password_reset_form.html',
+            from_email=settings.SUPPORT_EMAIL,
+            extra_email_context={
+                'site_name': settings.COMPANY_NAME,
+                'site_url': settings.SERVER_BASE_URL,
+            },
+        ),
+        name='password_reset',
+    ),
 
     # Emailed link to form for resetting password
     path('recovery/reset/<uidb64>/<token>/', views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
