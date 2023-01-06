@@ -1,0 +1,22 @@
+<cfoutput>
+Dear #Form.fullname#,
+
+Performance Rentals is requesting a one-time payment for the following item:
+
+#Form.item# : #NumberFormat(Form.amount,"$,.__")#
+
+<CFIF len(Form.mesg)>
+
+Additional Instructions:
+
+#Form.mesg#
+</CFIF>
+
+In order to submit payment for this item via credit card, please visit the following URL:
+
+#OnSecSite#subpay.cfm?m=#mcrypt#&e=#URLEncodedFormat(Form.email)#
+
+If you have any questions, please feel free to call us at #contactphone# or email #siteemail#
+
+This e-mail has been automatically generated.
+</cfoutput>

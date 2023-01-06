@@ -70,6 +70,8 @@ class AdHocPaymentDetailView(AdminViewMixin, AdHocPaymentViewMixin, ListViewMixi
                 card.zip = form.cleaned_data['cc_zip']
                 card.save()
 
+        # TODO: If is_paid is changing from False to True, send adhoc_payment_complete.txt email
+
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
@@ -79,6 +81,8 @@ class AdHocPaymentDetailView(AdminViewMixin, AdHocPaymentViewMixin, ListViewMixi
 class AdHocPaymentCreateView(AdminViewMixin, AdHocPaymentViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/adhoc_payment/detail.html'
     form_class = AdHocPaymentForm
+
+    # TODO: send adhoc_payment_request.txt email
 
     def get_success_url(self):
         return reverse('backoffice:adhocpayment-detail', kwargs={'pk': self.object.id})

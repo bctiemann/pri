@@ -469,6 +469,13 @@ class ValidateAdHocPaymentView(APIView):
         payment.save()
 
         # TODO: Send templated email
+        """
+        <cfmail from="sales@performancerentals.us (Performance Rentals)" TO="#siteemail# (Performance Rentals)" subject="PRI SubPay - Submitted">
+#fullname# has just submitted payment information. Please check the admin area.
+
+This e-mail has been automatically generated.
+        </cfmail>
+        """
 
         response = {
             'success': form.is_valid(),
