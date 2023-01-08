@@ -315,6 +315,9 @@ class ValidatePerformanceExperiencePaymentView(ReservationMixin, APIView):
     def get_customer_site_url(self, confirmation_code):
         return reverse('customer_portal:perfexp-confirm', kwargs={'confirmation_code': confirmation_code}),
 
+    def get_honeypot_url(self, **kwargs):
+        return reverse('performance-experience-honeypot')
+
 
 class ValidatePerformanceExperienceLoginView(ValidatePerformanceExperiencePaymentView):
     authentication_classes = (SessionAuthentication,)
