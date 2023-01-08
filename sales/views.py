@@ -394,7 +394,6 @@ class ReserveHoneypotView(NavMenuMixin, VehicleMixin, TemplateView):
 
 
 # Performance Experience
-# TODO: Complete view classes to match Joy Ride
 
 class PerformanceExperienceView(NavMenuMixin, PaymentLoginFormMixin, ReservationMixin, NoJSFlowMixin, FormView):
     template_name = 'front_site/performance_experience/reserve.html'
