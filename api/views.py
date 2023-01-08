@@ -429,7 +429,18 @@ class ValidateGiftCertificateView(APIView):
 
         gift_certificate = form.save()
 
-        # TODO: Send templated email
+        email_subject = 'PRI Gift Certificate Confirmation'
+        email_context = {
+            'gift_certificate': gift_certificate,
+            'site_url': settings.SERVER_BASE_URL,
+            'company_phone': settings.COMPANY_PHONE,
+            'site_email': settings.SITE_EMAIL,
+        }
+        send_email(
+            [gift_certificate.email], email_subject, email_context,
+            text_template='front_site/email/gift_cert_confirm.txt',
+            html_template='front_site/email/gift_cert_confirm.html',
+        )
 
         response = {
             'success': form.is_valid(),

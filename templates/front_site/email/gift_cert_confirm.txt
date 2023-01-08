@@ -1,0 +1,11 @@
+Dear {{ gift_certificate.cc_name }},
+
+Thank you for purchasing a gift certificate! This message is to confirm that we have
+received your data and will be processing your certificate shortly. When it is ready, you
+will receive another message from us with download instructions.
+
+Thank you for choosing Performance Rentals!
+
+If you have any questions, please feel free to call us at {{ company_phone }} or email {{ site_email }}
+
+This e-mail has been automatically generated. Please do not reply to this address.
