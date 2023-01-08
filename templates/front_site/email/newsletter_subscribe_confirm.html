@@ -1,12 +1,21 @@
-Dear #name#,
-        
-You've recently added your e-mail address to our newsletter at performancerentals.us. As a
-verification step, please visit the following URL in order to confirm this action.
-            
-#OnSecSite#newsletter.cfm?email=#URLEncodedFormat(LCase(email))#&ckd=#mcrypt#&confirm=1
-            
-        
-If you DID NOT request this action, or you would like to unsubscribe from our newsletter, visit
-the following URL:   
-            
-#OnSecSite#newsletter.cfm?email=#URLEncodedFormat(LCase(email))#&ckd=#mcrypt#&unsub=1
+<p>
+    Dear {{ subscription.full_name }},
+</p>
+
+<p>
+    You've recently added your e-mail address to our newsletter at performancerentals.us. As a
+    verification step, please visit the following URL in order to confirm this action.
+</p>
+
+<p>
+    {{ site_url }}{% url "newsletter-subscribe-confirm" hash=subscription.hash %}
+</p>
+
+<p>
+    If you DID NOT request this action, or you would like to unsubscribe from our newsletter, visit
+    the following URL:
+</p>
+
+<p>
+    {{ site_url }}{% url "newsletter-unsubscribe" %}
+</p>

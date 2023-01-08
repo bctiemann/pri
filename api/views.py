@@ -361,7 +361,6 @@ class ValidateNewsletterSubscriptionView(APIView):
             'subscription': newsletter_subscription,
             'site_url': settings.SERVER_BASE_URL,
         }
-        # TODO: Format confirm emails and point to correct URL
         send_email(
             [form.cleaned_data['email']], email_subject, email_context,
             text_template='front_site/email/newsletter_subscribe_confirm.txt',
