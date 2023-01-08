@@ -327,6 +327,8 @@ MILITARY_DISCOUNT_PCT = 10
 SURVEY_DISCOUNT_PCT = 5
 
 EXTEND_THRESHOLD_HOURS = 6
+# 30m + 1 second to allow reservations of up to 30m beyond the time of delivery
+RENTAL_GRACE_PERIOD_SECS = 1801
 
 # Backoffice site seconds of idle until push to "sleeping" page
 ADMIN_SLEEP_TIMEOUT_SECS = 1500

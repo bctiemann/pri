@@ -257,23 +257,6 @@ class ReservationRentalDetailsForm(FormErrorMixin, forms.ModelForm):
         return super().clean()
 
     @property
-    def rental_duration(self):
-        try:
-            return self.cleaned_data['back_at'] - self.cleaned_data['out_at']
-        except (KeyError, TypeError):
-            return datetime.timedelta(seconds=0)
-
-    @property
-    def rental_duration_hours(self):
-        return self.rental_duration.days * 24
-
-    @property
-    def num_days(self):
-        # Allow 1 hour past delivery time
-        grace_period = 3600
-        return math.ceil((self.rental_duration.total_seconds() - grace_period) / 86400)
-
-    @property
     def tax_zip(self):
         return self.cleaned_data.get('delivery_zip') or settings.DEFAULT_TAX_ZIP
 
@@ -285,7 +268,7 @@ class ReservationRentalDetailsForm(FormErrorMixin, forms.ModelForm):
             return {}
         price_calculator = RentalPriceCalculator(
             vehicle_marketing=self.cleaned_data['vehicle_marketing'],
-            num_days=self.num_days,
+            num_days=self.instance.num_days,
             extra_miles=self.cleaned_data['extra_miles'],
             coupon_code=self.cleaned_data.get('coupon_code'),
             email=self.cleaned_data.get('email'),
