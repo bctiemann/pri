@@ -6,12 +6,13 @@ from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.forms.models import model_to_dict
 
 from . import ListViewMixin, AdminViewMixin
 from fleet.models import VehicleMarketing
 from sales.models import Reservation, Rental
 from sales.calculators import RentalPriceCalculator
-from backoffice.forms import ReservationForm
+from backoffice.forms import ReservationForm, RentalConversionForm
 
 
 # Template generics-based CRUD views
@@ -67,26 +68,31 @@ class ReservationConvertToRentalView(UpdateView):
 
     def form_valid(self, form):
         reservation = form.instance
+        reservation_data = model_to_dict(reservation)
 
         # Collect all the field values from the BaseReservation, which will be used to create the Rental
-        reservation_fields = {}
-        for field in reservation.basereservation_ptr._meta.get_fields():
-            if field.name not in ['id', 'reservation', 'rental']:
-                reservation_fields[field.name] = getattr(reservation, field.name)
+        # reservation_fields = {}
+        # for field in reservation.basereservation_ptr._meta.get_fields():
+        #     if field.name not in ['id', 'reservation', 'rental']:
+        #         reservation_fields[field.name] = getattr(reservation, field.name)
 
         # reservation_fields = vars(reservation)
         # reservation_fields.pop('id')
         # reservation_fields.pop('_state')
 
-        reservation_fields['type'] = Rental.ReservationType.RENTAL
-        reservation_fields['status'] = Rental.Status.CONFIRMED
+        # reservation_fields['type'] = Rental.ReservationType.RENTAL
+        # reservation_fields['status'] = Rental.Status.CONFIRMED
 
         # We delete the Reservation object before converting it to a Rental (no harm in this as Rental is a superset
         # of Reservation, except for the status field). Have to delete prior to creating rental to avoid collision
         # of confirmation_code.
         reservation.delete()
 
-        rental = Rental.objects.create(**reservation_fields)
+        # rental = Rental.objects.create(**reservation_fields)
+
+        reservation_data['status'] = Rental.Status.CONFIRMED
+        rental_form = RentalConversionForm(data=reservation_data)
+        rental = rental_form.save()
 
         # Populate a new Rental object with fields explicitly from the Reservation
         # rental = Rental.objects.create(

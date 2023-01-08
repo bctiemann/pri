@@ -352,6 +352,14 @@ class RentalForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):
         exclude = ('confirmation_code', 'customer',)
 
 
+class RentalConversionForm(forms.ModelForm):
+
+    class Meta:
+        model = Rental
+        # exclude = ('confirmation_code', 'customer',)
+        exclude = ()
+
+
 class EmployeeForm(forms.ModelForm):
     email = forms.EmailField(required=True)
     password = forms.CharField(widget=forms.PasswordInput(), required=True)
