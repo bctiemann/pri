@@ -380,7 +380,6 @@ class ValidateNewsletterUnsubscriptionView(APIView):
 
     form_type = None
 
-    # TODO: Unsubscribe here and in NewsletterUnsubscribeView
     def post(self, request):
         # form_class = self._get_form_class()
         form = NewsletterUnsubscribeForm(request.POST)
