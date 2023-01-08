@@ -1,0 +1,3 @@
+{{ payment.full_name }} has just submitted payment information. Please check the admin area.
+
+This e-mail has been automatically generated.

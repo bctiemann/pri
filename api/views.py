@@ -478,14 +478,16 @@ class ValidateAdHocPaymentView(APIView):
         payment.submitted_at = timezone.now()
         payment.save()
 
-        # TODO: Send templated email
-        """
-        <cfmail from="sales@performancerentals.us (Performance Rentals)" TO="#siteemail# (Performance Rentals)" subject="PRI SubPay - Submitted">
-#fullname# has just submitted payment information. Please check the admin area.
-
-This e-mail has been automatically generated.
-        </cfmail>
-        """
+        email_subject = 'PRI SubPay - Submitted'
+        email_context = {
+            'payment': payment,
+        }
+        send_email(
+            [settings.SITE_EMAIL], email_subject, email_context,
+            text_template='front_site/email/adhoc_payment_submitted.txt',
+            html_template='front_site/email/adhoc_payment_submitted.html',
+            from_address=settings.SALES_EMAIL,
+        )
 
         response = {
             'success': form.is_valid(),
