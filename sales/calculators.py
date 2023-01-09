@@ -146,7 +146,8 @@ class PriceCalculator(ABC):
 
         specific_discounts = sorted(specific_discounts, key=lambda x: x['discount'], reverse=True)
         self.specific_discount = specific_discounts[0]['discount']
-        self.specific_discount_label = specific_discounts[0]['label']
+        if self.specific_discount:
+            self.specific_discount_label = specific_discounts[0]['label']
 
     def get_tax_amount(self, value=None):
         if value is None:
