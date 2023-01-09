@@ -252,11 +252,6 @@ class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, CustomerSearchMix
     work_phone = PhoneNumberField(required=False)
     mobile_phone = PhoneNumberField(required=False)
 
-    # out_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
-    # out_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
-    # back_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
-    # back_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
-
     delivery_required = forms.ChoiceField(choices=DELIVERY_REQUIRED_CHOICES)
     extra_miles = forms.ChoiceField(choices=get_extra_miles_choices())
     send_email = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, required=False)
@@ -270,14 +265,8 @@ class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, CustomerSearchMix
         self.fields['vehicle'].choices = get_vehicle_choices()
         self.fields['vehicle'].widget.attrs['class'] = 'check-conflict'
 
-        # self.style_customer_search_fields()
-
         self.init_reservation_date_time()
 
-        # for field in ['drivers', 'delivery_zip', 'tax_percent', 'miles_included', 'coupon_code']:
-        #     self.add_widget_css_class(field, 'short')
-
-        # self.fields['tax_percent'].initial = decimal.Decimal(settings.DEFAULT_TAX_RATE) * 100
         if self.instance.id:
             self.fields['tax_percent'].initial = self.instance.get_price_data()['tax_rate'] * 100
         self.fields['override_subtotal'].widget.attrs['placeholder'] = 'Override'
@@ -301,11 +290,6 @@ class RentalForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):
         'rental_discount_pct', 'tax_percent'
     )
 
-    # out_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
-    # out_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
-    # back_at_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'short check-conflict'}))
-    # back_at_time = forms.ChoiceField(choices=get_service_hours(), widget=forms.Select(attrs={'class': 'check-conflict'}))
-
     delivery_required = forms.ChoiceField(choices=DELIVERY_REQUIRED_CHOICES)
     extra_miles = forms.ChoiceField(choices=get_extra_miles_choices())
     is_military = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, required=False)
@@ -323,13 +307,6 @@ class RentalForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):
         for field in ['out_at_date', 'back_at_date']:
             if self.instance.status == Rental.Status.COMPLETE:
                 self.add_widget_css_class(field, 'dont-edit')
-
-        # for field in [
-        #     'delivery_zip', 'miles_included', 'mileage_out', 'mileage_back', 'coupon_code',
-        #     'deposit_amount', 'deposit_charged_on', 'deposit_refund_amount', 'deposit_refunded_on',
-        #     'rental_discount_pct', 'tax_percent'
-        # ]:
-        #     self.add_widget_css_class(field, 'short')
 
         self.fields['tax_percent'].initial = self.instance.get_price_data()['tax_rate'] * 100
         self.fields['override_subtotal'].widget.attrs['placeholder'] = 'Override'
@@ -356,7 +333,6 @@ class RentalConversionForm(forms.ModelForm):
 
     class Meta:
         model = Rental
-        # exclude = ('confirmation_code', 'customer',)
         exclude = ()
 
 

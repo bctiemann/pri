@@ -10,7 +10,7 @@ from django.forms.models import model_to_dict
 
 from . import ListViewMixin, AdminViewMixin
 from fleet.models import VehicleMarketing
-from sales.models import Reservation, Rental
+from sales.models import Reservation, Rental, Driver
 from sales.calculators import RentalPriceCalculator
 from backoffice.forms import ReservationForm, RentalConversionForm
 
@@ -65,61 +65,25 @@ class ReservationDeleteView(DeleteView):
 class ReservationConvertToRentalView(UpdateView):
     model = Reservation
     fields = ()
+    rental = None
 
     def form_valid(self, form):
         reservation = form.instance
-        reservation_data = model_to_dict(reservation)
 
         # Collect all the field values from the BaseReservation, which will be used to create the Rental
-        # reservation_fields = {}
-        # for field in reservation.basereservation_ptr._meta.get_fields():
-        #     if field.name not in ['id', 'reservation', 'rental']:
-        #         reservation_fields[field.name] = getattr(reservation, field.name)
-
-        # reservation_fields = vars(reservation)
-        # reservation_fields.pop('id')
-        # reservation_fields.pop('_state')
-
-        # reservation_fields['type'] = Rental.ReservationType.RENTAL
-        # reservation_fields['status'] = Rental.Status.CONFIRMED
+        reservation_data = model_to_dict(reservation)
 
         # We delete the Reservation object before converting it to a Rental (no harm in this as Rental is a superset
         # of Reservation, except for the status field). Have to delete prior to creating rental to avoid collision
         # of confirmation_code.
         reservation.delete()
 
-        # rental = Rental.objects.create(**reservation_fields)
-
         reservation_data['status'] = Rental.Status.CONFIRMED
         rental_form = RentalConversionForm(data=reservation_data)
-        rental = rental_form.save()
+        self.rental = rental_form.save()
 
-        # Populate a new Rental object with fields explicitly from the Reservation
-        # rental = Rental.objects.create(
-        #     type=Rental.ReservationType.RENTAL,
-        #     vehicle=reservation.vehicle,
-        #     customer=reservation.customer,
-        #     reserved_at=reservation.reserved_at,
-        #     out_at=reservation.out_at,
-        #     back_at=reservation.back_at,
-        #     drivers=reservation.drivers,
-        #     miles_included=reservation.miles_included,
-        #     extra_miles=reservation.extra_miles,
-        #     customer_notes=reservation.customer_notes,
-        #     coupon_code=reservation.coupon_code,
-        #     is_military=reservation.is_military,
-        #     deposit_amount=reservation.deposit_amount,
-        #     confirmation_code=reservation.confirmation_code,
-        #     app_channel=reservation.app_channel,
-        #     delivery_required=reservation.delivery_required,
-        #     delivery_zip=reservation.delivery_zip,
-        #     override_subtotal=reservation.override_subtotal,
-        #     final_price_data=reservation.final_price_data,
-        #     status=Rental.Status.CONFIRMED,
-        # )
-        self.rental = rental
-
-        # TODO: Add primary driver to Driver model
+        # Add the customer as the rental's primary driver
+        Driver.objects.create(rental=self.rental, customer=self.rental.customer, is_primary=True)
 
         return HttpResponseRedirect(self.get_success_url())
 
