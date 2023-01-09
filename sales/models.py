@@ -218,18 +218,14 @@ class BaseReservation(ConfirmationCodeMixin, EmailConfirmationMixin, models.Mode
 
     @property
     def rental_duration(self):
-        try:
-            return self.back_at - self.out_at
-        except (KeyError, TypeError):
-            return datetime.timedelta(seconds=0)
+        return self.back_at - self.out_at
 
     @property
     def num_days(self):
         if self.out_at and self.back_at:
             # Pad the selection with 30m so the estimate comes out to 1 day if up to 24.5 hours
             grace_period = datetime.timedelta(seconds=settings.RENTAL_GRACE_PERIOD_SECS)
-            rental_length = (self.rental_duration - grace_period)
-            return int(rental_length.days) + 1
+            return int((self.rental_duration - grace_period).days) + 1
         return 0
 
     @property
