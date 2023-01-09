@@ -21,6 +21,9 @@ from django.conf.urls import static
 from django.conf import settings
 from django.contrib.sitemaps.views import sitemap
 
+from wagtail.admin import urls as wagtailadmin_urls
+from wagtail import urls as wagtail_urls
+
 from sitemaps import sitemaps
 from api import views as api_views
 from fleet import views as rentals_views
@@ -37,6 +40,8 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     # Django admin site (generic database backend operations, CRUD, user management, etc)
     path('spork/', admin.site.urls),
+
+    path('cms/', include(wagtailadmin_urls)),
 
     path('sign_out/', users_views.LogoutView.as_view(next_page='home'), name='sign-out'),
 
@@ -170,6 +175,7 @@ urlpatterns = [
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
 
     path('', include(tf_urls, 'two_factor')),
+    path('', include(wagtail_urls)),
 ]
 
 # This maps the MEDIA_ROOT url for local development

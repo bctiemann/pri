@@ -27,3 +27,4 @@ pdfkit==1.0.0
 stripe==2.64.0
 redis==4.2.2
 hiredis==2.0.0
+wagtail==4.1.1

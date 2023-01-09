@@ -61,8 +61,25 @@ INSTALLED_APPS = [
     'service',
     'consignment',
     'marketing',
+    'content',
     'customer_portal',
     'backoffice',
+
+    # Wagtail
+    'wagtail.contrib.forms',
+    'wagtail.contrib.redirects',
+    'wagtail.embeds',
+    'wagtail.sites',
+    'wagtail.users',
+    'wagtail.snippets',
+    'wagtail.documents',
+    'wagtail.images',
+    'wagtail.search',
+    'wagtail.admin',
+    'wagtail',
+
+    'modelcluster',
+    'taggit',
 ]
 
 MIDDLEWARE = [
@@ -77,6 +94,7 @@ MIDDLEWARE = [
     'pri.middleware.RemoteHostMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'wagtail.contrib.redirects.middleware.RedirectMiddleware',
 ]
 
 ROOT_URLCONF = 'pri.urls'
@@ -286,6 +304,9 @@ SITE_EMAIL = 'info@performancerentals.us'
 DEBUG_EMAIL = 'btman@mac.com'
 RESERVATIONS_EMAIL = 'reservations@performancerentals.us'
 SALES_EMAIL = 'sales@performancerentals.us'
+
+WAGTAIL_SITE_NAME = 'Performance Rentals'
+WAGTAILADMIN_BASE_URL = 'http://127.0.0.1:8000/cms'
 
 # Choices for country picker for vehicle origins
 COUNTRIES_ONLY = ['US', 'JP', 'IT', 'GB', 'DE']

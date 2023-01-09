@@ -60,6 +60,10 @@ i, em {
 	font-weight: bold;
 }
 
+.right {
+	float: right;
+}
+
 .ant-footer {
 	position: absolute;
 	top: 30px;
