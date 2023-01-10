@@ -229,10 +229,7 @@ class VehicleMixin:
         slug = self.kwargs.get('slug')
         # We filter() rather than get() because vehicle_marketing.slug is not unique (we may have multiple of the
         # same vehicle)
-        ready_vehicles = VehicleMarketing.objects.filter(slug=slug, status=VehicleStatus.READY)
-        if not settings.BIKES_ENABLED:
-            ready_vehicles = ready_vehicles.filter(vehicle_type=VehicleType.CAR)
-        context['vehicle'] = ready_vehicles.first()
+        context['vehicle'] = VehicleMarketing.objects.ready().filter(slug__iexact=slug).first()
         if not context['vehicle']:
             raise Http404
         return context

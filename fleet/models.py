@@ -141,6 +141,16 @@ class Vehicle(models.Model):
         ordering = ('year',)
 
 
+# Custom Manager class which adds a ready() filter to automatically select only the available vehicles
+class VehicleMarketingManager(models.Manager):
+
+    def ready(self):
+        ready_vehicles = self.get_queryset().filter(status=VehicleStatus.READY)
+        if not settings.BIKES_ENABLED:
+            ready_vehicles = ready_vehicles.filter(vehicle_type=VehicleType.CAR)
+        return ready_vehicles
+
+
 # VehicleMarketing is the "front-end" representation of a vehicle, which contains no sensitive information.
 class VehicleMarketing(models.Model):
 
@@ -201,6 +211,8 @@ class VehicleMarketing(models.Model):
     discount_7_day = models.IntegerField(null=True, blank=True, verbose_name='7-day discount', help_text='Percent')
     security_deposit = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
     miles_included = models.IntegerField(null=True, blank=True, help_text='Per day')
+
+    objects = VehicleMarketingManager()
 
     # In the event of multiple vehicles matching this marketing representation, we pick the first one per the
     # Meta.ordering setting
