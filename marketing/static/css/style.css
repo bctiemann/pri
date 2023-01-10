@@ -60,6 +60,10 @@ i, em {
 	font-weight: bold;
 }
 
+.left {
+	float: left;
+}
+
 .right {
 	float: right;
 }
@@ -2147,18 +2151,46 @@ span.ui-icon {
 .services-block img {
 	width: 270px;
 }
-.services-block img.float-left {
+.services-block img.float-left,
+.well img.left {
 	margin-right: 20px;
+	margin-bottom: 20px;
 }
-.services-block img.float-right {
+.services-block img.float-right,
+.well img.right {
 	margin-left: 20px;
+	margin-bottom: 20px;
 }
-.services-block ul {
+.services-block ul,
+.well ul {
 	list-style-type: square;
 	padding-left: 20px;
 }
-.services-block li {
+.services-block li,
+.well li {
 	margin: 5px;
+}
+
+.well hr {
+	margin: 20px 0px;
+	clear: both;
+}
+
+.well .block-table caption {
+	padding: 4px;
+	text-decoration: underline;
+}
+.well .block-table td {
+	padding: 4px;
+}
+.well .block-table td:first-child {
+	text-align: right;
+	padding-right: 20px;
+	min-width: 240px;
+}
+.well .block-table td:last-child {
+	padding-left: 20px;
+	color: #666;
 }
 
 ul.prose {
