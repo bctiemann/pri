@@ -1,9 +1,11 @@
+import os
 import datetime
 import logging
 import pytz
 import requests
 import stripe
 from stripe.error import CardError
+import pdfkit
 
 from rest_framework import viewsets, mixins, status
 from rest_framework.views import APIView
@@ -21,6 +23,7 @@ from django.contrib.auth import authenticate, login
 from django.http import Http404, HttpResponseRedirect, HttpResponseBadRequest
 from django.forms.models import model_to_dict
 from django.utils import timezone
+from django.template.loader import get_template
 
 from sales.forms import (
     ReservationRentalDetailsForm, ReservationRentalPaymentForm, ReservationRentalLoginForm,
@@ -782,7 +785,7 @@ class CheckScheduleConflictView(APIView):
 
 
 class SendInsuranceAuthView(APIView):
-
+    template_name = 'pdf/info_auth.html'
     authentication_classes = (SessionAuthentication,)
     permission_classes = (HasReservationsAccess,)
 
@@ -803,12 +806,41 @@ class SendInsuranceAuthView(APIView):
             'site_email': settings.SITE_EMAIL,
         }
 
-        # TODO: Update PDF with current address/info, and make editable
-        # TODO: Generate PDF dynamically
+        template = get_template(self.template_name)
+        context = {
+            'static_root': settings.STATIC_ROOT,
+            'company_name': settings.COMPANY_NAME,
+            'company_phone': settings.COMPANY_PHONE,
+            'company_fax': settings.COMPANY_FAX,
+            'company_address': settings.COMPANY_ADDRESS,
+        }
+        html = template.render(context)
+
+        options = {
+            'quiet': '',
+            'page-size': 'Letter',
+            'margin-top': '0.75in',
+            'margin-right': '1.0in',
+            'margin-bottom': '0.0in',
+            'margin-left': '1.0in',
+            'encoding': "UTF-8",
+            'no-outline': None,
+            "enable-local-file-access": "",
+        }
+
+        kwargs = {}
+        wkhtmltopdf_bin = os.environ.get('WKHTMLTOPDF_BIN')
+        if wkhtmltopdf_bin:
+            kwargs['configuration'] = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_bin)
+
+        pdf = pdfkit.from_string(html, False, options, **kwargs)
+
         attachments = []
-        with open(f'{settings.BASE_DIR}/templates/attachments/PRI-infoauth.pdf', 'rb') as file:
-            attachment_data = file.read()
-        attachments.append({'filename': 'PRI-infoauth.pdf', 'content': attachment_data, 'mimetype': 'application/pdf'})
+        attachments.append({'filename': 'PRI-infoauth.pdf', 'content': pdf, 'mimetype': 'application/pdf'})
+
+        # TODO: This form (info_auth.html) is for collecting credit card info, not insurance info. Need to replace
+        #  this with a form which asks the customer for written permission to seek insurance coverage info from their
+        #  insurance provider.
 
         send_email(
             [customer.email], email_subject, email_context,

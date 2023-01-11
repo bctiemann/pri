@@ -1,0 +1,189 @@
+{% load static bbcode_tags %}
+
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+    <title>PRI Info Authorization</title>
+    <style type="text/css">
+        @import url("{% static "backoffice/css/contract.css" %}"");
+
+        body  {
+            font-size: 18px;
+            font-family: Verdana;
+        }
+
+        .address {
+            font-weight: bold;
+            margin: 30px 0px;
+        }
+
+        h3 {
+            text-decoration: underline;
+            font-size: 18px;
+            font-weight: normal;
+            margin: 60px 0px 20px 0px;
+        }
+
+        h4 {
+            text-decoration: underline;
+            font-size: 18px;
+            font-weight: normal;
+            margin-top: 50px;
+        }
+
+        .centered {
+            text-align: center;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        /* Page Breaks */
+        .pb_before {
+            page-break-before: always !important;
+        }
+
+        .pb_after {
+            page-break-after: always !important;
+        }
+
+        .pbi_avoid {
+            page-break-inside: avoid !important;
+        }
+    </style>
+</head>
+
+<body>
+
+<img src="{{ static_root }}/backoffice/images/PRI_logo_adm.jpg"/>
+
+<div class="address">
+    {{ company_name }}, Inc.
+    {{ company_address|bbcode|safe }}
+    Tel. {{ company_phone }} Fax. {{ company_fax }}
+</div>
+
+<p>
+    I hereby authorize Performance Rentals, Inc. to conduct or perform any verifications they deem necessary including,
+    but not limited to: a State Driver License check, address verification, insurance verification, employment
+    verification, criminal background checks and credit history; in order to establish my identity and suitability for
+    the rental of one of their vehicles.
+</p>
+
+<p>
+    I authorize Performance Rentals, Inc. and their agents to obtain my insurance coverage and related information from
+    _________________________________, policy number _______________________. Please provide policy limits, collision
+    coverage and deductible information to Performance Rentals, Inc. upon their request.
+</p>
+
+<p>
+    I also authorize Performance Rentals, Inc to charge my credit card or cards, specified below, for the amounts
+    discussed in the accompanying email/fax or verbal discussions for the reservation and deposit amounts.
+</p>
+
+<p>
+    Cancellation Policy and Fees: I hereby acknowledge that this rental is for a unique and specialized vehicle and my
+    reservation will be guaranteed with the vehicle being held for me until the scheduled rental time, except in the
+    event I am unable to provide sufficient information and/or credit authorizations, or meet any rental policy
+    requirement. I understand there is a $100 cancellation fee for reservations cancelled within 10 calendar days of the
+    rental period. I understand a fee of 50% of the rental amount, or $500, whichever is greater, shall be imposed for
+    reservations cancelled within 5 calendar days of the rental period. I understand a fee of 100% of the rental amount
+    will be imposed for reservations cancelled within 72 hours of the rental period, or if I do not arrive or otherwise
+    make myself available at the specified time to take delivery of my rental vehicle.
+</p>
+
+<p class="pb_after"></p>
+
+<p>
+    Agreed to on: ___ / ___ / ____
+</p>
+
+<p>Renter or Agent Signature:_____________________________________</p>
+
+<p>Renter’s Name: _____________________________________</p>
+
+<h3 class="centered">
+    Credit Card Information
+</h3>
+
+<h4>Card #1</h4>
+
+<p>
+    Card Type: Visa / MasterCard / Discover / AMEX (Circle One)
+</p>
+
+<p>
+    Card Number: _________________________________________
+</p>
+
+<p>
+    Name on Card: ________________________________________
+</p>
+
+<p>
+    Expiration Date: ______ / _______
+</p>
+
+<p>
+    CVV2 Verification Number: ______ (Last 3 or 4 digits on signature stripe)
+</p>
+
+<p>
+    Amount to be Charged: _________
+</p>
+
+<p>
+    I agree to pay Performance Rentals, Inc. the amount specified in accordance with my cardholder agreement.
+</p>
+
+<p>
+    Signature: __________________________________
+</p>
+
+<p>
+    Date: _____ / _____
+</p>
+
+<h4>Card #2</h4>
+
+<p>
+    Card Type: Visa / MasterCard / Discover / AMEX (Circle One)
+</p>
+
+<p>
+    Card Number: _________________________________________
+</p>
+
+<p>
+    Name on Card: ________________________________________
+</p>
+
+<p>
+    Expiration Date: ______ / _______
+</p>
+
+<p>
+    CVV2 Verification Number: ______ (Last 3 or 4 digits on signature stripe)
+</p>
+
+<p>
+    Amount to be Charged: _________
+</p>
+
+<p>
+    I agree to pay Performance Rentals, Inc. the amount specified in accordance with my cardholder agreement.
+</p>
+
+<p>
+    Signature: __________________________________
+</p>
+
+<p>
+    Date: _____ / _____
+</p>
+
+</body>
+</html>

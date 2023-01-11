@@ -287,6 +287,7 @@ SITE_ID = 1
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')
 STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -298,7 +299,10 @@ COMPANY_NAME = 'Performance Rentals'
 COMPANY_PHONE = '(866) 607-0084'
 COMPANY_FAX = '(845) 357-3535'
 # COMPANY_ADDRESS = '373 Margaret King Ave, Ringwood NJ 07430'
-COMPANY_ADDRESS = '1821 2nd Ave, Tampa FL 33605'
+COMPANY_ADDRESS = '''
+1821 2nd Ave
+Tampa FL 33605
+'''
 COMPANY_FOUNDING_YEAR = 2008
 SUPPORT_EMAIL = 'support@performance.rentals'
 SITE_EMAIL = 'info@performancerentals.us'
@@ -391,6 +395,7 @@ RECAPTCHA_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
 
 # Show the bike fleet?
 BIKES_ENABLED = True
+
 
 # Local overrides from env.yaml
 with open(os.path.join(BASE_DIR, 'env.yaml')) as f:
