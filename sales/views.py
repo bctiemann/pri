@@ -1,3 +1,5 @@
+import datetime
+
 from django.conf import settings
 from django.views.generic import TemplateView, FormView, CreateView, UpdateView
 from django.http import Http404, HttpResponseRedirect
@@ -108,9 +110,17 @@ class ReservationMixin:
                 'errors': form.errors,
             }
 
+        # Check IP here. If more than 2 customers created with the same IP in the last 10 minutes, create an IPBan.
+        if settings.REGISTRATION_FROM_SAME_IP_AUTO_BLOCK:
+            ten_minutes_ago = timezone.now() - datetime.timedelta(
+                minutes=settings.REGISTRATION_FROM_SAME_IP_INTERVAL_MINS
+            )
+            check_customers = Customer.objects.filter(created_at__gt=ten_minutes_ago, registration_ip=request.remote_ip)
+            if check_customers.count() > settings.REGISTRATION_FROM_SAME_IP_COUNT - 1:
+                IPBan.objects.create(ip_address=request.remote_ip, prefix_bits=32)
+
         # IP-based block list will send client to the honeypot success page and short-circuit all further processing.
         # Can be set globally (in settings.py or env.yaml) or by creating an IPBan.
-
         kill_switch = settings.KILL_SWITCH or IPBan.ip_is_banned(request.remote_ip)
         if kill_switch:
             return {
@@ -119,6 +129,8 @@ class ReservationMixin:
                 'confirmation_code': generate_code(self.reservation_type),
                 'customer_site_url': self.get_honeypot_url(form=form),
             }
+
+        # Passed abuse checks; now proceed with validating the login credentials.
 
         # Create Customer or login existing user
         customer = self._get_login_customer(request, form)
@@ -130,8 +142,6 @@ class ReservationMixin:
                     'password': ['Incorrect password'],
                 },
             }
-
-        # TODO: Check IP here. If more than 2 customers created with the same IP in the last 10 minutes, create an IPBan.
 
         # Create Reservation
 

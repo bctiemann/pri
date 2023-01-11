@@ -396,8 +396,15 @@ RECAPTCHA_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
 # Show the bike fleet?
 BIKES_ENABLED = True
 
+
+# Anti-abuse settings
+
 # Set to True to block all reservation creation and send all requests (i.e. by a bot) to a honeypot result page
 KILL_SWITCH = False
+# If more than COUNT customers are registered from the same IP within INTERVAL_MINS minutes, create an IPBan
+REGISTRATION_FROM_SAME_IP_AUTO_BLOCK = True
+REGISTRATION_FROM_SAME_IP_COUNT = 2
+REGISTRATION_FROM_SAME_IP_INTERVAL_MINS = 10
 
 
 # Local overrides from env.yaml
