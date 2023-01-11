@@ -609,7 +609,7 @@ class IPBanManager(models.Manager):
 
 class IPBan(models.Model):
     ip_address = models.GenericIPAddressField()
-    prefix_bits = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(32)])
+    prefix_bits = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(32)])
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('users.User', null=True, blank=True, on_delete=models.SET_NULL)
     expires_at = models.DateTimeField(null=True, blank=True)
@@ -637,6 +637,23 @@ class IPBan(models.Model):
             if ip_addr in ip_ban.cidr_address:
                 return True
         return False
+
+    @classmethod
+    @property
+    def global_ban_objects(cls):
+        return cls.objects.active().filter(ip_address='0.0.0.0', prefix_bits=0)
+
+    @classmethod
+    @property
+    def global_kill_switch(cls):
+        return cls.global_ban_objects.exists()
+
+    @classmethod
+    def toggle_global_kill_switch(cls):
+        if cls.global_kill_switch:
+            cls.global_ban_objects.delete()
+        else:
+            cls.objects.create(ip_address='0.0.0.0', prefix_bits=0)
 
 
 class AdHocPayment(ConfirmationCodeMixin, models.Model):

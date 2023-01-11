@@ -117,6 +117,7 @@ urlpatterns = [
     path('ip_bans/create/', ip_bans.IPBanCreateView.as_view(is_create_view=True), name='ipban-create'),
     path('ip_bans/<int:pk>/', ip_bans.IPBanDetailView.as_view(), name='ipban-detail'),
     path('ip_bans/<int:pk>/delete/', ip_bans.IPBanDeleteView.as_view(), name='ipban-delete'),
+    path('ip_bans/kill_switch/toggle/', ip_bans.IPBanKillSwitchToggleView.as_view(), name='ipban-kill-switch-toggle'),
 
     path('bbs/', bbs.BBSListView.as_view(), name='bbs-list'),
     path('bbs/<int:pk>/reply/', bbs.BBSReplyPostView.as_view(), name='bbs-reply'),

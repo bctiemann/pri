@@ -2,6 +2,29 @@
 
 {% block content %}
 
+    <form method="POST" action="{% url "backoffice:ipban-kill-switch-toggle" %}">
+        {% if global_kill_switch %}
+            <p>Global kill switch is ENGAGED. All reservation attempts will be blocked and clients sent to a honeypot.</p>
+            <button
+                class="btn"
+                type="submit"
+                name="disengage"
+            >
+                Disengage
+            </button>
+        {% else %}
+            <p>Global kill switch is DISENGAGED. If engaged, all reservation attempts will be blocked and clients sent to a honeypot.</p>
+            <button
+                class="btn delete solo"
+                type="submit"
+                name="engage"
+            >
+                Global Kill Switch
+            </button>
+        {% endif %}
+        {% csrf_token %}
+    </form>
+
     {% include "backoffice/includes/paginator.html" %}
 
     <table class="data alternating" sortedby="{{ sortby }}">

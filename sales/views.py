@@ -120,8 +120,9 @@ class ReservationMixin:
                 IPBan.objects.create(ip_address=request.remote_ip, prefix_bits=32)
 
         # IP-based block list will send client to the honeypot success page and short-circuit all further processing.
-        # Can be set globally (in settings.py or env.yaml) or by creating an IPBan.
-        kill_switch = settings.KILL_SWITCH or IPBan.ip_is_banned(request.remote_ip)
+        # Can be set globally (in settings.py or env.yaml) or by creating an IPBan, or by using the "global kill switch"
+        # (a synonym for an IPBan of 0.0.0.0/0).
+        kill_switch = settings.KILL_SWITCH or IPBan.global_kill_switch or IPBan.ip_is_banned(request.remote_ip)
         if kill_switch:
             return {
                 'success': True,

@@ -776,18 +776,11 @@ class IPBanForm(CSSClassMixin, forms.ModelForm):
 
     expires_on = forms.DateField(widget=forms.DateInput(), required=False)
 
-    # TODO: Global block (synonym for 0.0.0.0/0)
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance.expires_at:
             expires_at_localized = self.instance.expires_at.astimezone(pytz.timezone(settings.TIME_ZONE))
             self.fields['expires_on'].initial = expires_at_localized.strftime('%m/%d/%Y')
-
-    def clean_prefix_bits(self):
-        if self.cleaned_data['prefix_bits'] == 0:
-            raise forms.ValidationError('Cannot specify prefix bit length of 0.')
-        return self.cleaned_data['prefix_bits']
 
     def clean(self):
         super().clean()

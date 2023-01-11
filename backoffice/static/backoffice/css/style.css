@@ -1029,6 +1029,10 @@ input.dont-edit {
   margin-left: 100px;
 }
 
+.btn.delete.solo {
+  margin-left: 0px;
+}
+
 .btn.delete:hover {
   background: #fac0c5;
   background-image: -webkit-linear-gradient(top, #fac0c5, #cc6843);
