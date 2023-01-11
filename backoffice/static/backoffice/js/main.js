@@ -838,6 +838,7 @@ $(document).ready(function() {
     $('#id_paid_on_picker').datepicker({});
     $('#id_damaged_on').datepicker({});
     $('#id_repaired_on').datepicker({});
+    $('#id_expires_on').datepicker({});
 
     $('#id_select_vehicle').change(function() {
         selectVehicle();

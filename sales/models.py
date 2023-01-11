@@ -23,6 +23,7 @@ from django.db import models, IntegrityError
 from django.utils.timezone import now
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import reverse
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from sales.enums import SERVICE_TYPE_CODE_MAP, ServiceType
 from sales.utils import EncryptedUSSocialSecurityNumberField, format_cc_number
@@ -608,7 +609,7 @@ class IPBanManager(models.Manager):
 
 class IPBan(models.Model):
     ip_address = models.GenericIPAddressField()
-    prefix_bits = models.IntegerField()
+    prefix_bits = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(32)])
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('users.User', null=True, blank=True, on_delete=models.SET_NULL)
     expires_at = models.DateTimeField(null=True, blank=True)
