@@ -6,7 +6,7 @@ from django.views.generic import TemplateView, FormView, CreateView, UpdateView
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import reverse
 from django.db import IntegrityError
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django import forms
 from django.utils import timezone
 
@@ -72,13 +72,15 @@ class ReservationMixin:
         # form.customer is just Customer filtered by the given email; may or may not be authenticated as
         # the linked User.
         if form.customer:
-            # TODO: If authenticated user is not the same as the user in the request, logout and re-auth using POST data
-            if request.user.is_authenticated:
-                return form.customer
+            if request.user.is_authenticated and request.user.customer != form.customer:
+                # User was already logged in and is now using new credentials. Log them out so they're forced to
+                # re-auth.
+                logout(request)
+            # Re-auth even if user is already authenticated.
             if authenticate(request, username=form.customer.email, password=form.cleaned_data.get('password')):
                 login(request, form.customer.user)
                 return form.customer
-            # Only way to get here is if password is incorrect for an existing user's email
+            # Only way to get here is if password is incorrect for an existing user's email.
             raise ValueError('Incorrect password.')
 
         else:
