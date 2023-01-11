@@ -17,7 +17,7 @@ from sales.forms import (
     JoyRideDetailsForm, JoyRidePaymentForm, JoyRideLoginForm,
     GiftCertificateForm, AdHocPaymentForm
 )
-from sales.models import GiftCertificate, AdHocPayment, generate_code
+from sales.models import GiftCertificate, AdHocPayment, IPBan, generate_code
 from sales.enums import ServiceType
 from marketing.views import NavMenuMixin
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
@@ -108,9 +108,11 @@ class ReservationMixin:
                 'errors': form.errors,
             }
 
-        # TODO: kill switch
-        # IP-based block list will send client to the honeypot success page and short-circuit all further processing
-        kill_switch = False
+        # IP-based block list will send client to the honeypot success page and short-circuit all further processing.
+        # Can be set globally (in settings.py or env.yaml) or by creating an IPBan.
+
+        remote_addr = request.META.get('REMOTE_ADDR') or request.META.get('HTTP_X_FORWARDED_FOR') or ''
+        kill_switch = settings.KILL_SWITCH or IPBan.ip_is_banned(remote_addr)
         if kill_switch:
             return {
                 'success': True,
@@ -130,8 +132,7 @@ class ReservationMixin:
                 },
             }
 
-        # TODO: Check IP here. If more than 2 customers created with the same IP in the last 10 minutes, fail silently.
-        #  Push to honeypot success page.
+        # TODO: Check IP here. If more than 2 customers created with the same IP in the last 10 minutes, create an IPBan.
 
         # Create Reservation
 

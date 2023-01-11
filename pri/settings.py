@@ -396,6 +396,9 @@ RECAPTCHA_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
 # Show the bike fleet?
 BIKES_ENABLED = True
 
+# Set to True to block all reservation creation and send all requests (i.e. by a bot) to a honeypot result page
+KILL_SWITCH = False
+
 
 # Local overrides from env.yaml
 with open(os.path.join(BASE_DIR, 'env.yaml')) as f:

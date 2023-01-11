@@ -7,6 +7,9 @@ import uuid
 import logging
 import string
 import ipaddress
+
+from typing import Union
+
 from localflavor.us.models import USStateField, USZipCodeField
 from avalara import AvataxClient
 from requests import HTTPError
@@ -597,12 +600,20 @@ class RedFlag(models.Model):
     remarks = models.TextField(blank=True)
 
 
+class IPBanManager(models.Manager):
+
+    def active(self):
+        return self.get_queryset().filter(models.Q(expires_at__isnull=True) | models.Q(expires_at__gt=now()))
+
+
 class IPBan(models.Model):
     ip_address = models.GenericIPAddressField()
     prefix_bits = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('users.User', null=True, blank=True, on_delete=models.SET_NULL)
     expires_at = models.DateTimeField(null=True, blank=True)
+
+    objects = IPBanManager()
 
     @property
     def cidr_address(self):
@@ -611,6 +622,18 @@ class IPBan(models.Model):
     @property
     def network_address(self):
         return self.cidr_address.network_address
+
+    @classmethod
+    def ip_is_banned(cls, ip_addr: Union[str, ipaddress.IPv4Address]) -> bool:
+        if isinstance(ip_addr, str):
+            try:
+                ip_addr = ipaddress.IPv4Address(ip_addr)
+            except ipaddress.AddressValueError:
+                return False
+        for ip_ban in cls.objects.active():
+            if ip_addr in ip_ban.cidr_address:
+                return True
+        return False
 
 
 class AdHocPayment(ConfirmationCodeMixin, models.Model):
