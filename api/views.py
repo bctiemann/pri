@@ -838,10 +838,6 @@ class SendInsuranceAuthView(APIView):
         attachments = []
         attachments.append({'filename': 'PRI-infoauth.pdf', 'content': pdf, 'mimetype': 'application/pdf'})
 
-        # TODO: This form (info_auth.html) is for collecting credit card info, not insurance info. Need to replace
-        #  this with a form which asks the customer for written permission to seek insurance coverage info from their
-        #  insurance provider.
-
         send_email(
             [customer.email], email_subject, email_context,
             from_address=email_from,
