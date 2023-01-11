@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 from django.conf import settings
 from django.views.generic import TemplateView, FormView, CreateView, UpdateView
@@ -29,6 +30,8 @@ customer_fields = (
     'first_name', 'last_name', 'mobile_phone', 'home_phone', 'work_phone', 'fax', 'cc_number', 'cc_exp_yr',
     'cc_exp_mo', 'cc_cvv', 'cc_phone', 'address_line_1', 'address_line_2', 'city', 'state', 'zip'
 )
+
+logger = logging.getLogger(__name__)
 
 
 # All 2-part forms (where the first phase collects the reservation details, and the second phase is either a login form
@@ -66,6 +69,8 @@ class ReservationMixin:
 
     @staticmethod
     def _get_login_customer(request, form):
+        # form.customer is just Customer filtered by the given email; may or may not be authenticated as
+        # the linked User.
         if form.customer:
             # TODO: If authenticated user is not the same as the user in the request, logout and re-auth using POST data
             if request.user.is_authenticated:
@@ -73,18 +78,36 @@ class ReservationMixin:
             if authenticate(request, username=form.customer.email, password=form.cleaned_data.get('password')):
                 login(request, form.customer.user)
                 return form.customer
-            # Only way to return None is if password is incorrect for an existing user's email
-            return None
+            # Only way to get here is if password is incorrect for an existing user's email
+            raise ValueError('Incorrect password.')
+
         else:
-            # Create Customer object and login
-            # TODO: Ensure that every User has a Customer attached, as providing an email of an unattached user will
-            #  try to create a new user which will fail the uniqueness constraint. Alternatively, do a get_or_create
-            #  user = User.objects.create_user(form.cleaned_data['email'], password=generate_password())
+            # There is no Customer matching the submitted email address, so we have to decide what to do with it.
+
             new_password = form.cleaned_data.get('password_new')
-            # User changed email address after submitting a valid one in the details form
+
+            # If there is no password, it means the user changed the email address to that of an existing user after
+            # submitting an unknown email in the details form. Ideally this should be prevented in the front-end.
             if not new_password:
-                return None
-            user = User.objects.create_user(form.cleaned_data['email'], password=new_password)
+                raise ValueError('Email address was changed. Please refresh the page and try again.')
+
+            # Check that the submitted email does not match an existing User. If it does not (most common case), we
+            # are creating a new User with a new Customer attached.
+            try:
+                # First check whether a matching User exists that has a Customer
+                user = User.objects.get(email=form.cleaned_data['email'], customer__isnull=False)
+            except User.DoesNotExist:
+                try:
+                    # If it doesn't, check whether a User exists at all; if it does, this means we have a data problem.
+                    # Log the email and return an error to the customer.
+                    user = User.objects.get(email=form.cleaned_data['email'])
+                    logger.warning(f"Customer submitted reservation with email {form.cleaned_data['email']} which matches a User with no Customer attached.")
+                    raise ValueError('User data error occurred.')
+                except User.DoesNotExist:
+                    # We have found no matching User at all. This means we can create one and proceed with creating
+                    # a new Customer.
+                    user = User.objects.create_user(form.cleaned_data['email'], password=new_password)
+
             customer_kwargs = {key: form.cleaned_data.get(key) for key in customer_fields}
             # Create the customer object. Stripe cards are not registered until the Customer has an id (has been saved).
             customer = Customer.objects.create(
@@ -134,13 +157,18 @@ class ReservationMixin:
         # Passed abuse checks; now proceed with validating the login credentials.
 
         # Create Customer or login existing user
-        customer = self._get_login_customer(request, form)
+        customer = None
+        error_msg = ''
+        try:
+            customer = self._get_login_customer(request, form)
+        except ValueError as e:
+            error_msg = str(e)
         if not customer:
             return {
                 'success': False,
-                'error': 'Incorrect password',
+                'error': error_msg,
                 'errors': {
-                    'password': ['Incorrect password'],
+                    'password': [error_msg],
                 },
             }
 
