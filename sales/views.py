@@ -111,8 +111,7 @@ class ReservationMixin:
         # IP-based block list will send client to the honeypot success page and short-circuit all further processing.
         # Can be set globally (in settings.py or env.yaml) or by creating an IPBan.
 
-        remote_addr = request.META.get('REMOTE_ADDR') or request.META.get('HTTP_X_FORWARDED_FOR') or ''
-        kill_switch = settings.KILL_SWITCH or IPBan.ip_is_banned(remote_addr)
+        kill_switch = settings.KILL_SWITCH or IPBan.ip_is_banned(request.remote_ip)
         if kill_switch:
             return {
                 'success': True,

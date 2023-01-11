@@ -625,6 +625,8 @@ class IPBan(models.Model):
 
     @classmethod
     def ip_is_banned(cls, ip_addr: Union[str, ipaddress.IPv4Address]) -> bool:
+        if not ip_addr:
+            return False
         if isinstance(ip_addr, str):
             try:
                 ip_addr = ipaddress.IPv4Address(ip_addr)
