@@ -170,7 +170,7 @@ class BaseReservation(ConfirmationCodeMixin, EmailConfirmationMixin, models.Mode
         RENTAL = ('rental', 'Confirmed Rental')
 
     type = models.CharField(max_length=20, choices=ReservationType.choices, blank=True, default=ReservationType.RESERVATION)
-    vehicle = models.ForeignKey('fleet.Vehicle', null=True, blank=True, on_delete=models.SET_NULL)
+    vehicle = models.ForeignKey('fleet.Vehicle', null=True, blank=True, on_delete=models.CASCADE)
     customer = models.ForeignKey('users.Customer', null=True, blank=True, on_delete=models.CASCADE)
     reserved_at = models.DateTimeField(auto_now_add=True)
     out_at = models.DateTimeField(null=True, blank=True)
