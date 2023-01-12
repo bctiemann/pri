@@ -159,13 +159,10 @@ class ReservationMixin:
         # Passed abuse checks; now proceed with validating the login credentials.
 
         # Create Customer or login existing user
-        customer = None
-        error_msg = ''
         try:
             customer = self._get_login_customer(request, form)
         except ValueError as e:
             error_msg = str(e)
-        if not customer:
             return {
                 'success': False,
                 'error': error_msg,
@@ -183,6 +180,8 @@ class ReservationMixin:
         if 'vehicle_marketing' in form.cleaned_data:
             reservation.vehicle = form.cleaned_data['vehicle_marketing'].vehicle
 
+        # This will simply return an opaque "system error" to the front-end. Ideally should return a helpful message,
+        # but also ideally this will never fail due to a confirmation_code collision.
         try:
             reservation.save()
         except IntegrityError as e:
