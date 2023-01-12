@@ -49,6 +49,7 @@ class MassEmailComposeView(AdminViewMixin, MassEmailViewMixin, FormView):
         return reverse('backoffice:massemail-compose-done')
 
 
+# TODO: Styling for "done" page and navigation (just a "back" link)
 class MassEmailComposeDoneView(AdminViewMixin, MassEmailViewMixin, TemplateView):
     template_name = 'backoffice/mass_email/done.html'
 

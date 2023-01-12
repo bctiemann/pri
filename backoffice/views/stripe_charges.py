@@ -84,6 +84,7 @@ class StripeChargeCreateView(AdminViewMixin, StripeChargeViewMixin, ListViewMixi
         return reverse('backoffice:charge-detail', kwargs={'pk': self.object.id})
 
 
+# TODO: Prepopulate with a customer_id/card_id with link from Customer detail page
 class StripeChargeChargeView(AdminViewMixin, StripeChargeViewMixin, CreateView):
     template_name = 'backoffice/stripe_charge/charge.html'
     form_class = StripeChargeForm
@@ -93,6 +94,7 @@ class StripeChargeChargeView(AdminViewMixin, StripeChargeViewMixin, CreateView):
         print(form.errors)
         return super().form_invalid(form)
 
+    # TODO: actually charge card, and push to success page with link to charge in Stripe dashboard
     def form_valid(self, form):
         print(form.data)
         return HttpResponseRedirect(self.get_success_url())

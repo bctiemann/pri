@@ -24,6 +24,8 @@ from service.models import ScheduledService, Damage
 from marketing.models import NewsletterSubscription
 
 
+# TODO: Backoffice pages to manage Promotions
+
 # Home and login/logout views
 
 class AdminViewMixin:
