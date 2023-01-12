@@ -66,21 +66,22 @@ class CustomerSearchMixin:
         phone_fields = ['home_phone', 'work_phone', 'mobile_phone']
         for field in ['first_name', 'last_name', 'email', 'home_phone', 'work_phone', 'mobile_phone']:
             field_classes = ['newuserfield']
-            if self.instance.id:
+            if self.instance.id or self.initial.get('customer'):
                 field_classes.append('dont-edit')
             if field in phone_fields:
                 field_classes.append('phone')
                 field_classes.append('short')
             field_classes_str = ' '.join(field_classes)
             self.fields[field].widget.attrs['class'] = field_classes_str
-            if self.instance.customer:
+            customer = self.instance.customer or self.initial.get('customer')
+            if customer:
                 if field in phone_fields:
                     try:
-                        self.fields[field].initial = getattr(self.instance.customer, field).as_national
+                        self.fields[field].initial = getattr(customer, field).as_national
                     except AttributeError:
                         pass
                 else:
-                    self.fields[field].initial = getattr(self.instance.customer, field, None) or getattr(self.instance.customer.user, field, None)
+                    self.fields[field].initial = getattr(customer, field, None) or getattr(customer.user, field, None)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -270,6 +271,13 @@ class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, CustomerSearchMix
         if self.instance.id:
             self.fields['tax_percent'].initial = self.instance.get_price_data()['tax_rate'] * 100
         self.fields['override_subtotal'].widget.attrs['placeholder'] = 'Override'
+
+        if self.initial.get('customer'):
+            customer = self.initial['customer']
+            if isinstance(customer, Customer):
+                self.fields['first_name'].initial = customer.first_name
+                self.fields['last_name'].initial = customer.last_name
+                self.fields['email'].initial = customer.email
 
     def clean(self):
         super().clean()

@@ -2,15 +2,11 @@ TODO: GDPR compliance banner/cookie
 
 TODO: Stripe payment link on Customer detail page
 
-TODO: Reservation link on Customer list page
-
 TODO: Backoffice pages to manage Promotions
 
 TODO: Stripe payment success page with link to Stripe dashboard
 
 TODO: Mass email "done" page (styling, navigation)
-
-TODO: Wagtail for site content pages
 
 TODO: tracking functionality if necessary (see inc_trk.cfm); probably via middleware
 

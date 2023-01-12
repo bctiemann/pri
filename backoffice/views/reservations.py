@@ -10,6 +10,7 @@ from django.forms.models import model_to_dict
 
 from . import ListViewMixin, AdminViewMixin
 from fleet.models import VehicleMarketing
+from users.models import Customer
 from sales.models import Reservation, Rental, Driver
 from sales.calculators import RentalPriceCalculator
 from backoffice.forms import ReservationForm, RentalConversionForm
@@ -50,6 +51,17 @@ class ReservationCreateView(AdminViewMixin, ReservationViewMixin, ListViewMixin,
 
     # TODO: if form.send_email, reservation.send_welcome_email()
     #  If existing customer, use reservation_confirm_existing_customer.txt
+
+    def get_form_kwargs(self):
+        """Return the keyword arguments for instantiating the form."""
+        kwargs = super().get_form_kwargs()
+        customer_id = self.request.GET.get('customer_id')
+        if customer_id:
+            try:
+                kwargs['initial']['customer'] = Customer.objects.get(pk=customer_id)
+            except Customer.DoesNotExist:
+                pass
+        return kwargs
 
     def get_success_url(self):
         return reverse('backoffice:reservation-detail', kwargs={'pk': self.object.id})
