@@ -1,5 +1,6 @@
 import stripe
 import logging
+from typing import Optional
 
 from django.conf import settings
 from django.utils import timezone
@@ -42,7 +43,8 @@ class Stripe:
         )
         return token
 
-    def add_card_to_stripe_customer(self, stripe_customer, card_token, card=None, is_primary=False):
+    @staticmethod
+    def add_card_to_stripe_customer(stripe_customer, card_token, card=None, is_primary=False):
         try:
             stripe_card = stripe.Customer.create_source(
                 stripe_customer,
@@ -99,3 +101,22 @@ class Stripe:
         if number:
             updated_card.number = number
         updated_card.save()
+
+    @staticmethod
+    def charge_card(
+        amount: int,
+        source: str,
+        customer: str,
+        capture: bool = False,
+        description: Optional[str] = None,
+        currency: Optional[str] = 'usd'
+    ):
+        charge = stripe.Charge.create(
+            amount=amount,
+            currency=currency,
+            source=source,
+            customer=customer,
+            description=description,
+            capture=capture,
+        )
+        return charge

@@ -10,6 +10,19 @@
 
     {% include "backoffice/includes/form_error.html" %}
 
+    {% if charge and charge.card.stripe_card and not charge.processor_charge_id %}
+        <form method="POST" action="{% url "backoffice:charge-charge" pk=charge.id %}">
+            <button
+                class="btn delete"
+                type="submit"
+                name="charge"
+            >
+                Charge Card
+            </button>
+            {% csrf_token %}
+        </form>
+    {% endif %}
+
     {% if charge %}
         <form method="POST" action="{% url "backoffice:charge-detail" pk=charge.id %}">
     {% else %}

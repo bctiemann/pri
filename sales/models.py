@@ -712,6 +712,7 @@ class Charge(models.Model):
     country = CountryField(blank=True, countries=AllCountries)
     processor_charge_id = models.CharField(max_length=50, blank=True)
     error_code = models.CharField(max_length=30, blank=True)
+    stripe_customer = models.CharField(max_length=50, blank=True)
 
     @property
     def status(self):
@@ -719,7 +720,13 @@ class Charge(models.Model):
             return 'success'
         elif self.error_code:
             return self.error_code
+        elif not self.card:
+            return 'no card'
         return 'pending'
+
+    @property
+    def amount_int(self):
+        return int(self.amount * 100)
 
     def save(self, *args, **kwargs):
         self.cc_number = format_cc_number(self.cc_number)

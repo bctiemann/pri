@@ -103,10 +103,10 @@ urlpatterns = [
     path('adhoc_payments/<int:pk>/delete/', adhoc_payments.AdHocPaymentDeleteView.as_view(), name='adhocpayment-delete'),
 
     path('stripe_charges/', stripe_charges.StripeChargeListView.as_view(), name='charge-list'),
-    path('stripe_charges/charge/', stripe_charges.StripeChargeChargeView.as_view(), name='charge-charge'),
     path('stripe_charges/create/', stripe_charges.StripeChargeCreateView.as_view(is_create_view=True), name='charge-create'),
     path('stripe_charges/<int:pk>/', stripe_charges.StripeChargeDetailView.as_view(), name='charge-detail'),
     path('stripe_charges/<int:pk>/delete/', stripe_charges.StripeChargeDeleteView.as_view(), name='charge-delete'),
+    path('stripe_charges/<int:pk>/charge/', stripe_charges.StripeChargeChargeView.as_view(), name='charge-charge'),
 
     path('red_flags/', red_flags.RedFlagListView.as_view(), name='redflag-list'),
     path('red_flags/create/', red_flags.RedFlagCreateView.as_view(is_create_view=True), name='redflag-create'),
