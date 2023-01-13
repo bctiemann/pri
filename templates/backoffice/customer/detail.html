@@ -217,7 +217,7 @@
             <tr>
                 <td>Credit Card (1) Stripe ID</td>
                 <td>
-                    {{ customer.card_1.stripe_card }}
+                    {{ customer.card_1.stripe_card|default:"Card not validated (click Edit)" }}
                 </td>
             </tr>
             <tr>
@@ -256,7 +256,7 @@
             <tr>
                 <td>Credit Card (2) Stripe</td>
                 <td>
-                    {{ customer.card_2.stripe_card }}
+                    {{ customer.card_2.stripe_card|default:"Card not validated (click Edit)" }}
                 </td>
             </tr>
             <tr>

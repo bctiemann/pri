@@ -117,7 +117,7 @@
                 <tr>
                     <td>Card</td>
                     <td>
-                        {{ giftcertificate.card.stripe_card }}
+                        {{ giftcertificate.card.stripe_card|default:"Card not validated (click Edit)" }}
                     </td>
                 </tr>
             {% endif %}

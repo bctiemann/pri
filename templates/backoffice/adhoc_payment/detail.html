@@ -132,7 +132,7 @@
                 <tr>
                     <td>Card</td>
                     <td>
-                        {{ adhocpayment.card.stripe_card }}
+                        {{ adhocpayment.card.stripe_card|default:"Card not validated (click Edit)" }}
                     </td>
                 </tr>
                 <tr>

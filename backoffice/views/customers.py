@@ -1,3 +1,4 @@
+from stripe.error import CardError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -58,7 +59,11 @@ class CustomerDetailView(AdminViewMixin, CustomerViewMixin, ListViewMixin, Updat
                 card_1.customer = customer
                 card_1.is_primary = True
                 card_1.save()
-                stripe.add_card_to_customer(customer, card=card_1, is_primary=card_1.is_primary)
+                try:
+                    stripe.add_card_to_customer(customer, card=card_1, is_primary=card_1.is_primary)
+                except CardError as e:
+                    body = e.json_body
+                    err = body.get('error', {})
 
             if card_1:
                 card_1.name = customer.full_name
@@ -85,7 +90,11 @@ class CustomerDetailView(AdminViewMixin, CustomerViewMixin, ListViewMixin, Updat
                 card_2.is_primary = False
                 card_2.phone = form.cleaned_data['cc2_phone']
                 card_2.save()
-                stripe.add_card_to_customer(customer, card=card_2, is_primary=card_2.is_primary)
+                try:
+                    stripe.add_card_to_customer(customer, card=card_2, is_primary=card_2.is_primary)
+                except CardError as e:
+                    body = e.json_body
+                    err = body.get('error', {})
 
             if card_2:
                 card_2.name = customer.full_name

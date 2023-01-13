@@ -68,21 +68,20 @@ class GiftCertificateDetailView(AdminViewMixin, GiftCertificateViewMixin, ListVi
                 card_form = CardForm(data=card_data, instance=gift_certificate.card)
                 card = card_form.save()
 
-                card_token = stripe.get_card_token(card.number, card.exp_month, card.exp_year, card.cvv)
-
-                stripe_customer = stripe.add_stripe_customer(
-                    full_name=form.cleaned_data['cc_name'],
-                    email=form.cleaned_data['email'],
-                    phone=form.cleaned_data['phone'],
-                )
                 try:
+                    card_token = stripe.get_card_token(card.number, card.exp_month, card.exp_year, card.cvv)
+                    stripe_customer = stripe.add_stripe_customer(
+                        full_name=form.cleaned_data['cc_name'],
+                        email=form.cleaned_data['email'],
+                        phone=form.cleaned_data['phone'],
+                    )
                     card = stripe.add_card_to_stripe_customer(stripe_customer, card_token, card)
                     gift_certificate.card = card
+                    gift_certificate.stripe_customer = stripe_customer
+                    gift_certificate.save()
                 except CardError as e:
                     body = e.json_body
                     err = body.get('error', {})
-                gift_certificate.stripe_customer = stripe_customer
-                gift_certificate.save()
 
             if card:
                 card.name = gift_certificate.cc_name

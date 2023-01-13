@@ -96,11 +96,14 @@ class Stripe:
         if not customer.stripe_customer:
             customer.add_to_stripe()
 
-        updated_card = self.add_card_to_stripe_customer(customer.stripe_customer, card_token, card=card, is_primary=is_primary)
-        updated_card.customer = customer
-        if number:
-            updated_card.number = number
-        updated_card.save()
+        try:
+            updated_card = self.add_card_to_stripe_customer(customer.stripe_customer, card_token, card=card, is_primary=is_primary)
+            updated_card.customer = customer
+            if number:
+                updated_card.number = number
+            updated_card.save()
+        except stripe.error.CardError:
+            pass
 
     @staticmethod
     def charge_card(

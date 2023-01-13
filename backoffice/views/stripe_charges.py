@@ -44,21 +44,20 @@ class StripeChargeViewMixin:
                 card_form = CardForm(data=card_data, instance=card)
                 card = card_form.save()
 
-                card_token = self.stripe.get_card_token(card.number, card.exp_month, card.exp_year, card.cvv)
-
-                stripe_customer = self.stripe.add_stripe_customer(
-                    full_name=charge.full_name,
-                    email=charge.email,
-                    phone=charge.phone,
-                )
                 try:
+                    card_token = self.stripe.get_card_token(card.number, card.exp_month, card.exp_year, card.cvv)
+                    stripe_customer = self.stripe.add_stripe_customer(
+                        full_name=charge.full_name,
+                        email=charge.email,
+                        phone=charge.phone,
+                    )
                     card = self.stripe.add_card_to_stripe_customer(stripe_customer, card_token, card)
                     charge.card = card
+                    charge.stripe_customer = stripe_customer
                 except CardError as e:
                     body = e.json_body
                     err = body.get('error', {})
                     charge.error_code = err.get('code')
-                charge.stripe_customer = stripe_customer
                 charge.save()
 
             if card:

@@ -1,3 +1,4 @@
+from stripe.error import CardError
 import random
 import requests
 from localflavor.us.models import USStateField, USZipCodeField, USSocialSecurityNumberField
@@ -491,8 +492,11 @@ class Customer(models.Model):
         self.cc_number = format_cc_number(self.cc_number)
         self.cc2_number = format_cc_number(self.cc2_number)
         if self.id:
-            self.attach_card_1_to_stripe()
-            self.attach_card_2_to_stripe()
+            try:
+                self.attach_card_1_to_stripe()
+                self.attach_card_2_to_stripe()
+            except CardError:
+                pass
         super().save(*args, **kwargs)
 
     def __str__(self):

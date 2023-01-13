@@ -129,7 +129,7 @@
             <tr>
                 <td>Card</td>
                 <td>
-                    {{ charge.card.stripe_card }}
+                    {{ charge.card.stripe_card|default:"Card not validated (click Edit)" }}
                 </td>
             </tr>
             <tr>
