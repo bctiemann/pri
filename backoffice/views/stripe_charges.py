@@ -128,7 +128,6 @@ class StripeChargeCreateView(AdminViewMixin, StripeChargeViewMixin, ListViewMixi
         return reverse('backoffice:charge-detail', kwargs={'pk': self.object.id})
 
 
-# TODO: Prepopulate with a customer_id/card_id with link from Customer detail page
 class StripeChargeChargeView(AdminViewMixin, StripeChargeViewMixin, UpdateView):
     template_name = 'backoffice/stripe_charge/detail.html'
     fields = ()
