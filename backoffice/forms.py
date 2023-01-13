@@ -713,13 +713,13 @@ class StripeChargeForm(CSSClassMixin, forms.ModelForm):
         'amount', 'cc_zip',
     )
 
-    CHARGE_TYPE_CHOICES = (
+    CAPTURE_CHOICES = (
         (True, 'Charge'),
         (False, 'Auth only'),
     )
 
     amount = forms.DecimalField(required=True)
-    charge_type = forms.ChoiceField(choices=CHARGE_TYPE_CHOICES, initial=False)
+    capture = forms.ChoiceField(choices=CAPTURE_CHOICES, initial=False)
     cc_address = forms.CharField(widget=forms.Textarea(), required=False)
     cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices(since_founding=True, allow_null=False))
     cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(allow_null=False))
