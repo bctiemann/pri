@@ -1,6 +1,7 @@
 from stripe.error import CardError
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from decimal import Decimal, DecimalException
 
 from django.shortcuts import render, reverse
 from django.views.generic.list import ListView
@@ -11,6 +12,7 @@ from django.utils import timezone
 
 from . import ListViewMixin, AdminViewMixin
 from backoffice.forms import StripeChargeForm, CardForm
+from users.models import Customer
 from sales.models import Charge
 from sales.stripe import Stripe
 
@@ -92,10 +94,34 @@ class StripeChargeCreateView(AdminViewMixin, StripeChargeViewMixin, ListViewMixi
     template_name = 'backoffice/stripe_charge/detail.html'
     form_class = StripeChargeForm
 
+    def get_form_kwargs(self):
+        """Return the keyword arguments for instantiating the form."""
+        kwargs = super().get_form_kwargs()
+        customer_id = self.request.GET.get('customer_id')
+        amount = self.request.GET.get('amount')
+        card = self.request.GET.get('card')
+        if customer_id:
+            try:
+                kwargs['initial']['customer'] = Customer.objects.get(pk=customer_id)
+            except Customer.DoesNotExist:
+                pass
+        if amount:
+            try:
+                kwargs['initial']['amount'] = Decimal(amount)
+            except DecimalException:
+                pass
+        kwargs['initial']['card'] = card
+        return kwargs
+
     def form_valid(self, form):
         charge = form.save()
         self.object = charge
-        self.register_stripe_card(charge)
+        if form.cleaned_data['customer'] and form.cleaned_data['card_obj']:
+            charge.card = form.cleaned_data['card_obj']
+            charge.stripe_customer = form.cleaned_data['customer'].stripe_customer
+            charge.save()
+        else:
+            self.register_stripe_card(charge)
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):

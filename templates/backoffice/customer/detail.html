@@ -224,7 +224,7 @@
                 <td>Credit Card (1) Number</td>
                 <td>
                     {{ form.cc_number }}
-                    <small><a href="stripepay.cfm?customerid=#customerid#&card=1">Stripe charge</a></small>
+                    <small><a href="{% url "backoffice:charge-create" %}?customer_id={{ customer.id }}&card=1">Stripe charge</a></a></small>
                 </td>
             </tr>
             <tr>
@@ -263,7 +263,7 @@
                 <td>Credit Card (2) Number</td>
                 <td>
                     {{ form.cc2_number }}
-                    <small><a href="stripepay.cfm?customerid=#customerid#&card=2">Stripe charge</a></small>
+                    <small><a href="{% url "backoffice:charge-create" %}?customer_id={{ customer.id }}&card=2">Stripe charge</a></a></small>
                 </td>
             </tr>
             <tr>

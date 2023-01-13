@@ -726,6 +726,8 @@ class StripeChargeForm(CSSClassMixin, forms.ModelForm):
     stripe_token = forms.CharField(widget=forms.HiddenInput(), required=False)
     stripe_error = forms.CharField(widget=forms.HiddenInput(), required=False)
     stripe_error_param = forms.CharField(widget=forms.HiddenInput(), required=False)
+    customer = forms.ModelChoiceField(queryset=Customer.objects.all(), widget=forms.HiddenInput(), required=False)
+    card_obj = forms.ModelChoiceField(queryset=Card.objects.all(), widget=forms.HiddenInput(), required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -746,9 +748,32 @@ class StripeChargeForm(CSSClassMixin, forms.ModelForm):
             self.fields['cc_exp_mo'].initial = self.instance.card.exp_month
             self.fields['cc_cvv'].initial = self.instance.card.cvv
 
-    # def clean_stripe_token(self):
-    #     if self.cleaned_data['stripe_error']:
-    #         raise forms.ValidationError(self.cleaned_data['stripe_error'])
+        if self.initial.get('customer'):
+            customer = self.initial['customer']
+            if isinstance(customer, Customer):
+                self.fields['full_name'].initial = customer.full_name
+                self.fields['email'].initial = customer.email
+                self.fields['phone'].initial = customer.phone
+                self.fields['cc_address'].initial = customer.address_line_1
+                self.fields['cc_city'].initial = customer.city
+                self.fields['cc_state'].initial = customer.state
+                self.fields['cc_zip'].initial = customer.zip
+                card = None
+                if self.initial.get('card') == '1' and customer.card_1:
+                    card = customer.card_1
+                elif self.initial.get('card') == '2' and customer.card_2:
+                    card = customer.card_2
+                if card:
+                    self.fields['cc_number'].initial = card.number
+                    self.fields['cc_exp_mo'].initial = card.exp_month
+                    self.fields['cc_exp_yr'].initial = card.exp_year
+                    self.fields['cc_cvv'].initial = card.cvv
+                    self.fields['card_obj'].initial = card.id
+
+    def clean_amount(self):
+        if self.cleaned_data['amount'] <= 0.5:
+            raise forms.ValidationError('Amount must be greater than $0.50')
+        return self.cleaned_data['amount']
 
     def clean(self):
         if self.cleaned_data['stripe_error']:
@@ -757,7 +782,7 @@ class StripeChargeForm(CSSClassMixin, forms.ModelForm):
     class Meta:
         model = Charge
         # fields = '__all__'
-        exclude = ('uuid', 'card',)
+        exclude = ('uuid', 'card', 'stripe_customer',)
 
 
 class CardForm(forms.ModelForm):
