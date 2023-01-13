@@ -124,7 +124,9 @@ class ReservationMixin:
             except CardError as e:
                 body = e.json_body
                 err = body.get('error', {})
-                raise ValueError(err.get('message'))
+                code = err.get('code')
+                # raise ValueError(err.get('message'))
+                logger.warning(f'Customer {customer.id} card received error: {code}')
             login(request, user)
         return customer
 
