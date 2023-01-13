@@ -63,7 +63,7 @@ class Command(BaseCommand):
                                 customer.cc_exp_yr,
                                 customer.cc_cvv,
                             )
-                            stripe.add_card_to_customer(customer, card_token, card=customer.card_1)
+                            stripe.add_card_to_customer(customer, card_token, card=customer.card_1, is_primary=True)
                         except CardError as e:
                             print(e)
 
@@ -87,7 +87,7 @@ class Command(BaseCommand):
                                 customer.cc2_exp_yr,
                                 customer.cc2_cvv,
                             )
-                            stripe.add_card_to_customer(customer, card_token, card=customer.card_2)
+                            stripe.add_card_to_customer(customer, card_token, card=customer.card_2, is_primary=False)
                         except CardError as e:
                             print(e)
 

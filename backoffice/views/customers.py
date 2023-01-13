@@ -41,7 +41,6 @@ class CustomerDetailView(AdminViewMixin, CustomerViewMixin, ListViewMixin, Updat
         stripe = Stripe()
         customer = form.save()
 
-        # TODO: Figure out why this is saving to card 2 when you update card 1
         # Update primary and secondary card. If any data has changed since the last saved Card object, refresh the
         # Stripe object as well.
         if form.cleaned_data['cc_number']:
@@ -59,7 +58,7 @@ class CustomerDetailView(AdminViewMixin, CustomerViewMixin, ListViewMixin, Updat
                 card_1.customer = customer
                 card_1.is_primary = True
                 card_1.save()
-                stripe.add_card_to_customer(customer, card=card_1)
+                stripe.add_card_to_customer(customer, card=card_1, is_primary=card_1.is_primary)
 
             if card_1:
                 card_1.name = customer.full_name
@@ -86,7 +85,7 @@ class CustomerDetailView(AdminViewMixin, CustomerViewMixin, ListViewMixin, Updat
                 card_2.is_primary = False
                 card_2.phone = form.cleaned_data['cc2_phone']
                 card_2.save()
-                stripe.add_card_to_customer(customer, card=card_2)
+                stripe.add_card_to_customer(customer, card=card_2, is_primary=card_2.is_primary)
 
             if card_2:
                 card_2.name = customer.full_name
