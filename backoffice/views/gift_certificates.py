@@ -1,3 +1,4 @@
+from stripe.error import CardError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -53,8 +54,7 @@ class GiftCertificateDetailView(AdminViewMixin, GiftCertificateViewMixin, ListVi
             gift_certificate.used_on = timezone.now()
             gift_certificate.save()
 
-        # Update primary and secondary card. If any data has changed since the last saved Card object, refresh the
-        # Stripe object as well.
+        # Update card. If any data has changed since the last saved Card object, refresh the Stripe object as well.
         if form.cleaned_data['cc_number']:
             card_data = {
                 'number': form.cleaned_data['cc_number'],
@@ -75,8 +75,13 @@ class GiftCertificateDetailView(AdminViewMixin, GiftCertificateViewMixin, ListVi
                     email=form.cleaned_data['email'],
                     phone=form.cleaned_data['phone'],
                 )
-                card = stripe.add_card_to_stripe_customer(stripe_customer, card_token, card)
-                gift_certificate.card = card
+                try:
+                    card = stripe.add_card_to_stripe_customer(stripe_customer, card_token, card)
+                    gift_certificate.card = card
+                except CardError as e:
+                    body = e.json_body
+                    err = body.get('error', {})
+                gift_certificate.stripe_customer = stripe_customer
                 gift_certificate.save()
 
             if card:

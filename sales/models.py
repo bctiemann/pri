@@ -484,6 +484,7 @@ class GiftCertificate(models.Model):
     cc_zip = USZipCodeField(null=True)
 
     card = models.ForeignKey('sales.Card', null=True, blank=True, on_delete=models.SET_NULL)
+    stripe_customer = models.CharField(max_length=50, blank=True)
 
     cc_number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC number')
     cc_exp_yr = models.CharField(max_length=4, blank=True, verbose_name='CC exp year')
@@ -671,6 +672,7 @@ class AdHocPayment(ConfirmationCodeMixin, models.Model):
     message = models.TextField(blank=True)
     comments = models.TextField(blank=True)
     card = models.ForeignKey('sales.Card', null=True, blank=True, on_delete=models.SET_NULL)
+    stripe_customer = models.CharField(max_length=50, blank=True)
     cc_number = fields.EncryptedCharField(max_length=255, verbose_name='CC number')
     cc_exp_yr = models.CharField(max_length=4, verbose_name='CC exp year')
     cc_exp_mo = models.CharField(max_length=2, verbose_name='CC exp month')

@@ -1,5 +1,6 @@
 import datetime
 import logging
+from stripe.error import CardError
 
 from django.conf import settings
 from django.views.generic import TemplateView, FormView, CreateView, UpdateView
@@ -118,7 +119,12 @@ class ReservationMixin:
                 **customer_kwargs,
             )
             # Save a second time to register Stripe cards
-            customer.save()
+            try:
+                customer.save()
+            except CardError as e:
+                body = e.json_body
+                err = body.get('error', {})
+                raise ValueError(err.get('message'))
             login(request, user)
         return customer
 

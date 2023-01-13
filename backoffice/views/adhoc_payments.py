@@ -1,3 +1,4 @@
+from stripe.error import CardError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -36,8 +37,7 @@ class AdHocPaymentDetailView(AdminViewMixin, AdHocPaymentViewMixin, ListViewMixi
         stripe = Stripe()
         adhoc_payment = form.save()
 
-        # Update primary and secondary card. If any data has changed since the last saved Card object, refresh the
-        # Stripe object as well.
+        # Update card. If any data has changed since the last saved Card object, refresh the Stripe object as well.
         if form.cleaned_data['cc_number']:
             card_data = {
                 'number': form.cleaned_data['cc_number'],
@@ -58,8 +58,13 @@ class AdHocPaymentDetailView(AdminViewMixin, AdHocPaymentViewMixin, ListViewMixi
                     email=form.cleaned_data['email'],
                     phone=form.cleaned_data['phone'],
                 )
-                card = stripe.add_card_to_stripe_customer(stripe_customer, card_token, card)
-                adhoc_payment.card = card
+                try:
+                    card = stripe.add_card_to_stripe_customer(stripe_customer, card_token, card)
+                    adhoc_payment.card = card
+                except CardError as e:
+                    body = e.json_body
+                    err = body.get('error', {})
+                adhoc_payment.stripe_customer = stripe_customer
                 adhoc_payment.save()
 
             if card:
