@@ -217,7 +217,15 @@
             <tr>
                 <td>Credit Card (1) Stripe ID</td>
                 <td>
-                    {{ customer.card_1.stripe_card|default:"Card not validated (click Edit)" }}
+                    {% if customer.card_1 %}
+                        {{ customer.card_1.stripe_card|default:"Card not validated (click Edit)" }}
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>Credit Card (1) Status</td>
+                <td>
+                    {{ customer.card_1_status }}
                 </td>
             </tr>
             <tr>
@@ -256,7 +264,15 @@
             <tr>
                 <td>Credit Card (2) Stripe</td>
                 <td>
-                    {{ customer.card_2.stripe_card|default:"Card not validated (click Edit)" }}
+                    {% if customer.card_2 %}
+                        {{ customer.card_2.stripe_card|default:"Card not validated (click Edit)" }}
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>Credit Card (2) Status</td>
+                <td>
+                    {{ customer.card_2_status }}
                 </td>
             </tr>
             <tr>

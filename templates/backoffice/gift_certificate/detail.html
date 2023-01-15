@@ -120,6 +120,12 @@
                         {{ giftcertificate.card.stripe_card|default:"Card not validated (click Edit)" }}
                     </td>
                 </tr>
+                <tr>
+                    <td>Card Status</td>
+                    <td>
+                        {{ giftcertificate.card_status }}
+                    </td>
+                </tr>
             {% endif %}
             <tr>
                 <td>Billing Address</td>

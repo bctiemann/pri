@@ -61,10 +61,10 @@ class AdHocPaymentDetailView(AdminViewMixin, AdHocPaymentViewMixin, ListViewMixi
                     card = stripe.add_card_to_stripe_customer(stripe_customer, card_token, card)
                     adhoc_payment.card = card
                     adhoc_payment.stripe_customer = stripe_customer
-                    adhoc_payment.save()
+                    adhoc_payment.card_status = 'valid'
                 except CardError as e:
-                    body = e.json_body
-                    err = body.get('error', {})
+                    adhoc_payment.card_status = Stripe.get_error(e)
+                adhoc_payment.save()
 
             if card:
                 card.name = adhoc_payment.full_name

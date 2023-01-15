@@ -45,24 +45,10 @@ class Stripe:
 
     @staticmethod
     def add_card_to_stripe_customer(stripe_customer, card_token, card=None, is_primary=False):
-        try:
-            stripe_card = stripe.Customer.create_source(
-                stripe_customer,
-                source=card_token,
-                # source='tok_chargeCustomerFail',
-            )
-        except (stripe.error.CardError, stripe.error.InvalidRequestError) as e:
-            body = e.json_body
-            err = body.get('error', {})
-
-            logger.info("Status is: %s" % e.http_status)
-            logger.info("Type is: %s" % err.get('type'))
-            logger.info("Code is: %s" % err.get('code'))
-            # param is '' in this case
-            logger.info("Param is: %s" % err.get('param'))
-            logger.info("Message is: %s" % err.get('message'))
-
-            raise e
+        stripe_card = stripe.Customer.create_source(
+            stripe_customer,
+            source=card_token,
+        )
 
         if card:
             card.stripe_card = stripe_card.id
@@ -96,14 +82,11 @@ class Stripe:
         if not customer.stripe_customer:
             customer.add_to_stripe()
 
-        try:
-            updated_card = self.add_card_to_stripe_customer(customer.stripe_customer, card_token, card=card, is_primary=is_primary)
-            updated_card.customer = customer
-            if number:
-                updated_card.number = number
-            updated_card.save()
-        except stripe.error.CardError:
-            pass
+        updated_card = self.add_card_to_stripe_customer(customer.stripe_customer, card_token, card=card, is_primary=is_primary)
+        updated_card.customer = customer
+        if number:
+            updated_card.number = number
+        updated_card.save()
 
     @staticmethod
     def charge_card(
@@ -123,3 +106,23 @@ class Stripe:
             capture=capture,
         )
         return charge
+
+    @classmethod
+    def get_error(cls, exception):
+        body = exception.json_body
+        err = body.get('error', {})
+
+        logger.info("Status is: %s" % exception.http_status)
+        logger.info("Type is: %s" % err.get('type'))
+        logger.info("Code is: %s" % err.get('code'))
+        # param is '' in this case
+        logger.info("Param is: %s" % err.get('param'))
+        logger.info("Message is: %s" % err.get('message'))
+
+        if not err:
+            return None
+        code = err['code']
+        decline_code = err.get('decline_code')
+        if decline_code:
+            return f'{code}/{decline_code}'
+        return code

@@ -78,10 +78,10 @@ class GiftCertificateDetailView(AdminViewMixin, GiftCertificateViewMixin, ListVi
                     card = stripe.add_card_to_stripe_customer(stripe_customer, card_token, card)
                     gift_certificate.card = card
                     gift_certificate.stripe_customer = stripe_customer
-                    gift_certificate.save()
+                    gift_certificate.card_status = 'valid'
                 except CardError as e:
-                    body = e.json_body
-                    err = body.get('error', {})
+                    gift_certificate.card_status = Stripe.get_error(e)
+                gift_certificate.save()
 
             if card:
                 card.name = gift_certificate.cc_name

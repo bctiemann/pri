@@ -485,6 +485,7 @@ class GiftCertificate(models.Model):
 
     card = models.ForeignKey('sales.Card', null=True, blank=True, on_delete=models.SET_NULL)
     stripe_customer = models.CharField(max_length=50, blank=True)
+    card_status = models.CharField(max_length=50, blank=True)
 
     cc_number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC number')
     cc_exp_yr = models.CharField(max_length=4, blank=True, verbose_name='CC exp year')
@@ -673,6 +674,7 @@ class AdHocPayment(ConfirmationCodeMixin, models.Model):
     comments = models.TextField(blank=True)
     card = models.ForeignKey('sales.Card', null=True, blank=True, on_delete=models.SET_NULL)
     stripe_customer = models.CharField(max_length=50, blank=True)
+    card_status = models.CharField(max_length=50, blank=True)
     cc_number = fields.EncryptedCharField(max_length=255, verbose_name='CC number')
     cc_exp_yr = models.CharField(max_length=4, verbose_name='CC exp year')
     cc_exp_mo = models.CharField(max_length=2, verbose_name='CC exp month')
@@ -713,18 +715,14 @@ class Charge(models.Model):
     foreign_region = models.CharField(max_length=100, blank=True)
     country = CountryField(blank=True, countries=AllCountries)
     processor_charge_id = models.CharField(max_length=50, blank=True)
-    error_code = models.CharField(max_length=30, blank=True)
     stripe_customer = models.CharField(max_length=50, blank=True)
+    card_status = models.CharField(max_length=50, blank=True)
 
     @property
     def status(self):
-        if self.processor_charge_id and not self.error_code:
-            return 'success'
-        elif self.error_code:
-            return self.error_code
-        elif not self.card:
-            return 'no card'
-        return 'pending'
+        if self.processor_charge_id:
+            return 'Success'
+        return 'Not charged'
 
     @property
     def amount_int(self):

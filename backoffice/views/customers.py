@@ -61,9 +61,10 @@ class CustomerDetailView(AdminViewMixin, CustomerViewMixin, ListViewMixin, Updat
                 card_1.save()
                 try:
                     stripe.add_card_to_customer(customer, card=card_1, is_primary=card_1.is_primary)
+                    customer.card_1_status = 'valid'
                 except CardError as e:
-                    body = e.json_body
-                    err = body.get('error', {})
+                    customer.card_1_status = Stripe.get_error(e)
+                customer.save()
 
             if card_1:
                 card_1.name = customer.full_name
@@ -92,9 +93,10 @@ class CustomerDetailView(AdminViewMixin, CustomerViewMixin, ListViewMixin, Updat
                 card_2.save()
                 try:
                     stripe.add_card_to_customer(customer, card=card_2, is_primary=card_2.is_primary)
+                    customer.card_2_status = 'valid'
                 except CardError as e:
-                    body = e.json_body
-                    err = body.get('error', {})
+                    customer.card_2_status = Stripe.get_error(e)
+                customer.save()
 
             if card_2:
                 card_2.name = customer.full_name

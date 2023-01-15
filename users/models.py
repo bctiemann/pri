@@ -342,12 +342,14 @@ class Customer(models.Model):
     cc_exp_mo = models.CharField(max_length=2, blank=True, verbose_name='CC1 exp month')
     cc_cvv = models.CharField(max_length=6, blank=True, verbose_name='CC1 CVV')
     cc_phone = PhoneNumberField(blank=True, verbose_name='CC1 contact phone', help_text=BANK_PHONE_HELP_TEXT)
+    card_1_status = models.CharField(max_length=50, blank=True)
 
     cc2_number = fields.EncryptedCharField(max_length=255, blank=True, verbose_name='CC2 number')
     cc2_exp_yr = models.CharField(max_length=4, blank=True, verbose_name='CC2 exp year')
     cc2_exp_mo = models.CharField(max_length=2, blank=True, verbose_name='CC2 exp month')
     cc2_cvv = models.CharField(max_length=6, blank=True, verbose_name='CC2 CVV')
     cc2_phone = PhoneNumberField(blank=True, verbose_name='CC2 contact phone', help_text=BANK_PHONE_HELP_TEXT)
+    card_2_status = models.CharField(max_length=50, blank=True)
 
     rentals_count = models.IntegerField(null=True, blank=True)
     remarks = fields.EncryptedTextField(blank=True)
@@ -491,12 +493,18 @@ class Customer(models.Model):
     def save(self, *args, **kwargs):
         self.cc_number = format_cc_number(self.cc_number)
         self.cc2_number = format_cc_number(self.cc2_number)
+
+        # If an invalid card is specified during front-site reservation flow, no Card object will be created.
+        # Cards will be created in backoffice customer management, even if invalid.
         if self.id:
             try:
                 self.attach_card_1_to_stripe()
+            except CardError as e:
+                self.card_1_status = Stripe.get_error(e)
+            try:
                 self.attach_card_2_to_stripe()
-            except CardError:
-                pass
+            except CardError as e:
+                self.card_2_status = Stripe.get_error(e)
         super().save(*args, **kwargs)
 
     def __str__(self):

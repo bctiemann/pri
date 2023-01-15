@@ -447,7 +447,7 @@ class CustomerForm(CSSClassMixin, forms.ModelForm):
     class Meta:
         model = Customer
         # fields = '__all__'
-        exclude = ('user', 'rentals_count', 'stripe_customer',)
+        exclude = ('user', 'rentals_count', 'stripe_customer', 'card_1_status', 'card_2_status',)
 
 
 class CloneCustomerForm(forms.ModelForm):
