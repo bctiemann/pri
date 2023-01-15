@@ -73,14 +73,17 @@ class ReservationMixin:
         # form.customer is just Customer filtered by the given email; may or may not be authenticated as
         # the linked User.
         if form.customer:
+
             if request.user.is_authenticated and request.user.customer != form.customer:
                 # User was already logged in and is now using new credentials. Log them out so they're forced to
                 # re-auth.
                 logout(request)
+
             # Re-auth even if user is already authenticated.
             if authenticate(request, username=form.customer.email, password=form.cleaned_data.get('password')):
                 login(request, form.customer.user)
                 return form.customer
+
             # Only way to get here is if password is incorrect for an existing user's email.
             raise ValueError('Incorrect password.')
 
@@ -95,7 +98,7 @@ class ReservationMixin:
                 raise ValueError('Email address was changed. Please refresh the page and try again.')
 
             # We have already checked whether a Customer exists that is linked to a User with the given email. Now
-            # we have to check that a bare User exists with that email. If we do, this means we have a data problem.
+            # we have to check whether a bare User exists with that email. If we do, this means we have a data problem.
             # This might occur if we deleted a Customer but did not delete the linked User.
             # Log the email and return an error to the customer.
             try:
@@ -104,8 +107,8 @@ class ReservationMixin:
                 logger.warning(f"Customer submitted reservation with email {form.cleaned_data['email']} which matches a User with no Customer attached.")
                 raise ValueError('User data error occurred.')
 
-            customer_kwargs = {key: form.cleaned_data.get(key) for key in customer_fields}
             # Create the customer object. Stripe cards are not registered until the Customer has an id (has been saved).
+            customer_kwargs = {key: form.cleaned_data.get(key) for key in customer_fields}
             customer = Customer.objects.create(
                 user=user,
                 registration_ip=request.remote_ip,
