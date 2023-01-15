@@ -481,6 +481,7 @@ class Customer(models.Model):
             self.add_to_stripe()
         if all((self.cc_number, self.cc_exp_mo, self.cc_exp_yr, self.cc_cvv)) and not self.card_1:
             card_token = stripe.get_card_token(self.cc_number, self.cc_exp_mo, self.cc_exp_yr, self.cc_cvv)
+            # TODO: create Card here, if we want one to be created at reservation time
             stripe.add_card_to_customer(self, card_token=card_token, is_primary=True, number=self.cc_number)
 
     def attach_card_2_to_stripe(self):
@@ -488,6 +489,7 @@ class Customer(models.Model):
             self.add_to_stripe()
         if all((self.cc2_number, self.cc2_exp_mo, self.cc2_exp_yr, self.cc2_cvv)) and not self.card_2:
             card_token = stripe.get_card_token(self.cc2_number, self.cc2_exp_mo, self.cc2_exp_yr, self.cc2_cvv)
+            # TODO: create Card here, if we want one to be created at reservation time
             stripe.add_card_to_customer(self, card_token=card_token, number=self.cc2_number)
 
     def save(self, *args, **kwargs):

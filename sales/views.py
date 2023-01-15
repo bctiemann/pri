@@ -94,22 +94,15 @@ class ReservationMixin:
             if not new_password:
                 raise ValueError('Email address was changed. Please refresh the page and try again.')
 
-            # Check that the submitted email does not match an existing User. If it does not (most common case), we
-            # are creating a new User with a new Customer attached.
+            # We have already checked whether a Customer exists that is linked to a User with the given email. Now
+            # we have to check that a bare User exists with that email. If we do, this means we have a data problem.
+            # This might occur if we deleted a Customer but did not delete the linked User.
+            # Log the email and return an error to the customer.
             try:
-                # First check whether a matching User exists that has a Customer
-                user = User.objects.get(email=form.cleaned_data['email'], customer__isnull=False)
-            except User.DoesNotExist:
-                try:
-                    # If it doesn't, check whether a User exists at all; if it does, this means we have a data problem.
-                    # Log the email and return an error to the customer.
-                    user = User.objects.get(email=form.cleaned_data['email'])
-                    logger.warning(f"Customer submitted reservation with email {form.cleaned_data['email']} which matches a User with no Customer attached.")
-                    raise ValueError('User data error occurred.')
-                except User.DoesNotExist:
-                    # We have found no matching User at all. This means we can create one and proceed with creating
-                    # a new Customer.
-                    user = User.objects.create_user(form.cleaned_data['email'], password=new_password)
+                user = User.objects.create_user(form.cleaned_data['email'], password=new_password)
+            except IntegrityError:
+                logger.warning(f"Customer submitted reservation with email {form.cleaned_data['email']} which matches a User with no Customer attached.")
+                raise ValueError('User data error occurred.')
 
             customer_kwargs = {key: form.cleaned_data.get(key) for key in customer_fields}
             # Create the customer object. Stripe cards are not registered until the Customer has an id (has been saved).
@@ -119,15 +112,11 @@ class ReservationMixin:
                 **customer_kwargs,
             )
             # Save a second time to register Stripe cards
-            try:
-                customer.save()
-            except CardError as e:
-                body = e.json_body
-                err = body.get('error', {})
-                code = err.get('code')
-                # raise ValueError(err.get('message'))
-                logger.warning(f'Customer {customer.id} card received error: {code}')
+            customer.save()
+
+            # Now login as the resolved user
             login(request, user)
+
         return customer
 
     def create_reservation(self, request, form=None):
