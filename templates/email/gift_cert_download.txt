@@ -11,6 +11,6 @@ installed, available at no cost from adobe.com
 
 Thank you for choosing Performance Rentals!
 
-If you have any questions, please feel free to call us at {{ company_phone }} or email {{ site_email }}
+If you have any questions, please feel free to call us at {{ company_phone }} or email {{ company_email }}
 
 This e-mail has been automatically generated. Please do not reply to this address.

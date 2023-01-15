@@ -439,7 +439,7 @@ class ValidateGiftCertificateView(APIView):
             'gift_certificate': gift_certificate,
             'site_url': settings.SERVER_BASE_URL,
             'company_phone': settings.COMPANY_PHONE,
-            'site_email': settings.SITE_EMAIL,
+            'company_email': settings.SITE_EMAIL,
         }
         send_email(
             [gift_certificate.email], email_subject, email_context,
@@ -798,12 +798,12 @@ class SendInsuranceAuthView(APIView):
 
         # Send email with PDF attachment to customer
         email_subject = 'Performance Rentals Insurance Authorization Form'
-        email_from = f'{settings.RESERVATIONS_EMAIL} (Performance Rentals Reservations)'
+        email_from = f'"Performance Rentals Reservations" <{settings.RESERVATIONS_EMAIL}>'
         email_context = {
             'customer': customer,
             'company_phone': settings.COMPANY_PHONE,
             'company_fax': settings.COMPANY_FAX,
-            'site_email': settings.SITE_EMAIL,
+            'company_email': settings.SITE_EMAIL,
         }
 
         template = get_template(self.template_name)

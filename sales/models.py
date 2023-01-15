@@ -65,7 +65,7 @@ class ConfirmationCodeMixin:
 
 
 class EmailConfirmationMixin:
-    email_from = f'{settings.RESERVATIONS_EMAIL} (Performance Rentals Reservations)'
+    email_from = f'"Performance Rentals Reservations" <{settings.RESERVATIONS_EMAIL}>'
     email_subject = None
     email_text_template = None
     email_html_template = None
@@ -75,7 +75,7 @@ class EmailConfirmationMixin:
             'reservation': self,
             'company_phone': settings.COMPANY_PHONE,
             'company_fax': settings.COMPANY_FAX,
-            'site_email': settings.SITE_EMAIL,
+            'company_email': settings.SITE_EMAIL,
             'site_url': settings.SERVER_BASE_URL,
         }
 
@@ -520,13 +520,13 @@ class GiftCertificate(models.Model):
             'giftcertificate': self,
             'company_phone': settings.COMPANY_PHONE,
             'company_fax': settings.COMPANY_FAX,
-            'site_email': settings.SITE_EMAIL,
+            'company_email': settings.SITE_EMAIL,
             'site_url': settings.SERVER_BASE_URL,
         }
 
         send_email(
             [self.email], 'Performance Rentals Gift Certificate', email_context,
-            from_address=f'{settings.SALES_EMAIL} (Performance Rentals)',
+            from_address=f'"Performance Rentals" <{settings.SALES_EMAIL}>',
             text_template='email/gift_cert_download.txt',
             html_template='email/gift_cert_download.txt',
         )

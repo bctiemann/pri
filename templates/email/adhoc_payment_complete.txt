@@ -1,0 +1,11 @@
+{% load humanize %}
+
+Dear {{ adhoc_payment.full_name }},
+
+Your substitute payment in the amount of ${{ adhoc_payment.amount|intcomma }} has been accepted and processed.
+
+Thank you for choosing Performance Rentals!
+
+If you have any questions, please feel free to call us at {{ company_phone }} or email {{ company_email }}
+
+This e-mail has been automatically generated.

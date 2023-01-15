@@ -22,7 +22,7 @@ def settings_constants(request):
         'company_address_one_line': ', '.join(settings.COMPANY_ADDRESS.splitlines()),
         'stripe_publishable_key': settings.STRIPE_PUBLIC_KEY,
         'server_base_url': settings.SERVER_BASE_URL,
-        'site_email': settings.SITE_EMAIL,
+        'company_email': settings.SITE_EMAIL,
         'joy_ride_prices': settings.JOY_RIDE_PRICES,
         'performance_experience_prices': settings.PERFORMANCE_EXPERIENCE_PRICES,
         'survey_discount_pct': settings.SURVEY_DISCOUNT_PCT,

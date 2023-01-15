@@ -13,6 +13,7 @@ from . import ListViewMixin, AdminViewMixin
 from backoffice.forms import AdHocPaymentForm, CardForm
 from sales.models import AdHocPayment
 from sales.stripe import Stripe
+from sales.tasks import send_email
 
 
 # Template generics-based CRUD views
@@ -36,6 +37,7 @@ class AdHocPaymentDetailView(AdminViewMixin, AdHocPaymentViewMixin, ListViewMixi
 
     def form_valid(self, form):
         stripe = Stripe()
+        adhoc_payment_orig = self.get_object()
         adhoc_payment = form.save()
 
         # Update card. If any data has changed since the last saved Card object, refresh the Stripe object as well.
@@ -75,7 +77,20 @@ class AdHocPaymentDetailView(AdminViewMixin, AdHocPaymentViewMixin, ListViewMixi
                 card.zip = form.cleaned_data['cc_zip']
                 card.save()
 
-        # TODO: If is_paid is changing from False to True, send adhoc_payment_complete.txt email
+        # If is_paid is changing from False to True, send adhoc_payment_complete.txt email
+        if adhoc_payment.is_paid and not adhoc_payment_orig.is_paid:
+            email_subject = 'Performance Rentals Substitute Payment - Processed'
+            email_context = {
+                'adhoc_payment': adhoc_payment,
+                'company_phone': settings.COMPANY_PHONE,
+                'company_email': settings.SITE_EMAIL,
+            }
+            send_email(
+                [form.cleaned_data['email']], email_subject, email_context,
+                text_template='email/adhoc_payment_complete.txt',
+                html_template='email/adhoc_payment_complete.html',
+                from_address=settings.SALES_EMAIL,
+            )
 
         return HttpResponseRedirect(self.get_success_url())
 

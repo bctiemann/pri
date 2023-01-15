@@ -13,4 +13,4 @@ to re-enter all of your information. You may also update your billing informatio
 PLEASE DO NOT E-MAIL SENSITIVE INFORMATION.
 
 This message has been automatically generated. If you need to contact a representative regarding
-your booking, please call us at {{ company_phone }} or e-mail us at {{ site_email }}
+your booking, please call us at {{ company_phone }} or e-mail us at {{ company_email }}
