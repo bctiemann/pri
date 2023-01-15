@@ -55,7 +55,7 @@ class GiftCertificateDetailView(AdminViewMixin, GiftCertificateViewMixin, ListVi
             gift_certificate.save()
 
         # Update card. If any data has changed since the last saved Card object, refresh the Stripe object as well.
-        if form.cleaned_data['cc_number']:
+        if form.cleaned_data['cc_number'] and settings.STRIPE_ENABLED:
             card_data = {
                 'number': form.cleaned_data['cc_number'],
                 'exp_month': form.cleaned_data['cc_exp_mo'],

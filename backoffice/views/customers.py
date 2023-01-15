@@ -2,6 +2,7 @@ from stripe.error import CardError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from django.conf import settings
 from django.shortcuts import render, reverse
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -44,7 +45,7 @@ class CustomerDetailView(AdminViewMixin, CustomerViewMixin, ListViewMixin, Updat
 
         # Update primary and secondary card. If any data has changed since the last saved Card object, refresh the
         # Stripe object as well.
-        if form.cleaned_data['cc_number']:
+        if form.cleaned_data['cc_number'] and settings.STRIPE_ENABLED:
             card_1_data = {
                 'number': form.cleaned_data['cc_number'],
                 'exp_month': form.cleaned_data['cc_exp_mo'],
@@ -75,7 +76,7 @@ class CustomerDetailView(AdminViewMixin, CustomerViewMixin, ListViewMixin, Updat
                 card_1.zip = form.cleaned_data['zip']
                 card_1.save()
 
-        if form.cleaned_data['cc2_number']:
+        if form.cleaned_data['cc2_number'] and settings.STRIPE_ENABLED:
             card_2_data = {
                 'number': form.data['cc2_number'],
                 'exp_month': form.data['cc2_exp_mo'],

@@ -56,9 +56,6 @@ class StripeChargeViewMixin:
                     charge.stripe_customer = stripe_customer
                     charge.card_status = 'valid'
                 except CardError as e:
-                    # body = e.json_body
-                    # err = body.get('error', {})
-                    # charge.error_code = err.get('code')
                     charge.card_status = Stripe.get_error(e)
                 charge.save()
 

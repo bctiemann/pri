@@ -496,7 +496,7 @@ class Customer(models.Model):
 
         # If an invalid card is specified during front-site reservation flow, no Card object will be created.
         # Cards will be created in backoffice customer management, even if invalid.
-        if self.id:
+        if self.id and settings.STRIPE_ENABLED:
             try:
                 self.attach_card_1_to_stripe()
             except CardError as e:

@@ -126,18 +126,20 @@
                     {{ form.cc_zip }}
                 </td>
             </tr>
-            <tr>
-                <td>Card</td>
-                <td>
-                    {{ charge.card.stripe_card|default:"Card not validated (click Edit)" }}
-                </td>
-            </tr>
-            <tr>
-                <td>Card Status</td>
-                <td>
-                    {{ charge.card_status }}
-                </td>
-            </tr>
+            {% if charge %}
+                <tr>
+                    <td>Card</td>
+                    <td>
+                        {{ charge.card.stripe_card|default:"Card not validated (click Edit)" }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Card Status</td>
+                    <td>
+                        {{ charge.card_status }}
+                    </td>
+                </tr>
+            {% endif %}
             <tr>
                 <td>Credit Card Number</td>
                 <td>
