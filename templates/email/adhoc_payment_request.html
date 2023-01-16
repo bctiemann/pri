@@ -1,0 +1,27 @@
+{% load humanize bbcode_tags %}
+
+<p>
+    Dear {{ adhoc_payment.full_name }},
+</p>
+
+<p>
+    Performance Rentals is requesting a one-time payment for the following item:
+</p>
+
+<p>
+    {{ adhoc_payment.item }} : ${{ adhoc_payment.amount|intcomma }}
+</p>
+
+{% if adhoc_payment.message %}
+    <p>Additional Instructions:</p>
+
+    <p>{{ adhoc_payment.message|bbcode|safe }}</p>
+{% endif %}
+
+<p>In order to submit payment for this item via credit card, please visit the following URL:</p>
+
+<p>{{ site_url }}{% url "adhoc-payment" confirmation_code=adhoc_payment.confirmation_code %}</p>
+
+<p>If you have any questions, please feel free to call us at {{ company_phone }} or email {{ company_email }}</p>
+
+<p>This e-mail has been automatically generated.</p>

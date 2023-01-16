@@ -1,22 +1,21 @@
-<cfoutput>
-Dear #Form.fullname#,
+{% load humanize %}
+
+Dear {{ adhoc_payment.full_name }},
 
 Performance Rentals is requesting a one-time payment for the following item:
 
-#Form.item# : #NumberFormat(Form.amount,"$,.__")#
+{{ adhoc_payment.item }} : ${{ adhoc_payment.amount|intcomma }}
 
-<CFIF len(Form.mesg)>
-
+{% if adhoc_payment.message %}
 Additional Instructions:
 
-#Form.mesg#
-</CFIF>
+{{ adhoc_payment.message }}
+{% endif %}
 
 In order to submit payment for this item via credit card, please visit the following URL:
 
-#OnSecSite#subpay.cfm?m=#mcrypt#&e=#URLEncodedFormat(Form.email)#
+{{ site_url }}{% url "adhoc-payment" confirmation_code=adhoc_payment.confirmation_code %}
 
-If you have any questions, please feel free to call us at #contactphone# or email #siteemail#
+If you have any questions, please feel free to call us at {{ company_phone }} or email {{ company_email }}
 
 This e-mail has been automatically generated.
-</cfoutput>

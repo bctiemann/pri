@@ -515,6 +515,14 @@ class AdHocPaymentForm(CSSClassMixin, forms.ModelForm):
         exclude = ('submitted_at', 'paid_at', 'card', 'confirmation_code',)
 
 
+class AdHocPaymentCreateForm(CSSClassMixin, forms.ModelForm):
+    phone_fields = ('phone',)
+
+    class Meta:
+        model = AdHocPayment
+        fields = ('full_name', 'email', 'phone', 'amount', 'item', 'message',)
+
+
 class TollTagForm(forms.ModelForm):
 
     tag_number = forms.CharField(required=True)

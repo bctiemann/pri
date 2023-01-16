@@ -10,7 +10,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from . import ListViewMixin, AdminViewMixin
-from backoffice.forms import AdHocPaymentForm, CardForm
+from backoffice.forms import AdHocPaymentForm, AdHocPaymentCreateForm, CardForm
 from sales.models import AdHocPayment
 from sales.stripe import Stripe
 from sales.tasks import send_email
@@ -100,9 +100,25 @@ class AdHocPaymentDetailView(AdminViewMixin, AdHocPaymentViewMixin, ListViewMixi
 
 class AdHocPaymentCreateView(AdminViewMixin, AdHocPaymentViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/adhoc_payment/detail.html'
-    form_class = AdHocPaymentForm
+    form_class = AdHocPaymentCreateForm
 
-    # TODO: send adhoc_payment_request.txt email
+    def form_valid(self, form):
+        adhoc_payment = form.save()
+        self.object = adhoc_payment
+        email_subject = 'Performance Rentals Substitute Payment Request'
+        email_context = {
+            'adhoc_payment': adhoc_payment,
+            'company_phone': settings.COMPANY_PHONE,
+            'company_email': settings.SITE_EMAIL,
+            'site_url': settings.SERVER_BASE_URL,
+        }
+        send_email(
+            [form.cleaned_data['email']], email_subject, email_context,
+            text_template='email/adhoc_payment_request.txt',
+            html_template='email/adhoc_payment_request.html',
+            from_address=settings.SALES_EMAIL,
+        )
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
         return reverse('backoffice:adhocpayment-detail', kwargs={'pk': self.object.id})
