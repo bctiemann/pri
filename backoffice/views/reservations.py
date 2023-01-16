@@ -51,6 +51,7 @@ class ReservationCreateView(AdminViewMixin, ReservationViewMixin, ListViewMixin,
 
     # TODO: if form.send_email, reservation.send_welcome_email()
     #  If existing customer, use reservation_confirm_existing_customer.txt
+    # TODO: create customer if nonexistent
 
     def get_form_kwargs(self):
         """Return the keyword arguments for instantiating the form."""
