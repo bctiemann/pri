@@ -6,6 +6,10 @@ We will be contacting you shortly to confirm your reservation and arrange any ad
 Your confirmation code is: {{ reservation.confirmation_code }}
 Reservation date(s): {{ reservation.out_at|date:"g:i A D m/d/Y" }} thru {{ reservation.back_at|date:"g:i A D m/d/Y" }}
 
+You can view your upcoming reservation at our secure customer portal:
+{{ site_url }}{% url "customer_portal:confirm-reservation" confirmation_code=reservation.confirmation_code %}
+
+
 If you need to contact us regarding this reservation, please call {{ company_phone }}.
 
 PLEASE DO NOT E-MAIL SENSITIVE INFORMATION.

@@ -1,0 +1,26 @@
+<p>
+    Dear {{ reservation.customer.full_name }},
+</p>
+
+<p>
+    You've recently submitted a reservation request to Performance Rentals for our exciting {{ reservation.vehicle.make }} {{ reservation.vehicle.model }}!
+    We will be contacting you shortly to confirm your reservation and arrange any additional services you may require.
+</p>
+
+<p>
+    Your confirmation code is: {{ reservation.confirmation_code }}<br />
+    Reservation date(s): {{ reservation.out_at|date:"g:i A D m/d/Y" }} thru {{ reservation.back_at|date:"g:i A D m/d/Y" }}
+</p>
+
+<p>
+    You can view your upcoming reservation at our secure customer portal:<br />
+    {{ site_url }}{% url "customer_portal:confirm-reservation" confirmation_code=reservation.confirmation_code %}
+</p>
+
+<p>
+    If you need to contact us regarding this reservation, please call {{ company_phone }}.
+</p>
+
+<p>
+    PLEASE DO NOT E-MAIL SENSITIVE INFORMATION.
+</p>

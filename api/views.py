@@ -772,7 +772,8 @@ class CheckScheduleConflictView(APIView):
 
         conflicts = BaseReservation.objects.filter(vehicle=vehicle, back_at__gte=out_at, out_at__lte=back_at)
         exclude_id = request.POST.get('reservation_id') or request.POST.get('rental_id')
-        conflicts = conflicts.exclude(pk=exclude_id)
+        if exclude_id:
+            conflicts = conflicts.exclude(pk=exclude_id)
 
         serializer = ScheduleConflictSerializer(conflicts, many=True)
 

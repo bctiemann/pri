@@ -234,11 +234,11 @@ class ReservationDateTimeMixin(forms.ModelForm):
         self.cleaned_data['out_at'] = datetime.datetime.combine(
             self.cleaned_data['out_at_date'],
             out_at_time,
-        )
+        ).astimezone(pytz.timezone(settings.TIME_ZONE))
         self.cleaned_data['back_at'] = datetime.datetime.combine(
             self.cleaned_data['back_at_date'],
             back_at_time,
-        )
+        ).astimezone(pytz.timezone(settings.TIME_ZONE))
 
 
 class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, CustomerSearchMixin, forms.ModelForm):

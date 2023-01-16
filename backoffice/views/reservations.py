@@ -49,14 +49,18 @@ class ReservationCreateView(AdminViewMixin, ReservationViewMixin, ListViewMixin,
     template_name = 'backoffice/reservation/detail.html'
     form_class = ReservationCreateForm
 
-    # TODO: if form.send_email, reservation.send_welcome_email()
-    #  If existing customer, use reservation_confirm_existing_customer.txt
-
     def form_valid(self, form):
         reservation = form.save()
         self.object = reservation
+
         customer = form.cleaned_data['customer']
-        if not customer:
+        if customer:
+            if form.cleaned_data['send_email']:
+                reservation.send_welcome_email(
+                    email_text_template='email/reservation_confirm_existing_customer.txt',
+                    email_html_template='email/reservation_confirm_existing_customer.html',
+                )
+        else:
             user = User.objects.create_user(email=form.cleaned_data['email'], password=generate_password())
             customer = Customer.objects.create(
                 user=user,
@@ -66,6 +70,9 @@ class ReservationCreateView(AdminViewMixin, ReservationViewMixin, ListViewMixin,
                 work_phone=form.cleaned_data['work_phone'],
                 home_phone=form.cleaned_data['home_phone']
             )
+            if form.cleaned_data['send_email']:
+                reservation.send_welcome_email()
+
         reservation.customer = customer
         reservation.save()
         return HttpResponseRedirect(self.get_success_url())

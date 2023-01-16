@@ -70,7 +70,10 @@ class EmailConfirmationMixin:
     email_text_template = None
     email_html_template = None
 
-    def send_welcome_email(self):
+    def send_welcome_email(self, email_subject=None, email_text_template=None, email_html_template=None):
+        self.email_subject = email_subject or self.email_subject
+        self.email_text_template = email_text_template or self.email_text_template
+        self.email_html_template = email_html_template or self.email_html_template
         email_context = {
             'reservation': self,
             'company_phone': settings.COMPANY_PHONE,

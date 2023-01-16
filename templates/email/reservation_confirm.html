@@ -1,0 +1,35 @@
+<p>
+    Dear {{ reservation.customer.full_name }},
+</p>
+
+<p>
+    You've recently submitted a reservation request to Performance Rentals for our exciting {{ reservation.vehicle.make }} {{ reservation.vehicle.model }}!
+    Before we can confirm your reservation, we need you to supply some additional information about yourself.
+    Please visit the following secure URL and complete the requested information form, after which we will contact you
+    to confirm your details and complete your reservation.
+</p>
+
+<p>
+    {{ site_url }}{% url "customer_portal:confirm-reservation" confirmation_code=reservation.confirmation_code %}
+</p>
+
+<p>
+    If you would rather submit your information over the phone or via fax, please call us toll-free at {{ company_phone }}.
+</p>
+
+<p>
+    Your confirmation code is: {{ reservation.confirmation_code }}<br />
+    Reservation date(s): {{ reservation.out_at|date:"g:i A D m/d/Y" }} thru {{ reservation.back_at|date:"g:i A D m/d/Y" }}
+</p>
+
+<p>
+    NOTE: YOUR RESERVATION IS NOT CONFIRMED UNTIL THE RESERVATION PROCESS ABOVE IS COMPLETE.
+</p>
+
+<p>
+    PLEASE DO NOT E-MAIL SENSITIVE INFORMATION.
+</p>
+
+<p>
+    This e-mail has been automatically generated. Please do not reply to this address.
+</p>
