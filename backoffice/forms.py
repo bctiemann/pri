@@ -253,10 +253,10 @@ class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, CustomerSearchMix
     work_phone = PhoneNumberField(required=False)
     mobile_phone = PhoneNumberField(required=False)
 
-    delivery_required = forms.ChoiceField(choices=DELIVERY_REQUIRED_CHOICES)
+    delivery_required = forms.TypedChoiceField(coerce=lambda x: x == 'True', choices=DELIVERY_REQUIRED_CHOICES)
     extra_miles = forms.ChoiceField(choices=get_extra_miles_choices())
-    send_email = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, required=False)
-    is_military = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, required=False)
+    send_email = forms.TypedChoiceField(coerce=lambda x: x == 'True', choices=TRUE_FALSE_CHOICES, required=False)
+    is_military = forms.TypedChoiceField(coerce=lambda x: x == 'True', initial=False, choices=TRUE_FALSE_CHOICES, required=False)
     customer_notes = forms.CharField(widget=forms.Textarea(attrs={'class': 'customer-notes'}), required=False)
     tax_percent = forms.DecimalField(disabled=True, required=False)
 
@@ -270,7 +270,7 @@ class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, CustomerSearchMix
 
         if self.instance.id:
             self.fields['tax_percent'].initial = self.instance.get_price_data()['tax_rate'] * 100
-        self.fields['override_subtotal'].widget.attrs['placeholder'] = 'Override'
+            self.fields['override_subtotal'].widget.attrs['placeholder'] = 'Override'
 
         if self.initial.get('customer'):
             customer = self.initial['customer']
@@ -285,10 +285,42 @@ class ReservationForm(ReservationDateTimeMixin, CSSClassMixin, CustomerSearchMix
         self.cleaned_data['miles_included'] = vehicle_marketing.miles_included
         self.cleaned_data['deposit_amount'] = vehicle_marketing.security_deposit
 
+        if self.cleaned_data['back_at'] < self.cleaned_data['out_at']:
+            raise forms.ValidationError('Return date/time is earlier than out date/time.')
+
     class Meta:
         model = Reservation
         # fields = '__all__'
         exclude = ('confirmation_code',)
+
+
+class ReservationCreateForm(ReservationForm):
+
+    customer = forms.ModelChoiceField(queryset=Customer.objects.all(), widget=forms.HiddenInput(), required=False)
+    first_name = forms.CharField()
+    last_name = forms.CharField()
+    email = forms.EmailField()
+
+    def clean(self):
+        super().clean()
+        customer = self.cleaned_data.get('customer')
+        email = self.cleaned_data.get('email')
+        if not customer and email:
+            customer = Customer.objects.filter(user__email=email).first()
+        if not customer and User.objects.filter(email=self.cleaned_data['email'], customer__isnull=True).exists():
+            raise forms.ValidationError('User with the specified email (but no Customer) already exists.')
+        self.cleaned_data['customer'] = customer
+
+    class Meta:
+        model = Reservation
+        fields = (
+            'customer', 'first_name', 'last_name', 'email', 'mobile_phone', 'work_phone', 'home_phone',
+            'vehicle', 'out_at', 'out_at_date', 'out_at_time', 'back_at', 'back_at_date', 'back_at_time',
+            'drivers', 'status', 'delivery_required','delivery_zip', 'coupon_code', 'extra_miles', 'miles_included',
+            'deposit_amount', 'customer_notes',
+        )
+        # fields = '__all__'
+        # exclude = ('confirmation_code', 'customer',)
 
 
 class RentalForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):

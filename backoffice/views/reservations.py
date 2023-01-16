@@ -10,10 +10,10 @@ from django.forms.models import model_to_dict
 
 from . import ListViewMixin, AdminViewMixin
 from fleet.models import VehicleMarketing
-from users.models import Customer
+from users.models import Customer, User, generate_password
 from sales.models import Reservation, Rental, Driver
 from sales.calculators import RentalPriceCalculator
-from backoffice.forms import ReservationForm, RentalConversionForm
+from backoffice.forms import ReservationForm, ReservationCreateForm, RentalConversionForm
 
 
 # Template generics-based CRUD views
@@ -47,11 +47,28 @@ class ReservationDetailView(AdminViewMixin, ReservationViewMixin, ListViewMixin,
 
 class ReservationCreateView(AdminViewMixin, ReservationViewMixin, ListViewMixin, CreateView):
     template_name = 'backoffice/reservation/detail.html'
-    form_class = ReservationForm
+    form_class = ReservationCreateForm
 
     # TODO: if form.send_email, reservation.send_welcome_email()
     #  If existing customer, use reservation_confirm_existing_customer.txt
-    # TODO: create customer if nonexistent
+
+    def form_valid(self, form):
+        reservation = form.save()
+        self.object = reservation
+        customer = form.cleaned_data['customer']
+        if not customer:
+            user = User.objects.create_user(email=form.cleaned_data['email'], password=generate_password())
+            customer = Customer.objects.create(
+                user=user,
+                first_name=form.cleaned_data['first_name'],
+                last_name=form.cleaned_data['last_name'],
+                mobile_phone=form.cleaned_data['mobile_phone'],
+                work_phone=form.cleaned_data['work_phone'],
+                home_phone=form.cleaned_data['home_phone']
+            )
+        reservation.customer = customer
+        reservation.save()
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_form_kwargs(self):
         """Return the keyword arguments for instantiating the form."""
