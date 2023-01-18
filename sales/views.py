@@ -23,6 +23,7 @@ from sales.forms import (
 )
 from sales.models import GiftCertificate, AdHocPayment, IPBan, generate_code
 from sales.enums import ServiceType
+from sales.constants import GIFT_CERTIFICATE_TEXT
 from marketing.views import NavMenuMixin
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
 from pri.pdf import PDFView
@@ -473,6 +474,7 @@ class GiftCertificatePDFView(PDFView):
         context = super().get_context_data(**kwargs)
         try:
             context['gift_certificate'] = GiftCertificate.objects.get(tag=self.kwargs['tag'], is_paid=True)
+            context['gift_certificate_text'] = GIFT_CERTIFICATE_TEXT
         except GiftCertificate.DoesNotExist:
             raise Http404
         context['company_phone'] = settings.COMPANY_PHONE

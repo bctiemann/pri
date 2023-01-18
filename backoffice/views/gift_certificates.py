@@ -14,6 +14,7 @@ from . import ListViewMixin, AdminViewMixin
 from backoffice.forms import GiftCertificateForm, CardForm
 from sales.models import GiftCertificate
 from sales.stripe import Stripe
+from sales.constants import GIFT_CERTIFICATE_TEXT
 from pri.pdf import PDFView
 
 
@@ -94,6 +95,11 @@ class GiftCertificateDetailView(AdminViewMixin, GiftCertificateViewMixin, ListVi
 
         return HttpResponseRedirect(self.get_success_url())
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['gift_certificate_text'] = GIFT_CERTIFICATE_TEXT
+        return context
+
     def get_success_url(self):
         return reverse('backoffice:giftcert-detail', kwargs={'pk': self.object.id})
 
@@ -124,6 +130,7 @@ class GiftCertificatePDFView(PDFView):
         context = super().get_context_data(**kwargs)
         try:
             context['gift_certificate'] = GiftCertificate.objects.get(tag=self.kwargs['tag'])
+            context['gift_certificate_text'] = GIFT_CERTIFICATE_TEXT
         except GiftCertificate.DoesNotExist:
             raise Http404
         context['company_phone'] = settings.COMPANY_PHONE

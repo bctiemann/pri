@@ -123,8 +123,7 @@ body {
                     {% if gift_certificate.value_message %}
                         {{ gift_certificate.value_message }}
                     {% else %}
-                        <b>${{ gift_certificate.amount|floatformat:0|intcomma }}</b> toward any vehicle rental from PRI's
-                        sports car or bike fleet, or any service including the PRI Performance Experience or Joy Ride.
+                        <b>${{ gift_certificate.amount|floatformat:0|intcomma }}</b> {{ gift_certificate_text }}
                     {% endif %}
                 </div>
             </div>
