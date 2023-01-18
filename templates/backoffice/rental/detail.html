@@ -197,7 +197,7 @@
                                 <div class="card-number">{{ rental.customer.cc_number }}</div>
                                 <div class="card-exp">{{ rental.customer.cc_exp_mo }} / {{ rental.customer.cc_exp_yr }}</div>
                                 <div class="card-cvv">{{ rental.customer.cc_cvv }}</div>
-                                <div class="card-phone">{{ rental.customer.cc_phone }}</div>
+                                <div class="card-phone">{{ rental.customer.cc_phone.as_national }}</div>
                             {% endif %}
                         </div>
                         <div class="card-mockup {% if not rental.customer.cc2_number %}inactive{% endif %}">
@@ -206,7 +206,7 @@
                                 <div class="card-number">{{ rental.customer.cc2_number }}</div>
                                 <div class="card-exp">{{ rental.customer.cc2_exp_mo }} / {{ rental.customer.cc2_exp_yr }}</div>
                                 <div class="card-cvv">{{ rental.customer.cc2_cvv }}</div>
-                                <div class="card-phone">{{ rental.customer.cc2_phone }}</div>
+                                <div class="card-phone">{{ rental.customer.cc2_phone.as_national }}</div>
                             {% endif %}
                         </div>
                     </div>

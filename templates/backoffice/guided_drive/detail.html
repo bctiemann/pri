@@ -173,7 +173,7 @@
                                 <div class="card-number">{{ event.customer.cc_number }}</div>
                                 <div class="card-exp">{{ event.customer.cc_exp_mo }} / {{ event.customer.cc_exp_yr }}</div>
                                 <div class="card-cvv">{{ event.customer.cc_cvv }}</div>
-                                <div class="card-phone">{{ event.customer.cc_phone }}</div>
+                                <div class="card-phone">{{ event.customer.cc_phone.as_national }}</div>
                             {% endif %}
                         </div>
                         <div class="card-mockup {% if not event.customer.cc2_number %}inactive{% endif %}">
@@ -182,7 +182,7 @@
                                 <div class="card-number">{{ event.customer.cc2_number }}</div>
                                 <div class="card-exp">{{ event.customer.cc2_exp_mo }} / {{ event.customer.cc2_exp_yr }}</div>
                                 <div class="card-cvv">{{ event.customer.cc2_cvv }}</div>
-                                <div class="card-phone">{{ event.customer.cc2_phone }}</div>
+                                <div class="card-phone">{{ event.customer.cc2_phone.as_national }}</div>
                             {% endif %}
                         </div>
                     </div>
