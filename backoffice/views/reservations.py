@@ -116,6 +116,7 @@ class ReservationConvertToRentalView(UpdateView):
         reservation.delete()
 
         reservation_data['status'] = Rental.Status.CONFIRMED
+        reservation_data['damage_out'] = reservation.vehicle.damage
         rental_form = RentalConversionForm(data=reservation_data)
         self.rental = rental_form.save()
 

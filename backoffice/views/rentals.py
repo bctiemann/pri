@@ -45,9 +45,25 @@ class RentalDetailView(PermissionRequiredMixin, AdminViewMixin, RentalViewMixin,
     template_name = 'backoffice/rental/detail.html'
     form_class = RentalForm
 
-    # TODO: Update vehicle mileage and damage if changed in this rental
+    def form_valid(self, form):
+        rental_orig = self.get_object()
+        rental = form.save()
 
-    # TODO: If rental is in-progress and back_at is changed, recalculate extended_days
+        # Save mileage and damage state to vehicle at point of completion
+        if rental_orig.status != Rental.Status.COMPLETE and rental.status == Rental.Status.COMPLETE:
+            rental.vehicle.mileage = rental.mileage_back
+            rental.vehicle.damage = rental.damage_in
+            rental.save()
+
+        # If rental has started and back_at is changed, recalculate extended_days to be displayed outside of
+        # price breakdown (to be invoiced as a separate line item
+        if rental_orig.status == Rental.Status.IN_PROGRESS:
+            rental.extended_days = rental.get_extended_days()
+        else:
+            rental.back_at_orig = rental.back_at
+        rental.save()
+
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)

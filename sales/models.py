@@ -179,6 +179,7 @@ class BaseReservation(ConfirmationCodeMixin, EmailConfirmationMixin, models.Mode
     reserved_at = models.DateTimeField(auto_now_add=True)
     out_at = models.DateTimeField(null=True, blank=True)
     back_at = models.DateTimeField(null=True, blank=True)
+    back_at_orig = models.DateTimeField(null=True, blank=True)
     drivers = models.IntegerField(null=True, blank=True)
     miles_included = models.IntegerField(null=True, blank=True)
     extra_miles = models.IntegerField(null=True, blank=True)
@@ -225,15 +226,37 @@ class BaseReservation(ConfirmationCodeMixin, EmailConfirmationMixin, models.Mode
 
     @property
     def rental_duration(self):
+        return (self.back_at_orig or self.back_at) - self.out_at
+
+    @property
+    def rental_duration_in_progress(self):
         return self.back_at - self.out_at
 
     @property
+    def rental_duration_orig(self):
+        return self.back_at_orig - self.out_at
+
+    @property
     def num_days(self):
-        if self.out_at and self.back_at:
-            # Pad the selection with 30m so the estimate comes out to 1 day if up to 24.5 hours
-            grace_period = datetime.timedelta(seconds=settings.RENTAL_GRACE_PERIOD_SECS)
-            return int((self.rental_duration - grace_period).days) + 1
-        return 0
+        # Pad the selection with 30m so the estimate comes out to 1 day if up to 24.5 hours
+        grace_period = datetime.timedelta(seconds=settings.RENTAL_GRACE_PERIOD_SECS)
+        return int((self.rental_duration - grace_period).days) + 1
+
+    @property
+    def num_days_in_progress(self):
+        # If rental is in progress, pad with 6 hours before tacking on an extended day (invoiced separately)
+        grace_period = datetime.timedelta(hours=settings.EXTEND_THRESHOLD_HOURS)
+        return int((self.rental_duration_in_progress - grace_period).days) + 1
+
+    @property
+    def num_days_orig(self):
+        # The originally quoted num_days, for calculating extended days
+        grace_period = datetime.timedelta(seconds=settings.RENTAL_GRACE_PERIOD_SECS)
+        return int((self.rental_duration_orig - grace_period).days) + 1
+
+    def get_extended_days(self):
+        # extended_days = new num_days (6-hour padded) - original num_days (30-min padded)
+        return self.num_days_in_progress - self.num_days_orig
 
     @property
     def coupon(self):
@@ -264,6 +287,8 @@ class BaseReservation(ConfirmationCodeMixin, EmailConfirmationMixin, models.Mode
 
     def save(self, *args, **kwargs):
         self.coupon_code = self.coupon_code.upper()
+        if self.back_at and not self.back_at_orig:
+            self.back_at_orig = self.back_at
         if self.id:
             self.final_price_data = json.loads(json.dumps(self.get_price_data(), cls=DjangoJSONEncoder))
         super().save(*args, **kwargs)
@@ -303,7 +328,7 @@ class Rental(BaseReservation):
     deposit_refunded_at = models.DateTimeField(null=True, blank=True)
     deposit_refund_amount = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
     rental_discount_pct = models.IntegerField(null=True, blank=True)
-    extended_days = models.IntegerField(null=True, blank=True)
+    extended_days = models.IntegerField(null=True, blank=True, default=0)
 
     @property
     def extended_days_amount(self):

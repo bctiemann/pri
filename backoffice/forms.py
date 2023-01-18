@@ -366,7 +366,7 @@ class RentalForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):
 
     class Meta:
         model = Rental
-        exclude = ('confirmation_code', 'customer',)
+        exclude = ('confirmation_code', 'customer', 'back_at_orig',)
 
 
 class RentalConversionForm(forms.ModelForm):
