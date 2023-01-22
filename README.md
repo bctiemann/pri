@@ -28,6 +28,7 @@ to work with the project from now on (though PyCharm automates this; see below).
 - Finally, set up your local database using `./manage.py migrate`. This will create the SQLite database using all existing migrations
 and sync the tables with the models in code.
 - You can now run the app using `./manage.py runserver [8000]` and connect to it locally at http://127.0.0.1:8000
+- Note that `wkhtmltopdf` (available in Homebrew or FreeBSD packages) must be installed
 
 ### PyCharm Setup
 
