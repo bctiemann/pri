@@ -18,7 +18,7 @@ Virtualenv is a means of localizing a python environment and its installed packa
 the OS-level Python do not affect your development environments, which are also segregated from one another.
 - Once you have virtualenv, cd into the root directory of this project and enter: 
 `virtualenv venv --python=<path/to/python>`
-- Then activate the virtualenv (which sets the enviroment vars to use the localized python for this shell only):
+- Then activate the virtualenv (which sets the environment vars to use the localized python for this shell only):
 `. venv/bin/activate` (other activate commands exist for non-bash shells). This is how you will need to activate the venv
 to work with the project from now on (though PyCharm automates this; see below).
 - You can deactivate the shell's environment at any time with `deactivate`. Or just close the shell, it is not persistent.
