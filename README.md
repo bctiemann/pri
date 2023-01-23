@@ -17,7 +17,7 @@ To set up your local environment, you will need to create a python virtualenv.
 Virtualenv is a means of localizing a python environment and its installed packages to a specific project, so changes to
 the OS-level Python do not affect your development environments, which are also segregated from one another.
 - Once you have virtualenv, cd into the root directory of this project and enter: 
-`virtualenv venv --python=<path/to/python>`
+`virtualenv venv --python=<path/to/python>` or (more easily) `python -m virtualenv venv`
 - Then activate the virtualenv (which sets the environment vars to use the localized python for this shell only):
 `. venv/bin/activate` (other activate commands exist for non-bash shells). This is how you will need to activate the venv
 to work with the project from now on (though PyCharm automates this; see below).
@@ -74,7 +74,7 @@ template using the context dict. The template contains only minimal flow-control
 
 - Ideally, view logic should be sparse as well; any methods or logic which processes or transforms data from the database
 should reside in the models, i.e. as properties or model methods, which can then be invoked on the model instances returned
-by the ORM. See `rentals.models.Vehicle` for an example model class demonstrating these approaches. (This follows the
+by the ORM. See `fleet.models.Vehicle` for an example model class demonstrating these approaches. (This follows the
 model-view-controller principle of separation of concerns)
 
 `urls.py` in each app directory defines the URL patterns which map to specific views. Each app's `urls.py` is conventionally 
