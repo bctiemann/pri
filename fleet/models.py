@@ -113,9 +113,10 @@ class Vehicle(models.Model):
     @property
     def upcoming_services(self):
         services = self.scheduledservice_set.all()
-        upcoming_threshold_miles = self.mileage + 500
-        services = services.filter(next_mileage__lte=upcoming_threshold_miles)
-        services = services.filter(done_at__isnull=True, done_mileage__isnull=True)
+        if self.mileage:
+            upcoming_threshold_miles = self.mileage + 500
+            services = services.filter(next_mileage__lte=upcoming_threshold_miles)
+            services = services.filter(done_at__isnull=True, done_mileage__isnull=True)
         return services
         """
         AND (nextmiles <= <CFQUERYPARAM value="#Vehicles.mileage#" CFSQLType="CF_SQL_INTEGER"> + 500 AND donestamp IS NULL AND donemiles IS NULL)
