@@ -222,15 +222,15 @@ class ReservationDateTimeMixin(forms.ModelForm):
         if self.instance.out_at and self.instance.back_at:
             out_at_localized = self.instance.out_at.astimezone(pytz.timezone(settings.TIME_ZONE))
             back_at_localized = self.instance.back_at.astimezone(pytz.timezone(settings.TIME_ZONE))
-            self.fields['out_at_date'].initial = out_at_localized.strftime('%m/%d/%Y')
-            self.fields['back_at_date'].initial = back_at_localized.strftime('%m/%d/%Y')
-            self.fields['out_at_time'].initial = out_at_localized.strftime('%H:%M')
-            self.fields['back_at_time'].initial = back_at_localized.strftime('%H:%M')
+            self.fields['out_at_date'].initial = out_at_localized.strftime(settings.DATE_FORMAT_INPUT)
+            self.fields['back_at_date'].initial = back_at_localized.strftime(settings.DATE_FORMAT_INPUT)
+            self.fields['out_at_time'].initial = out_at_localized.strftime(settings.TIME_FORMAT_INPUT)
+            self.fields['back_at_time'].initial = back_at_localized.strftime(settings.TIME_FORMAT_INPUT)
 
     def clean(self):
         super().clean()
-        out_at_time = datetime.datetime.strptime(self.cleaned_data['out_at_time'], '%H:%M').time()
-        back_at_time = datetime.datetime.strptime(self.cleaned_data['back_at_time'], '%H:%M').time()
+        out_at_time = datetime.datetime.strptime(self.cleaned_data['out_at_time'], settings.TIME_FORMAT_INPUT).time()
+        back_at_time = datetime.datetime.strptime(self.cleaned_data['back_at_time'], settings.TIME_FORMAT_INPUT).time()
         self.cleaned_data['out_at'] = datetime.datetime.combine(
             self.cleaned_data['out_at_date'],
             out_at_time,
@@ -354,10 +354,10 @@ class RentalForm(ReservationDateTimeMixin, CSSClassMixin, forms.ModelForm):
         self.init_reservation_date_time()
         if self.instance.deposit_charged_at:
             deposit_charged_at_localized = self.instance.deposit_charged_at.astimezone(pytz.timezone(settings.TIME_ZONE))
-            self.fields['deposit_charged_on'].initial = deposit_charged_at_localized.strftime('%m/%d/%Y')
+            self.fields['deposit_charged_on'].initial = deposit_charged_at_localized.strftime(settings.DATE_FORMAT_INPUT)
         if self.instance.deposit_refunded_at:
             deposit_refunded_at_localized = self.instance.deposit_refunded_at.astimezone(pytz.timezone(settings.TIME_ZONE))
-            self.fields['deposit_refunded_on'].initial = deposit_refunded_at_localized.strftime('%m/%d/%Y')
+            self.fields['deposit_refunded_on'].initial = deposit_refunded_at_localized.strftime(settings.DATE_FORMAT_INPUT)
 
     def clean(self):
         super().clean()
@@ -618,9 +618,9 @@ class GuidedDriveForm(CSSClassMixin, CustomerSearchMixin, forms.ModelForm):
         self.fields['vehicle_choice_2'].choices = get_vehicle_choices(allow_null=True)
         self.fields['vehicle_choice_3'].choices = get_vehicle_choices(allow_null=True)
         if self.instance.requested_date:
-            self.fields['requested_date_picker'].initial = self.instance.requested_date.strftime('%m/%d/%Y')
+            self.fields['requested_date_picker'].initial = self.instance.requested_date.strftime(settings.DATE_FORMAT_INPUT)
         if self.instance.backup_date:
-            self.fields['backup_date_picker'].initial = self.instance.backup_date.strftime('%m/%d/%Y')
+            self.fields['backup_date_picker'].initial = self.instance.backup_date.strftime(settings.DATE_FORMAT_INPUT)
         self.fields['override_subtotal'].widget.attrs['placeholder'] = 'Override'
 
         # short_fields = [
@@ -673,7 +673,7 @@ class ConsignmentPaymentForm(CSSClassMixin, forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if self.instance.paid_at:
-            self.fields['paid_on_picker'].initial = self.instance.paid_at.strftime('%m/%d/%Y')
+            self.fields['paid_on_picker'].initial = self.instance.paid_at.strftime(settings.DATE_FORMAT_INPUT)
 
         # short_fields = [
         #     'amount', 'paid_on_picker'
@@ -853,7 +853,7 @@ class IPBanForm(CSSClassMixin, forms.ModelForm):
         super().__init__(*args, **kwargs)
         if self.instance.expires_at:
             expires_at_localized = self.instance.expires_at.astimezone(pytz.timezone(settings.TIME_ZONE))
-            self.fields['expires_on'].initial = expires_at_localized.strftime('%m/%d/%Y')
+            self.fields['expires_on'].initial = expires_at_localized.strftime(settings.DATE_FORMAT_INPUT)
 
     def clean(self):
         super().clean()
@@ -879,10 +879,10 @@ class DamageForm(CSSClassMixin, forms.ModelForm):
         self.fields['vehicle'].choices = get_vehicle_choices()
         if self.instance.damaged_at:
             damaged_at_localized = self.instance.damaged_at.astimezone(pytz.timezone(settings.TIME_ZONE))
-            self.fields['damaged_on'].initial = damaged_at_localized.strftime('%m/%d/%Y')
+            self.fields['damaged_on'].initial = damaged_at_localized.strftime(settings.DATE_FORMAT_INPUT)
         if self.instance.repaired_at:
             repaired_at_localized = self.instance.repaired_at.astimezone(pytz.timezone(settings.TIME_ZONE))
-            self.fields['repaired_on'].initial = repaired_at_localized.strftime('%m/%d/%Y')
+            self.fields['repaired_on'].initial = repaired_at_localized.strftime(settings.DATE_FORMAT_INPUT)
 
         # short_fields = [
         #     'damaged_on', 'repaired_on', 'cost', 'customer_billed_amount', 'customer_paid_amount',
@@ -914,10 +914,10 @@ class ScheduledServiceForm(CSSClassMixin, forms.ModelForm):
         self.fields['vehicle'].choices = get_vehicle_choices()
         if self.instance.done_at:
             done_at_localized = self.instance.done_at.astimezone(pytz.timezone(settings.TIME_ZONE))
-            self.fields['done_on'].initial = done_at_localized.strftime('%m/%d/%Y')
+            self.fields['done_on'].initial = done_at_localized.strftime(settings.DATE_FORMAT_INPUT)
         if self.instance.next_at:
             next_at_localized = self.instance.next_at.astimezone(pytz.timezone(settings.TIME_ZONE))
-            self.fields['next_on'].initial = next_at_localized.strftime('%m/%d/%Y')
+            self.fields['next_on'].initial = next_at_localized.strftime(settings.DATE_FORMAT_INPUT)
 
         # short_fields = [
         #     'done_on', 'done_mileage', 'next_on', 'next_mileage',
@@ -947,7 +947,7 @@ class IncidentalServiceForm(CSSClassMixin, forms.ModelForm):
         self.fields['vehicle'].choices = get_vehicle_choices()
         if self.instance.done_at:
             done_at_localized = self.instance.done_at.astimezone(pytz.timezone(settings.TIME_ZONE))
-            self.fields['done_on'].initial = done_at_localized.strftime('%m/%d/%Y')
+            self.fields['done_on'].initial = done_at_localized.strftime(settings.DATE_FORMAT_INPUT)
 
         # short_fields = [
         #     'done_on', 'mileage',

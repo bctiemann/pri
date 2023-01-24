@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+from django.conf import settings
 from django.urls import reverse
 from phonenumber_field.phonenumber import PhoneNumber
 from phonenumber_field.serializerfields import PhoneNumberField
@@ -112,8 +114,8 @@ class ScheduleConflictSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(source='customer.last_name')
     reservation_type = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
-    out_date = serializers.DateField(format='%m/%d/%Y')
-    back_date = serializers.DateField(format='%m/%d/%Y')
+    out_date = serializers.DateField(format=settings.DATE_FORMAT_INPUT)
+    back_date = serializers.DateField(format=settings.DATE_FORMAT_INPUT)
 
     def get_reservation_type(self, obj):
         if obj.is_rental:

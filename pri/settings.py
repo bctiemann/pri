@@ -397,6 +397,9 @@ RECAPTCHA_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
 # Show the bike fleet?
 BIKES_ENABLED = True
 
+# Date and time representation formats in form fields
+DATE_FORMAT_INPUT = '%m/%d/%Y'
+TIME_FORMAT_INPUT = '%H:%M'
 
 # Anti-abuse settings
 

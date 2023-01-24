@@ -33,7 +33,7 @@ class EventCalendar(calendar.HTMLCalendar):
         rentals = set(filter(lambda r: r.out_date <= focus_date.date() <= r.back_date, self.rentals))
         consigner_reservations = set(filter(lambda r: r.out_date <= focus_date.date() <= r.back_date, self.consigner_reservations))
 
-        date_str = focus_date.strftime('%m/%d/%Y')
+        date_str = focus_date.strftime(settings.DATE_FORMAT_INPUT)
         classes = self.cssclasses[weekday]
         reservation_id_str = ''
         if focus_date.date() == timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE)).date():

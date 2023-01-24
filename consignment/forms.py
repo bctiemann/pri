@@ -144,7 +144,7 @@ class ReservationCustomerInfoForm(CSSClassMixin, forms.ModelForm):
 
         self.fields['confirmation_code'].initial = confirmation_code
         if self.instance.date_of_birth:
-            self.fields['date_of_birth_date'].initial = self.instance.date_of_birth.strftime('%m/%d/%Y')
+            self.fields['date_of_birth_date'].initial = self.instance.date_of_birth.strftime(settings.DATE_FORMAT_INPUT)
 
         # for field in self.cc_fields:
         #     self.add_widget_css_class(field, 'cc-field')
