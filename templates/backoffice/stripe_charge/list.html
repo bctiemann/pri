@@ -29,7 +29,7 @@
                 <td>{{ capture|yesno:"Charge,Auth Only" }}</td>
                 <td>{{ charge.processor_charge_id }}</CFIF></td>
                 <td>{{ charge.status }}</td>
-                <td>{{ charge.charged_at|date:"m/d/Y" }}</td>
+                <td>{{ charge.charged_at|date:"SHORT_DATE_FORMAT" }}</td>
             </tr>
         {% endfor %}
     </table>

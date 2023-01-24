@@ -38,13 +38,13 @@
                 </tr>
                 <tr>
                     <td>Payment Requested</td>
-                    <td>{{ adhocpayment.created_at|date:"m/d/Y" }}
+                    <td>{{ adhocpayment.created_at|date:"SHORT_DATE_FORMAT" }}
                     </td>
                 </tr>
                 <tr>
                     <td>Payment Submitted</td>
                     <td>
-                        {{ adhocpayment.submitted_at|date:"m/d/Y"|default_if_none:"Not." }}
+                        {{ adhocpayment.submitted_at|date:"SHORT_DATE_FORMAT"|default_if_none:"Not." }}
                     </td>
                 </tr>
             {% endif %}

@@ -24,7 +24,7 @@
                 <td>{{ redflag.home_phone.as_national }}</td>
                 <td>{{ redflag.mobile_phone.as_national }}</td>
                 <td>{{ redflag.state }}</td>
-                <td>{{ redflag.created_at|date:"m/d/Y" }}</td>
+                <td>{{ redflag.created_at|date:"SHORT_DATE_FORMAT" }}</td>
             </tr>
         {% endfor %}
     </table>

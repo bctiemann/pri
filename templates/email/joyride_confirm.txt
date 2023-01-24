@@ -1,6 +1,6 @@
 Dear {{ reservation.customer.full_name }},
 
-This message confirms your Joy Ride booking on {{ reservation.requested_date|date:"m/d/Y" }}. We will be contacting you shortly to
+This message confirms your Joy Ride booking on {{ reservation.requested_date|date:"SHORT_DATE_FORMAT" }}. We will be contacting you shortly to
 confirm your booking and take care of any additional requests you may have.
 
 Your confirmation code is: {{ reservation.confirmation_code }}

@@ -21,7 +21,7 @@
                 <td><a href="{% url "backoffice:damage-detail" pk=damage.id %}">{{ damage.id }}</a></td>
                 <td>{{ damage.vehicle.vehicle_name }}</td>
                 <td>{{ damage.title }}</td>
-                <td>{{ damage.damaged_at|date:"m/d/Y" }}</td>
+                <td>{{ damage.damaged_at|date:"SHORT_DATE_FORMAT" }}</td>
                 <td>{% if damage.is_repaired %}&#10003;{% endif %}</td>
             </tr>
         {% endfor %}

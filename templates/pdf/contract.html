@@ -144,7 +144,7 @@ span.ul {
                     {{ company_name }} {{ company_phone }}<br />
                     Rental Contract
                 </td>
-                <td class="headright">Date: {{ rental.out_date|date:"m/d/Y" }}</td>
+                <td class="headright">Date: {{ rental.out_date|date:"SHORT_DATE_FORMAT" }}</td>
             </tr>
         </table>
     </div>
@@ -252,7 +252,7 @@ span.ul {
 
         <br />
         <p>
-            Signed: ______________________________ Date: {{ rental.out_date|date:"m/d/Y" }}
+            Signed: ______________________________ Date: {{ rental.out_date|date:"SHORT_DATE_FORMAT" }}
         </p>
     </div>
 
@@ -281,7 +281,7 @@ span.ul {
         <p>
             X__________________________________________________________<span style="margin-left: 20px; font-weight: bold;">
             {{ rental.customer.full_name }}</span>
-            <span style="margin-left:50px;">Date: {{ rental.out_date|date:"m/d/Y" }}</span><br />
+            <span style="margin-left:50px;">Date: {{ rental.out_date|date:"SHORT_DATE_FORMAT" }}</span><br />
         </p>
 
         <br />

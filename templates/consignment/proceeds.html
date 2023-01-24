@@ -21,8 +21,8 @@
         {% for rental in past_rentals %}
             <tr>
                 <td>{{ rental.vehicle.make }} {{ rental.vehicle.model }}</td>
-                <td>{{ rental.out_at|date:"m/d/Y" }}</td>
-                <td>{{ rental.back_at|date:"m/d/Y" }}</td>
+                <td>{{ rental.out_at|date:"SHORT_DATE_FORMAT" }}</td>
+                <td>{{ rental.back_at|date:"SHORT_DATE_FORMAT" }}</td>
                 <td class="numeric">{{ rental.mileage_back|intcomma }}</td>
                 <td class="numeric">${{ rental.gross_revenue|intcomma }}</td>
             </tr>

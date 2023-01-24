@@ -33,7 +33,7 @@
             <td>
                 {{ customer.get_drivers_club_display }}
             </td>
-            <td>{{ customer.created_at|date:"m/d/Y" }}</td>
+            <td>{{ customer.created_at|date:"SHORT_DATE_FORMAT" }}</td>
             </tr>
         {% endfor %}
     </table>

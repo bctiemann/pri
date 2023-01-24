@@ -26,7 +26,7 @@
                 <tr>
                     <td>Reservation Date</td>
                     <td>
-                        <b>{{ reservation.reserved_at|date:"m/d/Y" }} <small>{{ reservation.reserved_at|date:"l" }}</small> @ {{ reservation.reserved_at|date:"H:i" }} </b>
+                        <b>{{ reservation.reserved_at|date:"SHORT_DATE_FORMAT" }} <small>{{ reservation.reserved_at|date:"l" }}</small> @ {{ reservation.reserved_at|date:"H:i" }} </b>
                     </td>
                 </tr>
                 <tr>

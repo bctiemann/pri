@@ -17,7 +17,7 @@
             <tr class="clickable click-to-edit" destination="{% url "backoffice:taxrate-detail" pk=taxrate.id %}">
                 <td><a href="{% url "backoffice:taxrate-detail" pk=taxrate.id %}">{{ taxrate.id }}</a></td>
                 <td>{{ taxrate.postal_code }}</td>
-                <td>{{ taxrate.date_updated|date:"m/d/Y" }}</td>
+                <td>{{ taxrate.date_updated|date:"SHORT_DATE_FORMAT" }}</td>
                 <td>{{ taxrate.total_rate_as_percent }}</td>
             </tr>
         {% endfor %}

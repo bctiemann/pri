@@ -3,7 +3,7 @@
 <a href="{% url "backoffice:service-detail-scheduled" pk=service.id %}">
     <div class="service-item">
         <p>{{ service.service_item.name }}</p>
-        <p>{{ service.next_at|date:"m/d/Y"|default_if_none:"(Date not set)" }}</p>
+        <p>{{ service.next_at|date:"SHORT_DATE_FORMAT"|default_if_none:"(Date not set)" }}</p>
         <p>{{ service.next_mileage|default_if_none:"(Mileage not set)" }}</p>
         <div class="notes">{{ service.notes|bbcode|safe }}</div>
     </div>

@@ -21,7 +21,7 @@
                 <td>{{ employee.last_name }}</td>
                 <td>{{ employee.email }}</td>
                 <td>{{ employee.get_status_display }}</td>
-                <td>{{ employee.created_at|date:"m/d/Y" }}</td>
+                <td>{{ employee.created_at|date:"SHORT_DATE_FORMAT" }}</td>
             </tr>
         {% endfor %}
     </table>

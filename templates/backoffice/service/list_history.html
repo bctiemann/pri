@@ -29,7 +29,7 @@
                         <td><a href="{% url "backoffice:service-detail-incidental" pk=service.id %}">{{ service.id }}</a></td>
                         <td>{{ service.vehicle.vehicle_name }}</td>
                         <td>{{ service.title }}</td>
-                        <td>{{ service.done_at|date:"m/d/Y" }}</td>
+                        <td>{{ service.done_at|date:"SHORT_DATE_FORMAT" }}</td>
                         <td>{{ service.mileage|default_if_none:""|intcomma }}</td>
                         <td class="truncate">{{ service.notes|bbcode|safe }}</td>
                     </tr>
@@ -63,9 +63,9 @@
                         <td><a href="{% url "backoffice:service-detail-scheduled" pk=service.id %}">{{ service.id }}</a></td>
                         <td>{{ service.vehicle.vehicle_name }}</td>
                         <td>{{ service.name }}</td>
-                        <td>{{ service.done_at|date:"m/d/Y" }}</td>
+                        <td>{{ service.done_at|date:"SHORT_DATE_FORMAT" }}</td>
                         <td>{{ service.done_mileage|default_if_none:""|intcomma }}</td>
-                        <td>{{ service.next_at|date:"m/d/Y" }}</td>
+                        <td>{{ service.next_at|date:"SHORT_DATE_FORMAT" }}</td>
                         <td>{{ service.next_mileage|default_if_none:""|intcomma }}</td>
                         <td>{{ service.is_due }}</td>
                         <td class="truncate">{{ service.notes|bbcode|safe }}</td>

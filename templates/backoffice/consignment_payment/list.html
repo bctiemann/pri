@@ -22,7 +22,7 @@
                 <td>{{ consignment_payment.consigner.full_name }}</td>
                 <td>{{ consignment_payment.consigner.user.email }}</td>
                 <td>${{ consignment_payment.amount|intcomma }}</td>
-                <td>{{ consignment_payment.paid_at|date:"m/d/Y" }}</td>
+                <td>{{ consignment_payment.paid_at|date:"SHORT_DATE_FORMAT" }}</td>
                 <td>{{ consignment_payment.method }}</td>
             </tr>
         {% endfor %}

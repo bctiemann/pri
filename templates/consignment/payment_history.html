@@ -17,7 +17,7 @@
             {% if not transaction.is_rental %}
 
                 <tr>
-                    <td>{{ transaction.paid_at|date:"m/d/Y" }}</td>
+                    <td>{{ transaction.paid_at|date:"SHORT_DATE_FORMAT" }}</td>
                     <td class="numeric">${{ transaction.amount|intcomma }}</td>
                     <td>{{ transaction.method }}</td>
                     <td class="numeric">${{ transaction.running_total|intcomma }}</td>

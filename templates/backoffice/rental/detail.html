@@ -65,7 +65,7 @@
             <tr>
                 <td>Reservation Date</td>
                 <td>
-                    <b>{{ rental.reserved_at|date:"m/d/Y" }} <small>{{ rental.reserved_at|date:"l" }}</small> @ {{ rental.reserved_at|date:"H:i" }} </b>
+                    <b>{{ rental.reserved_at|date:"SHORT_DATE_FORMAT" }} <small>{{ rental.reserved_at|date:"l" }}</small> @ {{ rental.reserved_at|date:"H:i" }} </b>
                 </td>
             </tr>
             <tr>

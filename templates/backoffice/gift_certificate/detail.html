@@ -21,7 +21,7 @@
             {% if giftcertificate %}
                 <tr>
                     <td>Created</td>
-                    <td>{{ giftcertificate.created_at|date:"m/d/Y" }}</td>
+                    <td>{{ giftcertificate.created_at|date:"SHORT_DATE_FORMAT" }}</td>
                 </tr>
                 <tr>
                     <td>Tag</td>
@@ -43,7 +43,7 @@
                     <td>
                         {{ form.is_used }}
                         {% if giftcertificate.is_used %}
-                            {{ giftcertificate.used_on|date:"m/d/Y" }}
+                            {{ giftcertificate.used_on|date:"SHORT_DATE_FORMAT" }}
                         {% endif %}
                     </td>
                 </tr>
@@ -51,7 +51,7 @@
                     <td>Issued On</td>
                     <td>
                         {% if giftcertificate.issued_at %}
-                            {{ giftcertificate.issued_at|date:"m/d/Y" }}
+                            {{ giftcertificate.issued_at|date:"SHORT_DATE_FORMAT" }}
                         {% else %}
                             Not Paid/Issued
                         {% endif %}
@@ -61,7 +61,7 @@
                     <td>Expires On</td>
                     <td>
                         {% if giftcertificate.issued_at %}
-                            {{ giftcertificate.expires_at|date:"m/d/Y" }}
+                            {{ giftcertificate.expires_at|date:"SHORT_DATE_FORMAT" }}
                         {% else %}
                             Not Paid/Issued
                         {% endif %}
