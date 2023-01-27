@@ -313,7 +313,8 @@ class PerformanceExperiencePriceCalculator(PriceCalculator):
     """
     Price is calculated as follows:
     - Calculator is inited with # drivers, # passengers, coupon code, email, and tax zip
-    - Base price is per-driver rate * number of drivers, + per-passenger rate * number of passengers
+    - Base price is predefined per number of drivers up to 4, above which per-driver rate * number of drivers,
+      + per-passenger rate * number of passengers
     - Subtract largest of (coupon discount, customer discount, promotional discount, military discount, one-time discount)
     - Add sales tax
     """
@@ -385,7 +386,7 @@ class JoyRidePriceCalculator(PriceCalculator):
     """
     Price is calculated as follows:
     - Calculator is inited with # passengers, coupon code, email, and tax zip
-    - Base price is per-passenger rate * number of passengers
+    - Base price is predefined per number of passengers up to 4, above which per-passenger rate * number of passengers
     - Subtract largest of (coupon discount, customer discount, promotional discount, military discount, one-time discount)
     - Add sales tax
     """
