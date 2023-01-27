@@ -19,7 +19,8 @@ class PriceCalculator(ABC):
     Abstract base class implementing utility methods for calculating price structure.
     Unimplemented methods must be implemented in subclasses such as RentalPriceCalculator.
     Promotion/coupon/customer/military/one-time discounts are common to all calculators; subclasses
-    with other specific types of discounts should implement getter methods on a similar pattern.
+    with other specific types of discounts (such as multi-day) should implement getter methods on
+    a similar pattern.
     """
     service_type = None
 
