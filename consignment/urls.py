@@ -48,8 +48,9 @@ urlpatterns = [
     path('recovery/reset/<uidb64>/<token>/', views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
 
     # Success view for password recovery change form
-    path('recovery/change/done/',
-         auth_views.PasswordChangeDoneView.as_view(template_name='consignment/account/password_change_done.html'),
-         name='password_reset_complete'
-     ),
+    path(
+        'recovery/reset/complete/',
+        auth_views.PasswordResetCompleteView.as_view(template_name='consignment/account/password_change_complete.html'),
+        name='password_reset_complete'
+    ),
 ]
