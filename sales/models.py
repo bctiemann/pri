@@ -226,7 +226,10 @@ class BaseReservation(ConfirmationCodeMixin, EmailConfirmationMixin, models.Mode
 
     @property
     def rental_duration(self):
-        return (self.back_at_orig or self.back_at) - self.out_at
+        back_at = self.back_at_orig or self.back_at
+        if not back_at:
+            return datetime.timedelta(seconds=0)
+        return back_at - self.out_at
 
     @property
     def rental_duration_hours(self):
