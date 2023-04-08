@@ -13,6 +13,11 @@ FRONT_MODELS = [
 
 class FrontDBRouter(object):
 
+    def allow_migrate(self, db, app_label, model=None, **hints):
+        if db != 'default':
+            return False
+        return None
+
     def db_for_read(self, model, **hints):
         """ reading model from front """
         if model in FRONT_MODELS:

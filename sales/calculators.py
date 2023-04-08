@@ -54,7 +54,7 @@ class PriceCalculator(ABC):
     subtotal = 0.0
     override_subtotal = None
 
-    def __init__(self, coupon_code, email, tax_zip, effective_date, is_military=False, override_subtotal=None, one_time_discount_pct=None):
+    def __init__(self, coupon_code, email, tax_zip, effective_date=None, is_military=False, override_subtotal=None, one_time_discount_pct=None):
         self.effective_date = effective_date
         self.promotion = self.get_effective_promotion()
         self.coupon = self.get_coupon(coupon_code)

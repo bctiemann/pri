@@ -3,7 +3,7 @@ from wagtail.fields import StreamField
 from wagtail.blocks import CharBlock, RichTextBlock, RawHTMLBlock
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.contrib.table_block.blocks import TableBlock
-from wagtail.admin.edit_handlers import FieldPanel
+from wagtail.admin.panels import FieldPanel
 
 from marketing.views import NavMenuMixin
 
