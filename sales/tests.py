@@ -1,5 +1,6 @@
 from decimal import Decimal
 from datetime import date
+from freezegun import freeze_time
 
 from django.test import TestCase
 from django.test.client import Client
@@ -262,6 +263,22 @@ class RentalTestCase(TestCase):
         )
         self.vehicle_1 = Vehicle.objects.create(vehicle_marketing_id=self.vehiclemarketing_1.id)
 
+    def test_empty_post(self):
+        url = reverse('validate-rental-details')
+        post_data = dict()
+        response = self.client.post(url, post_data)
+        result = response.json()
+        self.assertFalse(result['success'])
+        errors = result['errors']
+        self.assertIn('vehicle_marketing', errors)
+        self.assertIn('out_at', errors)
+        self.assertIn('back_at', errors)
+        self.assertIn('out_date', errors)
+        self.assertIn('back_date', errors)
+        self.assertIn('email', errors)
+        self.assertIn('drivers', errors)
+        self.assertEqual(list(errors.keys())[0], 'out_at')
+
     def test_defaults(self):
         url = reverse('validate-rental-details')
         post_data = dict(
@@ -289,3 +306,34 @@ class RentalTestCase(TestCase):
         self.assertIn('out_date', errors)
         self.assertIn('back_date', errors)
         self.assertIn('email', errors)
+
+    @freeze_time('2023-02-01 15:00:00')
+    def test_valid_rental_single_day(self):
+        url = reverse('validate-rental-details')
+        post_data = dict(
+            vehicle_marketing=1,
+            vehicle_slug='test-vehicle',
+            out_date='04/25/2023',
+            out_time='17:00',
+            back_date='04/26/2023',
+            back_time='17:00',
+            drivers='1',
+            delivery_required='0',
+            delivery_zip='',
+            extra_miles='0',
+            email='test@test.com',
+            coupon_code='',
+            is_military=False,
+            customer_notes='',
+        )
+        response = self.client.post(url, post_data)
+        result = response.json()
+        self.assertTrue(result['success'])
+        self.assertEqual(result['errors'], {})
+        self.assertIsNone(result['customer_id'])
+        self.assertEqual(result['price_data']['total_with_tax'], Decimal(533.13))
+        self.assertEqual(result['price_data']['tax_amount'], Decimal(33.13))
+        self.assertEqual(result['price_data']['reservation_deposit'], Decimal(266.56))
+        self.assertEqual(result['price_data']['multi_day_discount'], Decimal(0.0))
+        self.assertEqual(result['price_data']['specific_discount'], Decimal(0.0))
+        self.assertEqual(result['price_data']['specific_discount_label'], '')

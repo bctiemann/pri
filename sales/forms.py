@@ -177,6 +177,8 @@ class ReservationRentalDetailsForm(FormErrorMixin, forms.ModelForm):
         return super().is_valid()
 
     def clean_out_at(self):
+        if "out_date" not in self.data:
+            raise forms.ValidationError(_('Invalid rental date.'))
         try:
             date_str = f'{self.data["out_date"]} {self.data["out_time"]}'
             out_at = datetime.datetime.strptime(date_str, self.DATETIME_FORMAT)
@@ -228,7 +230,7 @@ class ReservationRentalDetailsForm(FormErrorMixin, forms.ModelForm):
         return self.cleaned_data['back_date']
 
     def clean_delivery_required(self):
-        return bool(int(self.cleaned_data['delivery_required']))
+        return bool(int(self.cleaned_data.get('delivery_required', False)))
 
     def clean_delivery_zip(self):
         delivery_required = self.clean_delivery_required()

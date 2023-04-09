@@ -28,3 +28,4 @@ stripe==2.64.0
 redis==4.2.2
 hiredis==2.0.0
 wagtail==4.2.2
+freezegun==1.2.2

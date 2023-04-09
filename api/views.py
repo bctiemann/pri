@@ -115,7 +115,7 @@ class ValidateRentalDetailsView(APIView):
             'errors_html': form.errors.as_ul(),
             'customer_id': form.customer.id if form.customer else None,
             'price_data': form.price_data,
-            'delivery_required': form.cleaned_data['delivery_required'],
+            'delivery_required': form.cleaned_data.get('delivery_required', False),
         }
         return Response(response)
 
