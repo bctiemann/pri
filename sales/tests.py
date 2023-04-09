@@ -2,8 +2,10 @@ from decimal import Decimal
 from datetime import date
 
 from django.test import TestCase
+from django.test.client import Client
+from django.urls import reverse
 
-from fleet.models import VehicleMarketing
+from fleet.models import Vehicle, VehicleMarketing, VehicleStatus
 from users.models import Customer, User
 from sales.models import TaxRate, Coupon, Promotion
 from sales.calculators import RentalPriceCalculator
@@ -112,7 +114,8 @@ class RentalPriceCalculatorTestCase(TestCase):
         price_data = rental_price_calculator.get_price_data()
 
         self.assertEqual(price_data['coupon_discount'], Decimal('0.00'))
-        self.assertEqual(price_data['specific_discount_label'], 'Promotional discount')
+        self.assertEqual(price_data['specific_discount'], Decimal('0.00'))
+        self.assertEqual(price_data['specific_discount_label'], '')
         self.assertEqual(price_data['total_with_tax'], Decimal('1311.49'))
 
     def test_get_rental_price_data_with_customer_discount(self):
@@ -240,3 +243,49 @@ class RentalPriceCalculatorTestCase(TestCase):
         self.assertEqual(price_data['subtotal'], Decimal('1400.00'))
         self.assertEqual(price_data['total_with_tax'], Decimal('1492.75'))
 
+
+class RentalTestCase(TestCase):
+
+    databases = ('default', 'front',)
+
+    def setUp(self) -> None:
+        self.client = Client()
+        self.vehiclemarketing_1 = VehicleMarketing.objects.create(
+            id=1,
+            slug='test-vehicle',
+            status=VehicleStatus.READY,
+            price_per_day=500,
+            discount_2_day=10,
+            discount_3_day=20,
+            discount_7_day=40,
+            security_deposit=5000.00,
+        )
+        self.vehicle_1 = Vehicle.objects.create(vehicle_marketing_id=self.vehiclemarketing_1.id)
+
+    def test_defaults(self):
+        url = reverse('validate-rental-details')
+        post_data = dict(
+            vehicle_marketing=1,
+            vehicle_slug='test-vehicle',
+            out_date='',
+            out_time='07:00',
+            back_date='',
+            back_time='07:00',
+            drivers='1',
+            delivery_required='0',
+            delivery_zip='',
+            extra_miles='0',
+            email='',
+            coupon_code='',
+            is_military=False,
+            customer_notes='',
+        )
+        response = self.client.post(url, post_data)
+        result = response.json()
+        self.assertFalse(result['success'])
+        errors = result['errors']
+        self.assertIn('out_at', errors)
+        self.assertIn('back_at', errors)
+        self.assertIn('out_date', errors)
+        self.assertIn('back_date', errors)
+        self.assertIn('email', errors)

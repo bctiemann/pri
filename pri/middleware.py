@@ -77,23 +77,28 @@ class PermissionsMiddleware(object):
 
 class RemoteHostMiddleware(MiddlewareMixin):
 
+    def visited_within_hour(self, request):
+        one_hour_ago = timezone.now() - datetime.timedelta(hours=1)
+        return SessionVisit.objects.filter(
+            session__session_key=request.session.session_key,
+            visited_at__gte=one_hour_ago,
+        ).exists()
+
+    def record_session_visit(self, request):
+        try:
+            session = Session.objects.get(session_key=request.session.session_key)
+            SessionVisit.objects.create(session=session)
+        except Session.DoesNotExist:
+            pass
+
     def process_request(self, request):
         # Resolve the remote_ip and remote_host and store in session for tracking and reflection in templates
         request.remote_ip = request.META.get('REMOTE_ADDR') or request.META.get('HTTP_X_FORWARDED_FOR')
         request.remote_host = request.META.get('REMOTE_HOST') or request.remote_ip
         request.session['remote_ip'] = request.remote_ip
-        request.session['user_agent_hash'] = hashlib.md5(request.META.get('HTTP_USER_AGENT').encode('utf-8')).hexdigest()
+        request.session['user_agent_hash'] = hashlib.md5(request.META.get('HTTP_USER_AGENT', '').encode('utf-8')).hexdigest()
         request.session['last_access'] = timezone.now().isoformat()
 
         # If this session has not visited in the past hour, record a SessionVisit
-        one_hour_ago = timezone.now() - datetime.timedelta(hours=1)
-        visited_within_hour = SessionVisit.objects.filter(
-            session__session_key=request.session.session_key,
-            visited_at__gte=one_hour_ago,
-        )
-        if not visited_within_hour.exists():
-            try:
-                session = Session.objects.get(session_key=request.session.session_key)
-                SessionVisit.objects.create(session=session)
-            except Session.DoesNotExist:
-                pass
+        if not self.visited_within_hour(request):
+            self.record_session_visit(request)

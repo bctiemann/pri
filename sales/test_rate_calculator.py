@@ -20,19 +20,25 @@ from sales.calculators import RentalPriceCalculator
 
 @pytest.fixture
 def vehicle_mock_1(mocker):
-    vehicle_1 = mocker.MagicMock(spec=VehicleMarketing)
-    vehicle_1.price_per_day = 950
-    vehicle_1.discount_2_day = 10
-    vehicle_1.discount_3_day = 20
-    vehicle_1.discount_7_day = 40
+    vehicle_1 = mocker.MagicMock(
+        spec=VehicleMarketing,
+        price_per_day=950,
+        discount_2_day=10,
+        discount_3_day=20,
+        discount_7_day=40,
+    )
+    # vehicle_1.price_per_day = 950
+    # vehicle_1.discount_2_day = 10
+    # vehicle_1.discount_3_day = 20
+    # vehicle_1.discount_7_day = 40
     # vehicle_1.return_value = mocker.MagicMock()
     return vehicle_1
 
 
 @pytest.fixture
 def tax_rate_1(mocker):
-    tax_rate_1 = mocker.MagicMock(spec=TaxRate)
-    tax_rate_1.total_rate = 0.06625
+    tax_rate_1 = mocker.MagicMock(spec=TaxRate, total_rate=0.06625)
+    # tax_rate_1.total_rate = 0.06625
     tax_rate_1.return_value = mocker.MagicMock(), True
     return tax_rate_1
 
@@ -40,8 +46,8 @@ def tax_rate_1(mocker):
 @pytest.fixture
 def coupon_mock_1(mocker):
     # mocker.patch('sales.models.Coupon.get_discount_value', 15.00)
-    coupon_1 = mocker.MagicMock(spec=Coupon)
-    coupon_1.amount = 15.00
+    coupon_1 = mocker.MagicMock(spec=Coupon, amount=15.00)
+    # coupon_1.amount = 15.00
     # coupon_1.get_discount_value = mocker.MagicMock()
     coupon_1.return_value.get_discount_value.return_value = 15.00
     return coupon_1
