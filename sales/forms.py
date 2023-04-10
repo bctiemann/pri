@@ -239,8 +239,6 @@ class ReservationRentalDetailsForm(FormErrorMixin, forms.ModelForm):
         return self.cleaned_data['delivery_zip']
 
     def clean(self):
-        print('cleaned:')
-        print(self.cleaned_data)
         # TODO: Handle KeyError better
         try:
             self.customer = Customer.objects.get(user__email=self.cleaned_data['email'])
@@ -269,9 +267,9 @@ class ReservationRentalDetailsForm(FormErrorMixin, forms.ModelForm):
         if not self.vehicle:
             return {}
         price_calculator = RentalPriceCalculator(
-            vehicle_marketing=self.cleaned_data['vehicle_marketing'],
+            vehicle_marketing=self.cleaned_data.get('vehicle_marketing'),
             num_days=self.instance.num_days,
-            extra_miles=self.cleaned_data['extra_miles'],
+            extra_miles=self.cleaned_data.get('extra_miles') or 0,
             coupon_code=self.cleaned_data.get('coupon_code'),
             email=self.cleaned_data.get('email'),
             tax_zip=self.tax_zip,

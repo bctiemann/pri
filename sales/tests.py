@@ -5,6 +5,7 @@ from freezegun import freeze_time
 from django.test import TestCase
 from django.test.client import Client
 from django.urls import reverse
+from django.utils import timezone
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleStatus
 from users.models import Customer, User
@@ -337,3 +338,37 @@ class RentalTestCase(TestCase):
         self.assertEqual(result['price_data']['multi_day_discount'], Decimal(0.0))
         self.assertEqual(result['price_data']['specific_discount'], Decimal(0.0))
         self.assertEqual(result['price_data']['specific_discount_label'], '')
+
+    @freeze_time('2023-02-01 15:00:00')
+    def test_invalid_rental_negative_duration(self):
+        url = reverse('validate-rental-details')
+        post_data = dict(
+            vehicle_marketing=1,
+            vehicle_slug='test-vehicle',
+            out_date='04/25/2023',
+            out_time='17:00',
+            back_date='04/24/2023',
+            back_time='17:00',
+        )
+        response = self.client.post(url, post_data)
+        result = response.json()
+        self.assertFalse(result['success'])
+        self.assertEqual(result['errors']['back_at'], ["You've specified a return date earlier than the rental date."])
+        self.assertEqual(result['errors']['back_date'], result['errors']['back_at'])
+
+    @freeze_time('2023-02-01 15:00:00')
+    def test_invalid_rental_date_in_past(self):
+        url = reverse('validate-rental-details')
+        post_data = dict(
+            vehicle_marketing=1,
+            vehicle_slug='test-vehicle',
+            out_date='01/25/2023',
+            out_time='17:00',
+            back_date='01/26/2023',
+            back_time='17:00',
+        )
+        response = self.client.post(url, post_data)
+        result = response.json()
+        self.assertFalse(result['success'])
+        self.assertEqual(result['errors']['back_at'], ["You've specified a rental date in the past."])
+        self.assertEqual(result['errors']['back_date'], result['errors']['back_at'])

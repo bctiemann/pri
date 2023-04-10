@@ -106,9 +106,6 @@ class ValidateRentalDetailsView(APIView):
 
     def post(self, request):
         form = ReservationRentalDetailsForm(request.POST)
-        print(form.data)
-        print(form.is_valid())
-        print(form.errors.as_json())
         response = {
             'success': form.is_valid(),
             'errors': form.errors,
@@ -121,9 +118,6 @@ class ValidateRentalDetailsView(APIView):
 
     def post_legacy(self, request, payload):
         form = ReservationRentalDetailsForm(payload)
-        print(form.data)
-        print(form.is_valid())
-        print(form.errors.as_json())
         vehicle_marketing = form.cleaned_data.get('vehicle_marketing')
         response = {
             'success': form.is_valid(),
