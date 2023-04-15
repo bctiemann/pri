@@ -372,3 +372,20 @@ class RentalTestCase(TestCase):
         self.assertFalse(result['success'])
         self.assertEqual(result['errors']['back_at'], ["You've specified a rental date in the past."])
         self.assertEqual(result['errors']['back_date'], result['errors']['back_at'])
+
+    @freeze_time('2023-02-01 15:00:00')
+    def test_invalid_vehicle(self):
+        url = reverse('validate-rental-details')
+        post_data = dict(
+            vehicle_marketing=2,
+            vehicle_slug='test-vehicle-2',
+            out_date='02/25/2023',
+            out_time='17:00',
+            back_date='02/26/2023',
+            back_time='17:00',
+        )
+        response = self.client.post(url, post_data)
+        result = response.json()
+        self.assertFalse(result['success'])
+        self.assertEqual(result['errors']['vehicle_marketing'], ['Select a valid choice. That choice is not one of the available choices.'])
+        self.assertIn('Invalid vehicle specified.', result['errors']['__all__'])
