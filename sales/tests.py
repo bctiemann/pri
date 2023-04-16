@@ -389,3 +389,45 @@ class RentalTestCase(TestCase):
         self.assertFalse(result['success'])
         self.assertEqual(result['errors']['vehicle_marketing'], ['Select a valid choice. That choice is not one of the available choices.'])
         self.assertIn('Invalid vehicle specified.', result['errors']['__all__'])
+
+
+class PerformanceExperienceTestCase(TestCase):
+
+    databases = ('default', 'front',)
+
+    def setUp(self) -> None:
+        self.client = Client()
+        self.vehiclemarketing_1 = VehicleMarketing.objects.create(
+            id=1,
+            slug='test-vehicle-1',
+            status=VehicleStatus.READY,
+        )
+        self.vehicle_1 = Vehicle.objects.create(vehicle_marketing_id=self.vehiclemarketing_1.id)
+        self.vehiclemarketing_2 = VehicleMarketing.objects.create(
+            id=2,
+            slug='test-vehicle-2',
+            status=VehicleStatus.READY,
+        )
+        self.vehicle_2 = Vehicle.objects.create(vehicle_marketing_id=self.vehiclemarketing_2.id)
+        self.vehiclemarketing_3 = VehicleMarketing.objects.create(
+            id=3,
+            slug='test-vehicle-3',
+            status=VehicleStatus.READY,
+        )
+        self.vehicle_3 = Vehicle.objects.create(vehicle_marketing_id=self.vehiclemarketing_3.id)
+
+    @freeze_time('2023-02-01 15:00:00')
+    def test_empty_post(self):
+        url = reverse('validate-perfexp-details')
+        post_data = dict()
+        response = self.client.post(url, post_data)
+        result = response.json()
+        self.assertFalse(result['success'])
+        errors = result['errors']
+        self.assertIn('num_passengers', errors)
+        self.assertIn('num_drivers', errors)
+        self.assertIn('requested_date', errors)
+        self.assertIn('backup_date', errors)
+        self.assertIn('big_and_tall', errors)
+        self.assertIn('email', errors)
+        self.assertEqual(list(errors.keys())[0], 'num_passengers')

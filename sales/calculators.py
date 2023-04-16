@@ -336,18 +336,22 @@ class PerformanceExperiencePriceCalculator(PriceCalculator):
 
     @property
     def driver_cost(self):
+        if not self.num_drivers:
+            return 0
         if self.num_drivers == 1:
             return settings.PERFORMANCE_EXPERIENCE_PRICES['1_drv']
-        elif self.num_drivers == 2:
+        if self.num_drivers == 2:
             return settings.PERFORMANCE_EXPERIENCE_PRICES['2_drv']
-        elif self.num_drivers == 3:
+        if self.num_drivers == 3:
             return settings.PERFORMANCE_EXPERIENCE_PRICES['3_drv']
-        elif self.num_drivers == 4:
+        if self.num_drivers == 4:
             return settings.PERFORMANCE_EXPERIENCE_PRICES['4_drv']
         return settings.PERFORMANCE_EXPERIENCE_PRICES['cost_per_drv_gt_4'] * self.num_drivers
 
     @property
     def passenger_cost(self):
+        if not self.num_passengers:
+            return 0
         return settings.PERFORMANCE_EXPERIENCE_PRICES['cost_per_pax'] * self.num_passengers
 
     @property
@@ -406,13 +410,15 @@ class JoyRidePriceCalculator(PriceCalculator):
 
     @property
     def passenger_cost(self):
+        if not self.num_passengers:
+            return 0
         if self.num_passengers == 1:
             return settings.JOY_RIDE_PRICES['1_pax']
-        elif self.num_passengers == 2:
+        if self.num_passengers == 2:
             return settings.JOY_RIDE_PRICES['2_pax']
-        elif self.num_passengers == 3:
+        if self.num_passengers == 3:
             return settings.JOY_RIDE_PRICES['3_pax']
-        elif self.num_passengers == 4:
+        if self.num_passengers == 4:
             return settings.JOY_RIDE_PRICES['4_pax']
         return settings.JOY_RIDE_PRICES['cost_per_pax_gt_4'] * self.num_passengers
 
