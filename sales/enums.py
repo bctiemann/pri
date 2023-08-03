@@ -4,6 +4,7 @@ from datetime import datetime, time, timedelta
 from django.conf import settings
 from django.utils import timezone
 from django.db import models
+from django.db.utils import OperationalError, ProgrammingError
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleType
 
@@ -63,8 +64,11 @@ def get_exp_year_choices(since_founding=False, allow_null=False, null_display_va
 
 def get_vehicle_choices(allow_null=False, null_display_value='----'):
     vehicle_choices = []
-    vehicle_choices.append(('Cars', list((v.id, v.vehicle_name) for v in Vehicle.objects.filter(vehicle_type=VehicleType.CAR))))
-    vehicle_choices.append(('Motorcycles', list((v.id, v.vehicle_name) for v in Vehicle.objects.filter(vehicle_type=VehicleType.BIKE))))
+    try:
+        vehicle_choices.append(('Cars', list((v.id, v.vehicle_name) for v in Vehicle.objects.filter(vehicle_type=VehicleType.CAR))))
+        vehicle_choices.append(('Motorcycles', list((v.id, v.vehicle_name) for v in Vehicle.objects.filter(vehicle_type=VehicleType.BIKE))))
+    except (OperationalError, ProgrammingError):
+        print('Warning: DB tables not populated yet.')
     if allow_null:
         vehicle_choices = [(None, null_display_value)] + vehicle_choices
     return vehicle_choices
