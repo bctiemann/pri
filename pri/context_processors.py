@@ -8,6 +8,7 @@ def settings_constants(request):
     context = {
         'title_bar_line_1': settings.TITLE_BAR_LINE_1,
         'title_bar_line_2': settings.TITLE_BAR_LINE_2,
+        'twitter_enabled': settings.TWITTER_ENABLED,
         'vehicle_type': VehicleType,
         'vehicle_status': VehicleStatus,
         'bikes_enabled': settings.BIKES_ENABLED,

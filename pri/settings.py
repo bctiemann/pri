@@ -379,6 +379,9 @@ STRIPE_PUBLIC_KEY = None
 STRIPE_SECRET_KEY = None
 CARD_NUMBER_OVERRIDE = None
 
+# Twitter
+TWITTER_ENABLED = False
+
 # Google Maps embed API
 GOOGLE_MAPS_API_KEY = None
 
