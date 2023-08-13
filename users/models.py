@@ -441,7 +441,7 @@ class Customer(models.Model):
 
     @classmethod
     def survey_tag_to_email(cls, tag):
-        aes = AESCipher(settings.GLOBAL_KEY_LEGACY)
+        aes = AESCipher(settings.LEGACY_GLOBAL_KEY)
         try:
             return aes.decrypt(tag, is_base64=True)
         except (Base64Error, ValueError):
@@ -450,7 +450,7 @@ class Customer(models.Model):
 
     @property
     def survey_tag(self):
-        return self.generate_survey_tag(settings.GLOBAL_KEY_LEGACY)
+        return self.generate_survey_tag(settings.LEGACY_GLOBAL_KEY)
 
     # Cron job calls this method to solicit a survey response from all recent customers who have survey_done=False
     # TODO: Change survey_done to a DateTimeField and/or track multiple surveys per customer? Maybe unnecessary

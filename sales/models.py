@@ -569,7 +569,7 @@ class GiftCertificate(models.Model):
     def save(self, *args, **kwargs):
         self.cc_number = format_cc_number(self.cc_number)
         if not self.tag:
-            self.tag = self.generate_tag(settings.GLOBAL_KEY_LEGACY)
+            self.tag = self.generate_tag(settings.LEGACY_GLOBAL_KEY)
         super().save(*args, **kwargs)
 
     @property

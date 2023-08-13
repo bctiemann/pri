@@ -31,6 +31,10 @@ from pri.cipher import AESCipher
 
 logger = logging.getLogger(__name__)
 
+# Instructions:
+# ./manage.py import [--key <zZNZRrRNQfSEkDxvvNFxKCNhHzDNB41l>] [--clear_existing] [--map map.conf]
+# You can comment out individual elements of "enabled" to migrate specific tables
+
 
 TRANSMISSION_TYPE_MAP = {
     1: TransmissionType.MANUAL,
@@ -53,41 +57,41 @@ GUIDED_DRIVE_MODEL_MAP = {
     2: PerformanceExperience,
 }
 
-SITE_ROOT = 'http://172.16.0.5/prinew/root/'
-SITE_SEC_ROOT = 'http://172.16.0.5/prinew/secure/'
+SITE_ROOT = settings.LEGACY_SITE_ROOT
+SITE_SEC_ROOT = settings.LEGACY_SITE_SEC_ROOT
 
 
 class Command(BaseCommand):
 
     enabled = {
-        # 'do_tolltags': True,
-        # 'do_vehicles': True,
-        # 'do_vehicle_pics': True,
-        # 'do_vehicle_vids': True,
-        # 'do_customers': True,
-        # 'do_reservations': True,
-        # 'do_rentals': True,
+        'do_tolltags': True,
+        'do_vehicles': True,
+        'do_vehicle_pics': True,
+        'do_vehicle_vids': True,
+        'do_customers': True,
+        'do_reservations': True,
+        'do_rentals': True,
         'do_drivers': True,
-        # 'do_consigners': True,
-        # 'do_consignmentvehicles': True,
-        # 'do_consignmentpayments': True,
-        # 'do_admins': True,
-        # 'do_newsitems': True,
-        # 'do_bbsposts': True,
-        # 'do_sitecontent': True,
-        # 'do_newslettersubscriptions': True,
-        # 'do_coupons': True,
-        # 'do_guideddrives': True,
-        # 'do_giftcertificates': True,
-        # 'do_adhocpayments': True,
-        # 'do_charges': True,
-        # 'do_redflags': True,
-        # 'do_surveyresponses': True,
-        # 'do_damage': True,
-        # 'do_serviceitems': True,
-        # 'do_scheduledservices': True,
-        # 'do_incidentalservices': True,
-        # 'do_emailimages': True,
+        'do_consigners': True,
+        'do_consignmentvehicles': True,
+        'do_consignmentpayments': True,
+        'do_admins': True,
+        'do_newsitems': True,
+        'do_bbsposts': True,
+        'do_sitecontent': True,
+        'do_newslettersubscriptions': True,
+        'do_coupons': True,
+        'do_guideddrives': True,
+        'do_giftcertificates': True,
+        'do_adhocpayments': True,
+        'do_charges': True,
+        'do_redflags': True,
+        'do_surveyresponses': True,
+        'do_damage': True,
+        'do_serviceitems': True,
+        'do_scheduledservices': True,
+        'do_incidentalservices': True,
+        'do_emailimages': True,
     }
 
     def add_arguments(self, parser):
@@ -154,7 +158,7 @@ class Command(BaseCommand):
         email_image.save()
 
     def handle(self, *args, **options):
-        key = options.get('key', None)
+        key = options.get('key') or settings.LEGACY_GLOBAL_KEY
         if not key:
             print('Missing --key <key>')
             raise SystemExit
