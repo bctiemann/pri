@@ -94,16 +94,20 @@ class Command(BaseCommand):
         'do_emailimages': True,
     }
 
+    bbcode_parser = None
+    ignore_ssl_error = False
+
     def add_arguments(self, parser):
         parser.add_argument('--key', dest='key',)
         parser.add_argument('--clear_existing', dest='clear_existing', default=False, action='store_true',)
         parser.add_argument('--map', '--config', default=None, help='map.conf file for html2bbcode')
+        parser.add_argument('--ignore_ssl_error', dest='ignore_ssl_error', action='store_true', default=False)
 
     def decrypt(self, value):
         return self.aes.decrypt(value) if value else ''
 
     def get_image_tempfile(self, url):
-        r = requests.get(url)
+        r = requests.get(url, verify=not self.ignore_ssl_error)
         img_temp = NamedTemporaryFile(delete=True)
         img_temp.write(r.content)
         img_temp.flush()
@@ -166,6 +170,7 @@ class Command(BaseCommand):
         self.aes = AESCipher(key)
 
         self.bbcode_parser = parser.HTML2BBCode(options.get('map'))
+        self.ignore_ssl_error = options.get('ignore_ssl_error')
 
         legacy_db = settings.DATABASES['default_legacy']
         legacy_front_db = settings.DATABASES['front_legacy']
