@@ -14,7 +14,7 @@ FRONT_MODELS = [
 class FrontDBRouter(object):
 
     def allow_migrate(self, db, app_label, model=None, **hints):
-        if db != 'default' and 'wagtail' in app_label:
+        if db != 'default' and ('wagtail' in app_label or 'content' in app_label):
             return False
         return None
 
