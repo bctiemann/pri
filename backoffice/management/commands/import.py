@@ -64,7 +64,6 @@ SITE_SEC_ROOT = settings.LEGACY_SITE_SEC_ROOT
 class Command(BaseCommand):
 
     enabled = {
-        'do_tolltags': True,
         'do_vehicles': True,
         'do_vehicle_pics': True,
         'do_vehicle_vids': True,
@@ -81,6 +80,7 @@ class Command(BaseCommand):
         'do_sitecontent': True,
         'do_newslettersubscriptions': True,
         'do_coupons': True,
+        'do_tolltags': True,
         'do_guideddrives': True,
         'do_giftcertificates': True,
         'do_adhocpayments': True,
@@ -335,7 +335,6 @@ class Command(BaseCommand):
                 except Customer.DoesNotExist:
                     music_genre = MusicGenre.objects.filter(pk=old['musicgenre']).first()
                     new = Customer.objects.create(
-                        id=old['customerid'],
                         user=user,
                         first_name=old['fname'],
                         last_name=old['lname'],
@@ -375,6 +374,7 @@ class Command(BaseCommand):
                         registration_long=old['reglong'],
                         music_favorite=old['musicfav'] or '',
                     )
+                    new.id = old['customerid']
                     new.created_at = old['createdon']
                     new.save()
                     try:
