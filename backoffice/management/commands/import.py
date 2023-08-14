@@ -375,7 +375,7 @@ class Command(BaseCommand):
                     )
                     new.id = old['customerid']
                     new.user = user
-                    new.created_at = old['createdon']
+                    new.created_at = old['createdon'].replace(tzinfo=pytz.utc)
                     new.save()
                     try:
                         new.home_phone = old['hphone']
