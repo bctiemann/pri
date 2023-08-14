@@ -335,7 +335,6 @@ class Command(BaseCommand):
                 except Customer.DoesNotExist:
                     music_genre = MusicGenre.objects.filter(pk=old['musicgenre']).first()
                     new = Customer.objects.create(
-                        user=user,
                         first_name=old['fname'],
                         last_name=old['lname'],
                         address_line_1=self.decrypt(old['addr']),
@@ -375,6 +374,7 @@ class Command(BaseCommand):
                         music_favorite=old['musicfav'] or '',
                     )
                     new.id = old['customerid']
+                    new.user = user
                     new.created_at = old['createdon']
                     new.save()
                     try:
