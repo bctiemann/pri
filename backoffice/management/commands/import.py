@@ -841,7 +841,7 @@ class Command(BaseCommand):
                     foreign_region=old['ostate'] or '',
                     country=old['country'],
                     processor_charge_id=old['processorchargeid'],
-                    error_code=old['errorcode'] or '',
+                    card_status=old['errorcode'] or '',
                 )
                 if old['stamp']:
                     new.created_at = old['stamp']
