@@ -48,8 +48,8 @@ LOCATION_MAP = {
 }
 
 GUIDED_DRIVE_TYPE_MAP = {
-    1: GuidedDrive.EventType.JOY_RIDE.value,
-    2: GuidedDrive.EventType.PERFORMANCE_EXPERIENCE.value,
+    1: ServiceType.JOY_RIDE.value,
+    2: ServiceType.PERFORMANCE_EXPERIENCE.value,
 }
 
 GUIDED_DRIVE_MODEL_MAP = {
@@ -420,6 +420,8 @@ class Command(BaseCommand):
             for old in back_cursor.fetchall():
                 print(old['reservationid'])
                 customer = Customer.objects.filter(id=old['customerid']).first()
+                if not customer:
+                    continue
                 vehicle = Vehicle.objects.filter(id=old['vehicleid']).first()
                 new = Reservation.objects.create(
                     id=old['reservationid'],
@@ -440,7 +442,7 @@ class Command(BaseCommand):
                     delivery_required=bool(old['delivery']),
                     app_channel=Reservation.AppChannel.MOBILE if old['iphone'] else Reservation.AppChannel.WEB,
                     # tax_percent=old['taxpct'],
-                    delivery_zip=old['deliveryzip'],
+                    delivery_zip=old['deliveryzip'] or '',
                 )
                 new.reserved_at = old['reservdate']
                 new.save()
@@ -476,9 +478,9 @@ class Command(BaseCommand):
 
                     mileage_out=old['milesout'],
                     mileage_back=old['milesback'],
-                    abuse=old['abuse'],
-                    damage_out=old['damageout'],
-                    damage_in=old['damagein'],
+                    abuse=old['abuse'] or '',
+                    damage_out=old['damageout'] or '',
+                    damage_in=old['damagein'] or '',
                     internal_notes=self.decrypt(old['ournotes']),
                     deposit_charged_at=old['depchargedon'],
                     deposit_refunded_at=old['deprefundon'],
@@ -778,9 +780,8 @@ class Command(BaseCommand):
                     message=old['message'],
                     value_message=old['valuemessage'] or '',
                 )
-                if old['created']:
-                    new.created_at = old['created']
-                    new.save()
+                new.created_at = old['created'] or old['issued'] or timezone.now()
+                new.save()
 
         if 'do_adhocpayments' in self.enabled:
             if clear_existing:
