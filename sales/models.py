@@ -46,6 +46,8 @@ class ConfirmationCodeMixin:
         return generate_code(self.service_type)
 
     def save_with_unique_confirmation_code(self, *args, **kwargs):
+        if self.confirmation_code:
+            return
         retries_left = 5
         is_successful = False
         while not is_successful and retries_left > 0:
