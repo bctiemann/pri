@@ -378,22 +378,22 @@ class Command(BaseCommand):
                     new.created_at = old['createdon'].replace(tzinfo=pytz.utc)
                     new.save()
                     try:
-                        new.home_phone = old['hphone']
+                        new.home_phone = old['hphone'] or ''
                         new.save()
                     except ValueError:
                         pass
                     try:
-                        new.mobile_phone = old['mphone']
+                        new.mobile_phone = old['mphone'] or ''
                         new.save()
                     except ValueError:
                         pass
                     try:
-                        new.work_phone = old['wphone']
+                        new.work_phone = old['wphone'] or ''
                         new.save()
                     except ValueError:
                         pass
                     try:
-                        new.fax = old['fax']
+                        new.fax = old['fax'] or ''
                         new.save()
                     except ValueError:
                         pass
