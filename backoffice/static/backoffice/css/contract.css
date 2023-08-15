@@ -1,7 +1,7 @@
 body {
 	font-size: 14px;
 	font-family: sans-serif;
-	background-image: url('images/contractbg.png');
+	background-image: url('../images/contractbg.png');
 	background-repeat: no-repeat;
 	background-attachment: fixed;
 	background-position: bottom;
