@@ -517,9 +517,9 @@ class Command(BaseCommand):
                 print(f"{old['fname']} {old['lname']}")
                 password = self.decrypt(old['password'])
                 notes = self.decrypt(old['notes'])
-                account_number = self.decrypt(old['aa'])
-                routing_number = self.decrypt(old['ar'])
-                address = self.decrypt(old['addr'])
+                account_number = self.decrypt(old['aa']) if 'aa' in old else ''
+                routing_number = self.decrypt(old['ar']) if 'ar' in old else ''
+                address = self.decrypt(old['addr']) if 'addr' in old else ''
                 user = None
                 if old['email']:
                     try:
