@@ -298,7 +298,7 @@ class BaseReservation(ConfirmationCodeMixin, EmailConfirmationMixin, models.Mode
         self.coupon_code = self.coupon_code.upper()
         if self.back_at and not self.back_at_orig:
             self.back_at_orig = self.back_at
-        if self.id:
+        if self.id and self.customer:
             self.final_price_data = json.loads(json.dumps(self.get_price_data(), cls=DjangoJSONEncoder))
         super().save(*args, **kwargs)
 
