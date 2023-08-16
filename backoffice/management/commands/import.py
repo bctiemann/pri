@@ -100,7 +100,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--key', dest='key',)
         parser.add_argument('--clear_existing', dest='clear_existing', default=False, action='store_true',)
-        parser.add_argument('--map', '--config', default=None, help='map.conf file for html2bbcode')
+        parser.add_argument('--map', '--config', default='map.conf', help='map.conf file for html2bbcode')
         parser.add_argument('--ignore_ssl_error', dest='ignore_ssl_error', action='store_true', default=False)
 
     def decrypt(self, value):
