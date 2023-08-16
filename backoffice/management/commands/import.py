@@ -334,7 +334,10 @@ class Command(BaseCommand):
                     customer = Customer.objects.get(user__isnull=False, user=user)
                 except Customer.DoesNotExist:
                     music_genre = MusicGenre.objects.filter(pk=old['musicgenre']).first()
-                    new = Customer.objects.create(
+                    # Use save() rather than objects.create() here because ID is preset
+                    new = Customer(
+                        id=old['customerid'],
+                        user=user,
                         first_name=old['fname'],
                         last_name=old['lname'],
                         address_line_1=self.decrypt(old['addr']),
@@ -373,8 +376,7 @@ class Command(BaseCommand):
                         registration_long=old['reglong'],
                         music_favorite=old['musicfav'] or '',
                     )
-                    new.id = old['customerid']
-                    new.user = user
+                    new.save()
                     new.created_at = old['createdon'].replace(tzinfo=pytz.utc)
                     new.save()
                     try:
