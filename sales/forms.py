@@ -128,7 +128,7 @@ class ReservationRentalDetailsForm(FormErrorMixin, forms.ModelForm):
         (3, _('More than 2')),
     )
     DELIVERY_REQUIRED_CHOICES = (
-        (0, _('I will be picking up the vehicle at PRI in Ringwood, NJ')),
+        (0, _(f'I will be picking up the vehicle at PRI in {settings.COMPANY_CITY_FOR_DELIVERY}')),
         (1, _('I would like the vehicle to be delivered to me')),
     )
     DATETIME_FORMAT = '%m/%d/%Y %H:%M'

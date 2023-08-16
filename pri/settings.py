@@ -304,6 +304,7 @@ COMPANY_ADDRESS = '''
 1821 2nd Ave
 Tampa FL 33605
 '''
+COMPANY_CITY_FOR_DELIVERY = 'Ringwood, NJ'  # "Ringwood, NJ"
 COMPANY_FOUNDING_YEAR = 2008
 SUPPORT_EMAIL = 'support@performance.rentals'
 SITE_EMAIL = 'info@performancerentals.us'
