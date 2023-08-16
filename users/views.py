@@ -11,7 +11,7 @@ from django.views.generic import DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import HttpResponse, JsonResponse, Http404, HttpResponseForbidden, HttpResponseRedirect, HttpResponseNotFound
 
-from two_factor.views import LoginView, PhoneSetupView, PhoneDeleteView, DisableView
+from two_factor.views import LoginView
 from two_factor.forms import AuthenticationTokenForm, BackupTokenForm
 
 from users.forms import UserLoginForm
