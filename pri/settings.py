@@ -316,6 +316,8 @@ DEFAULT_FROM_EMAIL = SITE_EMAIL
 WAGTAIL_SITE_NAME = 'Performance Rentals'
 WAGTAILADMIN_BASE_URL = 'http://127.0.0.1:8000/cms'
 
+os.environ['WKHTMLTOPDF_BIN'] = '/usr/local/bin/wkhtmltopdf'
+
 # Choices for country picker for vehicle origins
 COUNTRIES_ONLY = ['US', 'JP', 'IT', 'GB', 'DE']
 
