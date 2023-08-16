@@ -2,8 +2,8 @@
     <div class="pager">
         <span class="step-links">
             {% if page_obj.has_previous %}
-                <a href="?page=1{% include "backoffice/includes/paginated_query_params.html" %}">&laquo; first</a>
-                <a href="?page={{ page_obj.previous_page_number }}{% include "backoffice/includes/paginated_query_params.html" %}">previous</a>
+                <a href="?page=1&{{ parameters }}">&laquo; first</a>
+                <a href="?page={{ page_obj.previous_page_number }}&{{ parameters }}">previous</a>
             {% endif %}
 
             <span class="current">
@@ -11,8 +11,8 @@
             </span>
 
             {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% include "backoffice/includes/paginated_query_params.html" %}">next</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}{% include "backoffice/includes/paginated_query_params.html" %}">last &raquo;</a>
+                <a href="?page={{ page_obj.next_page_number }}&{{ parameters }}">next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}&{{ parameters }}">last &raquo;</a>
             {% endif %}
         </span>
     </div>
