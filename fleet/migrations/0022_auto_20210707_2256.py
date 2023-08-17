@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='vehiclepicture',
             name='vehicle',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='fleet.vehicle'),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='fleet.vehiclemarketing'),
         ),
         migrations.AddField(
             model_name='vehiclepicture',
