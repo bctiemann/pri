@@ -13,8 +13,11 @@ FRONT_MODELS = [
 
 class FrontDBRouter(object):
 
-    def allow_migrate(self, db, app_label, model=None, **hints):
-        if db != 'default' and ('wagtail' in app_label or 'content' in app_label):
+    def allow_migrate(self, db, app_label, model_name=None, **hints):
+        front_model_names = [m._meta.model_name for m in FRONT_MODELS]
+        if db != 'default' and model_name not in front_model_names:
+            return False
+        if db == 'default' and model_name in front_model_names:
             return False
         return None
 
