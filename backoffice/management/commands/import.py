@@ -206,12 +206,13 @@ class Command(BaseCommand):
             for old_front in LegacyVehicleFront.objects.all().using('front_legacy'):
                 # back_cursor.execute("""SELECT * FROM Vehicles where vehicleid=%s""", old_front['vehicleid'])
                 # old = back_cursor.fetchone()
-                old = LegacyVehicle.objects.filter(vehicleid=old_front.vehicleid).first()
+                old = LegacyVehicle.objects.filter(vehicleid=old_front.vehicleid).using('default_legacy').first()
+                print(vars(old_front))
                 print(vars(old))
                 if not old:
                     continue
 
-                print(old.make., old.model.)
+                print(old.make, old.model)
                 parsed_blurb = self.bbcode_parser.feed(old_front.blurb)
                 slug = slugify(f'{old.make}-{old.model}')
                 new_front = VehicleMarketing.objects.create(
