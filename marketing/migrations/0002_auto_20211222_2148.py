@@ -27,8 +27,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='newsitem',
-            name='created_by',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL),
+            name='author_id',
+            field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AddField(
             model_name='newsitem',

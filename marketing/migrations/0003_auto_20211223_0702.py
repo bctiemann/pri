@@ -14,13 +14,4 @@ class Migration(migrations.Migration):
             name='newsitem',
             options={'ordering': ('-created_at',)},
         ),
-        migrations.RemoveField(
-            model_name='newsitem',
-            name='created_by',
-        ),
-        migrations.AddField(
-            model_name='newsitem',
-            name='author_id',
-            field=models.IntegerField(blank=True, null=True),
-        ),
     ]
