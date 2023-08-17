@@ -164,7 +164,7 @@ class BaseReservation(ConfirmationCodeMixin, EmailConfirmationMixin, models.Mode
     service_type = ServiceType.RENTAL.value
     email_subject = 'PRI Reservation Confirmation'
     email_text_template = 'email/reservation_confirm.txt'
-    email_html_template = 'email/reservation_confirm.txt'
+    email_html_template = 'email/reservation_confirm.html'
 
     class AppChannel(models.TextChoices):
         WEB = ('web', 'Web')
@@ -457,7 +457,7 @@ class JoyRide(EmailConfirmationMixin, GuidedDrive):
     service_type = ServiceType.JOY_RIDE.value
     email_subject = 'PRI Joy Ride Confirmation'
     email_text_template = 'email/joyride_confirm.txt'
-    email_html_template = 'email/joyride_confirm.txt'
+    email_html_template = 'email/joyride_confirm.html'
 
     def get_price_data(self):
         # TODO: Refactor sales.models classes to avoid this nested import
