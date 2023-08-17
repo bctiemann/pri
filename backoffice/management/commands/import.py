@@ -208,10 +208,10 @@ class Command(BaseCommand):
                 # old = back_cursor.fetchone()
                 old = LegacyVehicle.objects.filter(vehicleid=old_front.vehicleid).using('default_legacy').first()
                 print(vars(old_front))
-                print(vars(old))
                 if not old:
                     continue
 
+                print(vars(old))
                 print(old.make, old.model)
                 parsed_blurb = self.bbcode_parser.feed(old_front.blurb)
                 slug = slugify(f'{old.make}-{old.model}')
