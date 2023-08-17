@@ -27,6 +27,10 @@ from sales.models import (
 )
 from consignment.models import Consigner, ConsignmentPayment
 from service.models import Damage, ServiceItem, ScheduledService, IncidentalService
+from legacy.models import (
+    LegacyVehicleFront, LegacyVehicle
+)
+
 from pri.cipher import AESCipher
 
 logger = logging.getLogger(__name__)
@@ -172,24 +176,24 @@ class Command(BaseCommand):
         self.bbcode_parser = parser.HTML2BBCode(options.get('map'))
         self.ignore_ssl_error = options.get('ignore_ssl_error')
 
-        legacy_db = settings.DATABASES['default_legacy']
-        legacy_front_db = settings.DATABASES['front_legacy']
-        db = MySQLdb.connect(
-            passwd=legacy_db['PASSWORD'],
-            db=legacy_db['NAME'],
-            host=legacy_db['HOST'],
-            user=legacy_db['USER'],
-            charset=legacy_db['OPTIONS']['charset'],
-        )
-        back_cursor = db.cursor(MySQLdb.cursors.DictCursor)
-        front_db = MySQLdb.connect(
-            passwd=legacy_front_db['PASSWORD'],
-            db=legacy_front_db['NAME'],
-            host=legacy_front_db['HOST'],
-            user=legacy_front_db['USER'],
-            charset=legacy_front_db['OPTIONS']['charset'],
-        )
-        front_cursor = front_db.cursor(MySQLdb.cursors.DictCursor)
+        # legacy_db = settings.DATABASES['default_legacy']
+        # legacy_front_db = settings.DATABASES['front_legacy']
+        # db = MySQLdb.connect(
+        #     passwd=legacy_db['PASSWORD'],
+        #     db=legacy_db['NAME'],
+        #     host=legacy_db['HOST'],
+        #     user=legacy_db['USER'],
+        #     charset=legacy_db['OPTIONS']['charset'],
+        # )
+        # back_cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        # front_db = MySQLdb.connect(
+        #     passwd=legacy_front_db['PASSWORD'],
+        #     db=legacy_front_db['NAME'],
+        #     host=legacy_front_db['HOST'],
+        #     user=legacy_front_db['USER'],
+        #     charset=legacy_front_db['OPTIONS']['charset'],
+        # )
+        # front_cursor = front_db.cursor(MySQLdb.cursors.DictCursor)
 
         clear_existing = options.get('clear_existing')
 
@@ -197,68 +201,70 @@ class Command(BaseCommand):
             if clear_existing:
                 Vehicle.objects.all().delete()
                 VehicleMarketing.objects.all().delete()
-            front_cursor.execute("""SELECT * FROM VehiclesFront""")
-            for old_front in front_cursor.fetchall():
-                back_cursor.execute("""SELECT * FROM Vehicles where vehicleid=%s""", old_front['vehicleid'])
-                old = back_cursor.fetchone()
-                print(old)
+            # front_cursor.execute("""SELECT * FROM VehiclesFront""")
+            # for old_front in front_cursor.fetchall():
+            for old_front in LegacyVehicleFront.objects.all().using('front_legacy'):
+                # back_cursor.execute("""SELECT * FROM Vehicles where vehicleid=%s""", old_front['vehicleid'])
+                # old = back_cursor.fetchone()
+                old = LegacyVehicle.objects.filter(vehicleid=old_front.vehicleid).first()
+                print(vars(old))
                 if not old:
                     continue
 
-                print(old['make'], old['model'])
-                parsed_blurb = self.bbcode_parser.feed(old_front['blurb'])
-                slug = slugify(f'{old["make"]}-{old["model"]}')
+                print(old.make., old.model.)
+                parsed_blurb = self.bbcode_parser.feed(old_front.blurb)
+                slug = slugify(f'{old.make}-{old.model}')
                 new_front = VehicleMarketing.objects.create(
-                    id=old_front['vehicleid'],
+                    id=old_front.vehicleid,
                     slug=slug,
-                    make=old['make'],
-                    model=old['model'],
-                    year=old['year'],
-                    vehicle_type=old_front['type'],
-                    status=old_front['status'],
-                    weighting=old['weighting'],
-                    horsepower=old_front['hp'],
-                    torque=old_front['tq'],
-                    top_speed=old_front['topspeed'],
-                    transmission_type=TRANSMISSION_TYPE_MAP.get(old_front['trans']),
-                    gears=old_front['gears'],
-                    location=LOCATION_MAP.get(old_front['location']),
-                    tight_fit=old_front['tightfit'],
+                    make=old.make,
+                    model=old.model,
+                    year=old.year,
+                    vehicle_type=old_front.type,
+                    status=old_front.status,
+                    weighting=old.weighting,
+                    horsepower=old_front.hp,
+                    torque=old_front.tq,
+                    top_speed=old_front.topspeed,
+                    transmission_type=TRANSMISSION_TYPE_MAP.get(old_front.trans),
+                    gears=old_front.gears,
+                    location=LOCATION_MAP.get(old_front.location),
+                    tight_fit=old_front.tightfit,
                     blurb=parsed_blurb,
-                    specs=json.loads(old_front['specs']),
-                    origin_country='GB' if old_front['origin'] == 'UK' else old_front['origin'],
-                    price_per_day=old_front['price'],
-                    discount_2_day=old_front['disc2day'],
-                    discount_3_day=old_front['disc3day'],
-                    discount_7_day=old_front['disc7day'],
-                    security_deposit=old_front['deposit'],
-                    miles_included=old_front['milesinc'],
+                    specs=json.loads(old_front.specs),
+                    origin_country='GB' if old_front.origin. == 'UK' else old_front.origin,
+                    price_per_day=old_front.price,
+                    discount_2_day=old_front.disc2day,
+                    discount_3_day=old_front.disc3day,
+                    discount_7_day=old_front.disc7day,
+                    security_deposit=old_front.deposit,
+                    miles_included=old_front.milesinc,
                 )
-                self.import_showcase_image(new_front, old_front['vehicleid'])
-                self.import_thumbnail_image(new_front, old_front['vehicleid'])
-                self.import_inspection_image(new_front, old_front['vehicleid'])
-                self.import_mobile_thumb_image(new_front, old_front['vehicleid'])
+                self.import_showcase_image(new_front, old_front.vehicleid)
+                self.import_thumbnail_image(new_front, old_front.vehicleid)
+                self.import_inspection_image(new_front, old_front.vehicleid)
+                self.import_mobile_thumb_image(new_front, old_front.vehicleid)
 
                 new = Vehicle.objects.create(
-                    id=old['vehicleid'],
+                    id=old.vehicleid,
                     vehicle_marketing_id=new_front.id,
-                    make=old['make'],
-                    model=old['model'],
-                    year=old['year'],
+                    make=old.make,
+                    model=old.model,
+                    year=old.year,
                     slug=slug,
-                    vehicle_type=old['type'],
-                    status=old_front['status'],
-                    plate=old['plate'],
-                    vin=old['vin'],
-                    mileage=old['mileage'],
-                    damage=old['damage'],
-                    notes=old['notes'],
-                    policy_number=self.decrypt(old['policyno']),
-                    policy_company=old['policyco'],
-                    weighting=old['weighting'],
+                    vehicle_type=old.type,
+                    status=old_front.status,
+                    plate=old.plate,
+                    vin=old.vin,
+                    mileage=old.mileage,
+                    damage=old.damage,
+                    notes=old.notes,
+                    policy_number=self.decrypt(old.policyno),
+                    policy_company=old.policyco,
+                    weighting=old.weighting,
                 )
                 try:
-                    new.policy_phone = old['policytel']
+                    new.policy_phone = old.policytel
                     new.save()
                 except ValueError:
                     new.policy_phone = ''
