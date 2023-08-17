@@ -203,10 +203,10 @@ class ValidateRentalConfirmView(APIView):
             raise Http404
 
         form = ReservationCustomerInfoForm(request.POST, instance=reservation.customer, confirmation_code=confirmation_code)
-        print(form.data)
-        print(self.form_type)
-        print(form.is_valid())
-        print(form.errors.as_json())
+        logger.debug(form.data)
+        logger.debug(self.form_type)
+        logger.debug(form.is_valid())
+        logger.debug(form.errors.as_json())
         if not form.is_valid():
             return Response({
                 'success': False,
@@ -244,9 +244,9 @@ class ValidateJoyRideDetailsView(APIView):
 
     def post(self, request):
         form = JoyRideDetailsForm(request.POST)
-        print(form.data)
-        print(form.is_valid())
-        print(form.errors.as_json())
+        logger.debug(form.data)
+        logger.debug(form.is_valid())
+        logger.debug(form.errors.as_json())
         response = {
             'success': form.is_valid(),
             'errors': form.errors,
@@ -287,9 +287,9 @@ class ValidatePerformanceExperienceDetailsView(APIView):
 
     def post(self, request):
         form = PerformanceExperienceDetailsForm(request.POST)
-        print(form.data)
-        print(form.is_valid())
-        print(form.errors.as_json())
+        logger.debug(form.data)
+        logger.debug(form.is_valid())
+        logger.debug(form.errors.as_json())
         response = {
             'success': form.is_valid(),
             'errors': form.errors,
@@ -336,10 +336,10 @@ class ValidateNewsletterSubscriptionView(APIView):
         # form_class = self._get_form_class()
         form = NewsletterSubscribeForm(request.POST)
         # form = form_class(request.POST)
-        print(form.data)
-        print(self.form_type)
-        print(form.is_valid())
-        print(form.errors.as_json())
+        logger.debug(form.data)
+        logger.debug(self.form_type)
+        logger.debug(form.is_valid())
+        logger.debug(form.errors.as_json())
         if not form.is_valid():
             return Response({
                 'success': False,
@@ -384,10 +384,10 @@ class ValidateNewsletterUnsubscriptionView(APIView):
         # form_class = self._get_form_class()
         form = NewsletterUnsubscribeForm(request.POST)
         # form = form_class(request.POST)
-        print(form.data)
-        print(self.form_type)
-        print(form.is_valid())
-        print(form.errors.as_json())
+        logger.debug(form.data)
+        logger.debug(self.form_type)
+        logger.debug(form.is_valid())
+        logger.debug(form.errors.as_json())
         if not form.is_valid():
             return Response({
                 'success': False,
@@ -416,10 +416,10 @@ class ValidateGiftCertificateView(APIView):
         # form_class = self._get_form_class()
         form = GiftCertificateForm(request.POST)
         # form = form_class(request.POST)
-        print(form.data)
-        print(self.form_type)
-        print(form.is_valid())
-        print(form.errors.as_json())
+        logger.debug(form.data)
+        logger.debug(self.form_type)
+        logger.debug(form.is_valid())
+        logger.debug(form.errors.as_json())
         if not form.is_valid():
             return Response({
                 'success': False,
@@ -462,10 +462,10 @@ class ValidateAdHocPaymentView(APIView):
         payment = AdHocPayment.objects.get(confirmation_code=request.POST['confirmation_code'])
         form_kwargs = {'instance': payment, 'data': request.POST}
         form = AdHocPaymentForm(**form_kwargs)
-        print(form.data)
-        print(self.form_type)
-        print(form.is_valid())
-        print(form.errors.as_json())
+        logger.debug(form.data)
+        logger.debug(self.form_type)
+        logger.debug(form.is_valid())
+        logger.debug(form.errors.as_json())
         if not form.is_valid():
             return Response({
                 'success': False,

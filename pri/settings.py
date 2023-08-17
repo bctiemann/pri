@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'content',
     'customer_portal',
     'backoffice',
+    'legacy',
 
     # Wagtail
     'wagtail.contrib.forms',

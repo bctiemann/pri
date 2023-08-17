@@ -140,7 +140,7 @@ class ReserveView(CreateView):
         return JsonResponse({'success': False, 'errors': form.errors})
 
     def post(self, request, *args, **kwargs):
-        print(request.POST)
+        logger.debug(request.POST)
         try:
             self.vehicle = Vehicle.objects.get(slug=kwargs['slug'])
         except Vehicle.DoesNotExist:
@@ -188,7 +188,7 @@ class PasswordView(SidebarMixin, FormView):
     form_class = PasswordForm
 
     def form_valid(self, form):
-        print(form.cleaned_data)
+        logger.debug(form.cleaned_data)
         self.request.user.set_password(form.cleaned_data['password'])
         self.request.user.save()
         login(self.request, self.request.user)

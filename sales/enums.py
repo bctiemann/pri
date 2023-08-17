@@ -1,3 +1,4 @@
+import logging
 from enum import Enum
 from datetime import datetime, time, timedelta
 
@@ -7,6 +8,8 @@ from django.db import models
 from django.db.utils import OperationalError, ProgrammingError
 
 from fleet.models import Vehicle, VehicleMarketing, VehicleType
+
+logger = logging.getLogger(__name__)
 
 
 TRUE_FALSE_CHOICES = (
@@ -68,7 +71,7 @@ def get_vehicle_choices(allow_null=False, null_display_value='----'):
         vehicle_choices.append(('Cars', list((v.id, v.vehicle_name) for v in Vehicle.objects.filter(vehicle_type=VehicleType.CAR))))
         vehicle_choices.append(('Motorcycles', list((v.id, v.vehicle_name) for v in Vehicle.objects.filter(vehicle_type=VehicleType.BIKE))))
     except (OperationalError, ProgrammingError):
-        print('Warning: DB tables not populated yet.')
+        logger.debug('Warning: DB tables not populated yet.')
     if allow_null:
         vehicle_choices = [(None, null_display_value)] + vehicle_choices
     return vehicle_choices

@@ -125,9 +125,9 @@ class ReservationMixin:
 
     def create_reservation(self, request, form=None):
         form = form or self.form_class(request.POST)
-        print(form.data)
-        print(form.is_valid())
-        print(form.errors.as_json())
+        logger.debug(form.data)
+        logger.debug(form.is_valid())
+        logger.debug(form.errors.as_json())
 
         # CAPTCHA is checked as part of the form validation; if that fails, errors are returned here
         if not form.is_valid():

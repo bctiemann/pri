@@ -186,11 +186,6 @@ class ReservationNotesForm(forms.ModelForm):
 
     customer_notes = forms.CharField(widget=forms.Textarea(), required=False)
 
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     print('foo')
-        # self.fields['confirmation_code'].initial = confirmation_code
-
     class Meta:
         model = BaseReservation
         fields = ('customer_notes',)

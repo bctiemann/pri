@@ -1,3 +1,4 @@
+import logging
 from stripe.error import CardError
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -15,6 +16,8 @@ from backoffice.forms import StripeChargeForm, CardForm
 from users.models import Customer
 from sales.models import Charge
 from sales.stripe import Stripe
+
+logger = logging.getLogger(__name__)
 
 
 # Template generics-based CRUD views
@@ -131,8 +134,8 @@ class StripeChargeChargeView(AdminViewMixin, StripeChargeViewMixin, UpdateView):
     fields = ()
 
     def form_invalid(self, form):
-        print(form.data)
-        print(form.errors)
+        logger.debug(form.data)
+        logger.debug(form.errors)
         return super().form_invalid(form)
 
     def form_valid(self, form):

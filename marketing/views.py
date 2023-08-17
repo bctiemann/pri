@@ -1,3 +1,4 @@
+import logging
 from django.conf import settings
 from django.views.generic import TemplateView, FormView, CreateView, DeleteView, UpdateView, DetailView
 from django.http import Http404, HttpResponseRedirect
@@ -10,6 +11,8 @@ from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
 from marketing.models import NewsItem, SiteContent, NewsletterSubscription, SurveyResponse
 from marketing.forms import NewsletterSubscribeForm, NewsletterUnsubscribeForm, SurveyResponseForm
 from sales.tasks import send_email
+
+logger = logging.getLogger(__name__)
 
 
 # This mixin allows us to include the common query for cars and bikes into every view, for the nav menu
@@ -65,7 +68,7 @@ class VehicleView(NavMenuMixin, TemplateView):
     template_name = 'front_site/vehicle.html'
 
     def get(self, *args, **kwargs):
-        print(kwargs)
+        logger.debug(kwargs)
         return super().get(*args, **kwargs)
 
     def get_context_data(self, slug=None, **kwargs):

@@ -1,3 +1,4 @@
+import logging
 import datetime
 import pytz
 import math
@@ -20,6 +21,8 @@ from sales.calculators import RentalPriceCalculator, PerformanceExperiencePriceC
 from sales.enums import get_service_hours, TRUE_FALSE_CHOICES, get_exp_year_choices, get_exp_month_choices, get_numeric_choices
 from sales.constants import BANK_PHONE_HELP_TEXT
 from backoffice.forms import CSSClassMixin
+
+logger = logging.getLogger(__name__)
 
 current_year = timezone.now().year
 
@@ -335,8 +338,8 @@ class GuidedDriveBaseDetailsForm(forms.Form):
         return self.cleaned_data['backup_date']
 
     def clean(self):
-        print('cleaned:')
-        print(self.cleaned_data)
+        logger.debug('cleaned:')
+        logger.debug(self.cleaned_data)
         # TODO: Handle KeyError better
         try:
             self.customer = Customer.objects.get(user__email=self.cleaned_data['email'])
