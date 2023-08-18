@@ -138,6 +138,9 @@ class Tweet(models.Model):
     username = models.CharField(max_length=16, blank=True)
     text = models.TextField(blank=True)
 
+    class Meta:
+        ordering = ('-created_at',)
+
 
 class EmailImage(models.Model):
     image = models.ImageField(width_field='width', height_field='height', upload_to=get_email_image_path)

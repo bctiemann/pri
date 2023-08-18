@@ -1,0 +1,13 @@
+<span>Twitter</span> <small><i><a target="_blank" href="http://twitter.com/PerfRentals">@PerfRentals</a></i></small>
+<br /><br />
+{% if tweets %}
+    {% for tweet in tweets %}
+        <p class="tweet">
+            {{ tweet.text }}<br />
+            <small class="er">{{ tweet.created_at|date:"m/d/Y @ H:i" }}</small>
+        </p>
+        <br />
+    {% endfor %}
+{% else %}
+    No tweets.
+{% endif %}

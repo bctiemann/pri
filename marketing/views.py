@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from users.models import Customer
 from fleet.models import Vehicle, VehicleMarketing, VehicleType, VehicleStatus
-from marketing.models import NewsItem, SiteContent, NewsletterSubscription, SurveyResponse
+from marketing.models import NewsItem, Tweet, SiteContent, NewsletterSubscription, SurveyResponse
 from marketing.forms import NewsletterSubscribeForm, NewsletterUnsubscribeForm, SurveyResponseForm
 from sales.tasks import send_email
 
@@ -23,6 +23,7 @@ class NavMenuMixin:
         context['cars'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.CAR)
         context['bikes'] = context['ready_vehicles'].filter(vehicle_type=VehicleType.BIKE)
         context['footer_news_items'] = NewsItem.objects.all()[0:3]
+        context['tweets'] = Tweet.objects.all()[0:2]
         return context
 
 

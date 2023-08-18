@@ -45,9 +45,7 @@
 
                 <section class="footer-container l-col-4">
                     {% if twitter_enabled %}
-                        {# Official Twitter timeline embed #}
-                        <a class="twitter-timeline" data-width="320" data-height="200" data-theme="dark" href="https://twitter.com/PerfRentals?ref_src=twsrc%5Etfw">Tweets by PerfRentals</a>
-                        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                        {% include "front_site/includes/local_tweets.html" %}
                     {% endif %}
                 </section>
 
