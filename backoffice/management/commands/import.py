@@ -401,7 +401,7 @@ class Command(BaseCommand):
                         registration_long=old.reglong,
                         music_favorite=old.musicfav or '',
                     )
-                    new.save()
+                    new.save(save_cards=False)
                     new.created_at = old.createdon.replace(tzinfo=pytz.utc)
                     new.save()
                     try:

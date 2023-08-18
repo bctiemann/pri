@@ -492,13 +492,13 @@ class Customer(models.Model):
             # TODO: create Card here, if we want one to be created at reservation time
             stripe.add_card_to_customer(self, card_token=card_token, number=self.cc2_number)
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, save_cards=True, **kwargs):
         self.cc_number = format_cc_number(self.cc_number)
         self.cc2_number = format_cc_number(self.cc2_number)
 
         # If an invalid card is specified during front-site reservation flow, no Card object will be created.
         # Cards will be created in backoffice customer management, even if invalid.
-        if self.id and settings.STRIPE_ENABLED:
+        if self.id and save_cards and settings.STRIPE_ENABLED:
             try:
                 self.attach_card_1_to_stripe()
             except CardError as e:
