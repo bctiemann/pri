@@ -399,6 +399,8 @@ class Command(BaseCommand):
                         music_favorite=old.musicfav or '',
                     )
                     new.save()
+                    new.created_at = old.createdon.replace(tzinfo=pytz.utc)
+                    new.save()
                     try:
                         new.home_phone = old.hphone or ''
                         new.save()
