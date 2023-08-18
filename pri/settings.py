@@ -393,8 +393,8 @@ TWITTER_ENABLED = False
 GOOGLE_MAPS_API_KEY = None
 
 # For migrating from legacy
-LEGACY_SITE_ROOT = 'http://pantheraracing.com/'
-LEGACY_SITE_SEC_ROOT = 'https://secure.pantheraracing.com/'
+LEGACY_SITE_ROOT = 'http://performancerentals.us/'
+LEGACY_SITE_SEC_ROOT = 'https://secure.performancerentals.us/'
 LEGACY_GLOBAL_KEY = None
 
 # TinyMCE API key

@@ -28,7 +28,12 @@ from sales.models import (
 from consignment.models import Consigner, ConsignmentPayment
 from service.models import Damage, ServiceItem, ScheduledService, IncidentalService
 from legacy.models import (
-    LegacyVehicleFront, LegacyVehicle
+    LegacyVehicleFront, LegacyVehicle, LegacyVehiclePic, LegacyVehicleVid, LegacyCustomer, LegacyCustFront,
+    LegacyReservation, LegacyRental, LegacyDriver, LegacyConsigner, LegacyConsignmentVehicle, LegacyConsignmentPayment,
+    LegacyAdmin, LegacyNewsItem, LegacyBBSPost, LegacySiteContent, LegacyNewsletterSubscription, LegacyCoupon,
+    LegacyTollTag, LegacyGuidedDrive, LegacyGiftCertificate, LegacyAdHocPayment, LegacyCharge, LegacyRedFlag,
+    LegacySurveyResponse, LegacyDamage, LegacyServiceItem, LegacyScheduledService, LegacyIncidentalService,
+    LegacyEmailImage
 )
 
 from pri.cipher import AESCipher
@@ -141,7 +146,10 @@ class Command(BaseCommand):
     def import_vehicle_video(self, vehicle_video, vehicle_vid_id, ext, thumb_ext):
         url = f'{SITE_ROOT}vids/PRI-{vehicle_vid_id}.{ext}'
         video_tempfile = self.get_image_tempfile(url)
-        vehicle_video.video.save(get_vehicle_video_path(None, f'temp.{ext}'), File(video_tempfile))
+        if ext == 'mp4':
+            vehicle_video.video_mp4.save(get_vehicle_video_path(None, f'temp.{ext}'), File(video_tempfile))
+        elif ext == 'webm':
+            vehicle_video.video_webm.save(get_vehicle_video_path(None, f'temp.{ext}'), File(video_tempfile))
         thumb_url = f'{SITE_ROOT}vids/PRI-{vehicle_vid_id}.thumb.{thumb_ext}'
         thumb_tempfile = self.get_image_tempfile(thumb_url)
         vehicle_video.thumbnail.save(get_vehicle_video_path(None, f'temp.{thumb_ext}'), File(thumb_tempfile))
@@ -276,11 +284,12 @@ class Command(BaseCommand):
         if 'do_vehicle_pics' in self.enabled:
             if clear_existing:
                 VehiclePicture.objects.all().delete()
-            front_cursor.execute("""SELECT * FROM VPics""")
-            for old in front_cursor.fetchall():
-                print(old)
+            # front_cursor.execute("""SELECT * FROM VPics""")
+            # for old in front_cursor.fetchall():
+            for old in LegacyVehiclePic.objects.all().using('front_legacy'):
+                print(vars(old))
                 try:
-                    vehicle = Vehicle.objects.get(id=old['vehicleid'])
+                    vehicle = Vehicle.objects.get(id=old.vehicleid)
                 except Vehicle.DoesNotExist:
                     continue
                 try:
@@ -290,30 +299,33 @@ class Command(BaseCommand):
                 print(vehicle_marketing)
                 new = VehiclePicture.objects.create(
                     vehicle_marketing=vehicle_marketing,
-                    is_first=old['isfirst'],
+                    is_first=old.isfirst,
                 )
-                self.import_vehicle_picture_image(new, old['vpicsid'], old['fext'])
+                self.import_vehicle_picture_image(new, old.vpicsid, old.fext)
 
         if 'do_vehicle_vids' in self.enabled:
             if clear_existing:
                 VehicleVideo.objects.all().delete()
-            front_cursor.execute("""SELECT * FROM VVids""")
-            for old in front_cursor.fetchall():
-                print(old)
+            # front_cursor.execute("""SELECT * FROM VVids""")
+            # for old in front_cursor.fetchall():
+            for old in LegacyVehicleVid.objects.all().using('front_legacy'):
+                print(vars(old))
+                if not old.fext:
+                    continue
                 try:
-                    vehicle = Vehicle.objects.get(id=old['vehicleid'])
+                    vehicle = Vehicle.objects.get(id=old.vehicleid)
                 except Vehicle.DoesNotExist:
                     continue
                 try:
-                    vehicle_marketing = VehicleMarketing.objects.get(vehicle_id=vehicle.id)
+                    vehicle_marketing = VehicleMarketing.objects.get(id=vehicle.vehicle_marketing_id)
                 except VehicleMarketing.DoesNotExist:
                     continue
                 print(vehicle_marketing)
                 new = VehicleVideo.objects.create(
                     vehicle_marketing=vehicle_marketing,
-                    is_first=old['isfirst'],
+                    is_first=old.isfirst,
                 )
-                self.import_vehicle_video(new, old['vvidsid'], old['fext'], old['thumbext'])
+                self.import_vehicle_video(new, old.vvidsid, old.fext, old.thumbext)
 
         if 'do_customers' in self.enabled:
             if clear_existing:
@@ -321,103 +333,104 @@ class Command(BaseCommand):
                     if customer.user and not customer.user.is_admin:
                         customer.user.delete()
                     customer.delete()
-            back_cursor.execute("""SELECT * FROM Customers""")
-            for old in back_cursor.fetchall():
-                print(old['fname'], old['lname'])
-                front_cursor.execute("""SELECT * FROM CustFront where email=%s""", old['email'])
-                old_front = front_cursor.fetchone()
-                password = self.decrypt(old_front['password'])
+            # back_cursor.execute("""SELECT * FROM Customers""")
+            # for old in back_cursor.fetchall():
+            for old in LegacyCustomer.objects.all().using('default_legacy'):
+                print(old.fname, old.lname)
+                # front_cursor.execute("""SELECT * FROM CustFront where email=%s""", old['email'])
+                # old_front = front_cursor.fetchone()
+                old_front = LegacyCustFront.objects.filter(email=old.email).using('front_legacy').first()
+                password = self.decrypt(old_front.password)
                 user = None
-                if old['email']:
+                if old.email:
                     try:
-                        user = User.objects.get(email=old['email'])
+                        user = User.objects.get(email=old.email)
                     except User.DoesNotExist:
                         user = User.objects.create_user(
-                            email=old['email'],
+                            email=old.email,
                             password=password,
                         )
                     user.save()
                 try:
                     customer = Customer.objects.get(user__isnull=False, user=user)
                 except Customer.DoesNotExist:
-                    music_genre = MusicGenre.objects.filter(pk=old['musicgenre']).first()
+                    music_genre = MusicGenre.objects.filter(pk=old.musicgenre).first()
                     # Use save() rather than objects.create() here because ID is preset
                     new = Customer(
-                        id=old['customerid'],
+                        id=old.customerid,
+                        created_at=old.createdon.replace(tzinfo=pytz.utc),
                         user=user,
-                        first_name=old['fname'],
-                        last_name=old['lname'],
-                        address_line_1=self.decrypt(old['addr']),
+                        first_name=old.fname,
+                        last_name=old.lname,
+                        address_line_1=self.decrypt(old.addr),
                         address_line_2='',
-                        city=old['city'] or '',
-                        state=old['state'] or '',
-                        zip=old['zip'] or '',
-                        date_of_birth=old['dob'],
-                        license_number=old['licenseno'] or '',
-                        license_state=old['licensestate'] or '',
-                        license_history=old['licensehist'] or '',
-                        insurance_company=old['insco'] or '',
-                        insurance_policy_number=old['inspolnum'] or '',
-                        coverage_verified=bool(old['coverage']),
-                        cc_number=self.decrypt(old['ccnum']),
-                        cc_exp_yr=old['ccexpyr'] or '',
-                        cc_exp_mo=old['ccexpmo'] or '',
-                        cc_cvv=old['cccvv'] or '',
-                        cc2_number=self.decrypt(old['cc2num']),
-                        cc2_exp_yr=old['cc2expyr'] or '',
-                        cc2_exp_mo=old['cc2expmo'] or '',
-                        cc2_cvv=old['cc2cvv'] or '',
-                        rentals_count=old['rentednum'],
-                        remarks=self.decrypt(old['remarks']),
-                        rating=old['rating'],
-                        driver_skill=old['driverskill'],
-                        discount_pct=int(old['discount']) if old['discount'].isdigit() else None,
+                        city=old.city or '',
+                        state=old.state or '',
+                        zip=old.zip or '',
+                        date_of_birth=old.dob,
+                        license_number=old.licenseno or '',
+                        license_state=old.licensestate or '',
+                        license_history=old.licensehist or '',
+                        insurance_company=old.insco or '',
+                        insurance_policy_number=old.inspolnum or '',
+                        coverage_verified=bool(old.coverage),
+                        cc_number=self.decrypt(old.ccnum),
+                        cc_exp_yr=old.ccexpyr or '',
+                        cc_exp_mo=old.ccexpmo or '',
+                        cc_cvv=old.cccvv or '',
+                        cc2_number=self.decrypt(old.cc2num),
+                        cc2_exp_yr=old.cc2expyr or '',
+                        cc2_exp_mo=old.cc2expmo or '',
+                        cc2_cvv=old.cc2cvv or '',
+                        rentals_count=old.rentednum,
+                        remarks=self.decrypt(old.remarks),
+                        rating=old.rating,
+                        driver_skill=old.driverskill,
+                        discount_pct=int(old.discount) if old.discount.isdigit() else None,
                         music_genre=music_genre,
-                        first_time=bool(old['firsttime']),
-                        drivers_club=bool(old['DriversClub']),
-                        receive_email=not bool(old['nomail']),
-                        ban=bool(old['ban']),
-                        survey_done=bool(old['surveydone']),
-                        registration_ip=old['regip'],
-                        registration_lat=old['reglat'],
-                        registration_long=old['reglong'],
-                        music_favorite=old['musicfav'] or '',
+                        first_time=bool(old.firsttime),
+                        drivers_club=bool(old.DriversClub),
+                        receive_email=not bool(old.nomail),
+                        ban=bool(old.ban),
+                        survey_done=bool(old.surveydone),
+                        registration_ip=old.regip,
+                        registration_lat=old.reglat,
+                        registration_long=old.reglong,
+                        music_favorite=old.musicfav or '',
                     )
                     new.save()
-                    new.created_at = old['createdon'].replace(tzinfo=pytz.utc)
-                    new.save()
                     try:
-                        new.home_phone = old['hphone'] or ''
+                        new.home_phone = old.hphone or ''
                         new.save()
                     except ValueError:
                         pass
                     try:
-                        new.mobile_phone = old['mphone'] or ''
+                        new.mobile_phone = old.mphone or ''
                         new.save()
                     except ValueError:
                         pass
                     try:
-                        new.work_phone = old['wphone'] or ''
+                        new.work_phone = old.wphone or ''
                         new.save()
                     except ValueError:
                         pass
                     try:
-                        new.fax = old['fax'] or ''
+                        new.fax = old.fax or ''
                         new.save()
                     except ValueError:
                         pass
                     try:
-                        new.insurance_company_phone = old['inscotel'] or ''
+                        new.insurance_company_phone = old.inscotel or ''
                         new.save()
                     except ValueError:
                         pass
                     try:
-                        new.cc_phone = old['cctel'] or ''
+                        new.cc_phone = old.cctel or ''
                         new.save()
                     except ValueError:
                         pass
                     try:
-                        new.cc2_phone = old['cc2tel'] or ''
+                        new.cc2_phone = old.cc2tel or ''
                         new.save()
                     except ValueError:
                         pass
@@ -425,127 +438,132 @@ class Command(BaseCommand):
         if 'do_reservations' in self.enabled:
             if clear_existing:
                 Reservation.objects.all().delete()
-            back_cursor.execute("""SELECT * FROM Reservations""")
-            for old in back_cursor.fetchall():
-                print(old['reservationid'])
-                customer = Customer.objects.filter(id=old['customerid']).first()
+            # back_cursor.execute("""SELECT * FROM Reservations""")
+            # for old in back_cursor.fetchall():
+            for old in LegacyReservation.objects.all().using('default_legacy'):
+                print(old.reservationid)
+                customer = Customer.objects.filter(id=old.customerid).first()
                 if not customer:
                     continue
-                vehicle = Vehicle.objects.filter(id=old['vehicleid']).first()
+                vehicle = Vehicle.objects.filter(id=old.vehicleid).first()
                 new = Reservation.objects.create(
-                    id=old['reservationid'],
+                    id=old.reservationid,
+                    reserved_at=old.reservdate,
                     type=Reservation.ReservationType.RESERVATION,
                     customer=customer,
                     vehicle=vehicle,
-                    out_at=old['dateout'],
-                    back_at=old['dateback'],
-                    override_subtotal=old['rate'],
-                    drivers=old['drivers'],
-                    miles_included=old['milesinc'],
-                    extra_miles=old['xtramiles'],
-                    customer_notes=old['notes'],
-                    coupon_code=old['coupon'],
-                    status=old['status'],
-                    deposit_amount=old['depamount'],
-                    confirmation_code=old['confcode'],
-                    delivery_required=bool(old['delivery']),
-                    app_channel=Reservation.AppChannel.MOBILE if old['iphone'] else Reservation.AppChannel.WEB,
-                    # tax_percent=old['taxpct'],
-                    delivery_zip=old['deliveryzip'] or '',
+                    out_at=old.dateout,
+                    back_at=old.dateback,
+                    override_subtotal=old.rate,
+                    drivers=old.drivers,
+                    miles_included=old.milesinc,
+                    extra_miles=old.xtramiles,
+                    customer_notes=old.notes,
+                    coupon_code=old.coupon,
+                    status=old.status,
+                    deposit_amount=old.depamount,
+                    confirmation_code=old.confcode,
+                    delivery_required=bool(old.delivery),
+                    app_channel=Reservation.AppChannel.MOBILE if old.iphone else Reservation.AppChannel.WEB,
+                    # tax_percent=old.taxpct,
+                    delivery_zip=old.deliveryzip or '',
                 )
-                new.reserved_at = old['reservdate']
+                new.reserved_at = old.reservdate
                 new.save()
 
         if 'do_rentals' in self.enabled:
             if clear_existing:
                 Rental.objects.all().delete()
-            back_cursor.execute("""SELECT * FROM Rentals""")
-            for old in back_cursor.fetchall():
-                print(old)
-                customer = Customer.objects.filter(id=old['customerid']).first()
-                vehicle = Vehicle.objects.filter(id=old['vehicleid']).first()
+            # back_cursor.execute("""SELECT * FROM Rentals""")
+            # for old in back_cursor.fetchall():
+            for old in LegacyRental.objects.all().using('default_legacy'):
+                print(vars(old))
+                customer = Customer.objects.filter(id=old.customerid).first()
+                vehicle = Vehicle.objects.filter(id=old.vehicleid).first()
                 new = Rental.objects.create(
-                    id=old['rentalid'],
+                    id=old.rentalid,
                     type=Rental.ReservationType.RENTAL,
                     customer=customer,
                     vehicle=vehicle,
-                    out_at=old['dateout'],
-                    back_at=old['dateback'],
-                    override_subtotal=old['rate'],
-                    drivers=old['drivers'],
-                    miles_included=old['milesinc'],
-                    extra_miles=old['xtramiles'],
-                    customer_notes=old['notes'],
-                    coupon_code=old['coupon'],
-                    status=old['status'],
-                    deposit_amount=old['depamount'],
-                    confirmation_code=old['confcode'] or generate_code(ServiceType.RENTAL),
-                    delivery_required=bool(old['delivery']),
-                    app_channel=Reservation.AppChannel.MOBILE if old['iphone'] else Reservation.AppChannel.WEB,
-                    # tax_percent=old['taxpct'],
-                    delivery_zip=old['deliveryzip'] or '',
+                    out_at=old.dateout,
+                    back_at=old.dateback,
+                    override_subtotal=old.rate,
+                    drivers=old.drivers,
+                    miles_included=old.milesinc,
+                    extra_miles=old.xtramiles,
+                    customer_notes=old.notes,
+                    coupon_code=old.coupon,
+                    status=old.status,
+                    deposit_amount=old.depamount,
+                    confirmation_code=old.confcode or generate_code(ServiceType.RENTAL),
+                    delivery_required=bool(old.delivery),
+                    app_channel=Reservation.AppChannel.MOBILE if old.iphone else Reservation.AppChannel.WEB,
+                    # tax_percent=old.taxpct,
+                    delivery_zip=old.deliveryzip or '',
 
-                    mileage_out=old['milesout'],
-                    mileage_back=old['milesback'],
-                    abuse=old['abuse'] or '',
-                    damage_out=old['damageout'] or '',
-                    damage_in=old['damagein'] or '',
-                    internal_notes=self.decrypt(old['ournotes']),
-                    deposit_charged_at=old['depchargedon'],
-                    deposit_refunded_at=old['deprefundon'],
-                    deposit_refund_amount=old['deprefundamount'],
-                    rental_discount_pct=old['discount'],
-                    extended_days=old['extenddays'],
+                    mileage_out=old.milesout,
+                    mileage_back=old.milesback,
+                    abuse=old.abuse or '',
+                    damage_out=old.damageout or '',
+                    damage_in=old.damagein or '',
+                    internal_notes=self.decrypt(old.ournotes),
+                    deposit_charged_at=old.depchargedon,
+                    deposit_refunded_at=old.deprefundon,
+                    deposit_refund_amount=old.deprefundamount,
+                    rental_discount_pct=old.discount,
+                    extended_days=old.extenddays,
                 )
-                new.reserved_at = old['reservdate']
+                new.reserved_at = old.reservdate
                 new.save()
 
         if 'do_drivers' in self.enabled:
             if clear_existing:
                 Driver.objects.all().delete()
-            back_cursor.execute("""SELECT * FROM Drivers""")
-            for old in back_cursor.fetchall():
-                print(old)
+            # back_cursor.execute("""SELECT * FROM Drivers""")
+            # for old in back_cursor.fetchall():
+            for old in LegacyDriver.objects.all().using('default_legacy'):
+                print(vars(old))
                 try:
-                    rental = Rental.objects.get(pk=old['rentalid'])
+                    rental = Rental.objects.get(pk=old.rentalid)
                 except Rental.DoesNotExist:
                     continue
                 try:
-                    customer = Customer.objects.get(pk=old['customerid'])
+                    customer = Customer.objects.get(pk=old.customerid)
                 except Customer.DoesNotExist:
                     continue
                 new = Driver.objects.create(
                     rental=rental,
                     customer=customer,
-                    is_primary=bool(old['primarydrv']),
+                    is_primary=bool(old.primarydrv),
                 )
 
         if 'do_consigners' in self.enabled:
             if clear_existing:
                 Consigner.objects.all().delete()
-            back_cursor.execute("""SELECT * FROM Consigners""")
-            for old in back_cursor.fetchall():
-                print(f"{old['fname']} {old['lname']}")
-                password = self.decrypt(old['password'])
-                notes = self.decrypt(old['notes'])
-                account_number = self.decrypt(old['aa']) if 'aa' in old else ''
-                routing_number = self.decrypt(old['ar']) if 'ar' in old else ''
-                address = self.decrypt(old['addr']) if 'addr' in old else ''
+            # back_cursor.execute("""SELECT * FROM Consigners""")
+            # for old in back_cursor.fetchall():
+            for old in LegacyConsigner.objects.all().using('default_legacy'):
+                print(f"{old.fname} {old.lname}")
+                password = self.decrypt(old.password)
+                notes = self.decrypt(old.notes)
+                account_number = self.decrypt(old.aa) or ''
+                routing_number = self.decrypt(old.ar) or ''
+                address = self.decrypt(old.addr) or ''
                 user = None
-                if old['email']:
+                if old.email:
                     try:
-                        user = User.objects.get(email=old['email'])
+                        user = User.objects.get(email=old.email)
                     except User.DoesNotExist:
                         user = User.objects.create_user(
-                            email=old['email'],
+                            email=old.email,
                             password=password,
                         )
                     user.save()
                 new = Consigner.objects.create(
-                    id=old['consignerid'],
+                    id=old.consignerid,
                     user=user,
-                    first_name=old['fname'],
-                    last_name=old['lname'],
+                    first_name=old.fname,
+                    last_name=old.lname,
                     notes=notes,
                     account_number=account_number,
                     routing_number=routing_number,
@@ -553,11 +571,12 @@ class Command(BaseCommand):
                 )
 
         if 'do_consignmentvehicles' in self.enabled:
-            back_cursor.execute("""SELECT * FROM ConsignmentVehicles""")
-            for old in back_cursor.fetchall():
-                print(old)
-                consigner = Consigner.objects.filter(id=old['consignerid']).first()
-                vehicle = Vehicle.objects.filter(id=old['vehicleid']).first()
+            # back_cursor.execute("""SELECT * FROM ConsignmentVehicles""")
+            # for old in back_cursor.fetchall():
+            for old in LegacyConsignmentVehicle.objects.all().using('default_legacy'):
+                print(vars(old))
+                consigner = Consigner.objects.filter(id=old.consignerid).first()
+                vehicle = Vehicle.objects.filter(id=old.vehicleid).first()
                 if vehicle and consigner:
                     vehicle.external_owner = consigner
                     vehicle.save()
@@ -565,90 +584,96 @@ class Command(BaseCommand):
         if 'do_consignmentpayments' in self.enabled:
             if clear_existing:
                 ConsignmentPayment.objects.all().delete()
-            back_cursor.execute("""SELECT * FROM ConsignmentPayments""")
-            for old in back_cursor.fetchall():
-                print(old)
+            # back_cursor.execute("""SELECT * FROM ConsignmentPayments""")
+            # for old in back_cursor.fetchall():
+            for old in LegacyConsignmentPayment.objects.all().using('default_legacy'):
+                print(vars(old))
                 try:
-                    consigner = Consigner.objects.get(pk=old['consignerid'])
+                    consigner = Consigner.objects.get(pk=old.consignerid)
                 except Consigner.DoesNotExist:
                     continue
                 new = ConsignmentPayment.objects.create(
                     consigner=consigner,
-                    paid_at=old['stamp'],
-                    amount=old['amount'],
-                    method=old['method'],
+                    paid_at=old.stamp,
+                    amount=old.amount,
+                    method=old.method,
                 )
 
         if 'do_admins' in self.enabled:
             if clear_existing:
                 Employee.objects.all().delete()
-            back_cursor.execute("""SELECT * FROM admin""")
-            for old in back_cursor.fetchall():
-                print(old)
+            # back_cursor.execute("""SELECT * FROM admin""")
+            # for old in back_cursor.fetchall():
+            for old in LegacyAdmin.objects.all().using('default_legacy'):
+                print(vars(old))
                 try:
-                    password = self.decrypt(old['pass'])
+                    password = self.decrypt(old.password)
                 except ValueError:
-                    password = old['pass']
-                name_parts = old['fullname'].split(' ')
+                    password = old.password
+                name_parts = old.fullname.split(' ')
                 first_name = name_parts[0]
                 last_name = name_parts[1] if len(name_parts) > 1 else ''
                 user = None
-                if old['email']:
+                if old.email:
                     try:
-                        user = User.objects.get(email=old['email'])
+                        user = User.objects.get(email=old.email)
                     except User.DoesNotExist:
                         user = User.objects.create_user(
-                            email=old['email'],
+                            email=old.email,
                             password=password,
                         )
-                    user.id_orig = old['adminid']
-                    user.notes = old['about']
-                    user.created_at = old['stamp']
+                    user.id_orig = old.adminid
+                    user.notes = old.about
+                    user.created_at = old.stamp
                     user.is_backoffice = True
-                    user.is_admin = old['acclev'] == Employee.AccessLevel.ADMIN.value
+                    user.is_admin = old.acclev == Employee.AccessLevel.ADMIN.value
                     user.save()
                     employee = Employee.objects.create(
                         user=user,
                         first_name=first_name,
                         last_name=last_name,
-                        access_level=old['acclev'],
+                        access_level=old.acclev,
                     )
-                    employee.created_at = old['stamp']
+                    employee.created_at = old.stamp
                     employee.save()
 
         if 'do_newsitems' in self.enabled:
             if clear_existing:
                 NewsItem.objects.all().delete()
-            front_cursor.execute("""SELECT * FROM News""")
-            for old in front_cursor.fetchall():
-                print(old)
-                parsed_body = self.bbcode_parser.feed(old['thenews'])
+            # front_cursor.execute("""SELECT * FROM News""")
+            # for old in front_cursor.fetchall():
+            for old in LegacyNewsItem.objects.all().using('front_legacy'):
+                print(vars(old))
+                parsed_body = self.bbcode_parser.feed(old.thenews)
                 parsed_body = re.sub('[\r\n]{3,}', '\r\n\r\n', parsed_body)
                 parsed_body = re.sub('\[/?p\](\r\n)?', '', parsed_body)
 
                 news_item = NewsItem.objects.create(
-                    slug=slugify(old['subject']),
-                    subject=old['subject'],
+                    slug=slugify(old.subject),
+                    subject=old.subject,
                     body=parsed_body,
                 )
                 try:
-                    author = User.objects.get(id_orig=old['adminid'])
+                    author = User.objects.get(id_orig=old.adminid)
                     news_item.author_id = author.id
                 except User.DoesNotExist:
                     pass
-                news_item.created_at = old['stamp'].replace(tzinfo=pytz.utc)
+                news_item.created_at = old.stamp.replace(tzinfo=pytz.utc)
                 news_item.save()
 
         if 'do_bbsposts' in self.enabled:
             # if clear_existing:
             #     BBSPost.objects.all().delete()
-            back_cursor.execute("""SELECT * FROM notes""")
-            for old in back_cursor.fetchall():
-                print(old)
+            # back_cursor.execute("""SELECT * FROM notes""")
+            # for old in back_cursor.fetchall():
+            for old in LegacyBBSPost.objects.all().using('default_legacy'):
+                print(vars(old))
 
         if 'do_sitecontent' in self.enabled:
             if clear_existing:
                 SiteContent.objects.all().delete()
+            old_content = LegacySiteContent.objects.using('default_legacy').first()
+            print(vars(old_content))
             for page in (
                     ('about', 'about', 'About the Company',),
                     ('policies', 'policies', 'Policies',),
@@ -657,331 +682,344 @@ class Command(BaseCommand):
                     ('reservations', 'specials', 'Specials',),
             ):
                 db_key, page_key, page_name = page
-                back_cursor.execute(f"""SELECT {db_key} FROM vars""")
-                old_content = back_cursor.fetchone()
-                print(old_content)
+                # back_cursor.execute(f"""SELECT {db_key} FROM vars""")
+                # old_content = back_cursor.fetchone()
                 new = SiteContent.objects.create(
                     page=page_key,
                     name=page_name,
-                    content=old_content[db_key],
+                    content=getattr(old_content, db_key),
                 )
 
         if 'do_newslettersubscriptions' in self.enabled:
             if clear_existing:
                 NewsletterSubscription.objects.all().delete()
-            front_cursor.execute("""SELECT * FROM Newsletter""")
-            for old in front_cursor.fetchall():
-                print(old)
+            # front_cursor.execute("""SELECT * FROM Newsletter""")
+            # for old in front_cursor.fetchall():
+            for old in LegacyNewsletterSubscription.objects.all().using('front_legacy'):
+                print(vars(old))
                 new = NewsletterSubscription.objects.create(
-                    email=old['email'],
-                    full_name=old['name'],
-                    confirmed_at=timezone.now() if old['confirmed'] else None,
-                    hash=old['tkt'] or None,
-                    ip=old['ip'],
+                    email=old.email,
+                    full_name=old.name,
+                    confirmed_at=timezone.now() if old.confirmed else None,
+                    hash=old.tkt or None,
+                    ip=old.ip,
                 )
-                new.created_at = old['stamp'] or timezone.now()
+                new.created_at = old.stamp or timezone.now()
                 new.save()
 
         if 'do_coupons' in self.enabled:
             if clear_existing:
                 Coupon.objects.all().delete()
-            back_cursor.execute("""SELECT * FROM discounts""")
-            for old in back_cursor.fetchall():
-                print(old)
+            # back_cursor.execute("""SELECT * FROM discounts""")
+            # for old in back_cursor.fetchall():
+            for old in LegacyCoupon.objects.all().using('default_legacy'):
+                print(vars(old))
                 new = Coupon.objects.create(
-                    code=old['code'],
-                    name=old['code'],
-                    percent=old['amount'],
+                    code=old.code,
+                    name=old.code,
+                    percent=old.amount,
                 )
 
         if 'do_tolltags' in self.enabled:
             if clear_existing:
                 TollTag.objects.all().delete()
-            back_cursor.execute("""SELECT * FROM TollTags""")
-            for old in back_cursor.fetchall():
-                print(old)
+            # back_cursor.execute("""SELECT * FROM TollTags""")
+            # for old in back_cursor.fetchall():
+            for old in LegacyTollTag.objects.all().using('default_legacy'):
+                print(vars(old))
                 try:
-                    vehicle = Vehicle.objects.get(pk=old['vehicleid'])
+                    vehicle = Vehicle.objects.get(pk=old.vehicleid)
                 except Vehicle.DoesNotExist:
                     vehicle = None
                 new = TollTag.objects.create(
-                    toll_account=old['tollaccount'],
-                    tag_number=old['tagnumber'],
+                    toll_account=old.tollaccount,
+                    tag_number=old.tagnumber,
                     vehicle=vehicle,
-                    alt_usage=old['altusage'] or '',
-                    notes=old['notes'],
+                    alt_usage=old.altusage or '',
+                    notes=old.notes,
                 )
 
         if 'do_guideddrives' in self.enabled:
             if clear_existing:
                 JoyRide.objects.all().delete()
                 PerformanceExperience.objects.all().delete()
-            back_cursor.execute("""SELECT * FROM joyperf""")
-            for old in back_cursor.fetchall():
-                print(old)
+            # back_cursor.execute("""SELECT * FROM joyperf""")
+            # for old in back_cursor.fetchall():
+            for old in LegacyGuidedDrive.objects.all().using('default_legacy'):
+                print(vars(old))
                 try:
-                    customer = Customer.objects.get(pk=old['customerid'])
+                    customer = Customer.objects.get(pk=old.customerid)
                 except Customer.DoesNotExist:
                     continue
                 try:
-                    vehicle_choice_1 = Vehicle.objects.get(pk=old['choice1'])
+                    vehicle_choice_1 = Vehicle.objects.get(pk=old.choice1)
                 except Vehicle.DoesNotExist:
                     vehicle_choice_1 = None
                 try:
-                    vehicle_choice_2 = Vehicle.objects.get(pk=old['choice2'])
+                    vehicle_choice_2 = Vehicle.objects.get(pk=old.choice2)
                 except Vehicle.DoesNotExist:
                     vehicle_choice_2 = None
                 try:
-                    vehicle_choice_3 = Vehicle.objects.get(pk=old['choice3'])
+                    vehicle_choice_3 = Vehicle.objects.get(pk=old.choice3)
                 except Vehicle.DoesNotExist:
                     vehicle_choice_3 = None
-                model = GUIDED_DRIVE_MODEL_MAP.get(old['type'])
+                model = GUIDED_DRIVE_MODEL_MAP.get(old.type)
                 new = model.objects.create(
                     customer=customer,
                     vehicle_choice_1=vehicle_choice_1,
                     vehicle_choice_2=vehicle_choice_2,
                     vehicle_choice_3=vehicle_choice_3,
-                    requested_date=old['reqdate'],
-                    backup_date=old['bupdate'],
-                    confirmation_code=old['confcode'] or generate_code(GUIDED_DRIVE_TYPE_MAP.get(old['type'])),
-                    event_type=old['type'],
-                    status=old['status'],
-                    customer_notes=old['notes'],
-                    internal_notes=self.decrypt(old['ournotes']),
-                    num_passengers=old['nopax'],
-                    num_minors=old['nominors'],
-                    big_and_tall=old['bigtall'],
-                    coupon_code=old['coupon'],
-                    override_subtotal=old['rate'],
+                    requested_date=old.reqdate,
+                    backup_date=old.bupdate,
+                    confirmation_code=old.confcode or generate_code(GUIDED_DRIVE_TYPE_MAP.get(old.type)),
+                    event_type=old.type,
+                    status=old.status,
+                    customer_notes=old.notes,
+                    internal_notes=self.decrypt(old.ournotes),
+                    num_passengers=old.nopax,
+                    num_minors=old.nominors,
+                    big_and_tall=old.bigtall,
+                    coupon_code=old.coupon,
+                    override_subtotal=old.rate,
                 )
                 if model == PerformanceExperience:
-                    new.num_drivers = old['nodrv']
+                    new.num_drivers = old.nodrv
                     new.save()
 
         if 'do_giftcertificates' in self.enabled:
             if clear_existing:
                 GiftCertificate.objects.all().delete()
-            back_cursor.execute("""SELECT * FROM GiftCerts""")
-            for old in back_cursor.fetchall():
-                print(old)
+            # back_cursor.execute("""SELECT * FROM GiftCerts""")
+            # for old in back_cursor.fetchall():
+            for old in LegacyGiftCertificate.objects.all().using('default_legacy'):
+                print(vars(old))
                 new = GiftCertificate.objects.create(
-                    id=old['giftcertid'],
-                    tag=old['tag'],
-                    issued_at=old['issued'],
-                    beneficiary_name=old['usename'],
-                    cc_name=old['ccname'],
-                    cc_address=self.decrypt(old['ccaddr']),
-                    cc_city=old['cccity'],
-                    cc_state=old['ccstate'],
-                    cc_zip=old['cczip'],
-                    cc_number=self.decrypt(old['ccnum']),
-                    cc_exp_yr=old['ccexpyr'],
-                    cc_exp_mo=old['ccexpmo'],
-                    cc_cvv=old['cccvv'],
-                    cc_phone=old['cctel'],
-                    email=old['email'],
-                    phone=old['phone'],
-                    is_used=old['used'],
-                    used_on=old['usedon'],
-                    remarks=old['remarks'] or '',
-                    amount=old['amount'],
-                    is_paid=old['ispaid'],
-                    message=old['message'],
-                    value_message=old['valuemessage'] or '',
+                    id=old.giftcertid,
+                    tag=old.tag,
+                    issued_at=old.issued,
+                    beneficiary_name=old.usename,
+                    cc_name=old.ccname,
+                    cc_address=self.decrypt(old.ccaddr),
+                    cc_city=old.cccity,
+                    cc_state=old.ccstate,
+                    cc_zip=old.cczip,
+                    cc_number=self.decrypt(old.ccnum),
+                    cc_exp_yr=old.ccexpyr,
+                    cc_exp_mo=old.ccexpmo,
+                    cc_cvv=old.cccvv,
+                    cc_phone=old.cctel,
+                    email=old.email,
+                    phone=old.phone,
+                    is_used=old.used,
+                    used_on=old.usedon,
+                    remarks=old.remarks or '',
+                    amount=old.amount,
+                    is_paid=old.ispaid,
+                    message=old.message,
+                    value_message=old.valuemessage or '',
                 )
-                new.created_at = old['created'] or old['issued'] or timezone.now()
+                new.created_at = old.created or old.issued or timezone.now()
                 new.save()
 
         if 'do_adhocpayments' in self.enabled:
             if clear_existing:
                 AdHocPayment.objects.all().delete()
-            back_cursor.execute("""SELECT * FROM subp""")
-            for old in back_cursor.fetchall():
-                print(old)
+            # back_cursor.execute("""SELECT * FROM subp""")
+            # for old in back_cursor.fetchall():
+            for old in LegacyAdHocPayment.objects.all().using('default_legacy'):
+                print(vars(old))
                 new = AdHocPayment.objects.create(
-                    full_name=old['fullname'],
-                    email=old['email'],
-                    amount=old['amount'],
-                    is_paid=old['ispaid'],
-                    paid_at=old['paidon'] or timezone.now() if old['ispaid'] else None,
-                    item=old['item'],
-                    message=old['mesg'],
-                    comments=old['comments'] or '',
-                    cc_number=self.decrypt(old['ccnum']),
-                    cc_exp_yr=old['ccexpyr'],
-                    cc_exp_mo=old['ccexpmo'],
-                    cc_cvv=old['cccvv'],
-                    cc_address=self.decrypt(old['addr']),
-                    cc_city=old['city'],
-                    cc_state=old['state'],
-                    cc_zip=old['zip'],
-                    phone=old['tel'],
-                    foreign_region=old['ostate'] or '',
-                    country=old['country'],
-                    is_submitted=old['issub'],
-                    submitted_at=old['paidon'] or timezone.now() if old['issub'] else None,
+                    full_name=old.fullname,
+                    email=old.email,
+                    amount=old.amount,
+                    is_paid=old.ispaid,
+                    paid_at=old.paidon or timezone.now() if old.ispaid else None,
+                    item=old.item,
+                    message=old.mesg,
+                    comments=old.comments or '',
+                    cc_number=self.decrypt(old.ccnum),
+                    cc_exp_yr=old.ccexpyr,
+                    cc_exp_mo=old.ccexpmo,
+                    cc_cvv=old.cccvv,
+                    cc_address=self.decrypt(old.addr),
+                    cc_city=old.city,
+                    cc_state=old.state,
+                    cc_zip=old.zip,
+                    phone=old.tel,
+                    foreign_region=old.ostate or '',
+                    country=old.country,
+                    is_submitted=old.issub,
+                    submitted_at=old.paidon or timezone.now() if old.issub else None,
                 )
-                if old['stamp']:
-                    new.created_at = old['stamp']
+                if old.stamp:
+                    new.created_at = old.stamp
                     new.save()
 
         if 'do_charges' in self.enabled:
             if clear_existing:
                 Charge.objects.all().delete()
-            back_cursor.execute("""SELECT * FROM Charges""")
-            for old in back_cursor.fetchall():
-                print(old)
+            # back_cursor.execute("""SELECT * FROM Charges""")
+            # for old in back_cursor.fetchall():
+            for old in LegacyCharge.objects.all().using('default_legacy'):
+                print(vars(old))
                 new = Charge.objects.create(
-                    id=old['chargeid'],
-                    full_name=old['fullname'],
-                    email=old['email'],
-                    amount=old['amount'],
-                    capture=old['capture'],
-                    charged_at=old['chargedon'],
-                    notes=old['notes'],
-                    cc_number=self.decrypt(old['ccnum']),
-                    cc_exp_yr=old['ccexpyr'],
-                    cc_exp_mo=old['ccexpmo'],
-                    cc_cvv=old['cccvv'],
-                    cc_address=self.decrypt(old['addr']),
-                    cc_city=old['city'],
-                    cc_state=old['state'],
-                    cc_zip=old['zip'],
-                    phone=old['tel'],
-                    foreign_region=old['ostate'] or '',
-                    country=old['country'],
-                    processor_charge_id=old['processorchargeid'],
-                    card_status=old['errorcode'] or '',
+                    id=old.chargeid,
+                    full_name=old.fullname,
+                    email=old.email,
+                    amount=old.amount,
+                    capture=old.capture,
+                    charged_at=old.chargedon,
+                    notes=old.notes,
+                    cc_number=self.decrypt(old.ccnum),
+                    cc_exp_yr=old.ccexpyr,
+                    cc_exp_mo=old.ccexpmo,
+                    cc_cvv=old.cccvv,
+                    cc_address=self.decrypt(old.addr),
+                    cc_city=old.city,
+                    cc_state=old.state,
+                    cc_zip=old.zip,
+                    phone=old.tel,
+                    foreign_region=old.ostate or '',
+                    country=old.country,
+                    processor_charge_id=old.processorchargeid,
+                    card_status=old.errorcode or '',
                 )
-                if old['stamp']:
-                    new.created_at = old['stamp']
+                if old.stamp:
+                    new.created_at = old.stamp
                     new.save()
 
         if 'do_redflags' in self.enabled:
             if clear_existing:
                 RedFlag.objects.all().delete()
-            back_cursor.execute("""SELECT * FROM tards""")
-            for old in back_cursor.fetchall():
-                print(old)
+            # back_cursor.execute("""SELECT * FROM tards""")
+            # for old in back_cursor.fetchall():
+            for old in LegacyRedFlag.objects.all().using('default_legacy'):
+                print(vars(old))
                 new = RedFlag.objects.create(
-                    full_name=old['name'],
-                    phone=old['tel'] or old['cel'],
-                    email=old['email'],
-                    address=old['address'],
-                    city=old['city'],
-                    state=old['state'],
-                    zip=old['zip'],
-                    license_number=old['licenseno'],
-                    license_state=old['licensestate'],
-                    ssn=old['ssn'],
-                    remarks=old['remarks'],
+                    full_name=old.name,
+                    phone=old.tel or old.cel,
+                    email=old.email,
+                    address=old.address,
+                    city=old.city,
+                    state=old.state,
+                    zip=old.zip,
+                    license_number=old.licenseno,
+                    license_state=old.licensestate,
+                    ssn=old.ssn,
+                    remarks=old.remarks,
                 )
-                new.created_at = old['stamp']
+                new.created_at = old.stamp
                 new.save()
 
         if 'do_surveyresponses' in self.enabled:
             if clear_existing:
                 SurveyResponse.objects.all().delete()
-            front_cursor.execute("""SELECT * FROM surveys""")
-            for old in front_cursor.fetchall():
-                print(old)
-                customer = Customer.objects.filter(pk=old['customerid']).first()
+            # front_cursor.execute("""SELECT * FROM surveys""")
+            # for old in front_cursor.fetchall():
+            for old in LegacySurveyResponse.objects.all().using('front_legacy'):
+                print(vars(old))
+                customer = Customer.objects.filter(pk=old.customerid).first()
                 new = SurveyResponse.objects.create(
-                    id=old['surveyid'],
+                    id=old.surveyid,
                     customer=customer,
-                    ip=old['ip'],
-                    heard_about=old['hearabout'],
-                    general_rating=old['prirating'],
-                    rental_frequency=old['howmany'],
-                    vehicle_rating=old['vehiclerating'],
-                    would_recommend=old['recommend'],
-                    pricing=old['pricing'],
-                    email_frequency=old['email'],
-                    vehicle_types=old['types'],
-                    new_vehicles=old['newvehicles'],
-                    comments=old['comments'],
+                    ip=old.ip,
+                    heard_about=old.hearabout,
+                    general_rating=old.prirating,
+                    rental_frequency=old.howmany,
+                    vehicle_rating=old.vehiclerating,
+                    would_recommend=old.recommend,
+                    pricing=old.pricing,
+                    email_frequency=old.email,
+                    vehicle_types=old.types,
+                    new_vehicles=old.newvehicles,
+                    comments=old.comments,
                 )
-                new.created_at = old['stamp']
+                new.created_at = old.stamp
                 new.save()
 
         if 'do_damage' in self.enabled:
             if clear_existing:
                 Damage.objects.all().delete()
-            back_cursor.execute("""SELECT * FROM Damage""")
-            for old in back_cursor.fetchall():
-                print(old)
-                vehicle = Vehicle.objects.filter(pk=old['vehicleid']).first()
+            # back_cursor.execute("""SELECT * FROM Damage""")
+            # for old in back_cursor.fetchall():
+            for old in LegacyDamage.objects.all().using('default_legacy'):
+                print(vars(old))
+                vehicle = Vehicle.objects.filter(pk=old.vehicleid).first()
                 new = Damage.objects.create(
-                    id=old['damageid'],
+                    id=old.damageid,
                     vehicle=vehicle,
-                    title=old['title'],
-                    damaged_at=old['damageon'],
-                    repaired_at=old['repairedon'],
-                    is_repaired=old['repaired'],
-                    cost=old['cost'],
-                    fault=old['fault'],
-                    customer_billed_amount=old['billcustomer'],
-                    customer_paid_amount=old['paidamt'],
-                    is_paid=old['paid'],
-                    in_house_repair=old['inhouse'],
-                    notes=old['notes'] or '',
+                    title=old.title,
+                    damaged_at=old.damageon,
+                    repaired_at=old.repairedon,
+                    is_repaired=old.repaired,
+                    cost=old.cost,
+                    fault=old.fault,
+                    customer_billed_amount=old.billcustomer,
+                    customer_paid_amount=old.paidamt,
+                    is_paid=old.paid,
+                    in_house_repair=old.inhouse,
+                    notes=old.notes or '',
                 )
 
         if 'do_serviceitems' in self.enabled:
             if clear_existing:
                 ServiceItem.objects.all().delete()
-            back_cursor.execute("""SELECT * FROM ServiceItems""")
-            for old in back_cursor.fetchall():
-                print(old)
+            # back_cursor.execute("""SELECT * FROM ServiceItems""")
+            # for old in back_cursor.fetchall():
+            for old in LegacyServiceItem.objects.all().using('default_legacy'):
+                print(vars(old))
                 new = ServiceItem.objects.create(
-                    id=old['serviceitemid'],
-                    name=old['name'],
+                    id=old.serviceitemid,
+                    name=old.name,
                 )
 
         if 'do_scheduledservices' in self.enabled:
             if clear_existing:
                 ScheduledService.objects.all().delete()
-            back_cursor.execute("""SELECT * FROM Service""")
-            for old in back_cursor.fetchall():
-                print(old)
-                vehicle = Vehicle.objects.filter(pk=old['vehicleid']).first()
-                service_item = ServiceItem.objects.filter(pk=old['serviceitemid']).first()
+            # back_cursor.execute("""SELECT * FROM Service""")
+            # for old in back_cursor.fetchall():
+            for old in LegacyScheduledService.objects.all().using('default_legacy'):
+                print(vars(old))
+                vehicle = Vehicle.objects.filter(pk=old.vehicleid).first()
+                service_item = ServiceItem.objects.filter(pk=old.serviceitemid).first()
                 new = ScheduledService.objects.create(
-                    id=old['serviceid'],
+                    id=old.serviceid,
                     vehicle=vehicle,
                     service_item=service_item,
-                    name=old['name'],
-                    done_at=old['donestamp'],
-                    done_mileage=old['donemiles'],
-                    next_at=old['nextstamp'],
-                    next_mileage=old['nextmiles'],
-                    is_due=old['due'],
-                    notes=old['notes'] or '',
+                    name=old.name,
+                    done_at=old.donestamp,
+                    done_mileage=old.donemiles,
+                    next_at=old.nextstamp,
+                    next_mileage=old.nextmiles,
+                    is_due=old.due,
+                    notes=old.notes or '',
                 )
 
         if 'do_incidentalservices' in self.enabled:
             if clear_existing:
                 IncidentalService.objects.all().delete()
-            back_cursor.execute("""SELECT * FROM ServiceHist""")
-            for old in back_cursor.fetchall():
-                print(old)
-                vehicle = Vehicle.objects.filter(pk=old['vehicleid']).first()
+            # back_cursor.execute("""SELECT * FROM ServiceHist""")
+            # for old in back_cursor.fetchall():
+            for old in LegacyIncidentalService.objects.all().using('default_legacy'):
+                print(vars(old))
+                vehicle = Vehicle.objects.filter(pk=old.vehicleid).first()
                 new = IncidentalService.objects.create(
-                    id=old['servicehistid'],
+                    id=old.servicehistid,
                     vehicle=vehicle,
-                    done_at=old['stamp'],
-                    title=old['title'],
-                    notes=old['notes'] or '',
-                    mileage=old['mileage'],
+                    done_at=old.stamp,
+                    title=old.title,
+                    notes=old.notes or '',
+                    mileage=old.mileage,
                 )
 
         if 'do_emailimages' in self.enabled:
             if clear_existing:
                 EmailImage.objects.all().delete()
-            back_cursor.execute("""SELECT * FROM EmailPics""")
-            for old in back_cursor.fetchall():
-                print(old)
+            # back_cursor.execute("""SELECT * FROM EmailPics""")
+            # for old in back_cursor.fetchall():
+            for old in LegacyEmailImage.objects.all().using('default_legacy'):
+                print(vars(old))
                 new = EmailImage.objects.create(
-                    id=old['emailpicid'],
+                    id=old.emailpicid,
                 )
-                self.import_email_image(new, old['emailpicid'], old['ext'])
+                self.import_email_image(new, old.emailpicid, old.ext)
