@@ -133,7 +133,10 @@ class SurveyResponse(models.Model):
 
 
 class Tweet(models.Model):
-    pass
+    id = models.BigAutoField(primary_key=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    username = models.CharField(max_length=16, blank=True)
+    text = models.TextField(blank=True)
 
 
 class EmailImage(models.Model):

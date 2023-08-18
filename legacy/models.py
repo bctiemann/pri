@@ -554,3 +554,10 @@ class LegacyEmailImage(models.Model):
 
     class Meta:
         db_table = 'EmailPics'
+
+
+class LegacyTweet(models.Model):
+    id = models.CharField(max_length=20, primary_key=True)
+    stamp = models.DateTimeField(null=True, blank=True)
+    username = models.CharField(max_length=16, blank=True)
+    text = models.TextField(blank=True)

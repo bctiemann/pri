@@ -15,7 +15,9 @@ from django.core.files.temp import NamedTemporaryFile
 from django.core.files import File
 
 from backoffice.models import BBSPost
-from marketing.models import NewsItem, SiteContent, NewsletterSubscription, SurveyResponse, EmailImage, get_email_image_path
+from marketing.models import (
+    NewsItem, SiteContent, NewsletterSubscription, SurveyResponse, EmailImage, Tweet, get_email_image_path
+)
 from fleet.models import (
     Vehicle, VehicleMarketing, VehiclePicture, VehicleVideo, TransmissionType, Location, TollTag,
     get_vehicle_picture_path, get_vehicle_video_path
@@ -33,7 +35,7 @@ from legacy.models import (
     LegacyAdmin, LegacyNewsItem, LegacyBBSPost, LegacySiteContent, LegacyNewsletterSubscription, LegacyCoupon,
     LegacyTollTag, LegacyGuidedDrive, LegacyGiftCertificate, LegacyAdHocPayment, LegacyCharge, LegacyRedFlag,
     LegacySurveyResponse, LegacyDamage, LegacyServiceItem, LegacyScheduledService, LegacyIncidentalService,
-    LegacyEmailImage
+    LegacyEmailImage, LegacyTweet
 )
 
 from pri.cipher import AESCipher
@@ -101,6 +103,7 @@ class Command(BaseCommand):
         'do_scheduledservices': True,
         'do_incidentalservices': True,
         'do_emailimages': True,
+        'do_tweets': True,
     }
 
     bbcode_parser = None
@@ -1025,3 +1028,16 @@ class Command(BaseCommand):
                     id=old.emailpicid,
                 )
                 self.import_email_image(new, old.emailpicid, old.ext)
+
+        if 'do_tweets' in self.enabled:
+            if clear_existing:
+                Tweet.objects.all().delete()
+            for old in LegacyTweet.objects.all().using('front_legacy'):
+                print(vars(old))
+                new = Tweet.objects.create(
+                    id=old.id,
+                    username=old.username,
+                    text=old.text,
+                )
+                new.created_at = old.stamp
+                new.save()
