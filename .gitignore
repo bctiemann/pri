@@ -1,6 +1,7 @@
 *.pyc
 venv
 static_root
+site_media
 logs
 media
 .idea

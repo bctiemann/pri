@@ -561,3 +561,6 @@ class LegacyTweet(models.Model):
     stamp = models.DateTimeField(null=True, blank=True)
     username = models.CharField(max_length=16, blank=True)
     text = models.TextField(blank=True)
+
+    class Meta:
+        db_table = 'tweets'
