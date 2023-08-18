@@ -565,9 +565,9 @@ class Command(BaseCommand):
                     first_name=old.fname,
                     last_name=old.lname,
                     notes=notes,
-                    account_number=account_number,
-                    routing_number=routing_number,
-                    address=address,
+                    # account_number=account_number,
+                    # routing_number=routing_number,
+                    # address=address,
                 )
 
         if 'do_consignmentvehicles' in self.enabled:
