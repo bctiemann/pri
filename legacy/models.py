@@ -221,9 +221,9 @@ class LegacyConsigner(models.Model):
     lname = models.CharField(max_length=255, blank=True)
     password = models.CharField(max_length=255, blank=True)
     notes = models.TextField(blank=True)
-    ar = models.CharField(max_length=255, blank=True)
-    aa = models.CharField(max_length=255, blank=True)
-    addr = models.TextField(blank=True)
+    # ar = models.CharField(max_length=255, blank=True)
+    # aa = models.CharField(max_length=255, blank=True)
+    # addr = models.TextField(blank=True)
 
     class Meta:
         db_table = 'Consigners'
