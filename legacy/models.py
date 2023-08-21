@@ -26,6 +26,7 @@ class LegacyVehicleFront(models.Model):
 
     class Meta:
         db_table = 'VehiclesFront'
+        managed = False
 
 
 class LegacyVehicle(models.Model):
@@ -48,6 +49,7 @@ class LegacyVehicle(models.Model):
 
     class Meta:
         db_table = 'Vehicles'
+        managed = False
 
 
 class LegacyVehiclePic(models.Model):
@@ -58,6 +60,7 @@ class LegacyVehiclePic(models.Model):
 
     class Meta:
         db_table = 'VPics'
+        managed = False
 
 
 class LegacyVehicleVid(models.Model):
@@ -71,6 +74,7 @@ class LegacyVehicleVid(models.Model):
 
     class Meta:
         db_table = 'VVids'
+        managed = False
 
 
 class LegacyCustomer(models.Model):
@@ -123,6 +127,7 @@ class LegacyCustomer(models.Model):
 
     class Meta:
         db_table = 'Customers'
+        managed = False
 
 
 class LegacyCustFront(models.Model):
@@ -132,6 +137,7 @@ class LegacyCustFront(models.Model):
 
     class Meta:
         db_table = 'CustFront'
+        managed = False
 
 
 class LegacyReservation(models.Model):
@@ -159,6 +165,7 @@ class LegacyReservation(models.Model):
 
     class Meta:
         db_table = 'Reservations'
+        managed = False
 
 
 class LegacyRental(models.Model):
@@ -202,6 +209,7 @@ class LegacyRental(models.Model):
 
     class Meta:
         db_table = 'Rentals'
+        managed = False
 
 
 class LegacyDriver(models.Model):
@@ -212,6 +220,7 @@ class LegacyDriver(models.Model):
 
     class Meta:
         db_table = 'Drivers'
+        managed = False
 
 
 class LegacyConsigner(models.Model):
@@ -227,6 +236,7 @@ class LegacyConsigner(models.Model):
 
     class Meta:
         db_table = 'Consigners'
+        managed = False
 
 
 class LegacyConsignmentVehicle(models.Model):
@@ -235,6 +245,7 @@ class LegacyConsignmentVehicle(models.Model):
 
     class Meta:
         db_table = 'ConsignmentVehicles'
+        managed = False
 
 
 class LegacyConsignmentPayment(models.Model):
@@ -246,6 +257,7 @@ class LegacyConsignmentPayment(models.Model):
 
     class Meta:
         db_table = 'ConsignmentPayments'
+        managed = False
 
 
 class LegacyAdmin(models.Model):
@@ -271,6 +283,7 @@ class LegacyAdmin(models.Model):
 
     class Meta:
         db_table = 'admin'
+        managed = False
 
 
 class LegacyNewsItem(models.Model):
@@ -282,6 +295,7 @@ class LegacyNewsItem(models.Model):
 
     class Meta:
         db_table = 'News'
+        managed = False
 
 
 class LegacyBBSPost(models.Model):
@@ -295,6 +309,7 @@ class LegacyBBSPost(models.Model):
 
     class Meta:
         db_table = 'notes'
+        managed = False
 
 
 class LegacySiteContent(models.Model):
@@ -307,6 +322,7 @@ class LegacySiteContent(models.Model):
 
     class Meta:
         db_table = 'vars'
+        managed = False
 
 
 class LegacyNewsletterSubscription(models.Model):
@@ -320,6 +336,7 @@ class LegacyNewsletterSubscription(models.Model):
 
     class Meta:
         db_table = 'Newsletter'
+        managed = False
 
 
 class LegacyCoupon(models.Model):
@@ -329,6 +346,7 @@ class LegacyCoupon(models.Model):
 
     class Meta:
         db_table = 'discounts'
+        managed = False
 
 
 class LegacyTollTag(models.Model):
@@ -341,6 +359,7 @@ class LegacyTollTag(models.Model):
 
     class Meta:
         db_table = 'TollTags'
+        managed = False
 
 
 class LegacyGuidedDrive(models.Model):
@@ -365,6 +384,7 @@ class LegacyGuidedDrive(models.Model):
 
     class Meta:
         db_table = 'JoyPerf'
+        managed = False
 
 
 class LegacyGiftCertificate(models.Model):
@@ -395,6 +415,7 @@ class LegacyGiftCertificate(models.Model):
 
     class Meta:
         db_table = 'GiftCerts'
+        managed = False
 
 
 class LegacyAdHocPayment(models.Model):
@@ -423,6 +444,7 @@ class LegacyAdHocPayment(models.Model):
 
     class Meta:
         db_table = 'subp'
+        managed = False
 
 
 class LegacyCharge(models.Model):
@@ -451,6 +473,7 @@ class LegacyCharge(models.Model):
 
     class Meta:
         db_table = 'Charges'
+        managed = False
 
 
 class LegacyRedFlag(models.Model):
@@ -471,6 +494,7 @@ class LegacyRedFlag(models.Model):
 
     class Meta:
         db_table = 'tards'
+        managed = False
 
 
 class LegacySurveyResponse(models.Model):
@@ -491,6 +515,7 @@ class LegacySurveyResponse(models.Model):
 
     class Meta:
         db_table = 'surveys'
+        managed = False
 
 
 class LegacyDamage(models.Model):
@@ -510,6 +535,7 @@ class LegacyDamage(models.Model):
 
     class Meta:
         db_table = 'Damage'
+        managed = False
 
 
 class LegacyServiceItem(models.Model):
@@ -518,6 +544,7 @@ class LegacyServiceItem(models.Model):
 
     class Meta:
         db_table = 'ServiceItems'
+        managed = False
 
 
 class LegacyScheduledService(models.Model):
@@ -534,6 +561,7 @@ class LegacyScheduledService(models.Model):
 
     class Meta:
         db_table = 'Service'
+        managed = False
 
 
 class LegacyIncidentalService(models.Model):
@@ -546,6 +574,7 @@ class LegacyIncidentalService(models.Model):
 
     class Meta:
         db_table = 'ServiceHist'
+        managed = False
 
 
 class LegacyEmailImage(models.Model):
@@ -554,6 +583,7 @@ class LegacyEmailImage(models.Model):
 
     class Meta:
         db_table = 'EmailPics'
+        managed = False
 
 
 class LegacyTweet(models.Model):
@@ -564,3 +594,4 @@ class LegacyTweet(models.Model):
 
     class Meta:
         db_table = 'tweets'
+        managed = False
