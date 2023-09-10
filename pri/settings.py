@@ -298,6 +298,8 @@ SERVER_BASE_URL = 'https://performance.rentals'
 
 ADMINS = [('Brian Tiemann', 'btman@mac.com')]
 
+ADMIN_ENABLED = False
+
 COMPANY_NAME = 'Performance Rentals'
 COMPANY_PHONE = '(866) 607-0084'
 COMPANY_FAX = '(845) 357-3535'

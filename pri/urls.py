@@ -38,9 +38,6 @@ from users import views as users_views
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    # Django admin site (generic database backend operations, CRUD, user management, etc)
-    path('spork/', admin.site.urls),
-
     path('cms/', include(wagtailadmin_urls)),
 
     path('sign_out/', users_views.LogoutView.as_view(next_page='home'), name='sign-out'),
@@ -177,6 +174,12 @@ urlpatterns = [
     path('', include(tf_urls, 'two_factor')),
     path('', include(wagtail_urls)),
 ]
+
+if settings.ADMIN_ENABLED:
+    # Django admin site (generic database backend operations, CRUD, user management, etc)
+    urlpatterns = [
+        path('spork/', admin.site.urls),
+    ] + urlpatterns
 
 # This maps the MEDIA_ROOT url for local development
 if settings.DEBUG:
