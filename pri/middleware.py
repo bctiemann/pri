@@ -10,6 +10,7 @@ from django.contrib.sessions.models import Session
 from django.utils import timezone
 
 from users.models import SessionVisit
+from consignment.models import Consigner
 
 import logging
 logger = logging.getLogger(__name__)
@@ -71,6 +72,13 @@ class PermissionsMiddleware(object):
             if resolved.app_name == 'backoffice' and not request.user.is_backoffice:
                 logger.info(f'{request.user} not authorized for backoffice.')
                 raise PermissionDenied
+
+            if resolved.app_name == 'consignment':
+                try:
+                    request.user.consigner
+                except Consigner.DoesNotExist:
+                    logger.info(f'{request.user} not authorized for consignment.')
+                    raise PermissionDenied
 
         return self.get_response(request)
 
