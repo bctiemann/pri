@@ -423,6 +423,18 @@ class Customer(models.Model):
         return self.basereservation_set.filter(rental__isnull=False)
 
     @property
+    def days_since_last_activity(self):
+        last_rental = self.past_rentals.order_by('-out_at').first()
+        if last_rental:
+            return (timezone.now() - last_rental.out_at).days
+        last_perfexp = self.performanceexperience_set.order_by('-requested_date').first()
+        if last_perfexp:
+            return (timezone.now().date() - last_perfexp.requested_date).days
+        last_joyride = self.joyride_set.order_by('-requested_date').first()
+        if last_joyride:
+            return (timezone.now().date() - last_joyride.requested_date).days
+
+    @property
     def primary_phone(self):
         return self.home_phone or self.mobile_phone or self.work_phone
 
@@ -490,6 +502,28 @@ class Customer(models.Model):
             card_token = stripe.get_card_token(self.cc2_number, self.cc2_exp_mo, self.cc2_exp_yr, self.cc2_cvv)
             # TODO: create Card here, if we want one to be created at reservation time
             stripe.add_card_to_customer(self, card_token=card_token, number=self.cc2_number)
+
+    def clear_card_1(self):
+        self.cc_number = ''
+        self.cc_exp_mo = ''
+        self.cc_exp_yr = ''
+        self.cc_cvv = ''
+        self.cc_phone = ''
+        self.card_1_status = ''
+        self.save()
+
+    def clear_card_2(self):
+        self.cc2_number = ''
+        self.cc2_exp_mo = ''
+        self.cc2_exp_yr = ''
+        self.cc2_cvv = ''
+        self.cc2_phone = ''
+        self.card_2_status = ''
+        self.save()
+
+    def clear_cards(self):
+        self.clear_card_1()
+        self.clear_card_2()
 
     def save(self, *args, save_cards=True, **kwargs):
         self.cc_number = format_cc_number(self.cc_number)
