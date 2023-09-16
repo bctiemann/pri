@@ -27,6 +27,7 @@ def settings_constants(request):
         'joy_ride_prices': settings.JOY_RIDE_PRICES,
         'performance_experience_prices': settings.PERFORMANCE_EXPERIENCE_PRICES,
         'survey_discount_pct': settings.SURVEY_DISCOUNT_PCT,
+        'admin_enabled': settings.ADMIN_ENABLED,
     }
     return context
 

@@ -40,7 +40,11 @@
                 <td>Password</td>
                 {% if employee %}
                     <td>
-                        <a href="{% url "admin:auth_user_password_change" id=employee.user.id %}">Change password</a>
+                        {% if admin_enabled %}
+                            <a href="{% url "admin:auth_user_password_change" id=employee.user.id %}">Change password</a>
+                        {% else %}
+                            (Admin disabled; set ADMIN_ENABLED: true)
+                        {% endif %}
                         <input type="hidden" id="id_password" name="password" value="{{ employee.user.password }}" />
                     </td>
                 {% else %}

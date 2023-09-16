@@ -1,6 +1,6 @@
 <div id="menu_admin" class="popupbox">
     <ul class="navmenu">
-        {% if user.employee.admin_access %}
+        {% if admin_enabled and user.employee.admin_access %}
             <li>
                 <a
                     class="tnav"
@@ -10,14 +10,16 @@
                 </a>
             </li>
         {% endif %}
-        <li>
-            <a
-                class="tnav"
-                href="{% url "two_factor:setup" %}"
-            >
-                Two-factor
-            </a>
-        </li>
+        {% if admin_enabled %}
+            <li>
+                <a
+                    class="tnav"
+                    href="{% url "two_factor:setup" %}"
+                >
+                    Two-factor
+                </a>
+            </li>
+        {% endif %}
         {% if user.employee.admin_access %}
             <li>
                 <a
@@ -96,7 +98,7 @@
                     BBS
                 </a>
             </li>
-        {% if user.employee.admin_access %}
+        {% if admin_enabled and user.employee.admin_access %}
             <li>
                 <a
                     class="tnav"

@@ -96,7 +96,11 @@
                 <td>Password</td>
                 {% if consigner %}
                     <td>
-                        <a href="{% url "admin:auth_user_password_change" id=consigner.user.id %}">Change password</a>
+                        {% if admin_enabled %}
+                            <a href="{% url "admin:auth_user_password_change" id=consigner.user.id %}">Change password</a>
+                        {% else %}
+                            (Admin disabled; set ADMIN_ENABLED: true)
+                        {% endif %}
                         <input type="hidden" id="id_password" name="password" value="{{ consigner.user.password }}" />
                     </td>
                 {% else %}
