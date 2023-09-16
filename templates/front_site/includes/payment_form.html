@@ -1,9 +1,9 @@
 <div id="reservation_payment" class="1hidden">
 
     <p class="reservation-info">
-    We'll need a credit card to secure your reservation. Once the reservation is confirmed, you'll get access to the
-    secure PRI Customer Portal, where you can manage your rentals, confirm your insurance information, and specify
-    your preferred methods of payment for the rental and the security deposit.
+        We'll need your name, address, and contact details to secure your reservation. Once the reservation is confirmed,
+        you'll get access to the secure PRI Customer Portal, where you can manage your rentals, confirm your insurance
+        information, and specify your preferred methods of payment for the rental and the security deposit.
     </p>
 
     <div id="price_breakdown_container">
@@ -47,6 +47,7 @@
                 {{ payment_form.fax }}
             </td>
         </tr>
+        {% comment %}
         <tr>
             <td>Credit Card Number</td>
             <td>
@@ -77,6 +78,7 @@
                 </small>
             </td>
         </tr>
+        {% endcomment %}
         <tr>
             <td>Street Address Line 1</td>
             <td>

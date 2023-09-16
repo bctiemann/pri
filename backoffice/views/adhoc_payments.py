@@ -41,7 +41,7 @@ class AdHocPaymentDetailView(AdminViewMixin, AdHocPaymentViewMixin, ListViewMixi
         adhoc_payment = form.save()
 
         # Update card. If any data has changed since the last saved Card object, refresh the Stripe object as well.
-        if form.cleaned_data['cc_number'] and settings.STRIPE_ENABLED:
+        if form.cleaned_data['cc_number'] and settings.STRIPE_ENABLED and settings.STRIPE_CUSTOMER_ENABLED:
             card_data = {
                 'number': form.cleaned_data['cc_number'],
                 'exp_month': form.cleaned_data['cc_exp_mo'],

@@ -45,7 +45,7 @@ class CustomerDetailView(AdminViewMixin, CustomerViewMixin, ListViewMixin, Updat
 
         # Update primary and secondary card. If any data has changed since the last saved Card object, refresh the
         # Stripe object as well.
-        if form.cleaned_data['cc_number'] and settings.STRIPE_ENABLED:
+        if form.cleaned_data['cc_number'] and settings.STRIPE_ENABLED and settings.STRIPE_CUSTOMER_ENABLED:
             card_1_data = {
                 'number': form.cleaned_data['cc_number'],
                 'exp_month': form.cleaned_data['cc_exp_mo'],
@@ -76,7 +76,7 @@ class CustomerDetailView(AdminViewMixin, CustomerViewMixin, ListViewMixin, Updat
                 card_1.zip = form.cleaned_data['zip']
                 card_1.save()
 
-        if form.cleaned_data['cc2_number'] and settings.STRIPE_ENABLED:
+        if form.cleaned_data['cc2_number'] and settings.STRIPE_ENABLED and settings.STRIPE_CUSTOMER_ENABLED:
             card_2_data = {
                 'number': form.data['cc2_number'],
                 'exp_month': form.data['cc2_exp_mo'],

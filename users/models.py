@@ -472,21 +472,20 @@ class Customer(models.Model):
         )
 
     def add_to_stripe(self):
-        stripe_customer = stripe.add_stripe_customer(self.full_name, self.email, self.phone)
-        self.stripe_customer = stripe_customer
-        self.save()
+        if settings.STRIPE_CUSTOMER_ENABLED and not self.stripe_customer:
+            stripe_customer = stripe.add_stripe_customer(self.full_name, self.email, self.phone)
+            self.stripe_customer = stripe_customer
+            self.save()
 
     def attach_card_1_to_stripe(self):
-        if not self.stripe_customer:
-            self.add_to_stripe()
+        self.add_to_stripe()
         if all((self.cc_number, self.cc_exp_mo, self.cc_exp_yr, self.cc_cvv)) and not self.card_1:
             card_token = stripe.get_card_token(self.cc_number, self.cc_exp_mo, self.cc_exp_yr, self.cc_cvv)
             # TODO: create Card here, if we want one to be created at reservation time
             stripe.add_card_to_customer(self, card_token=card_token, is_primary=True, number=self.cc_number)
 
     def attach_card_2_to_stripe(self):
-        if not self.stripe_customer:
-            self.add_to_stripe()
+        self.add_to_stripe()
         if all((self.cc2_number, self.cc2_exp_mo, self.cc2_exp_yr, self.cc2_cvv)) and not self.card_2:
             card_token = stripe.get_card_token(self.cc2_number, self.cc2_exp_mo, self.cc2_exp_yr, self.cc2_cvv)
             # TODO: create Card here, if we want one to be created at reservation time
@@ -498,7 +497,7 @@ class Customer(models.Model):
 
         # If an invalid card is specified during front-site reservation flow, no Card object will be created.
         # Cards will be created in backoffice customer management, even if invalid.
-        if self.id and save_cards and settings.STRIPE_ENABLED:
+        if self.id and save_cards and settings.STRIPE_ENABLED and settings.STRIPE_CUSTOMER_ENABLED:
             try:
                 self.attach_card_1_to_stripe()
             except CardError as e:
@@ -508,6 +507,7 @@ class Customer(models.Model):
             except CardError as e:
                 self.card_2_status = Stripe.get_error(e)
         super().save(*args, **kwargs)
+        self.add_to_stripe()
 
     def __str__(self):
         return f'[{self.id}] {self.first_name} {self.last_name}'
