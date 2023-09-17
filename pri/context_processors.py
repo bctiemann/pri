@@ -28,6 +28,7 @@ def settings_constants(request):
         'performance_experience_prices': settings.PERFORMANCE_EXPERIENCE_PRICES,
         'survey_discount_pct': settings.SURVEY_DISCOUNT_PCT,
         'admin_enabled': settings.ADMIN_ENABLED,
+        'collect_card_info': settings.COLLECT_CARD_INFO,
     }
     return context
 

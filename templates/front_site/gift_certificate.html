@@ -87,56 +87,56 @@
                             </small>
                         </td>
                     </tr>
-                    {% comment %}
-                    <tr>
-                        <td >Billing Address</td>
-                        <td>
-                            {{ form.cc_address }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Billing City</td>
-                        <td>
-                            {{ form.cc_city }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Billing State</td>
-                        <td>
-                            {{ form.cc_state }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Billing Zip</td>
-                        <td>
-                            {{ form.cc_zip }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Credit Card Number</td>
-                        <td>
-                            {{ form.cc_number }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Credit Card Expiration</td>
-                        <td>
-                            {{ form.cc_exp_mo }} / {{ form.cc_exp_yr }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>CVV</td>
-                        <td>
-                            {{ form.cc_cvv }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Credit Card Bank Phone</td>
-                        <td>
-                            {{ form.cc_phone }}
-                        </td>
-                    </tr>
-                    {% endcomment %}
+                    {% if collect_card_info %}
+                        <tr>
+                            <td >Billing Address</td>
+                            <td>
+                                {{ form.cc_address }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Billing City</td>
+                            <td>
+                                {{ form.cc_city }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Billing State</td>
+                            <td>
+                                {{ form.cc_state }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Billing Zip</td>
+                            <td>
+                                {{ form.cc_zip }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Credit Card Number</td>
+                            <td>
+                                {{ form.cc_number }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Credit Card Expiration</td>
+                            <td>
+                                {{ form.cc_exp_mo }} / {{ form.cc_exp_yr }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>CVV</td>
+                            <td>
+                                {{ form.cc_cvv }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Credit Card Bank Phone</td>
+                            <td>
+                                {{ form.cc_phone }}
+                            </td>
+                        </tr>
+                    {% endif %}
                     <tr>
                         <td>Personal Message</td>
                         <td>

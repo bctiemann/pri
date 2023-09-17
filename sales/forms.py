@@ -29,11 +29,11 @@ current_year = timezone.now().year
 
 # This mixin adds credit card form fields to any other form. Reservation 2nd-phase, gift cert, ad-hoc paymnt, etc.
 class CardFormMixin(forms.Form):
-    cc_number = forms.CharField(required=False)
-    cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices(), required=False)
-    cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(), required=False)
-    cc_cvv = forms.CharField(required=False)
-    cc_phone = PhoneNumberField(help_text=BANK_PHONE_HELP_TEXT, required=False)
+    cc_number = forms.CharField(required=settings.COLLECT_CARD_INFO)
+    cc_exp_yr = forms.ChoiceField(choices=get_exp_year_choices(), required=settings.COLLECT_CARD_INFO)
+    cc_exp_mo = forms.ChoiceField(choices=get_exp_month_choices(), required=settings.COLLECT_CARD_INFO)
+    cc_cvv = forms.CharField(required=settings.COLLECT_CARD_INFO)
+    cc_phone = PhoneNumberField(help_text=BANK_PHONE_HELP_TEXT, required=settings.COLLECT_CARD_INFO)
 
 
 # This mixin can be added to any form to enforce checking a g-recaptcha-response field included in the form.data.

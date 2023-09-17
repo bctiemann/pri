@@ -1,9 +1,15 @@
 <div id="reservation_payment" class="1hidden">
 
     <p class="reservation-info">
-        We'll need your name, address, and contact details to secure your reservation. Once the reservation is confirmed,
-        you'll get access to the secure PRI Customer Portal, where you can manage your rentals, confirm your insurance
-        information, and specify your preferred methods of payment for the rental and the security deposit.
+        {% if collect_card_info %}
+            We'll need a credit card to secure your reservation. Once the reservation is confirmed,
+            you'll get access to the secure PRI Customer Portal, where you can manage your rentals, confirm your insurance
+            information, and specify your preferred methods of payment for the rental and the security deposit.
+        {% else %}
+            We'll need your name, address, and contact details to secure your reservation. Once the reservation is confirmed,
+            you'll get access to the secure PRI Customer Portal, where you can manage your rentals, confirm your insurance
+            information, and specify your preferred methods of payment for the rental and the security deposit.
+        {% endif %}
     </p>
 
     <div id="price_breakdown_container">
@@ -47,38 +53,38 @@
                 {{ payment_form.fax }}
             </td>
         </tr>
-        {% comment %}
-        <tr>
-            <td>Credit Card Number</td>
-            <td>
-                {{ payment_form.cc_number }}
-            </td>
-        </tr>
-        <tr>
-            <td>Credit Card Expiration</td>
-            <td>
-                {{ payment_form.cc_exp_mo }} / {{ payment_form.cc_exp_yr }}
-            </td>
-        </tr>
-        <tr>
-            <td>CVV</td>
-            <td>
-                {{ payment_form.cc_cvv }}
-            </td>
-        </tr>
-        <tr>
-            <td>Credit Card Bank Phone</td>
-            <td>
-                {{ payment_form.cc_phone }}
-                <small
-                    class="tooltip"
-                    title="{{ form.cc_phone.help_text }}"
-                >
-                    Why do we need this?
-                </small>
-            </td>
-        </tr>
-        {% endcomment %}
+        {% if collect_card_info %}
+            <tr>
+                <td>Credit Card Number</td>
+                <td>
+                    {{ payment_form.cc_number }}
+                </td>
+            </tr>
+            <tr>
+                <td>Credit Card Expiration</td>
+                <td>
+                    {{ payment_form.cc_exp_mo }} / {{ payment_form.cc_exp_yr }}
+                </td>
+            </tr>
+            <tr>
+                <td>CVV</td>
+                <td>
+                    {{ payment_form.cc_cvv }}
+                </td>
+            </tr>
+            <tr>
+                <td>Credit Card Bank Phone</td>
+                <td>
+                    {{ payment_form.cc_phone }}
+                    <small
+                        class="tooltip"
+                        title="{{ form.cc_phone.help_text }}"
+                    >
+                        Why do we need this?
+                    </small>
+                </td>
+            </tr>
+        {% endif %}
         <tr>
             <td>Street Address Line 1</td>
             <td>
