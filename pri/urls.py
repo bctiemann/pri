@@ -109,7 +109,7 @@ urlpatterns = [
 
     path('terms/', marketing_views.TermsConditionsView.as_view(), name='terms-and-conditions'),
     path('privacy/', marketing_views.PrivacyPolicyView.as_view(), name='privacy-policy'),
-    path('media/', marketing_views.MediaInquiriesView.as_view(), name='media-inquiries'),
+    path('media_inquiries/', marketing_views.MediaInquiriesView.as_view(), name='media-inquiries'),
 
     path('api/vehicles/', api_views.GetVehiclesView.as_view(), name='get-vehicles'),
     path('api/vehicles/<int:vehicle_id>/', api_views.GetVehicleView.as_view(), name='get-vehicle'),
