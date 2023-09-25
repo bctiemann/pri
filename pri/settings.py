@@ -200,40 +200,44 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'standard': {
-            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
-            'datefmt' : "%d/%b/%Y %H:%M:%S"
+            'format': '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s',
+            'datefmt': '%d/%b/%Y %H:%M:%S',
         },
         'colored': {
             '()': 'colorlog.ColoredFormatter',
-            'datefmt' : "%d/%b/%Y %H:%M:%S",
-            'format': "%(purple)s[%(asctime)s] %(cyan)s[%(name)s:%(lineno)s] %(log_color)s%(levelname)-4s%(reset)s %(white)s%(message)s"
+            'datefmt': '%d/%b/%Y %H:%M:%S',
+            'format': '%(purple)s[%(asctime)s] %(cyan)s[%(name)s:%(lineno)s] %(log_color)s%(levelname)-4s%(reset)s %(white)s%(message)s',
         }
     },
     'filters': {
         'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-#            '()': 'django.utils.log.RequireDebugTrue'
+            '()': 'django.utils.log.RequireDebugFalse',
         }
     },
     'handlers': {
         'mail_admins': {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
+            'class': 'django.utils.log.AdminEmailHandler',
         },
         'logfile': {
-            'level':'INFO',
+            'level': 'INFO',
             'filters': [],
-            'class':'logging.handlers.RotatingFileHandler',
-            'filename': str(BASE_DIR) + "/logs/django.log",
-            'maxBytes': 1024*1024*64,  # 64mb
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': str(BASE_DIR) + '/logs/django.log',
+            'maxBytes': 1024 * 1024 * 64,  # 64mb
             'backupCount': 5,
             'formatter': 'colored',
         },
+        'null': {
+            'class': 'logging.NullHandler',
+        },
     },
     'loggers': {
-        # Might have to remove django.request to just '' to get the e-mail
-        # to admin on ERROR working
+        'django.security.DisallowedHost': {
+            'handlers': ['null'],
+            'propagate': False,
+        },
         'django.request': {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
