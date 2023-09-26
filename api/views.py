@@ -118,34 +118,40 @@ class ValidateRentalDetailsView(APIView):
 
     def post_legacy(self, request, payload):
         form = ReservationRentalDetailsForm(payload)
-        vehicle_marketing = form.cleaned_data.get('vehicle_marketing')
-        response = {
-            'success': form.is_valid(),
-            'error': form.get_error(),
-            'price_data': form.price_data,
-            "tax_amt": form.price_data.get('tax_amount'),
-            "total_w_tax": form.price_data.get('total_with_tax'),
-            "reservation_deposit": form.price_data.get('reservation_deposit'),
-            "multi_day_discount_pct": form.price_data.get('multi_day_discount_pct'),
-            "extra_miles": form.price_data.get('extra_miles'),
-            "fieldErrors": form.errors,
-            "deposit": vehicle_marketing.security_deposit if vehicle_marketing else None,
-            "rental_duration": form.instance.rental_duration_hours,
-            "tcostRaw": form.price_data.get('base_price'),
-            "numdrivers": int(form.cleaned_data['drivers']),
-            "customer_discount": form.price_data.get('specific_discount'),
-            "customer_discount_pct": 0,
-            "tcost": form.price_data.get('post_multi_day_discount_subtotal'),
-            "delivery": int(form.cleaned_data['delivery_required']),
-            "customerid": form.customer.id if form.customer else None,
-            "numdays": form.instance.num_days,
-            "subtotal": form.price_data.get('subtotal'),
-            "dateout_check": form.cleaned_data['out_at'],  # "June, 01 2023 09:30:00",
-            "extra_miles_cost": form.price_data.get('extra_miles_cost'),
-            "tax_rate": form.price_data.get('tax_rate', 0) * 100,
-            "car_discount": form.price_data.get('coupon_discount'),
-            "multi_day_discount": form.price_data.get('multi_day_discount'),
-        }
+        if form.is_valid():
+            vehicle_marketing = form.cleaned_data.get('vehicle_marketing') if form.is_valid() else None
+            response = {
+                'success': form.is_valid(),
+                'error': form.get_error(),
+                'price_data': form.price_data,
+                "tax_amt": form.price_data.get('tax_amount'),
+                "total_w_tax": form.price_data.get('total_with_tax'),
+                "reservation_deposit": form.price_data.get('reservation_deposit'),
+                "multi_day_discount_pct": form.price_data.get('multi_day_discount_pct'),
+                "extra_miles": form.price_data.get('extra_miles'),
+                "fieldErrors": form.errors,
+                "deposit": vehicle_marketing.security_deposit if vehicle_marketing else None,
+                "rental_duration": form.instance.rental_duration_hours,
+                "tcostRaw": form.price_data.get('base_price'),
+                "numdrivers": int(form.cleaned_data['drivers']),
+                "customer_discount": form.price_data.get('specific_discount'),
+                "customer_discount_pct": 0,
+                "tcost": form.price_data.get('post_multi_day_discount_subtotal'),
+                "delivery": int(form.cleaned_data['delivery_required']),
+                "customerid": form.customer.id if form.customer else None,
+                "numdays": form.instance.num_days,
+                "subtotal": form.price_data.get('subtotal'),
+                "dateout_check": form.cleaned_data['out_at'],  # "June, 01 2023 09:30:00",
+                "extra_miles_cost": form.price_data.get('extra_miles_cost'),
+                "tax_rate": form.price_data.get('tax_rate', 0) * 100,
+                "car_discount": form.price_data.get('coupon_discount'),
+                "multi_day_discount": form.price_data.get('multi_day_discount'),
+            }
+        else:
+            response = {
+                "success": False,
+                'error': form.get_error(),
+            }
         return Response(response)
 
 
@@ -161,17 +167,23 @@ class ValidateRentalPaymentView(ReservationMixin, APIView):
 
     def post_legacy(self, request, payload):
         form = self.form_class(payload)
-        reservation_result = self.create_reservation(request, form=form)
-        response = {
-            'success': reservation_result.get('success'),
-            'error': reservation_result.get('error'),
-            'reservationid': reservation_result.get('reservation_id'),
-            'customerid': reservation_result.get('customer_id'),
-            'create_pass': None,
-            'confcode': reservation_result.get('confirmation_code'),
-            'custsite': reservation_result.get('customer_site_url'),
-            'reservation_type': reservation_result.get('reservation_type'),
-        }
+        if form.is_valid():
+            reservation_result = self.create_reservation(request, form=form)
+            response = {
+                'success': reservation_result.get('success'),
+                'error': reservation_result.get('error'),
+                'reservationid': reservation_result.get('reservation_id'),
+                'customerid': reservation_result.get('customer_id'),
+                'create_pass': None,
+                'confcode': reservation_result.get('confirmation_code'),
+                'custsite': reservation_result.get('customer_site_url'),
+                'reservation_type': reservation_result.get('reservation_type'),
+            }
+        else:
+            response = {
+                "success": False,
+                'error': form.get_error(),
+            }
         return Response(response)
 
     def get_customer_site_url(self, confirmation_code):
