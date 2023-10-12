@@ -327,7 +327,7 @@ WAGTAILADMIN_BASE_URL = 'http://127.0.0.1:8000/cms'
 os.environ['WKHTMLTOPDF_BIN'] = '/usr/local/bin/wkhtmltopdf'
 
 # Choices for country picker for vehicle origins
-COUNTRIES_ONLY = ['US', 'JP', 'IT', 'GB', 'DE']
+COUNTRIES_ONLY = ['US', 'JP', 'IT', 'GB', 'DE', 'AT']
 
 PHONENUMBER_DEFAULT_REGION = 'US'
 
