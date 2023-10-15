@@ -53,7 +53,10 @@ class AdminViewMixin:
         )).select_related('customer')
         menu_context['todo_item_count'] = sum([r.todo_item_count for r in menu_context['todo_list_rentals']])
 
-        menu_context['reservations'] = Reservation.objects.filter(status=Reservation.Status.UNCONFIRMED)
+        menu_context['reservations'] = Reservation.objects.filter(
+            status=Reservation.Status.UNCONFIRMED,
+            out_at__gt=timezone.now(),
+        )
         menu_context['rentals'] = Rental.objects.filter(status__in=(
             Rental.Status.INCOMPLETE,
             Rental.Status.CONFIRMED,
