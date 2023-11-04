@@ -1,6 +1,6 @@
-Django==4.0.3
+Django==4.1.13
 pyyaml==5.3.1
-ipython==7.18.1
+ipython==8.17.2
 djangorestframework==3.13.1
 PyMySQL==0.10.1
 colorlog==6.6.0
@@ -13,7 +13,7 @@ cryptography==3.4.7
 django-searchable-encrypted-fields==0.1.9
 django-countries==7.2.1
 django-prettyjson==0.4.1
-Pillow==8.3.1
+Pillow==10.1.0
 django-localflavor==3.1
 avalara==21.6.0
 english-words==1.0.3
@@ -25,7 +25,7 @@ pytest-django==4.4.0
 pytest-mock==3.6.1
 pdfkit==1.0.0
 stripe==2.64.0
-redis==4.2.2
+redis==5.0.1
 hiredis==2.0.0
 wagtail==4.2.2
 freezegun==1.2.2
