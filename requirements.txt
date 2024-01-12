@@ -1,7 +1,7 @@
 Django==4.1.13
 pyyaml==5.3.1
 ipython==8.17.2
-djangorestframework==3.13.1
+djangorestframework==3.14.0
 PyMySQL==0.10.1
 colorlog==6.6.0
 django-two-factor-auth==1.15.4
