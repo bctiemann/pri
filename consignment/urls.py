@@ -34,7 +34,7 @@ urlpatterns = [
     # AJAX route for requesting password reset token email
     path('recovery/password_reset/',
         views.PasswordResetView.as_view(
-            template_name='accounts/password_reset_form.html',
+            template_name='consignment/password_reset_form.html',
             from_email=settings.SUPPORT_EMAIL,
             extra_email_context={
                 'site_name': settings.COMPANY_NAME,
