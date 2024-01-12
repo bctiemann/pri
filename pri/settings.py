@@ -259,7 +259,7 @@ LOGIN_URL = 'two_factor:login'
 # LOGIN_URL = '/account/login/'
 LOGIN_REDIRECT_URL = '/account/two_factor/'
 
-LOG_AUTH = True
+LOG_AUTH = False
 
 REST_FRAMEWORK = {
    'DEFAULT_AUTHENTICATION_CLASSES': (
