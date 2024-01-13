@@ -206,6 +206,7 @@ class PasswordDoneView(SidebarMixin, TemplateView):
 # Password recovery
 
 class PasswordResetView(PasswordResetView):
+    http_method_names = ['post']
     email_template_name = 'consignment/email/password_recovery.html'
     success_url = reverse_lazy("consignment:password_reset_complete")
 

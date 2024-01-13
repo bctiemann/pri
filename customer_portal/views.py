@@ -411,6 +411,7 @@ class FindUsView(SidebarMixin, TemplateView):
 # Password recovery
 
 class PasswordResetView(PasswordResetView):
+    http_method_names = ['post']
     email_template_name = 'customer_portal/email/password_recovery.html'
     success_url = reverse_lazy("customer_portal:password_reset_complete")
 
