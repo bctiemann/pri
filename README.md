@@ -172,8 +172,7 @@ The segregation between "front" and "back" databases is preserved in this projec
 contains all the models that have encrypted fields, which include any potential PII or otherwise sensitive data.
 
 See `pri/db_routers.py` for how this is configured. Only those models listed in `FRONT_MODELS` are routed via "front".
-However, all models are present in both databases; they are empty in the database where that model is not used in
-the routing.
+Wagtail tables live in the "back" database to avoid complications with migrations.
 
 Note that in this project, there is no distinction between "secure" and "non-secure" areas of the site. The entire
 site should be SSL-protected.
