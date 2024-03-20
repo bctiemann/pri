@@ -1,15 +1,18 @@
+import datetime
 import decimal
 from abc import ABC
+from typing import Optional
 
 from django.conf import settings
 from django.db.models import Q
 
+from fleet.models import VehicleMarketing
 from sales.models import Promotion, Coupon, TaxRate
 from sales.enums import ServiceType
 from users.models import Customer
 
 
-def quantize_currency(value):
+def quantize_currency(value) -> decimal.Decimal:
     cents = decimal.Decimal('0.01')
     return decimal.Decimal(value).quantize(cents, decimal.ROUND_HALF_UP)
 
@@ -22,39 +25,49 @@ class PriceCalculator(ABC):
     with other specific types of discounts (such as multi-day) should implement getter methods on
     a similar pattern.
     """
-    service_type = None
+    service_type: ServiceType = None
 
-    tax_zip = None
-    tax_rate = None
-    effective_date = None
+    tax_zip: str = None
+    tax_rate: TaxRate = None
+    effective_date: datetime.date = None
 
-    promotion = None
-    promotion_discount = None
-    post_promotion_discount_subtotal = None
+    promotion: Promotion = None
+    promotion_discount: float = None
+    post_promotion_discount_subtotal: float = None
 
-    coupon = None
-    coupon_discount = None
-    post_coupon_discount_subtotal = None
+    coupon: Coupon = None
+    coupon_discount: float = None
+    post_coupon_discount_subtotal: float = None
 
-    customer = None
-    customer_discount = None
-    post_customer_discount_subtotal = None
+    customer: Customer = None
+    customer_discount: float = None
+    post_customer_discount_subtotal: float = None
 
-    is_military = False
-    military_discount = None
-    post_military_discount_subtotal = None
+    is_military: bool = False
+    military_discount: float = None
+    post_military_discount_subtotal: float = None
 
-    one_time_discount_pct = None
-    post_one_time_discount_subtotal = None
+    one_time_discount: float = None
+    one_time_discount_pct: float = None
+    post_one_time_discount_subtotal: float = None
 
-    specific_discount = None
-    specific_discount_label = ''
-    post_specific_discount = None
+    specific_discount: float = None
+    specific_discount_label: str = ''
+    post_specific_discount: float = None
 
-    subtotal = 0.0
-    override_subtotal = None
+    subtotal: float = 0.0
+    override_subtotal: float = None
 
-    def __init__(self, coupon_code, email, tax_zip, effective_date=None, is_military=False, override_subtotal=None, one_time_discount_pct=None):
+    def __init__(
+            self,
+            coupon_code: str,
+            email: str,
+            tax_zip: str,
+            effective_date: datetime.date = None,
+            is_military: bool = False,
+            override_subtotal: float = None,
+            one_time_discount_pct: float = None,
+    ):
         self.effective_date = effective_date
         self.promotion = self.get_effective_promotion()
         self.coupon = self.get_coupon(coupon_code)
@@ -66,7 +79,7 @@ class PriceCalculator(ABC):
             self.override_subtotal = float(override_subtotal)
         self.one_time_discount_pct = one_time_discount_pct
 
-    def get_effective_promotion(self):
+    def get_effective_promotion(self) -> Optional[Promotion]:
         if not self.effective_date:
             return None
         # Get all promotions in effect on the given date
@@ -81,26 +94,26 @@ class PriceCalculator(ABC):
             )
         return effective_promotions.first()
 
-    def get_coupon(self, coupon_code):
+    def get_coupon(self, coupon_code: str) -> Optional[Coupon]:
         return Coupon.objects.filter(code__iexact=coupon_code).first()
 
-    def get_customer(self, email):
+    def get_customer(self, email: str) -> Optional[Customer]:
         return Customer.objects.filter(user__email=email).first()
 
-    def get_tax_rate(self, tax_zip):
+    def get_tax_rate(self, tax_zip: str) -> TaxRate:
         if not tax_zip:
             raise ValueError('No tax ZIP provided.')
         tax_rate, tax_rate_created = TaxRate.objects.get_or_create(postal_code=tax_zip)
         return tax_rate
 
-    def get_promotion_discount(self, value=None):
+    def get_promotion_discount(self, value: float = None) -> float:
         if not self.promotion:
             return 0
         if value is None:
             raise ValueError('No base value provided.')
         return self.promotion.get_discount_value(value)
 
-    def get_coupon_discount(self, value=None):
+    def get_coupon_discount(self, value=None) -> float:
         if not self.coupon:
             return 0
         if value is None:
@@ -109,28 +122,28 @@ class PriceCalculator(ABC):
             return 0
         return self.coupon.get_discount_value(value)
 
-    def get_customer_discount(self, value=None):
+    def get_customer_discount(self, value=None) -> float:
         if value is None:
             raise ValueError('No base value provided.')
         if self.customer and self.customer.discount_pct:
             return value * self.customer.discount_pct / 100
         return 0
 
-    def get_military_discount(self, value=None):
+    def get_military_discount(self, value=None) -> float:
         if value is None:
             raise ValueError('No base value provided.')
         if self.is_military:
             return value * settings.MILITARY_DISCOUNT_PCT / 100
         return 0
 
-    def get_one_time_discount(self, value=None):
+    def get_one_time_discount(self, value: float = None) -> float:
         if value is None:
             raise ValueError('No base value provided.')
         if self.one_time_discount_pct:
             return value * self.one_time_discount_pct / 100
         return 0
 
-    def calculate_specific_discount(self, value):
+    def calculate_specific_discount(self, value: float) -> None:
         self.promotion_discount = self.get_promotion_discount(value=value)
         self.coupon_discount = self.get_coupon_discount(value=value)
         self.customer_discount = self.get_customer_discount(value=value)
@@ -150,36 +163,36 @@ class PriceCalculator(ABC):
         if self.specific_discount:
             self.specific_discount_label = specific_discounts[0]['label']
 
-    def get_tax_amount(self, value=None):
+    def get_tax_amount(self, value: float = None) -> float:
         if value is None:
             value = self.pre_tax_subtotal
         return float(self.tax_rate.total_rate) * value
 
-    def apply_discount(self, value=None):
+    def apply_discount(self, value: float = None) -> float:
         return self.subtotal - float(value)
 
-    def apply_surcharge(self, value=None):
+    def apply_surcharge(self, value: float = None) -> float:
         return self.subtotal + float(value)
 
     @property
-    def base_price(self):
+    def base_price(self) -> float:
         raise NotImplementedError
 
     @property
-    def computed_subtotal(self):
+    def computed_subtotal(self) -> float:
         return self.subtotal
 
     @property
-    def pre_tax_subtotal(self):
+    def pre_tax_subtotal(self) -> float:
         # subtotal should be incrementally calculated in __init__() and returned as its final value
         return self.override_subtotal or self.computed_subtotal
 
     @property
-    def total_with_tax(self):
+    def total_with_tax(self) -> float:
         tax_amount = self.get_tax_amount(self.pre_tax_subtotal)
         return self.pre_tax_subtotal + tax_amount
 
-    def get_price_data(self):
+    def get_price_data(self) -> dict:
         raise NotImplementedError
 
 
@@ -209,20 +222,20 @@ class RentalPriceCalculator(PriceCalculator):
     """
     service_type = ServiceType.RENTAL
 
-    vehicle_marketing = None
+    vehicle_marketing: VehicleMarketing = None
 
-    num_days = None
-    multi_day_discount = None
-    post_multi_day_discount_subtotal = None
+    num_days: int = None
+    multi_day_discount: float = None
+    post_multi_day_discount_subtotal: float = None
 
-    specific_discount = None
-    post_specific_discount_subtotal = None
+    specific_discount: float = None
+    post_specific_discount_subtotal: float = None
 
-    extra_miles = None
-    extra_miles_surcharge = None
-    post_extra_miles_surcharge_subtotal = None
+    extra_miles: int = None
+    extra_miles_surcharge: float = None
+    post_extra_miles_surcharge_subtotal: float = None
 
-    def __init__(self, vehicle_marketing, num_days, extra_miles, **kwargs):
+    def __init__(self, vehicle_marketing: VehicleMarketing, num_days: int, extra_miles: int, **kwargs):
         # Initialize objects handled by superclass
         super().__init__(**kwargs)
 
@@ -252,11 +265,11 @@ class RentalPriceCalculator(PriceCalculator):
         # Superclass handles sales tax and total from here
 
     @property
-    def base_price(self):
+    def base_price(self) -> float:
         return float(self.vehicle_marketing.price_per_day * self.num_days)
 
     @property
-    def multi_day_discount_pct(self):
+    def multi_day_discount_pct(self) -> int:
         if self.num_days >= 7:
             return self.vehicle_marketing.discount_7_day
         elif self.num_days >= 3:
@@ -265,22 +278,22 @@ class RentalPriceCalculator(PriceCalculator):
             return self.vehicle_marketing.discount_2_day
         return 0
 
-    def get_multi_day_discount(self, value=None):
+    def get_multi_day_discount(self, value: float = None) -> float:
         if value is None:
             raise ValueError('No base value provided.')
         return value * self.multi_day_discount_pct / 100
 
-    def get_extra_miles_cost(self):
+    def get_extra_miles_cost(self) -> float:
         try:
             return settings.EXTRA_MILES_PRICES.get(self.extra_miles)['cost']
         except TypeError:
             return 0
 
     @property
-    def reservation_deposit(self):
+    def reservation_deposit(self) -> float:
         return self.total_with_tax / 2
 
-    def get_price_data(self):
+    def get_price_data(self) -> dict:
         return dict(
             vehicle_price_per_day=quantize_currency(self.vehicle_marketing.price_per_day),
             num_days=self.num_days,
@@ -318,10 +331,10 @@ class PerformanceExperiencePriceCalculator(PriceCalculator):
     - Subtract largest of (coupon discount, customer discount, promotional discount, military discount, one-time discount)
     - Add sales tax
     """
-    num_drivers = None
-    num_passengers = None
+    num_drivers: int = None
+    num_passengers: int = None
 
-    def __init__(self, num_drivers, num_passengers, **kwargs):
+    def __init__(self, num_drivers: int, num_passengers: int, **kwargs):
         self.num_drivers = num_drivers
         self.num_passengers = num_passengers
         super().__init__(**kwargs)
@@ -335,7 +348,7 @@ class PerformanceExperiencePriceCalculator(PriceCalculator):
         self.post_specific_discount_subtotal = self.subtotal
 
     @property
-    def driver_cost(self):
+    def driver_cost(self) -> float:
         if not self.num_drivers:
             return 0
         if self.num_drivers == 1:
@@ -349,16 +362,16 @@ class PerformanceExperiencePriceCalculator(PriceCalculator):
         return settings.PERFORMANCE_EXPERIENCE_PRICES['cost_per_drv_gt_4'] * self.num_drivers
 
     @property
-    def passenger_cost(self):
+    def passenger_cost(self) -> float:
         if not self.num_passengers:
             return 0
         return settings.PERFORMANCE_EXPERIENCE_PRICES['cost_per_pax'] * self.num_passengers
 
     @property
-    def base_price(self):
+    def base_price(self) -> float:
         return self.driver_cost + self.passenger_cost
 
-    def get_price_data(self):
+    def get_price_data(self) -> dict:
         return dict(
             num_drivers=self.num_drivers,
             num_passengers=self.num_passengers,
@@ -394,9 +407,9 @@ class JoyRidePriceCalculator(PriceCalculator):
     - Subtract largest of (coupon discount, customer discount, promotional discount, military discount, one-time discount)
     - Add sales tax
     """
-    num_passengers = None
+    num_passengers: int = None
 
-    def __init__(self, num_passengers, **kwargs):
+    def __init__(self, num_passengers: int, **kwargs):
         self.num_passengers = num_passengers
         super().__init__(**kwargs)
 
@@ -409,7 +422,7 @@ class JoyRidePriceCalculator(PriceCalculator):
         self.post_specific_discount_subtotal = self.subtotal
 
     @property
-    def passenger_cost(self):
+    def passenger_cost(self) -> float:
         if not self.num_passengers:
             return 0
         if self.num_passengers == 1:
@@ -423,10 +436,10 @@ class JoyRidePriceCalculator(PriceCalculator):
         return settings.JOY_RIDE_PRICES['cost_per_pax_gt_4'] * self.num_passengers
 
     @property
-    def base_price(self):
+    def base_price(self) -> float:
         return self.passenger_cost
 
-    def get_price_data(self):
+    def get_price_data(self) -> dict:
         return dict(
             num_drivers=0,
             num_passengers=self.num_passengers,
