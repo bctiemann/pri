@@ -347,9 +347,9 @@ class GuidedDriveBaseDetailsForm(forms.Form):
             pass
 
         if not any((
-                self.cleaned_data['vehicle_choice_1'],
-                self.cleaned_data['vehicle_choice_2'],
-                self.cleaned_data['vehicle_choice_3'],
+                self.cleaned_data.get('vehicle_choice_1'),
+                self.cleaned_data.get('vehicle_choice_2'),
+                self.cleaned_data.get('vehicle_choice_3'),
         )):
             raise forms.ValidationError(_("Please select at least one and up to three vehicles for your event."))
 
