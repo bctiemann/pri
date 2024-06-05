@@ -584,7 +584,7 @@ class GiftCertificate(models.Model):
 class TaxRate(models.Model):
     MAX_AGE_DAYS = 30
 
-    postal_code = USZipCodeField(blank=True)
+    postal_code = USZipCodeField(blank=True, unique=True)
     country = models.CharField(max_length=20, default='us')
     total_rate = models.DecimalField(max_digits=10, decimal_places=5, null=True, blank=True)
     detail = models.JSONField(null=True, blank=True)
