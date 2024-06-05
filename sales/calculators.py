@@ -1,6 +1,5 @@
 import datetime
 import decimal
-import re
 from abc import ABC
 from typing import Optional
 
@@ -96,8 +95,7 @@ class PriceCalculator(ABC):
         return effective_promotions.first()
 
     def get_coupon(self, coupon_code: str) -> Optional[Coupon]:
-        coupon_code_clean = re.sub(r'\W+', '', str(coupon_code))
-        return Coupon.objects.filter(code__iexact=coupon_code_clean).first()
+        return Coupon.objects.filter(code__iexact=coupon_code).first()
 
     def get_customer(self, email: str) -> Optional[Customer]:
         return Customer.objects.filter(user__email=email).first()
