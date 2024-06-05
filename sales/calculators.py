@@ -96,9 +96,7 @@ class PriceCalculator(ABC):
         return effective_promotions.first()
 
     def get_coupon(self, coupon_code: str) -> Optional[Coupon]:
-        coupon_code_clean = re.sub(r'\W+', '', coupon_code)
-        if not coupon_code_clean:
-            return None
+        coupon_code_clean = re.sub(r'\W+', '', str(coupon_code))
         return Coupon.objects.filter(code__iexact=coupon_code_clean).first()
 
     def get_customer(self, email: str) -> Optional[Customer]:
