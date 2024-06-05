@@ -256,7 +256,7 @@ class NoJSFlowMixin:
         context = super().get_context_data(**kwargs)
         context['form_type'] = form_type or 'details'
         if form:
-            context['price_data'] = form.price_data
+            context['price_data'] = form.price_data if form else None
         return context
 
 
@@ -322,7 +322,7 @@ class ReservePriceBreakdownView(VehicleMixin, FormView):
     def get_context_data(self, **kwargs):
         form = kwargs.get('form')
         context = super().get_context_data(**kwargs)
-        context['price_data'] = form.price_data
+        context['price_data'] = form.price_data if form else None
         return context
 
 
@@ -378,7 +378,7 @@ class PerformanceExperiencePriceBreakdownView(FormView):
 
     def get_context_data(self, slug=None, form=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['price_data'] = form.price_data
+        context['price_data'] = form.price_data if form else None
         return context
 
 
@@ -434,7 +434,7 @@ class JoyRidePriceBreakdownView(FormView):
 
     def get_context_data(self, slug=None, form=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['price_data'] = form.price_data
+        context['price_data'] = form.price_data if form else None
         return context
 
 
