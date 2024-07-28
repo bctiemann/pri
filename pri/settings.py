@@ -309,10 +309,10 @@ COMPANY_PHONE = '(866) 607-0084'
 COMPANY_FAX = '(845) 357-3535'
 # COMPANY_ADDRESS = '373 Margaret King Ave, Ringwood NJ 07430'
 COMPANY_ADDRESS = '''
-1821 2nd Ave
-Tampa FL 33605
+5701 Lawton Dr
+Sarasota FL 34233
 '''
-COMPANY_CITY_FOR_DELIVERY = 'Ringwood, NJ'  # "Ringwood, NJ"
+COMPANY_CITY_FOR_DELIVERY = 'Sarasota, FL'  # "Ringwood, NJ"
 COMPANY_FOUNDING_YEAR = 2008
 SUPPORT_EMAIL = 'support@performance.rentals'
 SITE_EMAIL = 'info@performancerentals.us'
